@@ -47,13 +47,19 @@ ui_message_handlert::ui_message_handlert(
     break;
     
   case JSON_UI:
-    std::cout << "[\n";
+    {
+      std::cout << "[\n";
+      json_objectt json_program;
+      json_program["Program"] = json_stringt(program);
+      std::cout << json_program;
+    }
     break;
     
   case PLAIN:
     break;
     
-  default:;
+  default:
+    assert(false);
   }
 }
 
@@ -80,8 +86,12 @@ ui_message_handlert::~ui_message_handlert()
   case JSON_UI:
     std::cout << "]\n";
     break;
+
+  case PLAIN:
+    break;
   
-  default:;
+  default:
+    assert(false);
   }
 }
 
