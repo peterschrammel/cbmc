@@ -26,9 +26,14 @@ bool syntactic_difft::operator()(
 {
   forall_goto_functions(it, goto_model1.goto_functions)
   {
+    if(!it->second.body_available())
+      continue;
+
     goto_functionst::function_mapt::const_iterator f_it = 
       goto_model2.goto_functions.function_map.find(it->first);
-    if(f_it == goto_model2.goto_functions.function_map.end())
+    if(f_it==goto_model2.goto_functions.function_map.end() ||
+       (f_it!=goto_model2.goto_functions.function_map.end() &&
+	!f_it->second.body_available()))
     {
       deleted_functions.insert(it->first);
       continue;
@@ -63,8 +68,14 @@ bool syntactic_difft::operator()(
   }
   forall_goto_functions(it, goto_model2.goto_functions)
   {
-    if(goto_model1.goto_functions.function_map.find(it->first) == 
-       goto_model1.goto_functions.function_map.end())
+    if(!it->second.body_available())
+      continue;
+
+    goto_functionst::function_mapt::const_iterator f_it = 
+      goto_model1.goto_functions.function_map.find(it->first);
+    if(f_it==goto_model1.goto_functions.function_map.end() ||
+       (f_it!=goto_model1.goto_functions.function_map.end() &&
+	!f_it->second.body_available()))
       new_functions.insert(it->first);
   }
   
