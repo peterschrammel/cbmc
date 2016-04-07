@@ -289,10 +289,10 @@ void ui_message_handlert::json_ui_msg(
     result.new_element(xml(location));
   #endif
 
-  result["text"].value=msg1;
-  result["type"].value=type;
+  result["Text"] = json_stringt(msg1);
+  result["Type"] = json_stringt("Message");
+  result["MessageType"] = json_stringt(type);
   
-  std::cout << result;
-  std::cout << std::endl;
+  std::cout << ",\n" << result;
 }
 
