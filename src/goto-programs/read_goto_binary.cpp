@@ -366,7 +366,7 @@ bool read_object_and_link(
   goto_functionst &functions,
   language_uit &language_ui)
 {
-  language_ui.print(8, "Reading: " + file_name);
+  language_ui.statistics() << "Reading: " << file_name << messaget::eom;
 
   // we read into a temporary symbol_table
   symbol_tablet temp_symbol_table;
