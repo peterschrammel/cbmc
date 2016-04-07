@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/source_location.h>
 #include <util/time_stopping.h>
 #include <util/message_stream.h>
+#include <util/json.h>
 
 #include <langapi/mode.h>
 #include <langapi/languages.h>
@@ -223,6 +224,14 @@ void bmct::report_success()
       std::cout << "\n";
     }
     break;
+
+  case ui_message_handlert::JSON_UI:
+    {
+      json_objectt json_result;
+      json_result["CProverStatus"] = json_stringt("Success");
+      std::cout << ",\n" << json_result; 
+    }
+    break;
     
   default:
     assert(false);
@@ -256,6 +265,14 @@ void bmct::report_failure()
       xml.data="FAILURE";
       std::cout << xml;
       std::cout << "\n";
+    }
+    break;
+
+  case ui_message_handlert::JSON_UI:
+    {
+      json_objectt json_result;
+      json_result["CProverStatus"] = json_stringt("Failure");
+      std::cout << ",\n" << json_result; 
     }
     break;
     

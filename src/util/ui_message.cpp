@@ -84,7 +84,7 @@ ui_message_handlert::~ui_message_handlert()
     break;
   
   case JSON_UI:
-    std::cout << "]\n";
+    std::cout << "\n]\n";
     break;
 
   case PLAIN:
@@ -289,9 +289,8 @@ void ui_message_handlert::json_ui_msg(
     result.new_element(xml(location));
   #endif
 
-  result["Text"] = json_stringt(msg1);
-  result["Type"] = json_stringt("Message");
   result["MessageType"] = json_stringt(type);
+  result["MessageText"] = json_stringt(msg1);
   
   std::cout << ",\n" << result;
 }
