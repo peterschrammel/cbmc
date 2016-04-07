@@ -36,6 +36,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/string_instrumentation.h>
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
+#include <goto-programs/show_goto_functions.h>
 
 #include <goto-instrument/full_slicer.h>
 #include <goto-instrument/nondet_static.h>
@@ -938,7 +939,8 @@ bool cbmc_parse_optionst::process_goto_program(
     // show it?
     if(cmdline.isset("show-goto-functions"))
     {
-      goto_functions.output(ns, std::cout);
+      namespacet ns(symbol_table);
+      show_goto_functions(ns, get_ui(), goto_functions);
       return true;
     }
   }

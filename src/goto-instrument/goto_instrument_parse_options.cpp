@@ -32,6 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_asm.h>
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/parameter_assignments.h>
+#include <goto-programs/show_goto_functions.h>
 
 #include <pointer-analysis/value_set_analysis.h>
 #include <pointer-analysis/goto_program_dereference.h>
@@ -488,7 +489,7 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("show-goto-functions"))
     {
       namespacet ns(symbol_table);
-      goto_functions.output(ns, std::cout);
+      show_goto_functions(ns, get_ui(), goto_functions);
       return 0;
     }
 
