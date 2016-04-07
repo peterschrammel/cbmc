@@ -733,7 +733,8 @@ int cbmc_parse_optionst::get_goto_program(
       return 0;
     }
 
-    if(entry_point(symbol_table, "main", get_message_handler()))
+    if(!cmdline.isset("show-goto-functions") &&
+       entry_point(symbol_table, "main", get_message_handler()))
       return 6;
 
     status() << "Generating GOTO Program" << eom;
