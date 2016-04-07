@@ -551,7 +551,12 @@ int cbmc_parse_optionst::doit()
     
     // Entry point will have been set before and function pointers removed
     status() << "Removing Unused Functions" << eom;
-    remove_unused_functions(goto_functions, ui_message_handler);
+
+    //ENHANCE: this should be done somewhere else
+    if(config.main == "") //no function cmd line option given
+      config.main = id2string(ID__start);
+
+    remove_unused_functions(config, goto_functions, ui_message_handler);
     
     show_properties(ns, get_ui(), goto_functions);
     return 0;
