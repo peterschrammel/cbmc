@@ -282,9 +282,6 @@ void goto_diff_parse_optionst::get_command_line_options(optionst &options)
     error() << "--partial-loops and --unwinding-assertions must not be given together" << eom;
     exit(1);
   }
-
-  if(cmdline.isset("json-ui"))
-    options.set_option("json-ui", true);
 }
 
 /*******************************************************************\
@@ -346,10 +343,11 @@ int goto_diff_parse_optionst::doit()
   }
 
   std::unique_ptr<goto_difft> goto_diff; 
-  goto_diff = std::unique_ptr<goto_difft>(new syntactic_difft());
+  goto_diff = std::unique_ptr<goto_difft>(
+    new syntactic_difft(goto_model1, goto_model2,get_message_handler()));
   goto_diff->set_ui(get_ui());
 
-  (*goto_diff)(goto_model1, goto_model2);
+  (*goto_diff)();
 
   goto_diff->output_functions(std::cout);
 

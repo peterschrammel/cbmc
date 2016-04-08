@@ -20,9 +20,7 @@ Function: syntactic_difft::operator()
 
 \*******************************************************************/
 
-bool syntactic_difft::operator()(
-    const goto_modelt &goto_model1,
-    const goto_modelt &goto_model2)
+bool syntactic_difft::operator()()
 {
   forall_goto_functions(it, goto_model1.goto_functions)
   {
