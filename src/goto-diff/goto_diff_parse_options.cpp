@@ -282,6 +282,9 @@ void goto_diff_parse_optionst::get_command_line_options(optionst &options)
     error() << "--partial-loops and --unwinding-assertions must not be given together" << eom;
     exit(1);
   }
+
+  if(cmdline.isset("json-ui"))
+    options.set_option("json-ui", true);
 }
 
 /*******************************************************************\
@@ -332,6 +335,7 @@ int goto_diff_parse_optionst::doit()
 
   if(cmdline.isset("show-goto-functions"))
   {
+    //ENHANCE: make UI specific
     std::cout << "*******************************************************\n";
     namespacet ns1(goto_model1.symbol_table);
     goto_model1.goto_functions.output(ns1, std::cout);
@@ -343,6 +347,7 @@ int goto_diff_parse_optionst::doit()
 
   std::unique_ptr<goto_difft> goto_diff; 
   goto_diff = std::unique_ptr<goto_difft>(new syntactic_difft());
+  goto_diff->set_ui(get_ui());
 
   (*goto_diff)(goto_model1, goto_model2);
 
@@ -600,7 +605,6 @@ void goto_diff_parse_optionst::help()
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"
-    " --xml-ui                     use XML-formatted output\n"
-    " --xml-interface              bi-directional XML interface\n"
+    " --json-ui                    use JSON-formatted output\n"
     "\n";*/
 }
