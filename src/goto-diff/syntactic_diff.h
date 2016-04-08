@@ -14,9 +14,16 @@ Author: Peter Schrammel
 class syntactic_difft : public goto_difft
 {
  public:
-  virtual bool operator()(
-    const goto_modelt &goto_model1,
-    const goto_modelt &goto_model2);
+  explicit syntactic_difft(
+    const goto_modelt &_goto_model1,
+    const goto_modelt &_goto_model2,
+    message_handlert &_message_handler
+    )
+    :
+    goto_difft(_goto_model1, _goto_model2, _message_handler)
+    {}
+
+  virtual bool operator()();
 
 };
 
