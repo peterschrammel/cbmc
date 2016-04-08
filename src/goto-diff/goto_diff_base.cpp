@@ -62,21 +62,14 @@ std::ostream &goto_difft::output_functions(std::ostream &out) const
      }
      case ui_message_handlert::JSON_UI:
      {
-       {
-	json_arrayt result;
-	convert_function_group(result, new_functions);
-	out << ",\n\"NewFunctions\": " << result;
-       }
-       {
-	json_arrayt result;
-	convert_function_group(result, modified_functions);
-	out << ",\n\"ModifiedFunctions\": " << result;
-       }
-       {
-	json_arrayt result;
-	convert_function_group(result, deleted_functions);
-	out << ",\n\"DeletedFunctions\": " << result;
-       }
+       json_objectt json_result;
+       convert_function_group
+	 (json_result["NewFunctions"].make_array(), new_functions);
+       convert_function_group(
+	 json_result["ModifiedFunctions"].make_array(), modified_functions);
+       convert_function_group(
+	 json_result["DeletedFunctions"].make_array(), deleted_functions);
+       out << ",\n" << json_result;
        break;
     }
     default:
@@ -126,5 +119,5 @@ void goto_difft::convert_function(json_objectt &result,
     goto_model2.goto_functions.function_map.at(function_name).body;
   result["File"] = json_stringt(
     id2string(program.instructions.begin()->source_location.get_file()));
-  result["Function"] = json_stringt(id2string(function_name));
+  result["Name"] = json_stringt(id2string(function_name));
 }
