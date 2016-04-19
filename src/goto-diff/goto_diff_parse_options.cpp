@@ -71,7 +71,7 @@ goto_diff_parse_optionst::goto_diff_parse_optionst(int argc, const char **argv):
   language_uit("GOTO_DIFF " CBMC_VERSION, cmdline)
 {
 }
-  
+
 /*******************************************************************\
 
 Function: goto_diff_parse_optionst::goto_diff_parse_optionst
@@ -109,13 +109,13 @@ void goto_diff_parse_optionst::eval_verbosity()
 {
   // this is our default verbosity
   unsigned int v=messaget::M_STATISTICS;
-  
+
   if(cmdline.isset("verbosity"))
   {
     v=unsafe_string2unsigned(cmdline.get_value("verbosity"));
     if(v>10) v=10;
   }
-  
+
   ui_message_handler.set_verbosity(v);
 }
 
@@ -275,7 +275,7 @@ void goto_diff_parse_optionst::get_command_line_options(optionst &options)
   // generate unwinding assumptions otherwise
   options.set_option("partial-loops",
    cmdline.isset("partial-loops"));
-   
+
   if(options.get_bool_option("partial-loops") &&
      options.get_bool_option("unwinding-assertions"))
   {
@@ -303,7 +303,7 @@ int goto_diff_parse_optionst::doit()
     std::cout << CBMC_VERSION << std::endl;
     return 0;
   }
-  
+
   //
   // command line options
   //
@@ -342,7 +342,7 @@ int goto_diff_parse_optionst::doit()
     return 0;
   }
 
-  std::unique_ptr<goto_difft> goto_diff; 
+  std::unique_ptr<goto_difft> goto_diff;
   goto_diff = std::unique_ptr<goto_difft>(
     new syntactic_difft(goto_model1, goto_model2,get_message_handler()));
   goto_diff->set_ui(get_ui());
@@ -365,7 +365,7 @@ Function: goto_diff_parse_optionst::get_goto_programs
  Purpose:
 
 \*******************************************************************/
-  
+
 int goto_diff_parse_optionst::get_goto_programs(
   const optionst &options,
   goto_modelt &goto_model1,
@@ -380,20 +380,20 @@ int goto_diff_parse_optionst::get_goto_programs(
   status() << "Reading GOTO program from `" << cmdline.args[0] << "'" << eom;
 
   if(read_goto_binary(cmdline.args[0],
-    goto_model1.symbol_table, goto_model1.goto_functions, 
-		      get_message_handler()))
+                      goto_model1.symbol_table, goto_model1.goto_functions,
+                      get_message_handler()))
     throw 0;
 
   status() << "Reading GOTO program from `" << cmdline.args[1] << "'" << eom;
 
   if(read_goto_binary(cmdline.args[1],
-		      goto_model2.symbol_table, goto_model2.goto_functions, 
-		      get_message_handler()))
+                      goto_model2.symbol_table, goto_model2.goto_functions,
+                      get_message_handler()))
     throw 0;
 
   config.set(cmdline);
   config.set_from_symbol_table(goto_model2.symbol_table);
-  
+
   return -1; // no error, continue
 }
 
@@ -408,7 +408,7 @@ Function: goto_diff_parse_optionst::process_goto_program
  Purpose:
 
 \*******************************************************************/
-  
+
 bool goto_diff_parse_optionst::process_goto_program(
   const optionst &options,
   goto_modelt &goto_model)
@@ -419,13 +419,13 @@ bool goto_diff_parse_optionst::process_goto_program(
   try
   {
     namespacet ns(symbol_table);
-    
+
     // Remove inline assembler; this needs to happen before
     // adding the library.
     remove_asm(symbol_table, goto_functions);
 
     // add the library
-    status() << "Adding CPROVER library (" 
+    status() << "Adding CPROVER library ("
              << config.ansi_c.arch << ")" << eom;
     link_to_library(symbol_table, goto_functions, ui_message_handler);
 
@@ -444,20 +444,20 @@ bool goto_diff_parse_optionst::process_goto_program(
       status() << "Performing a full slice" << eom;
       full_slicer(goto_functions, ns);
     }
-  
+
     // do partial inlining
     status() << "Partial Inlining" << eom;
     goto_partial_inline(goto_functions, ns, ui_message_handler);
-    
+
     // remove returns, gcc vectors, complex
     remove_returns(symbol_table, goto_functions);
     remove_vector(symbol_table, goto_functions);
     remove_complex(symbol_table, goto_functions);
-    
+
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
     goto_check(ns, options, goto_functions);
-    
+
     // ignore default/user-specified initialization
     // of variables with static lifetime
     if(cmdline.isset("nondet-static"))
@@ -477,16 +477,16 @@ bool goto_diff_parse_optionst::process_goto_program(
     // add failed symbols
     // needs to be done before pointer analysis
     add_failed_symbols(symbol_table);
-    
+
     // recalculate numbers, etc.
     goto_functions.update();
 
     // add loop ids
     goto_functions.compute_loop_numbers();
-    
+
     // if we aim to cover assertions, replace
     // all assertions by false to prevent simplification
-    
+
     if(cmdline.isset("cover") &&
        cmdline.get_value("cover")=="assertions")
       make_assertions_false(goto_functions);
@@ -517,18 +517,18 @@ bool goto_diff_parse_optionst::process_goto_program(
     error() << e << eom;
     return true;
   }
-  
+
   catch(int)
   {
     return true;
   }
-  
+
   catch(std::bad_alloc)
   {
     error() << "Out of memory" << eom;
     return true;
   }
-  
+
   return false;
 }
 
