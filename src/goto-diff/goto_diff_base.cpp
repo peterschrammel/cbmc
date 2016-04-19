@@ -67,7 +67,7 @@ std::ostream &goto_difft::output_functions(std::ostream &out) const
     {
       json_objectt json_result;
       json_result["TotalNumberOfFunctions"] = 
-	json_stringt(i2string(total_functions_count));
+      json_stringt(i2string(total_functions_count));
       convert_function_group
         (json_result["NewFunctions"].make_array(), new_functions);
       convert_function_group(
