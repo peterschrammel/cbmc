@@ -21,56 +21,56 @@ Function: goto_difft::output_functions
 \*******************************************************************/
 
 std::ostream &goto_difft::output_functions(std::ostream &out) const
- {
-   switch(ui)
-   {
-     case ui_message_handlert::PLAIN:
-     {
-       out << "new functions: \n";
+{
+  switch(ui)
+  {
+    case ui_message_handlert::PLAIN:
+    {
+      out << "new functions: \n";
       for(irep_id_sett::const_iterator it = new_functions.begin();
- 	  it != new_functions.end(); ++it)
+          it != new_functions.end(); ++it)
       {
-	const goto_programt &program = 
-	  goto_model2.goto_functions.function_map.at(*it).body;
-	out << "  " 
-	    << program.instructions.begin()->source_location.get_file()
-	    << ": " << *it << "\n";
+        const goto_programt &program =
+          goto_model2.goto_functions.function_map.at(*it).body;
+        out << "  "
+          << program.instructions.begin()->source_location.get_file()
+          << ": " << *it << "\n";
       }
- 
-       out << "modified functions: \n";
+
+      out << "modified functions: \n";
       for(irep_id_sett::const_iterator it = modified_functions.begin();
- 	  it != modified_functions.end(); ++it)
+          it != modified_functions.end(); ++it)
       {
-	const goto_programt &program = 
-	  goto_model2.goto_functions.function_map.at(*it).body;
-	out << "  " 
-	    << program.instructions.begin()->source_location.get_file()
-	    << ": " << *it << "\n";
+        const goto_programt &program =
+          goto_model2.goto_functions.function_map.at(*it).body;
+        out << "  "
+          << program.instructions.begin()->source_location.get_file()
+          << ": " << *it << "\n";
       }
- 
-       out << "deleted functions: \n";
+
+      out << "deleted functions: \n";
       for(irep_id_sett::const_iterator it = deleted_functions.begin();
- 	  it != deleted_functions.end(); ++it)
+          it != deleted_functions.end(); ++it)
       {
-	const goto_programt &program = 
-	  goto_model2.goto_functions.function_map.at(*it).body;
-	out << "  " 
-	    << program.instructions.begin()->source_location.get_file()
-	    << ": " << *it << "\n";
+        const goto_programt &program =
+          goto_model2.goto_functions.function_map.at(*it).body;
+        out << "  "
+          << program.instructions.begin()->source_location.get_file()
+          << ": " << *it << "\n";
       }
-       break;
-     }
-     case ui_message_handlert::JSON_UI:
-     {
-       json_objectt json_result;
-       convert_function_group
-	 (json_result["NewFunctions"].make_array(), new_functions);
-       convert_function_group(
-	 json_result["ModifiedFunctions"].make_array(), modified_functions);
-       convert_function_group(
-	 json_result["DeletedFunctions"].make_array(), deleted_functions);
-       out << ",\n" << json_result;
-       break;
+      break;
+    }
+    case ui_message_handlert::JSON_UI:
+    {
+      json_objectt json_result;
+      convert_function_group
+        (json_result["NewFunctions"].make_array(), new_functions);
+      convert_function_group(
+        json_result["ModifiedFunctions"].make_array(), modified_functions);
+      convert_function_group(
+        json_result["DeletedFunctions"].make_array(), deleted_functions);
+      out << ",\n" << json_result;
+      break;
     }
     default:
       assert(false);
@@ -90,8 +90,9 @@ Function: goto_difft::convert_function_group
 
 \*******************************************************************/
 
-void goto_difft::convert_function_group(json_arrayt &result, 
-			const irep_id_sett &function_group) const
+void goto_difft::convert_function_group(
+  json_arrayt &result,
+  const irep_id_sett &function_group) const
 {
   for(irep_id_sett::const_iterator it = function_group.begin();
       it != function_group.end(); ++it)
@@ -112,12 +113,13 @@ Function: goto_difft::convert_functions
 
 \*******************************************************************/
 
-void goto_difft::convert_function(json_objectt &result, 
-		  const irep_idt &function_name) const
+void goto_difft::convert_function(
+  json_objectt &result,
+  const irep_idt &function_name) const
 {
-  const goto_programt &program = 
+  const goto_programt &program=
     goto_model2.goto_functions.function_map.at(function_name).body;
-  result["File"] = json_stringt(
+  result["File"]=json_stringt(
     id2string(program.instructions.begin()->source_location.get_file()));
-  result["Name"] = json_stringt(id2string(function_name));
+  result["Name"]=json_stringt(id2string(function_name));
 }
