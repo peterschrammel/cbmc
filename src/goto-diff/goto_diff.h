@@ -31,8 +31,7 @@ class goto_difft : public messaget
      ui(ui_message_handlert::PLAIN)
      {}
  
-  virtual bool operator()() 
-     { assert(false); }
+  virtual bool operator()()=0;
  
    void set_ui(language_uit::uit _ui) { ui=_ui; }
  
