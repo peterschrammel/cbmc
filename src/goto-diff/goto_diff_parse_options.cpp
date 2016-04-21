@@ -546,56 +546,16 @@ Function: goto_diff_parse_optionst::help
 
 void goto_diff_parse_optionst::help()
 {
-/*
   std::cout <<
     "\n"
-    "* *   GOTO_DIFF " CBMC_VERSION " - Copyright (C) 2016 ";
+    "* *   GOTO_DIFF " CBMC_VERSION " - Copyright (C) 2016       * *\n"
     "* *            Daniel Kroening, Peter Schrammel             * *\n"
     "* *                 kroening@kroening.com                   * *\n"
     "\n"
     "Usage:                       Purpose:\n"
     "\n"
     " goto_diff [-?] [-h] [--help]      show help\n"
-    " goto_diff old.c new.c             source file names\n"
-    "\n"
-    "Frontend options:\n"
-    " -I path                      set include path (C/C++)\n"
-    " -D macro                     define preprocessor macro (C/C++)\n"
-    " --preprocess                 stop after preprocessing\n"
-    " --16, --32, --64             set width of int\n"
-    " --LP64, --ILP64, --LLP64,\n"
-    "   --ILP32, --LP32            set width of int, long and pointers\n"
-    " --little-endian              allow little-endian word-byte conversions\n"
-    " --big-endian                 allow big-endian word-byte conversions\n"
-    " --unsigned-char              make \"char\" unsigned by default\n"
-    " --mm model                   set memory model (default: sc)\n"
-    " --arch                       set architecture (default: "
-                                   << configt::this_architecture() << ")\n"
-    " --os                         set operating system (default: "
-                                   << configt::this_operating_system() << ")\n"
-    " --c89/99/11                  set C language standard (default: "
-                                   << (configt::ansi_ct::default_c_standard()==
-                                       configt::ansi_ct::c_standardt::C89?"c89":
-                                       configt::ansi_ct::default_c_standard()==
-                                       configt::ansi_ct::c_standardt::C99?"c99":
-                                       configt::ansi_ct::default_c_standard()==
-                                       configt::ansi_ct::c_standardt::C11?"c11":"") << ")\n"
-    " --cpp98/03/11                set C++ language standard (default: "
-                                   << (configt::cppt::default_cpp_standard()==
-                                       configt::cppt::cpp_standardt::CPP98?"cpp98":
-                                       configt::cppt::default_cpp_standard()==
-                                       configt::cppt::cpp_standardt::CPP03?"cpp03":
-                                       configt::cppt::default_cpp_standard()==
-                                       configt::cppt::cpp_standardt::CPP11?"cpp11":"") << ")\n"
-    #ifdef _WIN32
-    " --gcc                        use GCC as preprocessor\n"
-    #endif
-    " --no-arch                    don't set up an architecture\n"
-    " --no-library                 disable built-in abstract C library\n"
-    " --round-to-nearest           rounding towards nearest even (default)\n"
-    " --round-to-plus-inf          rounding towards plus infinity\n"
-    " --round-to-minus-inf         rounding towards minus infinity\n"
-    " --round-to-zero              rounding towards zero\n"
+    " goto_diff old new                 goto binaries to be compared\n"
     "\n"
     "Diff options:\n"
     " --show-functions             show functions (default)\n"
@@ -604,5 +564,5 @@ void goto_diff_parse_optionst::help()
     "Other options:\n"
     " --version                    show version and exit\n"
     " --json-ui                    use JSON-formatted output\n"
-    "\n";*/
+    "\n";
 }
