@@ -53,6 +53,7 @@ Author: Peter Schrammel
 #include "goto_diff_parse_options.h"
 #include "goto_diff.h"
 #include "syntactic_diff.h"
+#include "unified_diff.h"
 
 /*******************************************************************\
 
@@ -342,6 +343,16 @@ int goto_diff_parse_optionst::doit()
     return 0;
   }
 
+  if(cmdline.isset("unified") ||
+     cmdline.isset('u'))
+  {
+    unified_difft u(goto_model1, goto_model2);
+    u();
+    u.output(std::cout);
+
+    return 0;
+  }
+
   std::unique_ptr<goto_difft> goto_diff;
   goto_diff = std::unique_ptr<goto_difft>(
     new syntactic_difft(goto_model1, goto_model2,get_message_handler()));
@@ -560,6 +571,7 @@ void goto_diff_parse_optionst::help()
     "Diff options:\n"
     " --show-functions             show functions (default)\n"
     " --syntactic                  do syntactic diff (default)\n"
+    " -u | --unified               output unified diff\n"
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"
