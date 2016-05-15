@@ -6,6 +6,8 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
+#include <util/i2string.h>
+
 #include "goto_diff.h"
 
 /*******************************************************************\
@@ -26,6 +28,7 @@ std::ostream &goto_difft::output_functions(std::ostream &out) const
   {
     case ui_message_handlert::PLAIN:
     {
+      out << "total number of functions: " << total_functions_count << "\n";
       out << "new functions: \n";
       for(irep_id_sett::const_iterator it = new_functions.begin();
           it != new_functions.end(); ++it)
@@ -63,6 +66,8 @@ std::ostream &goto_difft::output_functions(std::ostream &out) const
     case ui_message_handlert::JSON_UI:
     {
       json_objectt json_result;
+      json_result["TotalNumberOfFunctions"] = 
+	json_stringt(i2string(total_functions_count));
       convert_function_group
         (json_result["NewFunctions"].make_array(), new_functions);
       convert_function_group(

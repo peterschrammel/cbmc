@@ -68,6 +68,8 @@ bool syntactic_difft::operator()()
     if(!it->second.body_available())
       continue;
 
+    total_functions_count++;
+
     goto_functionst::function_mapt::const_iterator f_it =
       goto_model1.goto_functions.function_map.find(it->first);
     if(f_it==goto_model1.goto_functions.function_map.end() ||
