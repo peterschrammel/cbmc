@@ -15,11 +15,7 @@ Author: Peter Schrammel
 #include <util/config.h>
 #include <util/expr_util.h>
 #include <util/language.h>
-#include <util/unicode.h>
-#include <util/memory_info.h>
 #include <util/i2string.h>
-
-#include <ansi-c/c_preprocess.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
@@ -36,11 +32,6 @@ Author: Peter Schrammel
 #include <goto-programs/string_instrumentation.h>
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
-
-#include <goto-instrument/full_slicer.h>
-#include <goto-instrument/nondet_static.h>
-
-#include <linking/entry_point.h>
 
 #include <pointer-analysis/add_failed_symbols.h>
 
@@ -447,21 +438,10 @@ bool goto_diff_parse_optionst::process_goto_program(
              << config.ansi_c.arch << ")" << eom;
     link_to_library(symbol_table, goto_functions, ui_message_handler);
 
-    if(cmdline.isset("string-abstraction"))
-      string_instrumentation(
-        symbol_table, get_message_handler(), goto_functions);
-
     // remove function pointers
     status() << "Function Pointer Removal" << eom;
     remove_function_pointers(symbol_table, goto_functions,
       cmdline.isset("pointer-check"));
-
-    // full slice?
-    if(cmdline.isset("full-slice"))
-    {
-      status() << "Performing a full slice" << eom;
-      full_slicer(goto_functions, ns);
-    }
 
     // do partial inlining
     status() << "Partial Inlining" << eom;
@@ -476,22 +456,6 @@ bool goto_diff_parse_optionst::process_goto_program(
     status() << "Generic Property Instrumentation" << eom;
     goto_check(ns, options, goto_functions);
 
-    // ignore default/user-specified initialization
-    // of variables with static lifetime
-    if(cmdline.isset("nondet-static"))
-    {
-      status() << "Adding nondeterministic initialization "
-                  "of static/global variables" << eom;
-      nondet_static(ns, goto_functions);
-    }
-
-    if(cmdline.isset("string-abstraction"))
-    {
-      status() << "String Abstraction" << eom;
-      string_abstraction(symbol_table,
-        get_message_handler(), goto_functions);
-    }
-
     // add failed symbols
     // needs to be done before pointer analysis
     add_failed_symbols(symbol_table);
@@ -501,13 +465,6 @@ bool goto_diff_parse_optionst::process_goto_program(
 
     // add loop ids
     goto_functions.compute_loop_numbers();
-
-    // if we aim to cover assertions, replace
-    // all assertions by false to prevent simplification
-
-    if(cmdline.isset("cover") &&
-       cmdline.get_value("cover")=="assertions")
-      make_assertions_false(goto_functions);
 
     // show it?
     if(cmdline.isset("show-loops"))
