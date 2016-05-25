@@ -6,24 +6,13 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
       ../big-int/big-int$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
-      ../goto-symex/goto-symex$(LIBEXT) \
-      ../pointer-analysis/value_set$(OBJEXT) \
-      ../pointer-analysis/value_set_analysis_fi$(OBJEXT) \
-      ../pointer-analysis/value_set_domain_fi$(OBJEXT) \
-      ../pointer-analysis/value_set_fi$(OBJEXT) \
-      ../pointer-analysis/value_set_dereference$(OBJEXT) \
-      ../pointer-analysis/dereference_callback$(OBJEXT) \
-      ../pointer-analysis/add_failed_symbols$(OBJEXT) \
-      ../pointer-analysis/rewrite_index$(OBJEXT) \
-      ../pointer-analysis/goto_program_dereference$(OBJEXT) \
-      ../goto-instrument/full_slicer$(OBJEXT) \
-      ../goto-instrument/nondet_static$(OBJEXT) \
+      ../assembler/assembler$(LIBEXT) \
+      ../pointer-analysis/pointer-analysis$(LIBEXT) \
       ../analyses/analyses$(LIBEXT) \
       ../langapi/langapi$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \
-      ../assembler/assembler$(LIBEXT) \
-      ../solvers/solvers$(LIBEXT) \
-      ../util/util$(LIBEXT)
+      ../util/util$(LIBEXT) \
+      ../solvers/solvers$(LIBEXT)
 
 INCLUDES= -I ..
 

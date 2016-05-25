@@ -34,8 +34,8 @@ cbmc.dir: languages solvers.dir goto-symex.dir analyses.dir \
 goto-analyzer.dir: languages analyses.dir goto-programs.dir linking.dir \
                    json.dir goto-instrument.dir
 
-goto-diff.dir: languages analyses.dir goto-programs.dir linking.dir \
-                   json.dir
+goto-diff.dir: languages goto-programs.dir pointer-analysis.dir \
+               linking.dir analyses.dir solvers.dir json.dir
 
 goto-cc.dir: languages pointer-analysis.dir goto-programs.dir linking.dir
 
