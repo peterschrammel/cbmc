@@ -3,6 +3,6 @@
 CBMC.includes
 CMBC.files
 CBMC.creator.user
-CBMC.creator
+CBMC.creator*
 CBMC.config
 CBMC.files
