@@ -27,6 +27,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
       ../solvers/solvers$(LIBEXT) \
+			../test-c-gen/test-c-gen$(LIBEXT) \
       ../util/util$(LIBEXT)
 
 INCLUDES= -I ..
@@ -77,4 +78,3 @@ cbmc$(EXEEXT): $(OBJ)
 
 cbmc-mac-signed: cbmc$(EXEEXT)
 	strip cbmc$(EXEEXT) ; codesign -v -s $(OSX_IDENTITY) cbmc$(EXEEXT)
-
