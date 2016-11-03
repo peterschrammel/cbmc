@@ -3,6 +3,8 @@
 #include <util/symbol_table.h>
 #include <util/irep.h>
 
+#include <sstream>
+
 
 /*std::string generate_c_test_case_from_inputs(
     const symbol_tablet &st, const irep_idt &func_id,
@@ -23,9 +25,122 @@
   return "int main(int argc, char* argv) { return 0; }";
 }*/
 
+namespace
+{
+  class c_test_filet
+  {
+public:
+    c_test_filet()
+      : indentation_character("  "), current_indentation(0), current_file()
+    {}
+
+  void emit_standard_includes();
+  void emit_main_method();
+
+  void add_line_at_current_indentation(std::string line);
+  void add_line_at_root_indentation(std::string line);
+  void add_line_at_indentation(std::string line, int level);
+  void add_empty_line();
+
+  void add_opening_brace(int level);
+  void add_closing_brace(int level);
+
+  void end_main_method();
+
+  std::string get_file() const;
+
+private:
+  std::string indentation(int level) const;
+
+  std::string current_file;
+  int current_indentation;
+  const std::string indentation_character;
+  };
+
+  void c_test_filet::emit_standard_includes()
+  {
+    add_line_at_root_indentation("#include <assert.h>");
+    add_line_at_root_indentation("#include <stdio.h>");
+    add_empty_line();
+  }
+
+  void c_test_filet::emit_main_method()
+  {
+    add_line_at_current_indentation("int main(int argc, char* argv)");
+    add_opening_brace(0);
+  }
+
+  void c_test_filet::end_main_method()
+  {
+    add_closing_brace(0);
+    assert(current_indentation == 0);
+    add_empty_line();
+  }
+
+  std::string c_test_filet::get_file() const
+  {
+    return current_file;
+  }
+
+  void c_test_filet::add_opening_brace(int level)
+  {
+    assert(level == current_indentation);
+    add_line_at_current_indentation("{");
+    ++current_indentation;
+  }
+
+  void c_test_filet::add_closing_brace(int level)
+  {
+    assert(level == current_indentation - 1);
+    --current_indentation;
+    add_line_at_current_indentation("}");
+  }
+
+  void c_test_filet::add_line_at_current_indentation(std::string line)
+  {
+    add_line_at_indentation(line, current_indentation);
+  }
+
+  void c_test_filet::add_line_at_root_indentation(std::string line)
+  {
+    add_line_at_indentation(line, 0);
+  }
+
+  void c_test_filet::add_line_at_indentation(std::string line, int level)
+  {
+    current_file += indentation(level) + line + "\n";
+  }
+
+  void c_test_filet::add_empty_line()
+  {
+    current_file += "\n";
+  }
+
+  std::string c_test_filet::indentation(int level) const
+  {
+    std::ostringstream indentation_string;
+    for(int i = 0; i < level; ++i)
+    {
+      indentation_string << indentation_character;
+    }
+
+    return indentation_string.str();
+  }
+
+
+}
+
 
 std::string generate_c_test_case_from_inputs(
     const symbol_tablet &st)
 {
-  return "int main(int argc, char* argv) { return 0; }";
+  c_test_filet test_file;
+  test_file.emit_standard_includes();
+  test_file.emit_main_method();
+
+  test_file.add_line_at_current_indentation("printf(\"Running tests...\")");
+
+  test_file.end_main_method();
+
+  return test_file.get_file();
 }
