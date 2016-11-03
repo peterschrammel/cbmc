@@ -41,20 +41,6 @@ public:
     messaget(_message_handler)
 {
 }
-  /**
-   * @brief
-   *
-   * @details
-   *
-   * @param options
-   * @param st
-   * @param gf
-   * @param bmc
-   */
-  void run_bmc_generate_test(class optionst &options,
-                            const class symbol_tablet &st,
-                            const class goto_functionst &gf,
-                            class bmct &bmc);
 
   /**
    * @brief

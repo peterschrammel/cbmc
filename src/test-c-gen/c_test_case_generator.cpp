@@ -14,16 +14,6 @@
 
 #include "c_test_source_factory.h"
 
-
-void c_test_case_generatort::run_bmc_generate_test(optionst &options,
-                                                  const symbol_tablet &st,
-                                                  const goto_functionst &gf,
-                                                  bmct &bmc)
-{
-  const safety_checkert::resultt bmc_run_result = bmc.run(gf);
-  // TODO: Deal with response to bmct::run
-}
-
 std::string c_test_case_generatort::generate_tests(const optionst &options,
                                             const symbol_tablet &st,
                                             const goto_functionst &gf,

@@ -46,8 +46,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <pointer-analysis/add_failed_symbols.h>
 
-#include <test-c-gen/c_test_case_generator.h>
-
 #include <analyses/goto_check.h>
 
 #include <langapi/mode.h>
@@ -572,17 +570,6 @@ int cbmc_parse_optionst::doit()
     
     show_properties(ns, get_ui(), goto_functions);
     return 0;
-  }
-
-  if(options.get_bool_option("gen-c-test-case"))
-  {
-    status() << "Generating C test cases..." << eom;
-    bmc.set_ui(get_ui());
-    c_test_case_generatort gen(ui_message_handler);
-    gen.run_bmc_generate_test(options, symbol_table, goto_functions, bmc);
-    // TODO: run_bmc_generate_test should return some value, but this call
-    // calls run on the BMC so definitely want to return
-    return 10;
   }
 
   if(set_properties(goto_functions))
