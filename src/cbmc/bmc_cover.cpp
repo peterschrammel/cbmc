@@ -21,6 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/xml_goto_trace.h>
 #include <goto-programs/json_goto_trace.h>
 
+#include <test-c-gen/c_test_case_generator.h>
+
 #include "bmc.h"
 #include "bv_cbmc.h"
 
@@ -309,6 +311,42 @@ bool bmc_covert::operator()()
   for(const auto & it : goal_map)
     if(it.second.satisfied) goals_covered++;
   
+  if (bmc.options.get_bool_option("gen-c-test-case"))
+  {
+    size_t test_case_no=0;
+    for(auto& test : tests)
+    {
+      c_test_case_generatort gen(get_message_handler());
+      std::vector<std::string> goal_names;
+      for(const auto& goalid : test.covered_goals)
+        goal_names.push_back(
+                             as_string(goal_map.at(goalid).description)
+                             + "\n *  "
+                             + id2string(goal_map.at(goalid).source_location.get_file())
+                             + ":"
+                             + id2string(goal_map.at(goalid).source_location.get_line()));
+
+      // Compute the test function name
+      /*test.test_function_name=gen.generate_test_func_name(bmc.ns.get_symbol_table(),
+                                                          goto_functions, test_case_no);
+
+      // Compute the test code
+      test.source_code=gen.generate_tests(bmc.options,bmc.ns.get_symbol_table(),
+                                                   goto_functions,test.goto_trace,
+                                                   ++test_case_no,goal_names);*/
+
+      std::string test_function_name = gen.get_test_function_name(bmc.ns.get_symbol_table(),
+                                                                  goto_functions,
+                                                                  test_case_no);
+
+      std::string test_body = gen.generate_tests(bmc.options, bmc.ns.get_symbol_table(),
+                                                 goto_functions, test.goto_trace,
+                                                 test_case_no, goal_names);
+
+      ++test_case_no;
+    }
+  }
+
   switch(bmc.ui)
   {
     case ui_message_handlert::PLAIN:

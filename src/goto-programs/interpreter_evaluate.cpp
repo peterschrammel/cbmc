@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ieee_float.h>
 #include <util/fixedbv.h>
 #include <util/std_expr.h>
+#include <util/mp_arith.h>
 
 #include "interpreter_class.h"
 

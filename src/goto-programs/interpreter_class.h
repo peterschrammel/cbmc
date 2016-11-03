@@ -28,6 +28,10 @@ public:
   
   friend class simplify_evaluatet;
 
+  typedef std::map<const irep_idt,exprt> input_varst;
+  typedef std::map<const irep_idt,irep_idt> input_var_functionst;
+  typedef std::map<const irep_idt,const typet> dynamic_typest;
+
 protected:
   const symbol_tablet &symbol_table;
   const namespacet ns;

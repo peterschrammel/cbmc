@@ -579,7 +579,10 @@ int cbmc_parse_optionst::doit()
     status() << "Generating C test cases..." << eom;
     bmc.set_ui(get_ui());
     c_test_case_generatort gen(ui_message_handler);
-    gen.generate_tests();
+    gen.run_bmc_generate_test(options, symbol_table, goto_functions, bmc);
+    // TODO: run_bmc_generate_test should return some value, but this call
+    // calls run on the BMC so definitely want to return
+    return 10;
   }
 
   if(set_properties(goto_functions))
