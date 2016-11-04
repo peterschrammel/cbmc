@@ -14,6 +14,8 @@
 
 #include "c_test_source_factory.h"
 
+#include <goto-programs/interpreter_class.h>
+
 std::string c_test_case_generatort::generate_tests(const optionst &options,
                                             const symbol_tablet &st,
                                             const goto_functionst &gf,
@@ -58,43 +60,25 @@ std::string c_test_case_generatort::generate_tests_with_generator(const optionst
   return generator(st);
 }
 
+
+
+
+
+
+
+
+
+
 const irep_idt c_test_case_generatort::get_entry_function_id(const goto_functionst &gf)
 {
-  typedef goto_functionst::function_mapt function_mapt;
-  const function_mapt &fm = gf.function_map;
-
-  const irep_idt goto_start_id(goto_functionst::entry_point());
-
-  const function_mapt::const_iterator start_function = fm.find(goto_start_id);
-
-  // Check we found the start function
-  assert(start_function != fm.end());
-
-  // Iterate over the instructions to find the function call
-  typedef goto_programt::instructionst instructionst;
-  const instructionst &start_instructions = start_function->second.body.instructions;
-
-  typedef goto_programt::instructiont instructiont;
-  typedef goto_programt::instructionst::const_reverse_iterator rev_instruction_itert;
-
-  rev_instruction_itert last_function_call = std::find_if(
-        start_instructions.rbegin(), start_instructions.rend(),
-        [&](const instructiont &instruction ) {
-    return instruction.code.get_statement() == ID_function_call;
-  });
-
-  assert(last_function_call != start_instructions.rend());
-
-  const code_function_callt &func_call=to_code_function_call(last_function_call->code);
-
-  return get_calling_function_name(func_call);
+  const exprt &func_expr = interpretert::get_entry_function(gf);
+  return get_calling_function_name(func_expr);
 }
 
 const irep_idt c_test_case_generatort::get_calling_function_name(
-    const code_function_callt &function_call_instruction)
+    const exprt &func_expr)
 {
-  const exprt &func_expression = function_call_instruction.function();
-  return to_symbol_expr(func_expression).get_identifier();
+  return to_symbol_expr(func_expr).get_identifier();
 }
 
 std::string c_test_case_generatort::sanitise_function_name(

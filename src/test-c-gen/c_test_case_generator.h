@@ -86,8 +86,7 @@ private:
 
   const irep_idt get_entry_function_id(const class goto_functionst& gf);
 
-  const irep_idt get_calling_function_name(
-      const class code_function_callt & function_call_instruction);
+  const irep_idt get_calling_function_name(const class exprt &func_expr);
 
   std::string sanitise_function_name(const std::string called_function_name);
 

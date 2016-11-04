@@ -35,6 +35,8 @@ public:
   typedef std::map<const irep_idt,irep_idt> input_var_functionst;
   typedef std::map<const irep_idt,const typet> dynamic_typest;
 
+  static const exprt &get_entry_function(const goto_functionst &gf);
+
 protected:
   const symbol_tablet &symbol_table;
   const namespacet ns;
