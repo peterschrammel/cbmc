@@ -1,3 +1,6 @@
+#ifndef INTERPRETER_CLASS_H_
+#define INTERPRETER_CLASS_H_
+
 #include <stack>
 
 #include <util/arith_tools.h>
@@ -109,3 +112,5 @@ protected:
   
   void show_state();
 };
+
+#endif
