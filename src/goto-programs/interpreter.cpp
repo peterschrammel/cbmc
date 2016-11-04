@@ -664,6 +664,35 @@ void interpretert::build_memory_map(const symbolt &symbol)
   }
 }
 
+mp_integer interpretert::add_to_memory_map(const irep_idt &id, const typet &variable_type) const
+{
+  // TODO: "concretise" type
+  size_t size = get_size(variable_type);
+
+  // TODO: dealing with dynamic types
+
+  assert(size > 0);
+
+  // Allocate more memory to store the new variable
+  size_t address = memory.size();
+  memory.resize(address + size);
+
+  // Add an entry in the memory map corresponding to this variable
+  memory_map[id] = address;
+
+  // TODO: add a dynamic type?
+
+  for(int i = 0; i < size; ++i)
+  {
+    memory_cellt &cell = memory[address+i];
+    cell.identifier = id;
+    cell.offset = i;
+    cell.value = 0;
+  }
+
+  return address;
+}
+
 /*******************************************************************\
 
 Function: interpretert::get_size

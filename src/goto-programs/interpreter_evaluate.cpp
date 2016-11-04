@@ -457,6 +457,10 @@ mp_integer interpretert::evaluate_address(const exprt &expr) const
       if(m_it2!=call_stack.top().local_map.end())
         return m_it2->second;
     }
+
+    mp_integer address = memory.size();
+    add_to_memory_map(to_symbol_expr(expr).get_identifier(),expr.type());
+    return address;
   }
   else if(expr.id()==ID_dereference)
   {

@@ -43,7 +43,8 @@ protected:
   const goto_functionst &goto_functions;
 
   typedef hash_map_cont<irep_idt, unsigned, irep_id_hash> memory_mapt;
-  memory_mapt memory_map;
+  // TODO: as above, this shouldn't really be mutable
+  mutable memory_mapt memory_map;
   
   class memory_cellt
   {
@@ -54,12 +55,21 @@ protected:
   };
   
   typedef std::vector<memory_cellt> memoryt;
-  memoryt memory;
+
+  // See todo below, but this really shouldn't be mutable
+  mutable memoryt memory;
   
   std::size_t stack_pointer;
   
   void build_memory_map();
   void build_memory_map(const symbolt &symbol);
+
+  // TODO: this funciton is in no way const - but currently being called from
+  // evaluate_address which is reasonably const but currently adds to memory
+  // map (which feels odd)
+  mp_integer add_to_memory_map(const irep_idt &id,
+                               const typet &variable_type) const;
+
   unsigned get_size(const typet &type) const;
   void step();
   
