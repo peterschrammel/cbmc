@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cstdio>
 #include <iostream>
 #include <algorithm>
+#include <string.h>
 
 #include <util/std_types.h>
 #include <util/symbol_table.h>
@@ -115,6 +116,35 @@ const exprt &interpretert::get_entry_function(const goto_functionst &gf)
   const code_function_callt &func_call=to_code_function_call(last_function_call->code);
   const exprt &func_expr = func_call.function();
   return func_expr;
+}
+
+/*******************************************************************\
+
+Function: interpretert::get_is_variable_cprover
+
+  Inputs: The cell to check for a CPROVER variable
+
+ Outputs: True if the variable stored in the given cell is a CPROVER variable
+
+ Purpose: To check a given cell for being a CPROVER variable
+
+\*******************************************************************/
+bool interpretert::get_is_variable_cprover(
+    const interpretert::memory_cellt &cell)
+{
+  constexpr char const *cprover_variable_prefix = "__CPROVER";
+  constexpr int cprover_prefix_len = strlen(cprover_variable_prefix);
+
+  const char *cell_identifier = cell.identifier.c_str();
+
+  if(strncmp(cell_identifier, cprover_variable_prefix, cprover_prefix_len) == 0)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 /*******************************************************************\

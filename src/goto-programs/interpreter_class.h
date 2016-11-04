@@ -117,6 +117,8 @@ protected:
   // load counter example utility functions
 
   std::set<irep_idt> get_parameter_set(const exprt &func_expr);
+
+  static bool get_is_variable_cprover(const memory_cellt &cell);
 };
 
 #endif
