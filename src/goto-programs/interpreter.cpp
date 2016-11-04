@@ -57,6 +57,18 @@ void interpretert::operator()()
   }
 }
 
+/*******************************************************************\
+Function: interpretert::get_entry_function
+
+  Inputs: The Goto program being analysed
+
+ Outputs: The expression for the final funciton call in the
+          START function
+
+ Purpose: To find the first call of a user provided function
+          (e.g. the actual function being tested)
+
+\*******************************************************************/
 const exprt &interpretert::get_entry_function(const goto_functionst &gf)
 {
   typedef goto_functionst::function_mapt function_mapt;
