@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_types.h>
 #include <util/symbol_table.h>
+#include <util/irep.h>
 
 #include "interpreter.h"
 #include "interpreter_class.h"
@@ -57,6 +58,21 @@ void interpretert::operator()()
   }
 }
 
+std::set<irep_idt> interpretert::get_parameter_set(
+    const exprt &func_expr)
+{
+  typedef code_typet::parameterst parameterst;
+  typedef code_typet::parametert parametert;
+  const parameterst &params = to_code_type(func_expr.type()).parameters();
+
+  std::set<irep_idt> parameter_set;
+  for(const parametert & param : params)
+  {
+    parameter_set.insert(param.get_identifier());
+  }
+
+  return parameter_set;
+}
 /*******************************************************************\
 Function: interpretert::get_entry_function
 

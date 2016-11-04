@@ -113,6 +113,10 @@ protected:
   mp_integer evaluate_address(const exprt &expr) const;
   
   void show_state();
+
+  // load counter example utility functions
+
+  std::set<irep_idt> get_parameter_set(const exprt &func_expr);
 };
 
 #endif
