@@ -84,7 +84,11 @@ std::string c_test_case_generatort::generate_tests_with_generator(const optionst
   const exprt &entry_func = interpretert::get_entry_function(gf);
   const irep_idt &file_name = entry_func.source_location().get_file();
 
-  return generator(st, get_entry_function_id(gf), input_vars, file_name);
+  std::string test_contents = generator(st, get_entry_function_id(gf),
+                                        input_vars, file_name);
+
+  status() << test_contents << eom;
+  return test_contents;
 }
 
 const irep_idt c_test_case_generatort::get_entry_function_id(const goto_functionst &gf)
