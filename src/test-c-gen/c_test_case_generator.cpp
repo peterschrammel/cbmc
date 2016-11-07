@@ -57,17 +57,32 @@ std::string c_test_case_generatort::generate_tests_with_generator(const optionst
 {
   status() << "Producing test " << test_idx << eom;
 
-  return generator(st);
+  interpretert::input_varst input_vars;
+
+  for(const auto & step : trace.steps)
+  {
+    if(step.is_input())
+    {
+      typedef std::pair<irep_idt, exprt> input_entryt;
+      input_vars.insert(input_entryt(step.io_id, step.io_args.front()));
+
+      /*namespacet ns(st);
+      std::string value = from_expr(ns, "", step.io_args.front());*/
+
+      //status() << value << eom;
+    }
+  }
+
+
+
+
+
+
+
+
+
+  return generator(st, get_entry_function_id(gf), input_vars);
 }
-
-
-
-
-
-
-
-
-
 
 const irep_idt c_test_case_generatort::get_entry_function_id(const goto_functionst &gf)
 {

@@ -50,7 +50,8 @@ typedef interpretert::input_varst inputst;
  * @return The C code?
  */
 std::string generate_c_test_case_from_inputs(
-    const class symbol_tablet &st);
+    const class symbol_tablet &st, const irep_idt &function_id,
+    const interpretert::input_varst &input_vars);
 
 
 #endif // C_TEST_SOURCE_FACTORY_H_

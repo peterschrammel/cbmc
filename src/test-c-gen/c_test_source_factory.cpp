@@ -42,6 +42,9 @@ public:
   void add_line_at_indentation(std::string line, int level);
   void add_empty_line();
 
+  void add_function(const irep_idt &function_name,
+                    const std::vector<std::string> function_inputs);
+
   void add_opening_brace(int level);
   void add_closing_brace(int level);
 
@@ -116,6 +119,31 @@ private:
     current_file += "\n";
   }
 
+  void c_test_filet::add_function(const irep_idt &function_name,
+                                  const std::vector<std::string> function_inputs)
+  {
+    std::ostringstream function_call_builder;
+    function_call_builder << function_name;
+    function_call_builder << "(";
+
+    typedef std::vector<std::string>::const_iterator const_input_iterator;
+    const_input_iterator last = --function_inputs.cend();
+
+    for(const std::string &entry : function_inputs)
+    {
+
+      function_call_builder << entry;
+      if(entry != *last)
+      {
+        function_call_builder << ", ";
+      }
+    }
+
+    function_call_builder << ");";
+
+    add_line_at_current_indentation(function_call_builder.str());
+  }
+
   std::string c_test_filet::indentation(int level) const
   {
     std::ostringstream indentation_string;
@@ -126,19 +154,31 @@ private:
 
     return indentation_string.str();
   }
-
-
 }
 
 
-std::string generate_c_test_case_from_inputs(
-    const symbol_tablet &st)
+std::string generate_c_test_case_from_inputs(const symbol_tablet &st,
+                                             const irep_idt &function_id,
+                                             const interpretert::input_varst &input_vars)
 {
   c_test_filet test_file;
   test_file.emit_standard_includes();
   test_file.emit_main_method();
 
   test_file.add_line_at_current_indentation("printf(\"Running tests...\")");
+
+  namespacet ns(st);
+  typedef std::pair<irep_idt, exprt> input_entryt;
+
+  std::vector<std::string> input_entries;
+  for(const input_entryt &entry : input_vars)
+  {
+    std::string value = from_expr(ns, "", entry.second);
+    input_entries.push_back(value);
+  }
+
+
+  test_file.add_function(function_id, input_entries);
 
   test_file.end_main_method();
 

@@ -14,6 +14,8 @@
 
 #include <util/message.h>
 
+#include <goto-programs/interpreter_class.h>
+
 // This is the full original function type that we're working towards
 /*typedef std::function<
   std::string(const class symbol_tablet &, const irep_idt &,
@@ -32,7 +34,11 @@
               const std::vector<std::string>&,
               const std::string&)> test_case_generatort;*/
 
-typedef std::function<std::string(const class symbol_tablet &)> test_case_generatort;
+typedef std::function<std::string(
+    const symbol_tablet &, // the symbol table for the trace
+    const irep_idt &, // the id of the function
+    const interpretert::input_varst & // the input values for the function
+    )> test_case_generatort;
 
 class c_test_case_generatort : public messaget
 {
