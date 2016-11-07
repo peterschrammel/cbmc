@@ -59,26 +59,18 @@ std::string c_test_case_generatort::generate_tests_with_generator(const optionst
 
   interpretert::input_varst input_vars;
 
-  for(const auto & step : trace.steps)
-  {
-    if(step.is_input())
-    {
-      typedef std::pair<irep_idt, exprt> input_entryt;
-      input_vars.insert(input_entryt(step.io_id, step.io_args.front()));
+  // Get the function inputs from an interpreter
+  interpretert interpreter(st, gf, this, options);
 
-      /*namespacet ns(st);
-      std::string value = from_expr(ns, "", step.io_args.front());*/
+  interpretert::list_input_varst function_inputs;
+  interpretert::side_effects_differencet side_effects;
 
-      //status() << value << eom;
-    }
-  }
+  input_vars = interpreter.load_counter_example_inputs(trace, function_inputs,
+                                                       side_effects);
 
-
-
-
-
-
-
+  // TODO: at the momemnt we get a load of junk in the input vars
+  // which is being niavely passed as inputs to the function even
+  // though it only has one input
 
   // Get the file the entry function is in to include it
   const exprt &entry_func = interpretert::get_entry_function(gf);
