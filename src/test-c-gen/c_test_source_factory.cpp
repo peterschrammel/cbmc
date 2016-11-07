@@ -177,7 +177,7 @@ std::string generate_c_test_case_from_inputs(const symbol_tablet &st,
   test_file.emit_file_include(file_name);
   test_file.emit_main_method();
 
-  test_file.add_line_at_current_indentation("printf(\"Running tests...\")");
+  test_file.add_line_at_current_indentation("printf(\"Running tests...\\n\");");
 
   namespacet ns(st);
   typedef std::pair<irep_idt, exprt> input_entryt;
