@@ -17,15 +17,16 @@
 #include <goto-programs/interpreter_class.h>
 
 std::string c_test_case_generatort::generate_tests(const optionst &options,
-                                            const symbol_tablet &st,
-                                            const goto_functionst &gf,
-                                            const goto_tracet &trace,
-                                            const size_t test_idx,
-                                            const std::vector<std::string> &goals)
+                                                   const symbol_tablet &st,
+                                                   const goto_functionst &gf,
+                                                   const goto_tracet &trace,
+                                                   const size_t test_idx,
+                                                   const std::vector<std::string> &goals,
+                                                   const irep_idt &file_name)
 {
   test_case_generatort generator = generate_c_test_case_from_inputs;
   return generate_tests_with_generator(options, st, gf, trace, generator,
-                                test_idx, goals);
+                                test_idx, goals, file_name);
 }
 
 const std::string c_test_case_generatort::get_test_function_name(
@@ -48,12 +49,13 @@ const std::string c_test_case_generatort::get_test_function_name(
 }
 
 std::string c_test_case_generatort::generate_tests_with_generator(const optionst &options,
-                                                  const symbol_tablet &st,
-                                                  const goto_functionst &gf,
-                                                  const goto_tracet &trace,
-                                                  const test_case_generatort generator,
-                                                  size_t test_idx,
-                                                  std::vector<std::string> goals_reached)
+                                                                  const symbol_tablet &st,
+                                                                  const goto_functionst &gf,
+                                                                  const goto_tracet &trace,
+                                                                  const test_case_generatort generator,
+                                                                  size_t test_idx,
+                                                                  std::vector<std::string> goals_reached,
+                                                                  const irep_idt &file_name)
 {
   status() << "Producing test " << test_idx << eom;
 
@@ -81,7 +83,7 @@ std::string c_test_case_generatort::generate_tests_with_generator(const optionst
 
 
 
-  return generator(st, get_entry_function_id(gf), input_vars);
+  return generator(st, get_entry_function_id(gf), input_vars, file_name);
 }
 
 const irep_idt c_test_case_generatort::get_entry_function_id(const goto_functionst &gf)

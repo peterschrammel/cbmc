@@ -35,6 +35,7 @@ public:
     {}
 
   void emit_standard_includes();
+  void emit_file_include(const irep_idt &file_name);
   void emit_main_method();
 
   void add_line_at_current_indentation(std::string line);
@@ -65,6 +66,15 @@ private:
     add_line_at_root_indentation("#include <assert.h>");
     add_line_at_root_indentation("#include <stdio.h>");
     add_empty_line();
+  }
+
+  void c_test_filet::emit_file_include(const irep_idt &file_name)
+  {
+    std::ostringstream include_line_builder;
+    include_line_builder << "#include \"";
+    include_line_builder << file_name;
+    include_line_builder << "\"";
+    add_line_at_root_indentation(include_line_builder.str());
   }
 
   void c_test_filet::emit_main_method()
@@ -159,10 +169,12 @@ private:
 
 std::string generate_c_test_case_from_inputs(const symbol_tablet &st,
                                              const irep_idt &function_id,
-                                             const interpretert::input_varst &input_vars)
+                                             const interpretert::input_varst &input_vars,
+                                             const irep_idt &file_name)
 {
   c_test_filet test_file;
   test_file.emit_standard_includes();
+  test_file.emit_file_include(file_name);
   test_file.emit_main_method();
 
   test_file.add_line_at_current_indentation("printf(\"Running tests...\")");

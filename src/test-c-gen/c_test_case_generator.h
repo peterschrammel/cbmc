@@ -37,7 +37,8 @@
 typedef std::function<std::string(
     const symbol_tablet &, // the symbol table for the trace
     const irep_idt &, // the id of the function
-    const interpretert::input_varst & // the input values for the function
+    const interpretert::input_varst &, // the input values for the function
+    const irep_idt & // The file name the users function is in
     )> test_case_generatort;
 
 class c_test_case_generatort : public messaget
@@ -59,11 +60,12 @@ public:
    * @param bmc
    */
   std::string generate_tests(const class optionst &options,
-                      const class symbol_tablet &st,
-                      const class goto_functionst &gf,
-                      const class goto_tracet &trace,
-                      const size_t test_idx,
-                      const std::vector<std::string> &goals);
+                             const class symbol_tablet &st,
+                             const class goto_functionst &gf,
+                             const class goto_tracet &trace,
+                             const size_t test_idx,
+                             const std::vector<std::string> &goals,
+                             const irep_idt &file_name);
 
   /**
    * @brief Get the name for a specific function test
@@ -83,12 +85,13 @@ public:
 
 private:
   std::string generate_tests_with_generator(const class optionst &options,
-                                     const class symbol_tablet &st,
-                                     const class goto_functionst &gf,
-                                     const class goto_tracet &trace,
-                                     const test_case_generatort generator,
-                                     size_t test_idx,
-                                     std::vector<std::string> goals_reached);
+                                            const class symbol_tablet &st,
+                                            const class goto_functionst &gf,
+                                            const class goto_tracet &trace,
+                                            const test_case_generatort generator,
+                                            size_t test_idx,
+                                            std::vector<std::string> goals_reached,
+                                            const irep_idt &file_name);
 
   const irep_idt get_entry_function_id(const class goto_functionst& gf);
 
