@@ -64,8 +64,7 @@ public:
                              const class goto_functionst &gf,
                              const class goto_tracet &trace,
                              const size_t test_idx,
-                             const std::vector<std::string> &goals,
-                             const irep_idt &file_name);
+                             const std::vector<std::string> &goals);
 
   /**
    * @brief Get the name for a specific function test
@@ -90,8 +89,7 @@ private:
                                             const class goto_tracet &trace,
                                             const test_case_generatort generator,
                                             size_t test_idx,
-                                            std::vector<std::string> goals_reached,
-                                            const irep_idt &file_name);
+                                            std::vector<std::string> goals_reached);
 
   const irep_idt get_entry_function_id(const class goto_functionst& gf);
 

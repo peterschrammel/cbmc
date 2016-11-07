@@ -21,12 +21,11 @@ std::string c_test_case_generatort::generate_tests(const optionst &options,
                                                    const goto_functionst &gf,
                                                    const goto_tracet &trace,
                                                    const size_t test_idx,
-                                                   const std::vector<std::string> &goals,
-                                                   const irep_idt &file_name)
+                                                   const std::vector<std::string> &goals)
 {
   test_case_generatort generator = generate_c_test_case_from_inputs;
   return generate_tests_with_generator(options, st, gf, trace, generator,
-                                test_idx, goals, file_name);
+                                test_idx, goals);
 }
 
 const std::string c_test_case_generatort::get_test_function_name(
@@ -54,8 +53,7 @@ std::string c_test_case_generatort::generate_tests_with_generator(const optionst
                                                                   const goto_tracet &trace,
                                                                   const test_case_generatort generator,
                                                                   size_t test_idx,
-                                                                  std::vector<std::string> goals_reached,
-                                                                  const irep_idt &file_name)
+                                                                  std::vector<std::string> goals_reached)
 {
   status() << "Producing test " << test_idx << eom;
 
@@ -82,6 +80,9 @@ std::string c_test_case_generatort::generate_tests_with_generator(const optionst
 
 
 
+  // Get the file the entry function is in to include it
+  const exprt &entry_func = interpretert::get_entry_function(gf);
+  const irep_idt &file_name = entry_func.source_location().get_file();
 
   return generator(st, get_entry_function_id(gf), input_vars, file_name);
 }
