@@ -97,6 +97,8 @@ private:
 
   std::string sanitise_function_name(const std::string called_function_name);
 
+  void debug+print_trace(const goto_tracet &trace);
+
 };
 
 #endif
