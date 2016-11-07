@@ -29,7 +29,7 @@ musketeer.dir: goto-instrument.dir
 
 cbmc.dir: languages solvers.dir goto-symex.dir analyses.dir \
           pointer-analysis.dir goto-programs.dir linking.dir \
-          goto-instrument.dir test-c-gen.dir
+          goto-instrument.dir test-c-gen.dir json.dir
 
 goto-analyzer.dir: languages analyses.dir goto-programs.dir linking.dir \
                    json.dir goto-instrument.dir
