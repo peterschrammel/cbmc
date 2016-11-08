@@ -181,12 +181,12 @@ Function: interpretert::get_is_variable_cprover
 
 \*******************************************************************/
 bool interpretert::get_is_variable_cprover(
-    const interpretert::memory_cellt &cell)
+    const irep_idt &variable_id)
 {
   constexpr char const *cprover_variable_prefix = "__CPROVER";
   constexpr int cprover_prefix_len = strlen(cprover_variable_prefix);
 
-  const char *cell_identifier = cell.identifier.c_str();
+  const char *cell_identifier = variable_id.c_str();
 
   if(strncmp(cell_identifier, cprover_variable_prefix, cprover_prefix_len) == 0)
   {
@@ -1440,8 +1440,10 @@ void interpretert::list_inputs(bool use_non_det) {
     const memory_cellt &cell=memory[i];
     if(cell.initialised>=0)
       continue;
-    if(strncmp(cell.identifier.c_str(), "__CPROVER", 9)==0)
+    if(get_is_variable_cprover(cell.identifier))
+    {
       continue;
+    }
 
     try {
       typet symbol_type=get_type(cell.identifier);
@@ -1488,7 +1490,12 @@ void interpretert::list_inputs(input_varst &inputs) {
   for(unsigned long i=0;i<memory.size();i++) {
     const memory_cellt &cell=memory[i];
     if(cell.initialised>=0) continue;
-    if (strncmp(cell.identifier.c_str(), "__CPROVER", 9)==0) continue;
+
+    if(get_is_variable_cprover(cell.identifier))
+    {
+      continue;
+    }
+
     if(inputs.find(cell.identifier)!=inputs.end())
     {
       input_vars[cell.identifier]=inputs[cell.identifier];
