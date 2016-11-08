@@ -20,4 +20,6 @@ show:
 	done;
 
 clean:
-	rm tests.log
+	rm tests.log 
+	$(MAKE)
+	
