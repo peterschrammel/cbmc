@@ -1,4 +1,4 @@
-SRC = c_test_case_generator.cpp c_test_source_factory.cpp
+SRC = c_test_case_generator.cpp c_test_source_factory.cpp expr2cleanc.cpp
 
 INCLUDES= -I ..
 

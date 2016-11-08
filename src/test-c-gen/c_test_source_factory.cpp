@@ -1,9 +1,12 @@
 #include "c_test_source_factory.h"
 
-#include <util/symbol_table.h>
 #include <util/irep.h>
+#include <util/substitute.h>
+#include <util/symbol_table.h>
 
 #include <sstream>
+
+#include <test-c-gen/expr2cleanc.h>
 
 
 /*std::string generate_c_test_case_from_inputs(
@@ -65,6 +68,7 @@ private:
   {
     add_line_at_root_indentation("#include <assert.h>");
     add_line_at_root_indentation("#include <stdio.h>");
+    add_line_at_root_indentation("#include <stdbool.h>");
     add_empty_line();
   }
 
@@ -180,13 +184,44 @@ std::string generate_c_test_case_from_inputs(const symbol_tablet &st,
   test_file.add_line_at_current_indentation("printf(\"Running tests...\\n\");");
 
   namespacet ns(st);
+  expr2cleanct e2c(ns);
+
   typedef std::pair<irep_idt, exprt> input_entryt;
 
   std::vector<std::string> input_entries;
   for(const input_entryt &entry : input_vars)
   {
-    std::string value = from_expr(ns, "", entry.second);
-    input_entries.push_back(value);
+    std::ostringstream var_assignment_builder;
+
+    std::string type = e2c.convert(entry.second.type());
+    var_assignment_builder << type;
+
+    var_assignment_builder << " ";
+
+    std::ostringstream var_name_builder;
+    var_name_builder << "arg_";
+    var_name_builder << entry.first;
+
+    std::string var_name = var_name_builder.str();
+
+    substitute(var_name, "::", "_");
+
+    var_assignment_builder << var_name;
+    var_assignment_builder << " = ";
+
+
+    // TODO: Boolean's being capitalised
+    // TODO: Struct decleration including the whole body of the struct1
+    // TODO: Remove random extra parameter being generated (caused by local var in funciton)
+    std::string struct_init = e2c.convert(entry.second);
+
+    var_assignment_builder << struct_init;
+
+    var_assignment_builder << ";";
+
+    test_file.add_line_at_current_indentation(var_assignment_builder.str());
+
+    input_entries.push_back(var_name);
   }
 
 

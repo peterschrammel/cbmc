@@ -2337,11 +2337,17 @@ std::string expr2ct::convert_struct(
   const exprt &src,
   unsigned &precedence)
 {
+  return convert_struct(src, precedence, true);
+}
+
+
+std::string expr2ct::convert_struct(const exprt &src, unsigned &precedence, bool include_padding_members)
+{
   const typet full_type=ns.follow(src.type());
 
   if(full_type.id()!=ID_struct)
     return convert_norep(src, precedence);
-    
+
   const struct_typet &struct_type=
     to_struct_type(full_type);
 
@@ -2366,6 +2372,11 @@ std::string expr2ct::convert_struct(
   {
     if(o_it->type().id()==ID_code)
       continue;
+
+    if(c_it->get_is_padding() && !include_padding_members)
+    {
+      continue;
+    }
 
     if(first)
       first=false;
