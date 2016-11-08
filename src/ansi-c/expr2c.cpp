@@ -358,29 +358,7 @@ std::string expr2ct::convert_rec(
   }
   else if(src.id()==ID_struct)
   {
-    const struct_typet &struct_type=to_struct_type(src);
-  
-    std::string dest=q+"struct";
-
-    const irep_idt &tag=struct_type.get_tag();
-    if(tag!="") dest+=" "+id2string(tag);
-    dest+=" {";
-    
-    for(struct_typet::componentst::const_iterator
-        it=struct_type.components().begin();
-        it!=struct_type.components().end();
-        it++)
-    {
-      dest+=' ';
-      dest+=convert_rec(it->type(), c_qualifierst(), id2string(it->get_name()));
-      dest+=';';
-    }
-    
-    dest+=" }";
-    
-    dest+=d;
-    
-    return dest;
+    return convert_struct_type(src, q, d);
   }
   else if(src.id()==ID_incomplete_struct)
   {
@@ -703,6 +681,59 @@ std::string expr2ct::convert_rec(
 
     return dest;
   }
+}
+
+std::string expr2ct::convert_struct_type(const typet &src,
+                                         const std::string &qualifiers_str,
+                                         const std::string &declarator_str)
+{
+  return convert_struct_type(src, qualifiers_str, declarator_str, true, true);
+}
+
+std::string expr2ct::convert_struct_type(const typet &src,
+                                         const std::string &qualifiers,
+                                         const std::string &declarator,
+                                         bool inc_struct_body,
+                                         bool inc_padding_parameters)
+{
+  // Either we are including the body (in which case it makes sense to include
+  // or exclude the parameters) or there is no body so therefore we definitely
+  // shouldn't be including the parameters
+  assert(inc_struct_body || !inc_padding_parameters);
+
+  const struct_typet &struct_type=to_struct_type(src);
+
+  std::string dest= qualifiers + "struct";
+
+  const irep_idt &tag=struct_type.get_tag();
+  if(tag!="") dest+=" "+id2string(tag);
+
+  if(inc_struct_body)
+  {
+    dest+=" {";
+
+    for(struct_typet::componentst::const_iterator
+        it=struct_type.components().begin();
+        it!=struct_type.components().end();
+        it++)
+    {
+      // Skip padding parameters unless we including them
+      if(it->get_is_padding() && !inc_padding_parameters)
+      {
+        continue;
+      }
+
+      dest += ' ';
+      dest +=convert_rec(it->type(), c_qualifierst(), id2string(it->get_name()));
+      dest += ';';
+    }
+
+    dest += " }";
+  }
+
+  dest += declarator;
+
+  return dest;
 }
 
 /*******************************************************************\
