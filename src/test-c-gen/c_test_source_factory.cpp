@@ -209,8 +209,6 @@ std::string generate_c_test_case_from_inputs(const symbol_tablet &st,
     var_assignment_builder << var_name;
     var_assignment_builder << " = ";
 
-
-    // TODO: Boolean's being capitalised
     // TODO: Remove random extra parameter being generated (caused by local var in funciton)
     std::string struct_init = e2c.convert(entry.second);
 

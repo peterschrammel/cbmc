@@ -14,3 +14,16 @@ std::string expr2cleanct::convert_struct_type(const typet &src,
   return expr2ct::convert_struct_type(src, qualifer_str, declarator_str,
                                       false, false);
 }
+
+std::string expr2cleanct::convert_constant_bool(bool boolean_value)
+{
+  // This requires #include <stdbool.h>
+  if(boolean_value)
+  {
+    return "true";
+  }
+  else
+  {
+    return "false";
+  }
+}

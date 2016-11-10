@@ -2177,11 +2177,7 @@ std::string expr2ct::convert_constant(
   }
   else if(type.id()==ID_bool)
   {
-    // C doesn't really have these
-    if(src.is_true())
-      dest="TRUE";
-    else
-      dest="FALSE";
+    dest = convert_constant_bool(src.is_true());
   }
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
@@ -2197,11 +2193,7 @@ std::string expr2ct::convert_constant(
 
     if(type.id()==ID_c_bool)
     {
-      // C doesn't really have these
-      if(int_value!=0)
-        dest="TRUE";
-      else
-        dest="FALSE";
+      dest = convert_constant_bool(int_value != 0);
     }
     else if(type==char_type() && type!=signed_int_type() && type!=unsigned_int_type())
     {
@@ -2350,6 +2342,15 @@ std::string expr2ct::convert_constant(
     return convert_norep(src, precedence);
 
   return dest;
+}
+
+std::string expr2ct::convert_constant_bool(bool boolean_value)
+{
+  // C doesn't really have these
+  if(boolean_value)
+    return "TRUE";
+  else
+    return "FALSE";
 }
 
 /*******************************************************************\
