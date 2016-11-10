@@ -68,9 +68,6 @@ std::string c_test_case_generatort::generate_tests_with_generator(const optionst
   input_vars = interpreter.load_counter_example_inputs(trace, function_inputs,
                                                        side_effects);
 
-  // TODO: at the momemnt we get a load of junk in the input vars
-  // which is being niavely passed as inputs to the function even
-  // though it only has one input
 
   // Get the file the entry function is in to include it
   const exprt &entry_func = interpretert::get_entry_function(gf);

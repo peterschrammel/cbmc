@@ -211,7 +211,6 @@ std::string generate_c_test_case_from_inputs(const symbol_tablet &st,
 
 
     // TODO: Boolean's being capitalised
-    // TODO: Struct decleration including the whole body of the struct1
     // TODO: Remove random extra parameter being generated (caused by local var in funciton)
     std::string struct_init = e2c.convert(entry.second);
 

@@ -2372,7 +2372,8 @@ std::string expr2ct::convert_struct(
 }
 
 
-std::string expr2ct::convert_struct(const exprt &src, unsigned &precedence, bool include_padding_members)
+std::string expr2ct::convert_struct(const exprt &src, unsigned &precedence,
+                                    bool include_padding_members)
 {
   const typet full_type=ns.follow(src.type());
 
@@ -2406,6 +2407,7 @@ std::string expr2ct::convert_struct(const exprt &src, unsigned &precedence, bool
 
     if(c_it->get_is_padding() && !include_padding_members)
     {
+      ++o_it;
       continue;
     }
 
