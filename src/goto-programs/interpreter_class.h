@@ -1,5 +1,5 @@
-#ifndef INTERPRETER_CLASS_H_
-#define INTERPRETER_CLASS_H_
+#ifndef INTERPRETER_CLASS_H
+#define INTERPRETER_CLASS_H
 
 #include <stack>
 
