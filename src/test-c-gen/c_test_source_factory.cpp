@@ -34,7 +34,7 @@ namespace
   {
 public:
     c_test_filet()
-      : indentation_character("  "), current_indentation(0), current_file()
+      : current_file(), current_indentation(0), indentation_character("  ")
     {}
 
   void emit_standard_includes();
