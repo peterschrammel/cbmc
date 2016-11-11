@@ -1553,10 +1553,16 @@ void interpretert::list_inputs(input_varst &inputs) {
 void interpretert::print_inputs() {
   if(input_vars.size()<=0)
     list_inputs();
-  for(input_varst::iterator it=input_vars.begin();it!=input_vars.end();
+
+  print_inputs(input_vars);
+}
+
+void interpretert::print_inputs(const interpretert::input_varst &inputs) const
+{
+  for(input_varst::const_iterator it=inputs.begin();it!=inputs.end();
       it++) {
-    message->result() << it->first << "=" 
-                      << from_expr(ns, it->first, it->second) << "[" 
+    message->result() << it->first << "="
+                      << from_expr(ns, it->first, it->second) << "["
                       << it->second.type().id() << "]" << messaget::eom;
   }
   message->result() << messaget::eom;

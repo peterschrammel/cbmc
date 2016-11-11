@@ -208,6 +208,7 @@ public:
   void list_non_bodied();
   void list_non_bodied(const goto_programt::instructionst &instructions);
   void print_inputs();
+  void print_inputs(const input_varst &inputs) const;
   void print_memory(bool input_flags);
 
   goto_programt::const_targett getPC(const unsigned location,bool &ok);
