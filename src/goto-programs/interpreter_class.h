@@ -53,6 +53,9 @@ public:
   typedef std::map<const irep_idt,irep_idt> input_var_functionst;
   typedef std::map<const irep_idt,const typet> dynamic_typest;
 
+  static const code_function_callt &get_entry_function_call(
+      const goto_functionst &gf);
+
   static const exprt &get_entry_function(const goto_functionst &gf);
 
   // An assignment list annotated with the calling context.

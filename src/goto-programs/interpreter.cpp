@@ -125,19 +125,20 @@ std::set<irep_idt> interpretert::get_parameter_set(
 
   return parameter_set;
 }
+
 /*******************************************************************\
-Function: interpretert::get_entry_function
+Function: interpretert::get_entry_function_call
 
   Inputs: The Goto program being analysed
 
- Outputs: The expression for the final funciton call in the
-          START function
+ Outputs: The expression that represens the final call in the START
+          function
 
- Purpose: To find the first call of a user provided function
-          (e.g. the actual function being tested)
+ Purpose: To find the expression representing the first call of a
+          user provided function (e.g. the actual function being tested)
 
 \*******************************************************************/
-const exprt &interpretert::get_entry_function(const goto_functionst &gf)
+const code_function_callt &interpretert::get_entry_function_call(const goto_functionst &gf)
 {
   typedef goto_functionst::function_mapt function_mapt;
   const function_mapt &fm = gf.function_map;
@@ -164,7 +165,24 @@ const exprt &interpretert::get_entry_function(const goto_functionst &gf)
 
   assert(last_function_call != start_instructions.rend());
 
-  const code_function_callt &func_call=to_code_function_call(last_function_call->code);
+  return to_code_function_call(last_function_call->code);
+}
+
+/*******************************************************************\
+Function: interpretert::get_entry_function
+
+  Inputs: The Goto program being analysed
+
+ Outputs: The expression for the final funciton call in the
+          START function
+
+ Purpose: To find the first call of a user provided function
+          (e.g. the actual function being tested)
+
+\*******************************************************************/
+const exprt &interpretert::get_entry_function(const goto_functionst &gf)
+{
+  const code_function_callt &func_call = get_entry_function_call(gf);
   const exprt &func_expr = func_call.function();
   return func_expr;
 }
