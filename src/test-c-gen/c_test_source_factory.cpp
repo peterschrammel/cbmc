@@ -168,10 +168,38 @@ private:
 
     return indentation_string.str();
   }
+
+  inputst filter_inputs_to_function_parameters(const inputst &all_inputs,
+                                               const exprt &func_expr)
+  {
+    const code_typet::parameterst &params=
+                      to_code_type(func_expr.type()).parameters();
+
+    typedef code_typet::parametert parametert;
+
+    inputst filtered_inputs;
+
+    for(const parametert &parameter : params)
+    {
+      const irep_idt &parameter_identifer = parameter.get_identifier();
+      typedef inputst::const_iterator const_inputs_itert;
+      const_inputs_itert param_iter = all_inputs.find(parameter_identifer);
+
+      // The input vars should include all parameters
+      assert(param_iter != all_inputs.cend());
+
+      typedef std::pair<const irep_idt &, exprt> input_entryt;
+      filtered_inputs.insert(input_entryt(parameter_identifer,
+                                          param_iter->second));
+    }
+
+    return filtered_inputs;
+  }
 }
 
 
 std::string generate_c_test_case_from_inputs(const symbol_tablet &st,
+                                             const exprt & func_call_expr,
                                              const irep_idt &function_id,
                                              const interpretert::input_varst &input_vars,
                                              const irep_idt &file_name)
@@ -187,9 +215,11 @@ std::string generate_c_test_case_from_inputs(const symbol_tablet &st,
   expr2cleanct e2c(ns);
 
   typedef std::pair<irep_idt, exprt> input_entryt;
+  inputst function_inputs = filter_inputs_to_function_parameters(input_vars,
+                                                                 func_call_expr);
 
   std::vector<std::string> input_entries;
-  for(const input_entryt &entry : input_vars)
+  for(const input_entryt &entry : function_inputs)
   {
     std::ostringstream var_assignment_builder;
 

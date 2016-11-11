@@ -36,6 +36,7 @@
 
 typedef std::function<std::string(
     const symbol_tablet &, // the symbol table for the trace
+    const exprt &, // the expression of the function call
     const irep_idt &, // the id of the function
     const interpretert::input_varst &, // the input values for the function
     const irep_idt & // The file name the users function is in
