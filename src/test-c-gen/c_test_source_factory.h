@@ -9,6 +9,7 @@
  * @details
  */
 typedef interpretert::input_varst inputst;
+typedef std::pair<const irep_idt &, exprt> input_entryt;
 
 /**
  * @brief

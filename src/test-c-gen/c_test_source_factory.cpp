@@ -47,7 +47,8 @@ public:
   void add_empty_line();
 
   void add_function(const irep_idt &function_name,
-                    const std::vector<std::string> function_inputs);
+                    const std::vector<std::string> function_inputs,
+                    const std::string function_return);
 
   void add_opening_brace(int level);
   void add_closing_brace(int level);
@@ -134,9 +135,16 @@ private:
   }
 
   void c_test_filet::add_function(const irep_idt &function_name,
-                                  const std::vector<std::string> function_inputs)
+                                  const std::vector<std::string> function_inputs,
+                                  const std::string function_return)
   {
     std::ostringstream function_call_builder;
+    if(function_return.length() > 0)
+    {
+      function_call_builder << function_return;
+      function_call_builder << " = ";
+    }
+
     function_call_builder << function_name;
     function_call_builder << "(";
 
@@ -188,12 +196,27 @@ private:
       // The input vars should include all parameters
       assert(param_iter != all_inputs.cend());
 
-      typedef std::pair<const irep_idt &, exprt> input_entryt;
       filtered_inputs.insert(input_entryt(parameter_identifer,
                                           param_iter->second));
     }
 
     return filtered_inputs;
+  }
+
+  input_entryt get_return_inputs(const inputst &all_inputs, bool &out_has_return)
+  {
+    for(const input_entryt &input : all_inputs)
+    {
+      // TODO: this isn't a great way to find returns
+      if(input.first == "return'")
+      {
+        out_has_return = true;
+        return input;
+      }
+    }
+
+    out_has_return = false;
+    return input_entryt(ID_empty, exprt());
   }
 }
 
@@ -239,7 +262,6 @@ std::string generate_c_test_case_from_inputs(const symbol_tablet &st,
     var_assignment_builder << var_name;
     var_assignment_builder << " = ";
 
-    // TODO: Remove random extra parameter being generated (caused by local var in funciton)
     std::string struct_init = e2c.convert(entry.second);
 
     var_assignment_builder << struct_init;
@@ -251,8 +273,48 @@ std::string generate_c_test_case_from_inputs(const symbol_tablet &st,
     input_entries.push_back(var_name);
   }
 
+  // get return
+  std::string return_variable_name = "";
+  bool has_return;
+  input_entryt return_value = get_return_inputs(input_vars, has_return);
+  if(has_return)
+  {
+    std::ostringstream ret_var_decleartion_builder;
 
-  test_file.add_function(function_id, input_entries);
+    std::string type = e2c.convert(return_value.second.type());
+    ret_var_decleartion_builder << type;
+
+    ret_var_decleartion_builder << " ";
+
+    std::ostringstream ret_name_builder;
+    ret_name_builder << "ret_";
+    ret_name_builder << function_id;
+    return_variable_name = ret_name_builder.str();
+
+    ret_var_decleartion_builder << return_variable_name;
+    ret_var_decleartion_builder << ";";
+
+    test_file.add_line_at_current_indentation(ret_var_decleartion_builder.str());
+  }
+
+  test_file.add_function(function_id, input_entries, return_variable_name);
+
+  if(has_return)
+  {
+    std::ostringstream assert_builder;
+    assert_builder << "assert(";
+    assert_builder << return_variable_name;
+    // TODO: Should we handle more complex assertions, e.g. checking
+    // pointers dereferenced == something sensible?
+    assert_builder << " == ";
+
+    std::string expected_return_value = e2c.convert(return_value.second);
+
+    assert_builder << expected_return_value;
+    assert_builder << ");";
+
+    test_file.add_line_at_current_indentation(assert_builder.str());
+  }
 
   test_file.end_main_method();
 
