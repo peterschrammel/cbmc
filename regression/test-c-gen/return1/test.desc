@@ -10,8 +10,9 @@ main.c
 ^#include "main\.c"$
 ^int main(int argc, char\* argv)$
 ^\{$
-^  int fun_return = fun();$
-^  assert(fun_return == 5);$
+^  signed int ret_fun;
+^  ret_fun = fun();$
+^  assert(ret_fun == 5);$
 ^\}$
 --
 ^warning: ignoring
