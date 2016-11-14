@@ -58,22 +58,6 @@ namespace
 
     return filtered_inputs;
   }
-
-  input_entryt get_return_inputs(const inputst &all_inputs, bool &out_has_return)
-  {
-    for(const input_entryt &input : all_inputs)
-    {
-      // TODO: this isn't a great way to find returns
-      if(input.first == "return'")
-      {
-        out_has_return = true;
-        return input;
-      }
-    }
-
-    out_has_return = false;
-    return input_entryt(ID_empty, exprt());
-  }
 }
 
 
