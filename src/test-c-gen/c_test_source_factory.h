@@ -1,14 +1,7 @@
 #ifndef C_TEST_SOURCE_FACTORY_H_
 #define C_TEST_SOURCE_FACTORY_H_
 
-#include <goto-programs/interpreter_class.h>
-
-/**
- * @brief
- *
- * @details
- */
-typedef interpretert::input_varst inputst;
+#include <test-c-gen/input_entry.h>
 
 /**
  * @brief

@@ -8,6 +8,7 @@
 #include <test-c-gen/expr2cleanc.h>
 
 #include <test-c-gen/function_parameter_builder.h>
+#include <test-c-gen/function_return_builder.h>
 
 
 /*std::string generate_c_test_case_from_inputs(
@@ -49,7 +50,7 @@ public:
 
   void add_function(const irep_idt &function_name,
                     const std::vector<std::string> function_inputs,
-                    const std::string function_return);
+                    const function_return_buildert &function_return);
 
   void add_opening_brace(int level);
   void add_closing_brace(int level);
@@ -137,12 +138,12 @@ private:
 
   void c_test_filet::add_function(const irep_idt &function_name,
                                   const std::vector<std::string> function_inputs,
-                                  const std::string function_return)
+                                  const function_return_buildert &function_return)
   {
     std::ostringstream function_call_builder;
-    if(function_return.length() > 0)
+    if(function_return.get_function_has_return() > 0)
     {
-      function_call_builder << function_return;
+      function_call_builder << function_return.get_return_variable_name();
       function_call_builder << " = ";
     }
 
@@ -252,47 +253,20 @@ std::string generate_c_test_case_from_inputs(const symbol_tablet &st,
     input_entries.push_back(function_param.get_parameter_variable_name());
   }
 
-  // get return
-  std::string return_variable_name = "";
-  bool has_return;
-  input_entryt return_value = get_return_inputs(input_vars, has_return);
-  if(has_return)
+  function_return_buildert return_builder(input_vars, function_id, e2c);
+
+  if(return_builder.get_function_has_return())
   {
-    std::ostringstream ret_var_decleartion_builder;
-
-    std::string type = e2c.convert(return_value.second.type());
-    ret_var_decleartion_builder << type;
-
-    ret_var_decleartion_builder << " ";
-
-    std::ostringstream ret_name_builder;
-    ret_name_builder << "ret_";
-    ret_name_builder << function_id;
-    return_variable_name = ret_name_builder.str();
-
-    ret_var_decleartion_builder << return_variable_name;
-    ret_var_decleartion_builder << ";";
-
-    test_file.add_line_at_current_indentation(ret_var_decleartion_builder.str());
+    test_file.add_line_at_current_indentation(
+          return_builder.get_return_decleration());
   }
 
-  test_file.add_function(function_id, input_entries, return_variable_name);
+  test_file.add_function(function_id, input_entries, return_builder);
 
-  if(has_return)
+  if(return_builder.get_function_has_return())
   {
-    std::ostringstream assert_builder;
-    assert_builder << "assert(";
-    assert_builder << return_variable_name;
-    // TODO: Should we handle more complex assertions, e.g. checking
-    // pointers dereferenced == something sensible?
-    assert_builder << " == ";
-
-    std::string expected_return_value = e2c.convert(return_value.second);
-
-    assert_builder << expected_return_value;
-    assert_builder << ");";
-
-    test_file.add_line_at_current_indentation(assert_builder.str());
+    test_file.add_line_at_current_indentation(
+          return_builder.get_assertion_line());
   }
 
   test_file.end_main_method();

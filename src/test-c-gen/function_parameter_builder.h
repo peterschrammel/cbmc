@@ -1,10 +1,7 @@
 #ifndef FUNCTION_PARAMETER_BUILDERT_H
 #define FUNCTION_PARAMETER_BUILDERT_H
 
-#include <util/irep.h>
-#include <util/expr.h>
-
-typedef std::pair<irep_idt, exprt> input_entryt;
+#include <test-c-gen/input_entry.h>
 
 class function_parameter_buildert
 {
