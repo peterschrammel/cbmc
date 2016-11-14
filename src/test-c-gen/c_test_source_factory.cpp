@@ -1,12 +1,13 @@
 #include "c_test_source_factory.h"
 
 #include <util/irep.h>
-#include <util/substitute.h>
 #include <util/symbol_table.h>
 
 #include <sstream>
 
 #include <test-c-gen/expr2cleanc.h>
+
+#include <test-c-gen/function_parameter_builder.h>
 
 
 /*std::string generate_c_test_case_from_inputs(
@@ -237,40 +238,18 @@ std::string generate_c_test_case_from_inputs(const symbol_tablet &st,
   namespacet ns(st);
   expr2cleanct e2c(ns);
 
-  typedef std::pair<irep_idt, exprt> input_entryt;
   inputst function_inputs = filter_inputs_to_function_parameters(input_vars,
                                                                  func_call_expr);
 
   std::vector<std::string> input_entries;
   for(const input_entryt &entry : function_inputs)
   {
-    std::ostringstream var_assignment_builder;
+    function_parameter_buildert function_param(entry, e2c);
 
-    std::string type = e2c.convert(entry.second.type());
-    var_assignment_builder << type;
+    test_file.add_line_at_current_indentation(
+          function_param.get_parameter_decleration());
 
-    var_assignment_builder << " ";
-
-    std::ostringstream var_name_builder;
-    var_name_builder << "arg_";
-    var_name_builder << entry.first;
-
-    std::string var_name = var_name_builder.str();
-
-    substitute(var_name, "::", "_");
-
-    var_assignment_builder << var_name;
-    var_assignment_builder << " = ";
-
-    std::string struct_init = e2c.convert(entry.second);
-
-    var_assignment_builder << struct_init;
-
-    var_assignment_builder << ";";
-
-    test_file.add_line_at_current_indentation(var_assignment_builder.str());
-
-    input_entries.push_back(var_name);
+    input_entries.push_back(function_param.get_parameter_variable_name());
   }
 
   // get return

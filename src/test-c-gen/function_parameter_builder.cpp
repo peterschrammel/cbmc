@@ -1,0 +1,48 @@
+#include "function_parameter_builder.h"
+
+#include <sstream>
+
+#include <util/substitute.h>
+
+#include <test-c-gen/expr2cleanc.h>
+
+function_parameter_buildert::function_parameter_buildert(
+    const input_entryt &entry, expr2cleanct &e2c)
+{
+  std::ostringstream var_assignment_builder;
+
+  std::string type = e2c.convert(entry.second.type());
+  var_assignment_builder << type;
+
+  var_assignment_builder << " ";
+
+  std::ostringstream var_name_builder;
+  var_name_builder << "arg_";
+  var_name_builder << entry.first;
+
+  variable_name = var_name_builder.str();
+
+  substitute(variable_name, "::", "_");
+
+  var_assignment_builder << variable_name;
+  var_assignment_builder << " = ";
+
+  std::string struct_init = e2c.convert(entry.second);
+
+  var_assignment_builder << struct_init;
+
+  var_assignment_builder << ";";
+
+  variable_decleration_line = var_assignment_builder.str();
+}
+
+std::string function_parameter_buildert::get_parameter_decleration() const
+{
+  return variable_decleration_line;
+}
+
+std::string function_parameter_buildert::get_parameter_variable_name() const
+{
+  return variable_name;
+}
+
