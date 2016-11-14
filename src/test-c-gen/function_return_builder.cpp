@@ -33,6 +33,74 @@ void function_return_buildert::set_return_variable_name(
   return_var_name = ret_name_builder.str();
 }
 
+void function_return_buildert::add_assertions_for_expression(const exprt &correct_expression,
+                                                             std::string ret_value_var)
+{
+  assert(has_return);
+
+  const typet &type = correct_expression.type();
+
+  if(type.id() == ID_struct)
+  {
+    add_assertions_for_struct_expression(correct_expression, ret_value_var);
+  }
+  else if(type.id() == ID_pointer)
+  {
+    // TODO - this should check pointers dereferenced == something sensible?
+    add_assertions_for_simple_expression(correct_expression, ret_value_var);
+  }
+  else
+  {
+    add_assertions_for_simple_expression(correct_expression, ret_value_var);
+  }
+}
+
+void function_return_buildert::add_assertions_for_struct_expression(
+    const exprt &correct_expression, std::string ret_value_var)
+{
+  const struct_typet &struct_type=to_struct_type(correct_expression.type());
+
+  exprt::operandst::const_iterator o_it=correct_expression.operands().begin();
+  for(struct_typet::componentst::const_iterator
+      it=struct_type.components().begin();
+      it!=struct_type.components().end();
+      it++)
+  {
+    // Skip padding parameters
+    if(it->get_is_padding())
+    {
+      ++o_it;
+      continue;
+    }
+
+    const irep_idt &component_name = it->get_name();
+
+    std::ostringstream struct_component_name_builder;
+    struct_component_name_builder << ret_value_var << "." << component_name;
+
+
+    add_assertions_for_expression(*o_it, struct_component_name_builder.str());
+    ++o_it;
+  }
+}
+
+void function_return_buildert::add_assertions_for_simple_expression(
+    const exprt &correct_expression, std::string return_value_var)
+{
+  std::ostringstream assert_builder;
+
+  assert_builder << "assert(";
+  assert_builder << return_value_var;
+  assert_builder << " == ";
+
+  std::string expected_return_value = e2c.convert(correct_expression);
+
+  assert_builder << expected_return_value;
+  assert_builder << ");";
+
+  assertions.push_back(assert_builder.str());
+}
+
 bool function_return_buildert::get_function_has_return() const
 {
   return has_return;
@@ -66,71 +134,16 @@ std::string function_return_buildert::get_return_decleration() const
 }
 
 
-std::vector<std::string> function_return_buildert::get_assertion_lines() const
+std::vector<std::string> function_return_buildert::get_assertion_lines()
 {
   // if the function doesn't return anything, these other methods shouldn't
   // be called
   assert(has_return);
 
+  assertions.clear();
+  add_assertions_for_expression(return_entry.second, return_var_name);
 
-  std::vector<std::string> assert_lines;
-  if(return_entry.second.type().id() == ID_struct)
-  {
-    const struct_typet &struct_type=to_struct_type(return_entry.second.type());
-
-    exprt::operandst::const_iterator o_it=return_entry.second.operands().begin();
-    for(struct_typet::componentst::const_iterator
-        it=struct_type.components().begin();
-        it!=struct_type.components().end();
-        it++)
-    {
-      std::ostringstream assert_builder;
-
-      // Skip padding parameters unless we including them
-      if(it->get_is_padding())
-      {
-        ++o_it;
-        continue;
-      }
-
-      const irep_idt &component_name = it->get_name();
-
-      // TODO: we need to recurssively handle structs containing structs
-
-      assert_builder << "assert(";
-      assert_builder << get_return_variable_name() << "." << component_name;
-      assert_builder << " == ";
-
-      std::string expected_return_value = e2c.convert(*o_it);
-
-      assert_builder << expected_return_value;
-
-      assert_builder << ");";
-
-      assert_lines.push_back(assert_builder.str());
-
-      ++o_it;
-    }
-  }
-  else
-  {
-    std::ostringstream assert_builder;
-
-    assert_builder << "assert(";
-    assert_builder << return_var_name;
-    // TODO: Should we handle more complex assertions, e.g. checking
-    // pointers dereferenced == something sensible?
-    assert_builder << " == ";
-
-    std::string expected_return_value = e2c.convert(return_entry.second);
-
-    assert_builder << expected_return_value;
-    assert_builder << ");";
-
-    assert_lines.push_back(assert_builder.str());
-  }
-
-  return assert_lines;
+  return assertions;
 }
 
 
