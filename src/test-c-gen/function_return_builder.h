@@ -13,7 +13,7 @@ public:
   bool get_function_has_return() const;
   std::string get_return_decleration() const;
   std::string get_return_variable_name() const;
-  std::string get_assertion_line() const;
+  std::vector<std::string> get_assertion_lines() const;
 
 private:
   void set_return_variable_name(const irep_idt &function_id);

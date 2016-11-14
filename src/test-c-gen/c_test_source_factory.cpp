@@ -265,8 +265,13 @@ std::string generate_c_test_case_from_inputs(const symbol_tablet &st,
 
   if(return_builder.get_function_has_return())
   {
-    test_file.add_line_at_current_indentation(
-          return_builder.get_assertion_line());
+    const std::vector<std::string> &assertion_lines =
+        return_builder.get_assertion_lines();
+
+    for(const std::string &assert_line : assertion_lines)
+    {
+      test_file.add_line_at_current_indentation(assert_line);
+    }
   }
 
   test_file.end_main_method();
