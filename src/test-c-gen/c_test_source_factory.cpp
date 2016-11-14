@@ -33,6 +33,15 @@
 
 namespace
 {
+/*******************************************************************\
+ Function: filter_inputs_to_function_parameters
+ Inputs:
+  all_inputs - All the inputs that have come back from the interpreter
+  func_expr - The function call to filter for
+Outputs: The inputs which are parameters for the supplied function
+Purpose: To pull out from the inputs the relevant ones for the function
+         call
+\*******************************************************************/
   inputst filter_inputs_to_function_parameters(const inputst &all_inputs,
                                                const exprt &func_expr)
   {
@@ -61,6 +70,17 @@ namespace
 }
 
 
+/*******************************************************************\
+Function: generate_c_test_case_from_inputs
+Inputs:
+ st - The symbol table
+ func_call_expr - The entry point for the users code
+ function_id - The ID of the entry point function
+ input_vars - The inputs required for the function to recreate the race
+ file_name - The name of the file we are testing
+Outputs: An executable C test harness
+Purpose: To generate a test harness to reproduce a specific trace
+\*******************************************************************/
 std::string generate_c_test_case_from_inputs(const symbol_tablet &st,
                                              const exprt & func_call_expr,
                                              const irep_idt &function_id,

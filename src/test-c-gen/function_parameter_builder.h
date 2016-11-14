@@ -1,5 +1,13 @@
-#ifndef FUNCTION_PARAMETER_BUILDERT_H
-#define FUNCTION_PARAMETER_BUILDERT_H
+/*******************************************************************
+
+ Module: C Test Case Generator
+
+ Author: Thomas Kiley, thomas@diffblue.com
+
+\*******************************************************************/
+
+#ifndef FUNCTION_PARAMETER_BUILDER_H
+#define FUNCTION_PARAMETER_BUILDER_H
 
 #include <test-c-gen/input_entry.h>
 

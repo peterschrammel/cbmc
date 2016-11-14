@@ -1,5 +1,13 @@
-#ifndef EXPR2CLEANC_H_
-#define EXPR2CLEANC_H_
+/*******************************************************************
+
+ Module: C Test Case Generator
+
+ Author: Thomas Kiley, thomas@diffblue.com
+
+\*******************************************************************/
+
+#ifndef EXPR2CLEANC_H
+#define EXPR2CLEANC_H
 
 #include <ansi-c/expr2c_class.h>
 

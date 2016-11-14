@@ -2,6 +2,14 @@
 
 #include <test-c-gen/expr2cleanc.h>
 
+/*******************************************************************\
+Function: function_return_buildert::function_return_buildert
+Inputs:
+ all_inputs - All the inputs from the interpreter
+ function_id - The ID of the function being called
+ e2c_converter - The expr2c converter being used to generate C code
+Purpose: A builder class for dealing with function returns
+ \*******************************************************************/
 function_return_buildert::function_return_buildert(const inputst &all_inputs,
                                                    const irep_idt &function_id,
                                                    expr2cleanct &e2c_converter)
@@ -24,6 +32,12 @@ function_return_buildert::function_return_buildert(const inputst &all_inputs,
   has_return = false;
 }
 
+/*******************************************************************\
+Function: function_return_buildert::set_return_variable_name
+Inputs:
+ function_id - The name of the function
+Purpose: Store the variable named used to store the result of the function
+ \*******************************************************************/
 void function_return_buildert::set_return_variable_name(
     const irep_idt &function_id)
 {
@@ -33,6 +47,13 @@ void function_return_buildert::set_return_variable_name(
   return_var_name = ret_name_builder.str();
 }
 
+/*******************************************************************\
+Function: function_return_buildert::add_assertions_for_expression
+Inputs:
+ correct_expression - The expression representing the value expected
+ ret_value_var - The name of the variable (including relevant nesting)
+Pupose: Add assertions to the assertions list for the return value
+ \*******************************************************************/
 void function_return_buildert::add_assertions_for_expression(const exprt &correct_expression,
                                                              std::string ret_value_var)
 {
@@ -55,6 +76,14 @@ void function_return_buildert::add_assertions_for_expression(const exprt &correc
   }
 }
 
+/*******************************************************************\
+Function: function_return_buildert::add_assertions_for_struct_expression
+Inputs:
+ correct_expression - The expression representing the value expected
+ ret_value_var - The name of the variable (including relevant nesting)
+Purpose: Look through all the components of the struct and add assertions for
+         each of them.
+ \*******************************************************************/
 void function_return_buildert::add_assertions_for_struct_expression(
     const exprt &correct_expression, std::string ret_value_var)
 {
@@ -84,6 +113,13 @@ void function_return_buildert::add_assertions_for_struct_expression(
   }
 }
 
+/*******************************************************************\
+Function: function_return_buildert::add_assertions_for_simple_expression
+Inputs:
+ correct_expression - The expression representing the value expected
+ return_value_var - The name of the variable (including relevant nesting)
+Purpose: Add an assertion for a simple expression
+ \*******************************************************************/
 void function_return_buildert::add_assertions_for_simple_expression(
     const exprt &correct_expression, std::string return_value_var)
 {
@@ -101,11 +137,22 @@ void function_return_buildert::add_assertions_for_simple_expression(
   assertions.push_back(assert_builder.str());
 }
 
+/*******************************************************************\
+Function: function_return_buildert::get_function_has_return
+Outputs: Returns true if the function has a return value
+Purpose: We only store and validate function returns if the
+         function actually returns something.
+ \*******************************************************************/
 bool function_return_buildert::get_function_has_return() const
 {
   return has_return;
 }
 
+/*******************************************************************\
+Function: function_return_buildert::get_return_variable_name
+Outputs: The variable used to store the function return
+Purpose: For getting the name used to store the function return
+ \*******************************************************************/
 std::string function_return_buildert::get_return_variable_name() const
 {
   // if the function doesn't return anything, these other methods shouldn't
@@ -114,6 +161,11 @@ std::string function_return_buildert::get_return_variable_name() const
   return return_var_name;
 }
 
+/*******************************************************************\
+Function: function_return_buildert::get_return_decleration
+Outputs: The decleration line
+Purpose: Get the decleration line for the return variable
+ \*******************************************************************/
 std::string function_return_buildert::get_return_decleration() const
 {
   // if the function doesn't return anything, these other methods shouldn't
@@ -133,7 +185,11 @@ std::string function_return_buildert::get_return_decleration() const
   return ret_var_decleartion_builder.str();
 }
 
-
+/*******************************************************************\
+Function: function_return_buildert::get_assertion_lines
+Outputs: The asserts on the return type
+Purpose: Produce all the assertions (one per line) for the return
+ \*******************************************************************/
 std::vector<std::string> function_return_buildert::get_assertion_lines()
 {
   // if the function doesn't return anything, these other methods shouldn't
@@ -145,6 +201,3 @@ std::vector<std::string> function_return_buildert::get_assertion_lines()
 
   return assertions;
 }
-
-
-

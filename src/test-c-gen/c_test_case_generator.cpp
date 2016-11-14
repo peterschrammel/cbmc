@@ -16,6 +16,19 @@
 
 #include <goto-programs/interpreter_class.h>
 
+
+/*******************************************************************\
+Function: c_test_case_generatort::generate_tests
+Inputs:
+ options - The command line options (used by the interpreter)
+ st - The symbol table of the trace
+ gf - The goto functions the trace is over
+ trace - The trace to be reproduced by this test
+ test_idx - The index of this test
+ goals - The goals this test will cover
+Outputs: An executable C test harness
+Purpose: To generate a test harness that produces a specific trace
+\*******************************************************************/
 std::string c_test_case_generatort::generate_tests(const optionst &options,
                                                    const symbol_tablet &st,
                                                    const goto_functionst &gf,
@@ -28,6 +41,16 @@ std::string c_test_case_generatort::generate_tests(const optionst &options,
                                 test_idx, goals);
 }
 
+/*******************************************************************\
+Function: c_test_case_generatort::get_test_function_name
+Inputs:
+ st - The symbol table of the trace
+ gf - The goto code the trace is over
+ test_idx - The index of the test
+Outputs: The name of the test based on the function being tested and the test
+         index.
+Purpose: To name a given test.
+\*******************************************************************/
 const std::string c_test_case_generatort::get_test_function_name(
     const symbol_tablet &st, const goto_functionst &gf, size_t test_idx)
 {
@@ -47,6 +70,20 @@ const std::string c_test_case_generatort::get_test_function_name(
   return test_name.str();
 }
 
+/*******************************************************************\
+Function: c_test_case_generatort::generate_tests_with_generator
+Inputs:
+ options - The command line options (used by the interpreter)
+ st - The symbol table of the trace
+ gf - The goto functions the trace is over
+ trace - The trace to be reproduced by this test
+ generator - The function to use to generate the test code
+ test_idx - The index of this test
+ goals - The goals this test will cover
+Outputs:  An executable C test harness
+Purpose: To generate hte C test harness for a specific trace with a
+         with a specific test generation function
+\*******************************************************************/
 std::string c_test_case_generatort::generate_tests_with_generator(const optionst &options,
                                                                   const symbol_tablet &st,
                                                                   const goto_functionst &gf,
@@ -81,18 +118,39 @@ std::string c_test_case_generatort::generate_tests_with_generator(const optionst
   return test_contents;
 }
 
+/*******************************************************************\
+Function: c_test_case_generatort::get_entry_function_id
+Inputs:
+ gf - The program under consideration
+Outputs: The ID of the entry function where the users code starts
+Purpose: To find the ID of the first user function called
+\*******************************************************************/
 const irep_idt c_test_case_generatort::get_entry_function_id(const goto_functionst &gf)
 {
   const exprt &func_expr = interpretert::get_entry_function(gf);
   return get_calling_function_name(func_expr);
 }
 
+/*******************************************************************\
+Function: c_test_case_generatort::get_calling_function_name
+Inputs:
+ func_expr - The expression calling the entry function
+Outputs: The ID of the given function
+Purpose: To get the name of a specific function being called
+\*******************************************************************/
 const irep_idt c_test_case_generatort::get_calling_function_name(
     const exprt &func_expr)
 {
   return to_symbol_expr(func_expr).get_identifier();
 }
 
+/*******************************************************************\
+Function: c_test_case_generatort::sanitise_function_name
+Inputs:
+ called_function_name - the name of the function being sanitised
+Outputs: A clean version of the name.
+Purpose: Remove ., <, > from names.
+\*******************************************************************/
 std::string c_test_case_generatort::sanitise_function_name(
     const std::string called_function_name)
 {
@@ -107,6 +165,12 @@ std::string c_test_case_generatort::sanitise_function_name(
   return isolated_function_name;
 }
 
+/*******************************************************************\
+Function: c_test_case_generatort::debug_print_trace
+Inputs:
+ trace - The trace to print
+Purpose: Print a string version of the trace using enum strings
+\*******************************************************************/
 void c_test_case_generatort::debug_print_trace(const goto_tracet &trace)
 {
   // Print out the trace

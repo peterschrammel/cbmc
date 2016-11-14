@@ -6,6 +6,14 @@
 
 #include <test-c-gen/expr2cleanc.h>
 
+/*******************************************************************\
+Function:  function_parameter_buildert::function_parameter_buildert
+Inputs:
+ entry - The parameter to fill
+ e2c - The C converter class to use
+Purpose: To create relevant parts for assigning a specific value as a
+         function parameter
+ \*******************************************************************/
 function_parameter_buildert::function_parameter_buildert(
     const input_entryt &entry, expr2cleanct &e2c)
 {
@@ -36,11 +44,23 @@ function_parameter_buildert::function_parameter_buildert(
   variable_decleration_line = var_assignment_builder.str();
 }
 
+/*******************************************************************\
+Function:  function_parameter_buildert::get_parameter_decleration
+Outputs: The decleration line of the parameter
+Purpose: Get the decleration line of the parameter where its value is
+         assigned
+ \*******************************************************************/
 std::string function_parameter_buildert::get_parameter_decleration() const
 {
   return variable_decleration_line;
 }
 
+/*******************************************************************\
+Function:  function_parameter_buildert::get_parameter_variable_name
+Outputs: The variable name
+Purpose: To get the name being used in the decleration so can be used as
+         parameter for the function call
+ \*******************************************************************/
 std::string function_parameter_buildert::get_parameter_variable_name() const
 {
   return variable_name;

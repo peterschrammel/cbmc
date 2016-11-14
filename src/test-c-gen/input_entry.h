@@ -1,3 +1,11 @@
+/*******************************************************************
+
+ Module: C Test Case Generator
+
+ Author: Thomas Kiley, thomas@diffblue.com
+
+\*******************************************************************/
+
 #ifndef INPUT_ENTRY_H
 #define INPUT_ENTRY_H
 

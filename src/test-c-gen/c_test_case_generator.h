@@ -6,8 +6,8 @@
 
 \*******************************************************************/
 
-#ifndef C_TEST_CASE_GENERATOR_H_
-#define C_TEST_CASE_GENERATOR_H_
+#ifndef C_TEST_CASE_GENERATOR_H
+#define C_TEST_CASE_GENERATOR_H
 
 #include <functional>
 #include <string>
