@@ -1,0 +1,19 @@
+CORE
+main.c
+--function fun --cover branch --gen-c-test-case
+^EXIT=0$
+^SIGNAL=0$
+^#include <assert\.h>$
+^#include <stdio\.h>$
+^#include <stdbool\.h>$
+
+^#include "main\.c"$
+^int main(int argc, char\* argv)$
+^\{$
+^  struct example_s ret_fun;
+^  ret_fun = fun();$
+^  assert(ret_fun.b == true);$
+^  assert(ret_fun.x == 4);$
+^\}$
+--
+^warning: ignoring

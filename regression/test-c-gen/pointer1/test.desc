@@ -1,0 +1,28 @@
+CORE
+main.c
+--function fun --cover branch --gen-c-test-case
+^EXIT=0$
+^SIGNAL=0$
+^#include <assert\.h>$
+^#include <stdio\.h>$
+^#include <stdbool\.h>$
+
+^#include "main\.c"$
+^int main(int argc, char\* argv)$
+^\{$
+^  signed int \* arg_fun_ptr_x = ((signed int \*)NULL);$
+
+^  signed int \* arg_fun_ptr_x = ((signed int \*)malloc(sizeof(signed int)));$
+^  *arg_fun_ptr_x = -1;$
+
+^  signed int ret_fun;$
+^  ret_fun = fun();$
+
+^  assert(ret_fun == 4);$
+
+^  assert(ret_fun == 0);$
+^\}$
+
+
+--
+^warning: ignoring
