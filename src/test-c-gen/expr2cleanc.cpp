@@ -48,10 +48,10 @@ std::string expr2cleanct::convert_constant_bool(bool boolean_value)
   // This requires #include <stdbool.h>
   if(boolean_value)
   {
-    return "true";
+    return "1";
   }
   else
   {
-    return "false";
+    return "0";
   }
 }

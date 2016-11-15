@@ -12,7 +12,6 @@ void c_test_filet::emit_standard_includes()
 {
   add_line_at_root_indentation("#include <assert.h>");
   add_line_at_root_indentation("#include <stdio.h>");
-  add_line_at_root_indentation("#include <stdbool.h>");
   add_line_at_root_indentation("#include <stdlib.h>");
   add_empty_line();
 }
