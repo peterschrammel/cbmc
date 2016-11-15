@@ -13,6 +13,7 @@ void c_test_filet::emit_standard_includes()
   add_line_at_root_indentation("#include <assert.h>");
   add_line_at_root_indentation("#include <stdio.h>");
   add_line_at_root_indentation("#include <stdbool.h>");
+  add_line_at_root_indentation("#include <stdlib.h>");
   add_empty_line();
 }
 
@@ -37,7 +38,7 @@ Purpose: Start creating the main method
 \*******************************************************************/
 void c_test_filet::emit_main_method()
 {
-  add_line_at_current_indentation("int main(int argc, char* argv)");
+  add_line_at_current_indentation("int test_main(int argc, char* argv)");
   add_opening_brace(0);
 }
 
@@ -47,6 +48,8 @@ Purpose: Put the closing brace on the main method
 \*******************************************************************/
 void c_test_filet::end_main_method()
 {
+  add_line_at_current_indentation("exit(0);");
+  add_line_at_current_indentation("return 0;");
   add_closing_brace(0);
   assert(current_indentation == 0);
   add_empty_line();
