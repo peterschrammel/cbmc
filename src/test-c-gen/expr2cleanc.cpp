@@ -1,6 +1,22 @@
 #include <test-c-gen/expr2cleanc.h>
 
 /*******************************************************************\
+Function: expr2cleanct::convert_with_identifier
+Inputs:
+ src - The type to convert
+ identifier - The identifier to use as the type
+Outputs: A C decleration of the given type with the right identifier.
+Purpose: To convert a type in to ANSI-C but with the identifier in place
+         This is useful for array types where the identifier is inside
+         the type
+\*******************************************************************/
+std::string expr2cleanct::convert_with_identifier(const typet &src,
+                                                  const std::string &identifier)
+{
+  return convert_rec(src, c_qualifierst(), identifier);
+}
+
+/*******************************************************************\
 Function: expr2cleanct::convert_struct
 Inputs:
  src - The struct expression being converted
@@ -8,7 +24,7 @@ Inputs:
 Outputs: C assignment of a struct
 Purpose: To produce C code for assigning a struct
          The clean version removes padding variables.
- \*******************************************************************/
+\*******************************************************************/
 std::string expr2cleanct::convert_struct(const exprt &src, unsigned &precedence)
 {
   // Generate the normal struct code except we exlude padding members

@@ -18,6 +18,9 @@ public:
     : expr2ct(ns)
   {}
 
+  std::string convert_with_identifier(const typet &src,
+                                      const std::string &identifier);
+
 protected:
   virtual std::string convert_struct(const exprt &src, unsigned &precedence) override;
 
