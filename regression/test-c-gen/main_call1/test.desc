@@ -1,0 +1,26 @@
+CORE
+main.c
+--function main --cover branch --gen-c-test-case
+^EXIT=0$
+^SIGNAL=0$
+^#include <assert\.h>$
+^#include <stdio\.h>$
+^#include <stdlib\.h>$
+
+^#include "main\.c"$
+^int test_main(int argc, char\* argv)$
+^\{$
+^  signed int arg_main_argc = 4098;$
+^  char \*\*arg_main_params = ((char \*\*)NULL);$
+^  signed int ret_main;$
+^  ret_main = main(arg_main_argc, arg_main_params);$
+
+^  assert(ret_main == 45);$
+^  exit(0);$
+^\}$
+^  return 0;$
+^\}$
+
+
+--
+^warning: ignoring
