@@ -35,6 +35,13 @@ std::string expr2cleanct::convert_struct_type(const typet &src,
                                       false, false);
 }
 
+std::string expr2cleanct::convert_array_type(const typet &src,
+                                             const c_qualifierst &qualifiers,
+                                             const std::string &declarator_str)
+{
+  return expr2ct::convert_array_type(src, qualifiers, declarator_str, false);
+}
+
 /*******************************************************************\
 Function: expr2cleanct::convert_constant_bool
 Inputs:

@@ -25,6 +25,10 @@ protected:
                                           const std::string &qualifer_str,
                                           const std::string &declarator_str) override;
 
+  virtual std::string convert_array_type(const typet &src,
+                                         const c_qualifierst &qualifiers,
+                                         const std::string &declarator_str) override;
+
   virtual std::string convert_constant_bool(bool boolean_value) override;
 };
 
