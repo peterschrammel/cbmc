@@ -5,16 +5,18 @@ main.c
 ^SIGNAL=0$
 ^#include <assert\.h>$
 ^#include <stdio\.h>$
-^#include <stdbool\.h>$
+^#include <stdlib\.h>$
 
 ^#include "main\.c"$
-^int main(int argc, char\* argv)$
+^int test_main(int argc, char\* argv)$
 ^\{$
-^  struct example_s arg_fun_struct_param = { \.b=true, \.x=-2147483648, \.internal={ .y=5.739719e-42f } };$
-^  struct example_s arg_fun_struct_param = { \.b=true, \.x=1, \.internal={ .y=5.739719e-42f } };$
-^  struct example_s arg_fun_struct_param = { \.b=true, \.x=1, \.internal={ .y=2.000977e+0f } };$
-^  struct example_s arg_fun_struct_param = { \.b=false, \.x=1, \.internal={ .y=2.000977e+0f } };$
+^  struct example_s arg_fun_struct_param = { \.b=1, \.x=-2147483648, \.internal={ .y=5.739719e-42f } };$
+^  struct example_s arg_fun_struct_param = { \.b=1, \.x=1, \.internal={ .y=5.739719e-42f } };$
+^  struct example_s arg_fun_struct_param = { \.b=1, \.x=1, \.internal={ .y=2.000977e+0f } };$
+^  struct example_s arg_fun_struct_param = { \.b=0, \.x=1, \.internal={ .y=2.000977e+0f } };$
 ^  fun(arg_fun_struct_param);$
+^  exit(0);$
+^  return 0;$
 ^\}$
 
 

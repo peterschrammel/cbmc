@@ -5,15 +5,17 @@ main.c
 ^SIGNAL=0$
 ^#include <assert\.h>$
 ^#include <stdio\.h>$
-^#include <stdbool\.h>$
+^#include <stdlib\.h>$
 
 ^#include "main\.c"$
-^int main(int argc, char\* argv)$
+^int test_main(int argc, char\* argv)$
 ^\{$
 ^  struct example_s ret_fun;
 ^  ret_fun = fun();$
-^  assert(ret_fun.b == true);$
+^  assert(ret_fun.b == 1);$
 ^  assert(ret_fun.x == 4);$
+^  exit(0);$
+^  return 0;$
 ^\}$
 --
 ^warning: ignoring

@@ -5,10 +5,10 @@ main.c
 ^SIGNAL=0$
 ^#include <assert\.h>$
 ^#include <stdio\.h>$
-^#include <stdbool\.h>$
+^#include <stdlib\.h>$
 
 ^#include "main\.c"$
-^int main(int argc, char\* argv)$
+^int test_main(int argc, char\* argv)$
 ^\{$
 ^  signed int \* arg_fun_ptr_x = ((signed int \*)NULL);$
 
@@ -21,6 +21,8 @@ main.c
 ^  assert(ret_fun == 4);$
 
 ^  assert(ret_fun == 0);$
+^  exit(0);$
+^  return 0;$
 ^\}$
 
 

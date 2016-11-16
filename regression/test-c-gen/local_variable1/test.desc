@@ -5,12 +5,14 @@ main.c
 ^SIGNAL=0$
 ^#include <assert\.h>$
 ^#include <stdio\.h>$
-^#include <stdbool\.h>$
+^#include <stdlib\.h>$
 
 ^#include "main\.c"$
-^int main(int argc, char\* argv)$
+^int test_main(int argc, char\* argv)$
 ^\{$
 ^  fun();$
+^  exit(0);$
+^  return 0;$
 ^\}$
 
 
