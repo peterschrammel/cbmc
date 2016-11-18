@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <numeric>
 
 #include <cegis/instrument/instrument_var_ops.h>
 #include <cegis/refactor/instructionset/processor_types.h>
@@ -19,7 +20,7 @@ public:
 
   goto_programt::targett operator()(const symbol_tablet &st,
       const std::string &func_name, goto_programt &body,
-      goto_programt::targett pos) const
+      const goto_programt::targett pos) const
   {
     pos->type=goto_program_instruction_typet::ASSIGN;
     pos->source_location=default_cegis_source_location();
@@ -62,6 +63,33 @@ public:
   }
 };
 
+class assignt
+{
+  const typet type;
+public:
+  assignt(const typet &type) :
+      type(type)
+  {
+  }
+
+  goto_programt::targett operator()(const symbol_tablet &st,
+      const std::string &func_name, goto_programt &body,
+      goto_programt::targett pos) const
+  {
+    pos->type=goto_program_instruction_typet::ASSIGN;
+    pos->source_location=default_cegis_source_location();
+    const dereference_exprt lhs(cegis_operand(st, func_name, type, 0));
+    const dereference_exprt rhs(cegis_operand(st, func_name, type, 1));
+    pos->code=code_assignt(lhs, rhs);
+    return pos;
+  }
+};
+
+instruction_descriptiont assign_desc(const typet &type)
+{
+  return instruction_descriptiont( { type, type }, assignt(type));
+}
+
 void insert(
     std::map<instruction_descriptiont::typest, instruction_descriptionst> &result,
     const instruction_descriptiont &instr)
@@ -77,13 +105,13 @@ ordered_instructionst get_instructions_for_types(
   for (const cegis_operand_datat::value_type &typeWithSlots : signature)
   {
     const typet &type=typeWithSlots.first;
-    if (!is_cegis_primitive(type))
-    assert(!"Class type operand generation not supported.");
+    if (!is_cegis_primitive(type)) continue; // TODO: Add support for class types
     const arithmetic_instructionst arith(type);
     insert(result, arith.plus());
     insert(result, arith.minus());
     insert(result, arith.mult());
     insert(result, arith.div());
+    insert(result, assign_desc(type));
   }
   return result;
 }

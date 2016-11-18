@@ -120,7 +120,7 @@ void value_set_fivrnst::output_entry(
   out << display_name << " = { ";
   if(object_map.read().size()!=0) out << "\n      ";
   
-  unsigned width=0;
+  std::size_t width=0;
   
   forall_valid_objects(o_it, object_map.read())
   {
@@ -1516,6 +1516,10 @@ void value_set_fivrnst::apply_code(
       symbol_exprt lhs(rvs, code.op0().type());
       assign(lhs, code.op0(), ns);
     }
+  }
+  else if(statement==ID_input || statement==ID_output)
+  {
+	  // doesn't do anything
   }
   else
   {

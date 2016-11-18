@@ -44,6 +44,13 @@
  * @brief
  *
  * @details
+ */
+#define INSTR_TYPE_SUFFIX "_instructiont"
+
+/**
+ * @brief
+ *
+ * @details
  *
  * @param st
  * @param type
@@ -120,5 +127,16 @@ dereference_exprt cegis_operand(
     const std::string &func_name,
     const typet &type,
     size_t op);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param var
+ *
+ * @return
+ */
+bool is_refactor_meta_var(const irep_idt &var);
 
 #endif /* CEGIS_REFACTOR_INSTRUCTIONSET_PROCESSOR_SYMBOLS_H_ */

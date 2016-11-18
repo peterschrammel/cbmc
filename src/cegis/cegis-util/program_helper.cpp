@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <functional>
 
 #include <util/type_eq.h>
 #include <goto-programs/goto_functions.h>
@@ -30,7 +31,8 @@ goto_programt &get_body(goto_functionst &gf, const std::string &func_name)
   return f.body;
 }
 
-goto_programt &get_body(goto_functionst &gf, const goto_programt::const_targett pos)
+goto_programt &get_body(goto_functionst &gf,
+    const goto_programt::const_targett pos)
 {
   return get_body(gf, id2string(pos->function));
 }
@@ -122,7 +124,8 @@ bool is_nondet(goto_programt::const_targett target,
 
 bool is_return_value_name(const std::string &name)
 {
-  return contains(name, "return_value___") || contains(name, RETURN_VALUE_SUFFIX);
+  return contains(name, "return_value___")
+      || contains(name, RETURN_VALUE_SUFFIX);
 }
 
 const typet &get_affected_type(const goto_programt::instructiont &instr)
@@ -177,12 +180,26 @@ bool is_global_const(const irep_idt &name, const typet &type)
   return std::string::npos == n.find(NS_SEP);
 }
 
+void move_labels(goto_programt::instructionst &body,
+    const goto_programt::targett &from, const goto_programt::targett &to)
+{
+  for (goto_programt::instructiont &instr : body)
+    for (goto_programt::targett &target : instr.targets)
+      if (from == target) target=to;
+}
+
 void move_labels(goto_programt &body, const goto_programt::targett &from,
     const goto_programt::targett &to)
 {
-  for (goto_programt::instructiont &instr : body.instructions)
-    for (goto_programt::targett &target : instr.targets)
-      if (from == target) target=to;
+  move_labels(body.instructions, from, to);
+}
+
+goto_programt::targett insert_before_preserve_labels(goto_programt &body,
+    const goto_programt::targett &target)
+{
+  const goto_programt::targett result=body.insert_before(target);
+  move_labels(body, target, result);
+  return result;
 }
 
 bool is_builtin(const source_locationt &loc)
@@ -192,8 +209,9 @@ bool is_builtin(const source_locationt &loc)
   return file.empty() || file.at(0) == '<';
 }
 
-symbolt &create_local_cegis_symbol(symbol_tablet &st, const std::string &full_name,
-    const std::string &base_name, const typet &type)
+symbolt &create_local_cegis_symbol(symbol_tablet &st,
+    const std::string &full_name, const std::string &base_name,
+    const typet &type)
 {
   symbolt new_symbol;
   new_symbol.name=full_name;
@@ -217,17 +235,23 @@ symbolt &create_cegis_symbol(symbol_tablet &st, const std::string &full_name,
   return create_local_cegis_symbol(st, full_name, full_name, type);
 }
 
+void cegis_assign(const symbol_tablet &st, goto_programt::instructiont &instr,
+    const exprt &lhs, const exprt &rhs, const source_locationt &loc)
+{
+  instr.type=goto_program_instruction_typet::ASSIGN;
+  instr.source_location=loc;
+  const namespacet ns(st);
+  const typet &type=lhs.type();
+  if (type_eq(type, rhs.type(), ns)) instr.code=code_assignt(lhs, rhs);
+  else instr.code=code_assignt(lhs, typecast_exprt(rhs, type));
+}
+
 goto_programt::targett cegis_assign(const symbol_tablet &st,
     goto_programt &body, const goto_programt::targett &insert_after_pos,
     const exprt &lhs, const exprt &rhs, const source_locationt &loc)
 {
-  goto_programt::targett assign=body.insert_after(insert_after_pos);
-  assign->type=goto_program_instruction_typet::ASSIGN;
-  assign->source_location=loc;
-  const namespacet ns(st);
-  const typet &type=lhs.type();
-  if (type_eq(type, rhs.type(), ns)) assign->code=code_assignt(lhs, rhs);
-  else assign->code=code_assignt(lhs, typecast_exprt(rhs, type));
+  const goto_programt::targett assign=body.insert_after(insert_after_pos);
+  cegis_assign(st, *assign, lhs, rhs, loc);
   return assign;
 }
 
@@ -288,11 +312,8 @@ void remove_return(goto_programt &body, const goto_programt::targett pos)
   call.lhs().make_nil();
 }
 
-goto_programt::targett add_return_assignment(
-    goto_programt &body,
-    goto_programt::targett pos,
-    const irep_idt &func_id,
-    const exprt &value)
+goto_programt::targett add_return_assignment(goto_programt &body,
+    goto_programt::targett pos, const irep_idt &func_id, const exprt &value)
 {
   const source_locationt &loc=pos->source_location;
   pos=body.insert_after(pos);
@@ -300,4 +321,33 @@ goto_programt::targett add_return_assignment(
   pos->source_location=loc;
   pos->code=code_assignt(get_ret_val_var(func_id, value.type()), value);
   return pos;
+}
+
+namespace
+{
+goto_programt::targett insert_preserving_source_location(
+    goto_programt::targett pos,
+    const std::function<goto_programt::targett(goto_programt::targett)> &inserter)
+{
+  const source_locationt &loc=pos->source_location;
+  const irep_idt &func_name=pos->function;
+  pos=inserter(pos);
+  pos->source_location=loc;
+  pos->function=func_name;
+  return pos;
+}
+}
+
+goto_programt::targett insert_after_preserving_source_location(
+    goto_programt &body, goto_programt::targett pos)
+{
+  const auto op=std::bind1st(std::mem_fun(&goto_programt::insert_after), &body);
+  return insert_preserving_source_location(pos, op);
+}
+
+goto_programt::targett insert_before_preserving_source_location(
+    goto_programt &body, goto_programt::targett pos)
+{
+  const auto op=std::bind1st(std::mem_fun(&goto_programt::insert_before), &body);
+  return insert_preserving_source_location(pos, op);
 }

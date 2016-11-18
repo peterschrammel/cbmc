@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_CBMC_PARSEOPTIONS_H
-#define CPROVER_CBMC_PARSEOPTIONS_H
+#ifndef CPROVER_CBMC_PARSE_OPTIONS_H
+#define CPROVER_CBMC_PARSE_OPTIONS_H
 
 #include <util/ui_message.h>
 #include <util/parse_options.h>
@@ -64,8 +64,8 @@ class cbmc_parse_optionst:
   public language_uit
 {
 public:
-  virtual int doit();
-  virtual void help();
+  virtual int doit() override;
+  virtual void help() override;
 
   cbmc_parse_optionst(int argc, const char **argv);
   cbmc_parse_optionst(

@@ -96,8 +96,10 @@ protected:
   } instruction_sizet;
 
   // return corresponding reference of variable
-  variablet &find_variable_for_slot(unsigned number_int, size_t address,
-                                    variablest &var_list, instruction_sizet inst_size)
+  variablet &find_variable_for_slot(
+    size_t address,
+    variablest &var_list,
+    instruction_sizet inst_size)
   {
     for(variablet &var : var_list)
     {
@@ -127,7 +129,8 @@ protected:
     variablest &var_list = variables[number_int];
 
     // search variable in list for correct frame / address if necessary
-    variablet &var = find_variable_for_slot(number_int, address, var_list, inst_size);
+    variablet &var =
+      find_variable_for_slot(address, var_list, inst_size);
 
     if(var.symbol_expr.get_identifier().empty())
     {
@@ -538,7 +541,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
     if(i_it->statement!="goto" &&
        i_it->statement!="return" &&
        !(i_it->statement==patternt("?return")) &&
-       i_it->statement!="athrow")
+       i_it->statement!="athrow" &&
+       i_it->statement!="jsr" &&
+       i_it->statement!="jsr_w" &&
+       i_it->statement!="ret")
     {
       instructionst::const_iterator next=i_it;
       if(++next!=instructions.end())
@@ -549,7 +555,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
        i_it->statement==patternt("if_?cmp??") ||
        i_it->statement==patternt("if??") ||
        i_it->statement=="ifnonnull" ||
-       i_it->statement=="ifnull")
+       i_it->statement=="ifnull" ||
+       i_it->statement=="jsr" ||
+       i_it->statement=="jsr_w")
     {
       assert(!i_it->args.empty());
 
