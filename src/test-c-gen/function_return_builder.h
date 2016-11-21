@@ -19,7 +19,7 @@ public:
                            class expr2cleanct &e2c_converter);
 
   bool get_function_has_return() const;
-  std::string get_return_decleration() const;
+  std::string get_return_declaration() const;
   std::string get_return_variable_name() const;
   std::vector<std::string> get_assertion_lines();
 

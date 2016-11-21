@@ -160,27 +160,27 @@ std::string function_return_buildert::get_return_variable_name() const
 }
 
 /*******************************************************************\
-Function: function_return_buildert::get_return_decleration
-Outputs: The decleration line
-Purpose: Get the decleration line for the return variable
+Function: function_return_buildert::get_return_declaration
+Outputs: The declaration line
+Purpose: Get the declaration line for the return variable
  \*******************************************************************/
-std::string function_return_buildert::get_return_decleration() const
+std::string function_return_buildert::get_return_declaration() const
 {
   // if the function doesn't return anything, these other methods shouldn't
   // be called
   assert(has_return);
 
-  std::ostringstream ret_var_decleartion_builder;
+  std::ostringstream ret_var_declaration_builder;
 
   std::string type=e2c.convert(return_entry.second.type());
-  ret_var_decleartion_builder << type;
+  ret_var_declaration_builder << type;
 
-  ret_var_decleartion_builder << " ";
+  ret_var_declaration_builder << " ";
 
-  ret_var_decleartion_builder << get_return_variable_name();
-  ret_var_decleartion_builder << ";";
+  ret_var_declaration_builder << get_return_variable_name();
+  ret_var_declaration_builder << ";";
 
-  return ret_var_decleartion_builder.str();
+  return ret_var_declaration_builder.str();
 }
 
 /*******************************************************************\
