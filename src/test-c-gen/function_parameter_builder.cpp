@@ -16,7 +16,7 @@ Purpose: To create relevant parts for assigning a specific value as a
  \*******************************************************************/
 function_parameter_buildert::function_parameter_buildert(const input_entryt &entry,
                                                          expr2cleanct &e2c,
-                                                         const symbol_tablet &st)
+                                                         const symbol_tablet &symbol_table)
 {
   std::ostringstream var_assignment_builder;
 
@@ -24,35 +24,32 @@ function_parameter_buildert::function_parameter_buildert(const input_entryt &ent
   var_name_builder << "arg_";
   var_name_builder << entry.first;
 
-  variable_name = var_name_builder.str();
+  variable_name=var_name_builder.str();
   substitute(variable_name, "::", "_");
 
-  const typet &lhs_type=st.lookup(entry.first).type;
-
+  const typet &lhs_type=symbol_table.lookup(entry.first).type;
   std::string type=e2c.convert_with_identifier(lhs_type,
                                                  variable_name);
   var_assignment_builder << type;
 
   var_assignment_builder << " = ";
 
-  std::string struct_init = e2c.convert(entry.second);
-
+  std::string struct_init=e2c.convert(entry.second);
   var_assignment_builder << struct_init;
-
   var_assignment_builder << ";";
 
-  variable_decleration_line = var_assignment_builder.str();
+  variable_declaration_line=var_assignment_builder.str();
 }
 
 /*******************************************************************\
-Function:  function_parameter_buildert::get_parameter_decleration
-Outputs: The decleration line of the parameter
+Function:  function_parameter_buildert::get_parameter_declaration
+Outputs: The declaration line of the parameter
 Purpose: Get the decleration line of the parameter where its value is
          assigned
  \*******************************************************************/
-std::string function_parameter_buildert::get_parameter_decleration() const
+std::string function_parameter_buildert::get_parameter_declaration() const
 {
-  return variable_decleration_line;
+  return variable_declaration_line;
 }
 
 /*******************************************************************\

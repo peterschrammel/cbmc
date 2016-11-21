@@ -321,12 +321,12 @@ bool bmc_covert::operator()()
       c_test_case_generatort gen(get_message_handler());
       std::vector<std::string> goal_names;
       for(const auto& goalid : test.covered_goals)
-        goal_names.push_back(
-                             as_string(goal_map.at(goalid).description)
-                             + "\n *  "
-                             + id2string(goal_map.at(goalid).source_location.get_file())
-                             + ":"
-                             + id2string(goal_map.at(goalid).source_location.get_line()));
+      {
+        goal_names.push_back(as_string(goal_map.at(goalid).description)+"\n *  "
+          +id2string(goal_map.at(goalid).source_location.get_file())
+          +":"
+          +id2string(goal_map.at(goalid).source_location.get_line()));
+      }
 
       // Compute the test function name
       test.test_function_name=gen.get_test_function_name(bmc.ns.get_symbol_table(),

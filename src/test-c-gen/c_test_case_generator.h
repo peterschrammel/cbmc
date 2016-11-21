@@ -32,34 +32,13 @@ public:
 {
 }
 
-  /**
-   * @brief
-   *
-   * @details
-   *
-   * @param options
-   * @param st
-   * @param gf
-   * @param bmc
-   */
   std::string generate_tests(const class optionst &options,
-                             const class symbol_tablet &st,
-                             const class goto_functionst &gf,
+                             const class symbol_tablet &symbol_table,
+                             const class goto_functionst &goto_functions,
                              const class goto_tracet &trace,
                              const size_t test_idx,
                              const std::vector<std::string> &goals);
 
-  /**
-   * @brief Get the name for a specific function test
-   *
-   * @details
-   *
-   * @param st
-   * @param gf
-   * @param test_idx
-   *
-   * @return The name of the test
-   */
   const std::string get_test_function_name(const class symbol_tablet &st,
                                            const class goto_functionst &gf,
                                            size_t test_idx);
@@ -67,8 +46,8 @@ public:
 
 private:
   std::string generate_tests_with_generator(const class optionst &options,
-                                            const class symbol_tablet &st,
-                                            const class goto_functionst &gf,
+                                            const class symbol_tablet &symbol_table,
+                                            const class goto_functionst &goto_functions,
                                             const class goto_tracet &trace,
                                             const test_case_generatort generator,
                                             size_t test_idx,
@@ -78,7 +57,7 @@ private:
 
   const irep_idt get_calling_function_name(const class exprt &func_expr);
 
-  std::string sanitise_function_name(const std::string called_function_name);
+  std::string sanitize_function_name(const std::string called_function_name);
 };
 
 #endif

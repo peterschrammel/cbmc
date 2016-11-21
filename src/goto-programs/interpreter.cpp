@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/message.h>
 #include <util/string2int.h>
+#include <util/prefix.h>
+#include <util/cprover_prefix.h>
 #include <ansi-c/c_types.h>
 #include <json/json_parser.h>
 
@@ -122,29 +124,31 @@ Function: interpretert::get_entry_function_call
           user provided function (e.g. the actual function being tested)
 
 \*******************************************************************/
-const code_function_callt &interpretert::get_entry_function_call(const goto_functionst &gf)
+const code_function_callt &interpretert::get_entry_function_call(
+    const goto_functionst &goto_functions)
 {
-  typedef goto_functionst::function_mapt function_mapt;
-  const function_mapt &fm = gf.function_map;
+  const goto_functionst::function_mapt &function_map=goto_functions.function_map;
 
   const irep_idt goto_start_id(goto_functionst::entry_point());
 
-  const function_mapt::const_iterator start_function = fm.find(goto_start_id);
+  const goto_functionst::function_mapt::const_iterator start_function =
+    function_map.find(goto_start_id);
 
   // Check we found the start function
-  assert(start_function != fm.end());
+  assert(start_function!=function_map.end());
 
   // Iterate over the instructions to find the function call
   typedef goto_programt::instructionst instructionst;
-  const instructionst &start_instructions = start_function->second.body.instructions;
+  const instructionst &start_instructions=start_function->second.body.instructions;
 
   typedef goto_programt::instructiont instructiont;
   typedef goto_programt::instructionst::const_reverse_iterator rev_instruction_itert;
 
-  rev_instruction_itert last_function_call = std::find_if(
-        start_instructions.rbegin(), start_instructions.rend(),
-        [&](const instructiont &instruction ) {
-    return instruction.code.get_statement() == ID_function_call;
+  rev_instruction_itert last_function_call=
+      std::find_if(start_instructions.rbegin(), start_instructions.rend(),
+        [&](const instructiont &instruction )
+  {
+    return instruction.code.get_statement()==ID_function_call;
   });
 
   assert(last_function_call != start_instructions.rend());
@@ -164,10 +168,10 @@ Function: interpretert::get_entry_function
           (e.g. the actual function being tested)
 
 \*******************************************************************/
-const exprt &interpretert::get_entry_function(const goto_functionst &gf)
+const exprt &interpretert::get_entry_function(const goto_functionst &goto_functions)
 {
-  const code_function_callt &func_call = get_entry_function_call(gf);
-  const exprt &func_expr = func_call.function();
+  const code_function_callt &func_call=get_entry_function_call(goto_functions);
+  const exprt &func_expr=func_call.function();
   return func_expr;
 }
 
@@ -182,22 +186,10 @@ Function: interpretert::get_is_variable_cprover
  Purpose: To check a given cell for being a CPROVER variable
 
 \*******************************************************************/
-bool interpretert::get_is_variable_cprover(
-    const irep_idt &variable_id)
-{
-  constexpr char const *cprover_variable_prefix = "__CPROVER";
-  constexpr int cprover_prefix_len = strlen(cprover_variable_prefix);
-
-  const char *cell_identifier = variable_id.c_str();
-
-  if(strncmp(cell_identifier, cprover_variable_prefix, cprover_prefix_len) == 0)
-  {
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+bool interpretert::get_is_variable_cprover(const irep_idt &variable_id)
+{  
+  std::string variable_id_str(variable_id.c_str());
+  return has_prefix(variable_id_str, CPROVER_PREFIX);
 }
 
 /*******************************************************************\
@@ -2002,29 +1994,6 @@ exprt interpretert::get_value(const irep_idt& id)
 
   return get_value(get_type,integer2unsigned(whole_lhs_object_address));
 }
-
-const exprt & get_entry_function(const goto_functionst &gf)
-{
-  typedef goto_functionst::function_mapt function_mapt;
-  const function_mapt &fm=gf.function_map;
-  const irep_idt start(goto_functionst::entry_point());
-  const function_mapt::const_iterator entry_func=fm.find(start);
-  assert(fm.end() != entry_func);
-  const goto_programt::instructionst &in=entry_func->second.body.instructions;
-  typedef goto_programt::instructionst::const_reverse_iterator reverse_target;
-  reverse_target codeit=in.rbegin();
-  const reverse_target end=in.rend();
-  assert(end != codeit);
-  // Tolerate 'dead' statements at the end of _start.
-  while(end!=codeit && codeit->code.get_statement()!=ID_function_call)
-    ++codeit;
-  assert(end != codeit);
-  const reverse_target call=codeit;
-  const code_function_callt &func_call=to_code_function_call(call->code);
-  const exprt &func_expr=func_call.function();
-  return func_expr;
-}
-
 
 /*******************************************************************
  Function: load_counter_example_inputs

@@ -69,12 +69,5 @@ Purpose: Output C code for a boolean literal.
 std::string expr2cleanct::convert_constant_bool(bool boolean_value)
 {
   // This requires #include <stdbool.h>
-  if(boolean_value)
-  {
-    return "1";
-  }
-  else
-  {
-    return "0";
-  }
+  return boolean_value?"1":"0";
 }

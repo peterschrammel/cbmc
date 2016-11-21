@@ -27,7 +27,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
       ../solvers/solvers$(LIBEXT) \
-			../test-c-gen/test-c-gen$(LIBEXT) \
+      ../test-c-gen/test-c-gen$(LIBEXT) \
       ../util/util$(LIBEXT) \
       ../json/json$(LIBEXT)
 

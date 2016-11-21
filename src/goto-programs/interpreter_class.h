@@ -54,9 +54,9 @@ public:
   typedef std::map<const irep_idt,const typet> dynamic_typest;
 
   static const code_function_callt &get_entry_function_call(
-      const goto_functionst &gf);
+      const goto_functionst &goto_functions);
 
-  static const exprt &get_entry_function(const goto_functionst &gf);
+  static const exprt &get_entry_function(const goto_functionst &goto_functions);
 
   // An assignment list annotated with the calling context.
   struct function_assignments_contextt {

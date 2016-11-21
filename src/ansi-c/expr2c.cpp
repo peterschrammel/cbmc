@@ -701,19 +701,18 @@ std::string expr2ct::convert_struct_type(const typet &src,
   {
     dest+=" {";
 
-    for(struct_typet::componentst::const_iterator
-        it=struct_type.components().begin();
-        it!=struct_type.components().end();
-        it++)
+    typedef struct_union_typet::componentt componentt;
+    for(const componentt &component : struct_type.components())
     {
       // Skip padding parameters unless we including them
-      if(it->get_is_padding() && !inc_padding_parameters)
+      if(component.get_is_padding() && !inc_padding_parameters)
       {
         continue;
       }
 
       dest += ' ';
-      dest +=convert_rec(it->type(), c_qualifierst(), id2string(it->get_name()));
+      dest +=convert_rec(component.type(), c_qualifierst(),
+                         id2string(component.get_name()));
       dest += ';';
     }
 
@@ -2192,7 +2191,7 @@ std::string expr2ct::convert_constant(
   }
   else if(type.id()==ID_bool)
   {
-    dest = convert_constant_bool(src.is_true());
+    dest=convert_constant_bool(src.is_true());
   }
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
@@ -2208,7 +2207,7 @@ std::string expr2ct::convert_constant(
 
     if(type.id()==ID_c_bool)
     {
-      dest = convert_constant_bool(int_value != 0);
+      dest=convert_constant_bool(int_value != 0);
     }
     else if(type==char_type() && type!=signed_int_type() && type!=unsigned_int_type())
     {
@@ -2413,15 +2412,13 @@ std::string expr2ct::convert_struct(const exprt &src, unsigned &precedence,
   bool newline=false;
   size_t last_size=0;
 
-  for(struct_typet::componentst::const_iterator
-      c_it=components.begin();
-      c_it!=components.end();
-      c_it++)
+  typedef struct_union_typet::componentt componentt;
+  for(const componentt &component : struct_type.components())
   {
     if(o_it->type().id()==ID_code)
       continue;
 
-    if(c_it->get_is_padding() && !include_padding_members)
+    if(component.get_is_padding() && !include_padding_members)
     {
       ++o_it;
       continue;
@@ -2450,7 +2447,7 @@ std::string expr2ct::convert_struct(const exprt &src, unsigned &precedence,
       newline=false;
 
     dest+='.';
-    dest+=c_it->get_string(ID_name);
+    dest+=component.get_string(ID_name);
     dest+='=';
     dest+=tmp;
 

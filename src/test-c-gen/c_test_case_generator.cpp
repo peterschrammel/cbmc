@@ -30,15 +30,15 @@ Outputs: An executable C test harness
 Purpose: To generate a test harness that produces a specific trace
 \*******************************************************************/
 std::string c_test_case_generatort::generate_tests(const optionst &options,
-                                                   const symbol_tablet &st,
-                                                   const goto_functionst &gf,
+                                                   const symbol_tablet &symbol_table,
+                                                   const goto_functionst &goto_functions,
                                                    const goto_tracet &trace,
                                                    const size_t test_idx,
                                                    const std::vector<std::string> &goals)
 {
-  test_case_generatort generator = generate_c_test_case_from_inputs;
-  return generate_tests_with_generator(options, st, gf, trace, generator,
-                                test_idx, goals);
+  test_case_generatort generator=generate_c_test_case_from_inputs;
+  return generate_tests_with_generator(options, symbol_table, goto_functions,
+                                       trace, generator, test_idx, goals);
 }
 
 /*******************************************************************\
@@ -54,10 +54,10 @@ Purpose: To name a given test.
 const std::string c_test_case_generatort::get_test_function_name(
     const symbol_tablet &st, const goto_functionst &gf, size_t test_idx)
 {
-  const irep_idt called_function_name = get_entry_function_id(gf);
+  const irep_idt called_function_name=get_entry_function_id(gf);
 
-  const std::string pretty_function_name = as_string(st.lookup(called_function_name).pretty_name);
-  const std::string sanitised_name = sanitise_function_name(pretty_function_name);
+  const std::string pretty_function_name=as_string(st.lookup(called_function_name).pretty_name);
+  const std::string sanitised_name=sanitize_function_name(pretty_function_name);
 
   // In the java version we hash the function name and append it, but I don't
   // see a reason for this
@@ -85,8 +85,8 @@ Purpose: To generate hte C test harness for a specific trace with a
          with a specific test generation function
 \*******************************************************************/
 std::string c_test_case_generatort::generate_tests_with_generator(const optionst &options,
-                                                                  const symbol_tablet &st,
-                                                                  const goto_functionst &gf,
+                                                                  const symbol_tablet &symbol_table,
+                                                                  const goto_functionst &goto_functions,
                                                                   const goto_tracet &trace,
                                                                   const test_case_generatort generator,
                                                                   size_t test_idx,
@@ -97,21 +97,21 @@ std::string c_test_case_generatort::generate_tests_with_generator(const optionst
   interpretert::input_varst input_vars;
 
   // Get the function inputs from an interpreter
-  interpretert interpreter(st, gf, this, options);
+  interpretert interpreter(symbol_table, goto_functions, this, options);
 
   interpretert::list_input_varst function_inputs;
   interpretert::side_effects_differencet side_effects;
 
-  input_vars = interpreter.load_counter_example_inputs(trace, function_inputs,
+  input_vars=interpreter.load_counter_example_inputs(trace, function_inputs,
                                                        side_effects);
 
 
   // Get the file the entry function is in to include it
-  const exprt &entry_func = interpretert::get_entry_function(gf);
-  const irep_idt &file_name = entry_func.source_location().get_file();
+  const exprt &entry_func=interpretert::get_entry_function(goto_functions);
+  const irep_idt &file_name=entry_func.source_location().get_file();
 
-  std::string test_contents = generator(st, entry_func,
-                                        get_entry_function_id(gf),
+  std::string test_contents=generator(symbol_table, entry_func,
+                                        get_entry_function_id(goto_functions),
                                         input_vars, file_name);
 
   status() << test_contents << eom;
@@ -127,7 +127,7 @@ Purpose: To find the ID of the first user function called
 \*******************************************************************/
 const irep_idt c_test_case_generatort::get_entry_function_id(const goto_functionst &gf)
 {
-  const exprt &func_expr = interpretert::get_entry_function(gf);
+  const exprt &func_expr=interpretert::get_entry_function(gf);
   return get_calling_function_name(func_expr);
 }
 
@@ -151,11 +151,11 @@ Inputs:
 Outputs: A clean version of the name.
 Purpose: Remove ., <, > from names.
 \*******************************************************************/
-std::string c_test_case_generatort::sanitise_function_name(
+std::string c_test_case_generatort::sanitize_function_name(
     const std::string called_function_name)
 {
-  const size_t bracket_offset = called_function_name.find('(');
-  std::string isolated_function_name = called_function_name.substr(0, bracket_offset);
+  const size_t bracket_offset=called_function_name.find('(');
+  std::string isolated_function_name=called_function_name.substr(0, bracket_offset);
 
   // Remove '<', '>', '.' and replace with _ to get valid name
   substitute(isolated_function_name, ".", "_");

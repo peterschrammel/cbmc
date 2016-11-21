@@ -50,7 +50,7 @@ void c_test_filet::end_main_method()
   add_line_at_current_indentation("exit(0);");
   add_line_at_current_indentation("return 0;");
   add_closing_brace(0);
-  assert(current_indentation == 0);
+  assert(current_indentation==0);
   add_empty_line();
 }
 
@@ -71,7 +71,7 @@ Purpose: To add an opening brace and increase indentation
 \*******************************************************************/
 void c_test_filet::add_opening_brace(int level)
 {
-  assert(level == current_indentation);
+  assert(level==current_indentation);
   add_line_at_current_indentation("{");
   ++current_indentation;
 }
@@ -85,7 +85,7 @@ Purpose: To put the closing brace on an indented block
 \*******************************************************************/
 void c_test_filet::add_closing_brace(int level)
 {
-  assert(level == current_indentation - 1);
+  assert(level==current_indentation - 1);
   --current_indentation;
   add_line_at_current_indentation("}");
 }
@@ -121,7 +121,7 @@ Purpose: To add a specific line at a specific indentation level
 \*******************************************************************/
 void c_test_filet::add_line_at_indentation(std::string line, int level)
 {
-  current_file += indentation(level) + line + "\n";
+  current_file+=indentation(level)+line+"\n";
 }
 
 /*******************************************************************\
@@ -130,7 +130,7 @@ Purpose: Add an empty line
 \*******************************************************************/
 void c_test_filet::add_empty_line()
 {
-  current_file += "\n";
+  current_file+="\n";
 }
 
 /*******************************************************************\
@@ -148,7 +148,7 @@ void c_test_filet::add_function(const irep_idt &function_name,
                                 const function_return_buildert &function_return)
 {
   std::ostringstream function_call_builder;
-  if(function_return.get_function_has_return() > 0)
+  if(function_return.get_function_has_return()>0)
   {
     function_call_builder << function_return.get_return_variable_name();
     function_call_builder << " = ";
@@ -158,13 +158,13 @@ void c_test_filet::add_function(const irep_idt &function_name,
   function_call_builder << "(";
 
   typedef std::vector<std::string>::const_iterator const_input_iterator;
-  const_input_iterator last = --function_inputs.cend();
+  const_input_iterator last=--function_inputs.cend();
 
   for(const std::string &entry : function_inputs)
   {
 
     function_call_builder << entry;
-    if(entry != *last)
+    if(entry!=*last)
     {
       function_call_builder << ", ";
     }
@@ -186,7 +186,7 @@ Purpose: To create indentation for a specific level
 std::string c_test_filet::indentation(int level) const
 {
   std::ostringstream indentation_string;
-  for(int i = 0; i < level; ++i)
+  for(int i=0; i<level; ++i)
   {
     indentation_string << indentation_character;
   }

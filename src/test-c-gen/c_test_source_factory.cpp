@@ -12,25 +12,6 @@
 #include <test-c-gen/function_return_builder.h>
 
 
-/*std::string generate_c_test_case_from_inputs(
-    const symbol_tablet &st, const irep_idt &func_id,
-    bool enters_main, inputst inputs,
-    const interpretert::list_input_varst& opaque_function_returns,
-    const interpretert::input_var_functionst& input_defn_functions,
-    const interpretert::dynamic_typest& dynamic_types,
-    const std::string &test_func_name,
-    const interpretert::side_effects_differencet &valuesDifference,
-    const exprt &assertExpr, bool emitAssert,
-    bool disable_mocks,
-    bool disable_verify_mocks,
-    const optionst::value_listt& mock_classes,
-    const optionst::value_listt& no_mock_classes,
-    const std::vector<std::string>& goals_reached,
-    const std::string& expect_exception)
-{
-  return "int main(int argc, char* argv) { return 0; }";
-}*/
-
 namespace
 {
 /*******************************************************************\
@@ -54,12 +35,12 @@ Purpose: To pull out from the inputs the relevant ones for the function
 
     for(const parametert &parameter : params)
     {
-      const irep_idt &parameter_identifer = parameter.get_identifier();
+      const irep_idt &parameter_identifer=parameter.get_identifier();
       typedef inputst::const_iterator const_inputs_itert;
-      const_inputs_itert param_iter = all_inputs.find(parameter_identifer);
+      const_inputs_itert param_iter=all_inputs.find(parameter_identifer);
 
       // The input vars should include all parameters
-      assert(param_iter != all_inputs.cend());
+      assert(param_iter!=all_inputs.cend());
 
       filtered_inputs.insert(input_entryt(parameter_identifer,
                                           param_iter->second));
@@ -81,7 +62,7 @@ Inputs:
 Outputs: An executable C test harness
 Purpose: To generate a test harness to reproduce a specific trace
 \*******************************************************************/
-std::string generate_c_test_case_from_inputs(const symbol_tablet &st,
+std::string generate_c_test_case_from_inputs(const symbol_tablet &symbol_table,
                                              const exprt & func_call_expr,
                                              const irep_idt &function_id,
                                              const interpretert::input_varst &input_vars,
@@ -94,19 +75,19 @@ std::string generate_c_test_case_from_inputs(const symbol_tablet &st,
 
   test_file.add_line_at_current_indentation("printf(\"Running tests...\\n\");");
 
-  namespacet ns(st);
+  namespacet ns(symbol_table);
   expr2cleanct e2c(ns);
 
-  inputst function_inputs = filter_inputs_to_function_parameters(input_vars,
+  inputst function_inputs=filter_inputs_to_function_parameters(input_vars,
                                                                  func_call_expr);
 
   std::vector<std::string> input_entries;
   for(const input_entryt &entry : function_inputs)
   {
-    function_parameter_buildert function_param(entry, e2c, st);
+    function_parameter_buildert function_param(entry, e2c, symbol_table);
 
     test_file.add_line_at_current_indentation(
-          function_param.get_parameter_decleration());
+          function_param.get_parameter_declaration());
 
     input_entries.push_back(function_param.get_parameter_variable_name());
   }
@@ -123,7 +104,7 @@ std::string generate_c_test_case_from_inputs(const symbol_tablet &st,
 
   if(return_builder.get_function_has_return())
   {
-    const std::vector<std::string> &assertion_lines =
+    const std::vector<std::string> &assertion_lines=
         return_builder.get_assertion_lines();
 
     for(const std::string &assert_line : assertion_lines)

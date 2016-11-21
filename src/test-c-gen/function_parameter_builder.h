@@ -16,14 +16,14 @@ class function_parameter_buildert
 public:
   function_parameter_buildert(const input_entryt &entry,
                               class expr2cleanct &e2c,
-                              const symbol_tablet &st);
+                              const symbol_tablet &symbol_table);
 
-  std::string get_parameter_decleration() const;
+  std::string get_parameter_declaration() const;
   std::string get_parameter_variable_name() const;
 
 private:
   std::string variable_name;
-  std::string variable_decleration_line;
+  std::string variable_declaration_line;
 
 };
 
