@@ -164,33 +164,3 @@ std::string c_test_case_generatort::sanitise_function_name(
 
   return isolated_function_name;
 }
-
-/*******************************************************************\
-Function: c_test_case_generatort::debug_print_trace
-Inputs:
- trace - The trace to print
-Purpose: Print a string version of the trace using enum strings
-\*******************************************************************/
-void c_test_case_generatort::debug_print_trace(const goto_tracet &trace)
-{
-  // Print out the trace
-
-  status() << "[";
-  std::vector<std::string> trace_types = {"NONE", "ASSIGNMENT", "ASSUME",
-                                         "ASSERT", "GOTO", "LOCATION",
-                                         "INPUT", "OUTPUT", "DECL", "DEAD",
-                                         "FUNCTION_CALL", "FUNCTION_RETURN",
-                                         "CONSTRAINT", "SHARED_READ",
-                                         "SHARED_WRITE", "SPAWN",
-                                         "MEMORY_BARRIER", "ATOMIC_BEGIN",
-                                         "ATOMIC_END" };
-
-  for(const goto_trace_stept &step : trace.steps)
-  {
-    status() << trace_types[(int)step.type] << ", ";
-  }
-
-  status() << "]";
-  status() << eom;
-
-}
