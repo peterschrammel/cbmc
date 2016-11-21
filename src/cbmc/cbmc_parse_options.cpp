@@ -909,8 +909,11 @@ bool cbmc_parse_optionst::process_goto_program(
     }
   
     // do partial inlining
-    status() << "Partial Inlining" << eom;
-    goto_partial_inline(goto_functions, ns, ui_message_handler);
+    if(!cmdline.isset("no-inlining"))
+    {
+      status() << "Partial Inlining" << eom;
+      goto_partial_inline(goto_functions, ns, ui_message_handler);
+    }
     
     // remove returns, gcc vectors, complex
     remove_returns(symbol_table, goto_functions);
@@ -1191,6 +1194,7 @@ void cbmc_parse_optionst::help()
     " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n"
     " --arrays-uf-always           always turn arrays into uninterpreted functions\n"
+    " --no-inlining                disable all inlining when generating goto code\n"
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"

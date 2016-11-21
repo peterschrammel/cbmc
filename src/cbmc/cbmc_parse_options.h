@@ -53,6 +53,7 @@ class optionst;
   "(arrays-uf-always)(arrays-uf-never)" \
   "(string-abstraction)(no-arch)(arch):" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
+  "(no-inlining)" \
   "(graphml-cex):" \
   "(gen-c-test-case)" \
   "(localize-faults)(localize-faults-method):" \
