@@ -111,6 +111,8 @@ public:
   {
     goto_tracet goto_trace;
     std::vector<irep_idt> covered_goals;
+    std::string source_code;
+    std::string test_function_name;
   };
   
   inline irep_idt id(goto_programt::const_targett loc)
@@ -327,21 +329,13 @@ bool bmc_covert::operator()()
                              + id2string(goal_map.at(goalid).source_location.get_line()));
 
       // Compute the test function name
-      /*test.test_function_name=gen.generate_test_func_name(bmc.ns.get_symbol_table(),
+      test.test_function_name=gen.get_test_function_name(bmc.ns.get_symbol_table(),
                                                           goto_functions, test_case_no);
 
       // Compute the test code
       test.source_code=gen.generate_tests(bmc.options,bmc.ns.get_symbol_table(),
                                                    goto_functions,test.goto_trace,
-                                                   ++test_case_no,goal_names);*/
-
-      std::string test_function_name = gen.get_test_function_name(bmc.ns.get_symbol_table(),
-                                                                  goto_functions,
-                                                                  test_case_no);
-
-      std::string test_body = gen.generate_tests(bmc.options, bmc.ns.get_symbol_table(),
-                                                 goto_functions, test.goto_trace,
-                                                 test_case_no, goal_names);
+                                                   ++test_case_no,goal_names);
 
       ++test_case_no;
     }
@@ -368,7 +362,11 @@ bool bmc_covert::operator()()
                  << eom;
       }
 
-      status() << '\n';
+      for(const auto& it : tests)
+      {
+        if(it.source_code.length()!=0)
+          status() << it.source_code << '\n';
+      }
 
       break;
     }
@@ -469,6 +467,13 @@ bool bmc_covert::operator()()
             }
           }
         }
+
+        if(test.source_code.length()!=0)
+        {
+          result["name"]=json_stringt(test.test_function_name);
+          result["test"]=json_stringt(test.source_code);
+        }
+
         json_arrayt &goal_refs=result["coveredGoals"].make_array();
         for(const auto & goal_id : test.covered_goals)
         {
