@@ -6,8 +6,8 @@
 
 \*******************************************************************/
 
-#ifndef FUNCTION_RETURN_BUILDER_H
-#define FUNCTION_RETURN_BUILDER_H
+#ifndef CPROVER_FUNCTION_RETURN_BUILDER_H
+#define CPROVER_FUNCTION_RETURN_BUILDER_H
 
 #include <goto-programs/interpreter_class.h>
 
@@ -43,4 +43,4 @@ private:
   std::vector<std::string> assertions;
 };
 
-#endif // FUNCTION_RETURN_BUILDERT_H
+#endif // CPROVER_FUNCTION_RETURN_BUILDERT_H

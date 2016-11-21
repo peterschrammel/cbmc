@@ -6,8 +6,8 @@
 
 \*******************************************************************/
 
-#ifndef C_TEST_CASE_GENERATOR_H
-#define C_TEST_CASE_GENERATOR_H
+#ifndef CPROVER_C_TEST_CASE_GENERATOR_H
+#define CPROVER_C_TEST_CASE_GENERATOR_H
 
 #include <functional>
 #include <string>
@@ -53,4 +53,4 @@ private:
     const interpretert::input_varst &all_inputs, const exprt &func_expr);
 };
 
-#endif
+#endif // CPROVER_C_TEST_CASE_GENERATOR_H

@@ -1,4 +1,4 @@
-#include "function_parameter_builder.h"
+#include <test-c-gen/function_parameter_builder.h>
 
 #include <sstream>
 

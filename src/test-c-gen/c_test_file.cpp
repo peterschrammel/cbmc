@@ -1,4 +1,4 @@
-#include "c_test_file.h"
+#include <test-c-gen/c_test_file.h>
 
 #include <sstream>
 

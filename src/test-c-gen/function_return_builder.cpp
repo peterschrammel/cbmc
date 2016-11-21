@@ -1,4 +1,4 @@
-#include "function_return_builder.h"
+#include <test-c-gen/function_return_builder.h>
 
 #include <test-c-gen/expr2cleanc.h>
 

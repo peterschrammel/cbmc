@@ -6,8 +6,8 @@
 
 \*******************************************************************/
 
-#ifndef EXPR2CLEANC_H
-#define EXPR2CLEANC_H
+#ifndef CPROVER_EXPR2CLEANC_H
+#define CPROVER_EXPR2CLEANC_H
 
 #include <ansi-c/expr2c_class.h>
 
@@ -35,4 +35,4 @@ protected:
   virtual std::string convert_constant_bool(bool boolean_value) override;
 };
 
-#endif // EXPR2CLEANC_H_
+#endif // CPROVER_EXPR2CLEANC_H_

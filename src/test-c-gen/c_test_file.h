@@ -1,5 +1,13 @@
-#ifndef C_TEST_FILE_H
-#define C_TEST_FILE_H
+/*******************************************************************
+
+ Module: C Test Case Generator
+
+ Author: Thomas Kiley, thomas@diffblue.com
+
+\*******************************************************************/
+
+#ifndef CPROVER_C_TEST_FILE_H
+#define CPROVER_C_TEST_FILE_H
 
 #include <util/irep.h>
 
@@ -38,4 +46,4 @@ private:
   const std::string indentation_character;
 };
 
-#endif // C_TEST_FILE_H
+#endif // CPROVER_C_TEST_FILE_H
