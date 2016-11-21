@@ -122,11 +122,11 @@ std::string c_test_case_generatort::generate_c_test_case_from_inputs(
   namespacet ns(symbol_table);
   expr2cleanct e2c(ns);
 
-  inputst function_inputs=filter_inputs_to_function_parameters(input_vars,
-                                                               func_call_expr);
+  interpretert::input_varst function_inputs=
+      filter_inputs_to_function_parameters(input_vars, func_call_expr);
 
   std::vector<std::string> input_entries;
-  for(const input_entryt &entry : function_inputs)
+  for(const interpretert::input_entryt &entry : function_inputs)
   {
     function_parameter_buildert function_param(entry, e2c, symbol_table);
 
@@ -141,7 +141,7 @@ std::string c_test_case_generatort::generate_c_test_case_from_inputs(
   if(return_builder.get_function_has_return())
   {
     test_file.add_line_at_current_indentation(
-      return_builder.get_return_decleration());
+      return_builder.get_return_declaration());
   }
 
   test_file.add_function(function_id, input_entries, return_builder);
@@ -218,25 +218,25 @@ Outputs: The inputs which are parameters for the supplied function
 Purpose: To pull out from the inputs the relevant ones for the function
          call
 \*******************************************************************/
-inputst c_test_case_generatort::filter_inputs_to_function_parameters(
-    const inputst &all_inputs, const exprt &func_expr)
+interpretert::input_varst c_test_case_generatort::filter_inputs_to_function_parameters(
+    const interpretert::input_varst &all_inputs, const exprt &func_expr)
 {
   const code_typet::parameterst &params=
       to_code_type(func_expr.type()).parameters();
 
-  inputst filtered_inputs;
+  interpretert::input_varst filtered_inputs;
 
   typedef code_typet::parametert parametert;
   for(const parametert &parameter : params)
   {
     const irep_idt &parameter_identifer=parameter.get_identifier();
-    typedef inputst::const_iterator const_inputs_itert;
+    typedef interpretert::input_varst::const_iterator const_inputs_itert;
     const_inputs_itert param_iter=all_inputs.find(parameter_identifer);
 
     // The input vars should include all parameters
     assert(param_iter!=all_inputs.cend());
 
-    filtered_inputs.insert(input_entryt(parameter_identifer,
+    filtered_inputs.insert(interpretert::input_entryt(parameter_identifer,
                                         param_iter->second));
   }
 

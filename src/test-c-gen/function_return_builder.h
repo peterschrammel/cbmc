@@ -9,12 +9,12 @@
 #ifndef FUNCTION_RETURN_BUILDER_H
 #define FUNCTION_RETURN_BUILDER_H
 
-#include <test-c-gen/input_entry.h>
+#include <goto-programs/interpreter_class.h>
 
 class function_return_buildert
 {
 public:
-  function_return_buildert(const inputst &all_inputs,
+  function_return_buildert(const interpretert::input_varst &all_inputs,
                            const irep_idt &function_id,
                            class expr2cleanct &e2c_converter);
 
@@ -37,7 +37,7 @@ private:
 
   class expr2cleanct &e2c;
   bool has_return;
-  input_entryt return_entry;
+  interpretert::input_entryt return_entry;
   std::string return_var_name;
 
   std::vector<std::string> assertions;

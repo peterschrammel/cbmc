@@ -15,7 +15,6 @@
 #include <util/message.h>
 
 #include <goto-programs/interpreter_class.h>
-#include <test-c-gen/input_entry.h>
 
 class c_test_case_generatort : public messaget
 {
@@ -49,8 +48,9 @@ private:
   const irep_idt get_calling_function_name(const class exprt &func_expr);
 
   std::string sanitize_function_name(const std::string called_function_name);
-  inputst filter_inputs_to_function_parameters(const inputst &all_inputs,
-                                               const exprt &func_expr);
+
+  interpretert::input_varst filter_inputs_to_function_parameters(
+    const interpretert::input_varst &all_inputs, const exprt &func_expr);
 };
 
 #endif

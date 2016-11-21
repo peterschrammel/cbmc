@@ -9,12 +9,12 @@
 #ifndef FUNCTION_PARAMETER_BUILDER_H
 #define FUNCTION_PARAMETER_BUILDER_H
 
-#include <test-c-gen/input_entry.h>
+#include <goto-programs/interpreter_class.h>
 
 class function_parameter_buildert
 {
 public:
-  function_parameter_buildert(const input_entryt &entry,
+  function_parameter_buildert(const interpretert::input_entryt &entry,
                               class expr2cleanct &e2c,
                               const symbol_tablet &symbol_table);
 

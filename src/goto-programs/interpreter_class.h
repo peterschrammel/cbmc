@@ -50,6 +50,7 @@ public:
   friend class simplify_evaluatet;
 
   typedef std::map<const irep_idt,exprt> input_varst;
+  typedef std::pair<irep_idt, exprt> input_entryt;
   typedef std::map<const irep_idt,irep_idt> input_var_functionst;
   typedef std::map<const irep_idt,const typet> dynamic_typest;
 
