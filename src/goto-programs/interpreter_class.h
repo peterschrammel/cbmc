@@ -197,10 +197,6 @@ public:
   void initialise(bool init);
   void show_state();
 
-  // load counter example utility functions
-
-  std::set<irep_idt> get_parameter_set(const exprt &func_expr);
-
   static bool get_is_variable_cprover(const irep_idt &variable_id);
   void list_inputs(bool use_non_det = false);
   void list_inputs(input_varst &inputs);
