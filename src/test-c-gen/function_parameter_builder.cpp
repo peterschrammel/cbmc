@@ -14,8 +14,9 @@ Inputs:
 Purpose: To create relevant parts for assigning a specific value as a
          function parameter
  \*******************************************************************/
-function_parameter_buildert::function_parameter_buildert(
-    const input_entryt &entry, expr2cleanct &e2c)
+function_parameter_buildert::function_parameter_buildert(const input_entryt &entry,
+                                                         expr2cleanct &e2c,
+                                                         const symbol_tablet &st)
 {
   std::ostringstream var_assignment_builder;
 
@@ -26,7 +27,9 @@ function_parameter_buildert::function_parameter_buildert(
   variable_name = var_name_builder.str();
   substitute(variable_name, "::", "_");
 
-  std::string type = e2c.convert_with_identifier(entry.second.type(),
+  const typet &lhs_type=st.lookup(entry.first).type;
+
+  std::string type=e2c.convert_with_identifier(lhs_type,
                                                  variable_name);
   var_assignment_builder << type;
 

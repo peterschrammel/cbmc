@@ -103,7 +103,7 @@ std::string generate_c_test_case_from_inputs(const symbol_tablet &st,
   std::vector<std::string> input_entries;
   for(const input_entryt &entry : function_inputs)
   {
-    function_parameter_buildert function_param(entry, e2c);
+    function_parameter_buildert function_param(entry, e2c, st);
 
     test_file.add_line_at_current_indentation(
           function_param.get_parameter_decleration());
