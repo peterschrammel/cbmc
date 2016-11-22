@@ -26,6 +26,10 @@ protected:
   virtual void add_main_method(c_test_filet &test_file,
     const std::vector<testt> &tests) override;
 
+  virtual void add_simple_assert(class c_test_filet &test_file,
+    const exprt &correct_expression,
+    std::string ret_value_var);
+
 private:
   bool using_test_main;
 };

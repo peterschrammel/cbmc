@@ -10,12 +10,12 @@
 #define CPROVER_TEST_C_GEN_FUNCTION_PARAMETER_BUILDER_H
 
 #include <goto-programs/interpreter_class.h>
+#include <test-c-gen/expr2cleanc.h>
 
 class function_parameter_buildert
 {
 public:
-  function_parameter_buildert(const interpretert::input_entryt &entry,
-    class expr2cleanct &e2c,
+  function_parameter_buildert(const interpretert::input_entryt &entry, expr2cleanct &e2c,
     const symbol_tablet &symbol_table);
 
   std::string get_parameter_declaration() const;

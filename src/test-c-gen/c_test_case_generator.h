@@ -15,8 +15,9 @@
 #include <util/message.h>
 
 #include <goto-programs/interpreter_class.h>
+#include <test-c-gen/expr2cleanc.h>
 
-// TODO: Since this is also used by Java test generation it should
+// TODO(tkiley): Since this is also used by Java test generation it should
 // be moved into its own file
 struct testt
 {
@@ -45,6 +46,8 @@ protected:
   virtual void add_includes(c_test_filet &test_file);
   virtual void add_main_method(c_test_filet &test_file,
     const std::vector<testt> &tests) = 0;
+  virtual void add_simple_assert(class c_test_filet &test_file,
+    const exprt &expected_value, std::string return_var_name) = 0;
 
 private:
   void generate_c_test_case_from_inputs(const exprt & func_call_expr,
@@ -61,10 +64,23 @@ private:
   interpretert::input_varst filter_inputs_to_function_parameters(
     const interpretert::input_varst &all_inputs, const exprt &func_expr);
 
+  interpretert::input_entryt get_function_return_parameter(const interpretert::input_varst &all_inputs);
+
+  void add_asserts(class c_test_filet &test_file,
+    const exprt &expected_value, std::string return_var_name);
+
+  void add_struct_assert(class c_test_filet &test_file,
+    const exprt &expected_value, std::string return_var_name);
+
   const class optionst &options;
   const class symbol_tablet &symbol_table;
   const class goto_functionst &goto_functions;
   std::vector<testt> tests;
+
+  namespacet ns;
+protected:
+  std::unique_ptr<expr2cleanct> e2c;
+
 };
 
 #endif // CPROVER_TEST_C_GEN_C_TEST_CASE_GENERATOR_H

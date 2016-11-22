@@ -8,6 +8,7 @@
 
 #include <test-c-gen/c_simple_test_case_generator.h>
 #include <test-c-gen/c_test_file.h>
+#include <test-c-gen/expr2cleanc.h>
 #include <string>
 #include <vector>
 
@@ -83,4 +84,30 @@ void c_simple_test_case_generatort::add_main_method(c_test_filet &test_file,
 
   test_file.add_line_at_current_indentation("return 0;");
   test_file.end_function();
+}
+
+/*******************************************************************\
+Function: c_simple_test_case_generatort::add_simple_assert
+Inputs:
+ test_file - The C test file being created
+ correct_expression - The expression representing the value expected
+ return_value_var - The name of the variable (including relevant nesting)
+Purpose: Add an assertion for a simple expression
+ \*******************************************************************/
+void c_simple_test_case_generatort::add_simple_assert(c_test_filet &test_file,
+  const exprt &correct_expression,
+  std::string return_value_var)
+{
+  std::ostringstream assert_builder;
+
+  assert_builder << "assert(";
+  assert_builder << return_value_var;
+  assert_builder << " == ";
+
+  std::string expected_return_value=e2c->convert(correct_expression);
+
+  assert_builder << expected_return_value;
+  assert_builder << ");";
+
+  test_file.add_line_at_current_indentation(assert_builder.str());
 }
