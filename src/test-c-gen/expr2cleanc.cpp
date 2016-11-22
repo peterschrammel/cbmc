@@ -51,6 +51,16 @@ std::string expr2cleanct::convert_struct_type(const typet &src,
     false, false);
 }
 
+/*******************************************************************\
+Function: expr2cleanct::convert_array_type
+Inputs:
+ src - The array type being converted
+ qualifiers - Type qualifiers
+ declarator_str - Type declarators
+Outputs: C type decleration for an array
+Purpose: To produce a C type decleration for a given array
+         The clean version removes specifying the size of the array
+ \*******************************************************************/
 std::string expr2cleanct::convert_array_type(const typet &src,
 const c_qualifierst &qualifiers,
   const std::string &declarator_str)
