@@ -64,7 +64,7 @@ void c_simple_test_case_generatort::add_main_method(c_test_filet &test_file,
   const std::string main_method_name=using_test_main?"test_main":"main";
 
   test_file.add_function("int", main_method_name,
-    {{"int", "argv"}, {"char*", "argv[]"}});
+    {{"int", "argc"}, {"char*", "argv"}});
 
   for(const testt &test : tests)
   {
