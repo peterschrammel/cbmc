@@ -18,8 +18,6 @@ public:
     : current_file(), current_indentation(0), indentation_character("  ")
   {}
 
-  void emit_standard_includes();
-  void emit_file_include(const irep_idt &file_name);
   void emit_main_method();
 
   void add_line_at_current_indentation(std::string line);

@@ -41,7 +41,8 @@ public:
 
   const std::string get_test_function_name(size_t test_idx);
 
-
+protected:
+  virtual void add_includes(c_test_filet &test_file);
 
 private:
   void generate_c_test_case_from_inputs(const exprt & func_call_expr,

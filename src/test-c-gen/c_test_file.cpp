@@ -5,33 +5,6 @@
 #include <test-c-gen/function_return_builder.h>
 
 /*******************************************************************\
-Function: c_test_filet::emit_standard_includes
-Purpose: Add the normal includes needed for the test harness
-\*******************************************************************/
-void c_test_filet::emit_standard_includes()
-{
-  add_line_at_root_indentation("#include <assert.h>");
-  add_line_at_root_indentation("#include <stdio.h>");
-  add_line_at_root_indentation("#include <stdlib.h>");
-  add_empty_line();
-}
-
-/*******************************************************************\
-Function: c_test_filet::emit_file_include
-Inputs:
- file_name - The file being tested
-Purpose: To add an include for the file being tested
-\*******************************************************************/
-void c_test_filet::emit_file_include(const irep_idt &file_name)
-{
-  std::ostringstream include_line_builder;
-  include_line_builder << "#include \"";
-  include_line_builder << file_name;
-  include_line_builder << "\"";
-  add_line_at_root_indentation(include_line_builder.str());
-}
-
-/*******************************************************************\
 Function: c_test_filet::emit_main_method
 Purpose: Start creating the main method
 \*******************************************************************/
@@ -214,11 +187,8 @@ void c_test_filet::add_function(const std::string &return_type,
 
 /*******************************************************************\
 Function: c_test_filet::end_function
-Inputs:
- level - The level of indentation
-Outputs: A string of whitespace characters that would indent text to a
-         specific level
-Purpose: To create indentation for a specific level
+Purpose: To put the closing brace on a given function, checking braces
+         match.
 \*******************************************************************/
 void c_test_filet::end_function()
 {

@@ -53,13 +53,7 @@ void c_test_case_generatort::operator()()
   c_test_filet test_file;
 
   // Add standard includes
-  test_file.emit_standard_includes();
-
-  // Get the file the entry function is in to include it
-  const exprt &entry_func=interpretert::get_entry_function(goto_functions);
-  const irep_idt &file_name=entry_func.source_location().get_file();
-
-  test_file.emit_file_include(file_name);
+  add_includes(test_file);
 
   size_t test_index=0;
 
@@ -112,6 +106,26 @@ const std::string c_test_case_generatort::get_test_function_name(
   test_name << std::setfill('0') << std::setw(3) << test_idx;
 
   return test_name.str();
+}
+
+/*******************************************************************\
+Function: c_test_case_generatort::add_includes
+Inputs:
+ test_file - The C file to add the includes to
+Purpose: To generate hte C test harness for a specific trace with a
+         with a specific test generation function
+\*******************************************************************/
+void c_test_case_generatort::add_includes(c_test_filet &test_file)
+{
+  // Get the file the entry function is in to include it
+  const exprt &entry_func=interpretert::get_entry_function(goto_functions);
+  const irep_idt &file_name=entry_func.source_location().get_file();
+
+  std::ostringstream include_line_builder;
+  include_line_builder << "#include \"";
+  include_line_builder << file_name;
+  include_line_builder << "\"";
+  test_file.add_line_at_root_indentation(include_line_builder.str());
 }
 
 /*******************************************************************\

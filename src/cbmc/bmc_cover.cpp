@@ -21,7 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/xml_goto_trace.h>
 #include <goto-programs/json_goto_trace.h>
 
-#include <test-c-gen/c_test_case_generator.h>
+#include <test-c-gen/c_simple_test_case_generator.h>
 
 #include "bmc.h"
 #include "bv_cbmc.h"
@@ -307,8 +307,8 @@ bool bmc_covert::operator()()
   
   if (bmc.options.get_bool_option("gen-c-test-case"))
   {
-    c_test_case_generatort gen(get_message_handler(), bmc.options,
-      bmc.ns.get_symbol_table(), goto_functions, tests);
+    c_simple_test_case_generatort gen(get_message_handler(), bmc.options,
+      bmc.ns.get_symbol_table(), goto_functions, tests, true);
 
     gen();
 
