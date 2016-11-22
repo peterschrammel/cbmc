@@ -22,7 +22,6 @@ c_simple_test_case_generatort::c_simple_test_case_generatort(
       goto_functions, tests),
     using_test_main(using_test_main)
 {
-
 }
 
 void c_simple_test_case_generatort::add_includes(c_test_filet &test_file)
@@ -41,4 +40,33 @@ void c_simple_test_case_generatort::add_includes(c_test_filet &test_file)
 
   // Add the include for the file after the initial includes
   c_test_case_generatort::add_includes(test_file);
+}
+
+void c_simple_test_case_generatort::add_main_method(c_test_filet &test_file,
+  const std::vector<testt> &tests)
+{
+  // Create main method
+  const std::string main_method_name=using_test_main?"test_main":"main";
+
+  test_file.add_function("int", main_method_name,
+    {{"int", "argv"}, {"char*", "argv[]"}});
+
+  for(const testt &test : tests)
+  {
+    std::ostringstream test_function_call_builder;
+    test_function_call_builder << test.test_function_name;
+    test_function_call_builder << "();";
+    test_file.add_line_at_current_indentation(test_function_call_builder.str());
+  }
+
+  test_file.add_empty_line();
+
+  // Shutdown the application correctly
+  if(using_test_main)
+  {
+    test_file.add_line_at_current_indentation("exit(0);");
+  }
+
+  test_file.add_line_at_current_indentation("return 0;");
+  test_file.end_function();
 }

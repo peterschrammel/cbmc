@@ -23,6 +23,8 @@ public:
 
 protected:
   virtual void add_includes(class c_test_filet &test_file) override;
+  virtual void add_main_method(c_test_filet &test_file,
+    const std::vector<testt> &tests) override;
 
 private:
   bool using_test_main;

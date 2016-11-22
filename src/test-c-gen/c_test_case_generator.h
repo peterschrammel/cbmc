@@ -43,6 +43,8 @@ public:
 
 protected:
   virtual void add_includes(c_test_filet &test_file);
+  virtual void add_main_method(c_test_filet &test_file,
+    const std::vector<testt> &tests) = 0;
 
 private:
   void generate_c_test_case_from_inputs(const exprt & func_call_expr,

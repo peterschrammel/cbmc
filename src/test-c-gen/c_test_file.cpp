@@ -12,25 +12,6 @@
 
 #include <test-c-gen/function_return_builder.h>
 
-/*******************************************************************\
-Function: c_test_filet::emit_main_method
-Purpose: Start creating the main method
-\*******************************************************************/
-void c_test_filet::emit_main_method()
-{
-  add_function("int", "main", {{"int", "argv"}, {"char*", "argv[]"}});
-}
-
-/*******************************************************************\
-Function: c_test_filet::end_main_method
-Purpose: Put the closing brace on the main method
-\*******************************************************************/
-void c_test_filet::end_main_method()
-{
-  add_line_at_current_indentation("exit(0);");
-  add_line_at_current_indentation("return 0;");
-  end_function();
-}
 
 /*******************************************************************\
 Function: c_test_filet::get_file

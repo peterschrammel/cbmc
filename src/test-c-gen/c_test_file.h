@@ -18,8 +18,6 @@ public:
     : current_file(), current_indentation(0), indentation_character("  ")
   {}
 
-  void emit_main_method();
-
   void add_line_at_current_indentation(std::string line);
   void add_line_at_root_indentation(std::string line);
   void add_line_at_indentation(std::string line, int level);
@@ -40,8 +38,6 @@ public:
 
   void add_opening_brace(int level);
   void add_closing_brace(int level);
-
-  void end_main_method();
 
   std::string get_file() const;
 

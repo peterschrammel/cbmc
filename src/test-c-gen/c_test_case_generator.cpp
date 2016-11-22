@@ -49,7 +49,6 @@ c_test_case_generatort::c_test_case_generatort(
     goto_functions(goto_functions),
     tests(tests)
 {
-
 }
 
 /*******************************************************************\
@@ -75,18 +74,7 @@ void c_test_case_generatort::operator()()
     ++test_index;
   }
 
-  // Create main method
-  test_file.emit_main_method();
-
-  for(testt &test : tests)
-  {
-    std::ostringstream test_function_call_builder;
-    test_function_call_builder << test.test_function_name;
-    test_function_call_builder << "();";
-    test_file.add_line_at_current_indentation(test_function_call_builder.str());
-  }
-
-  test_file.end_main_method();
+  add_main_method(test_file, tests);
 
   status() << test_file.get_file() << eom;
 }
