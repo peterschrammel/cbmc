@@ -24,6 +24,12 @@ c_simple_test_case_generatort::c_simple_test_case_generatort(
 {
 }
 
+/*******************************************************************\
+Function: c_simple_test_case_generatort::add_includes
+Inputs:
+ test_file - The C file to add the includes to
+Purpose: To add the includes required for a simple test harness
+\*******************************************************************/
 void c_simple_test_case_generatort::add_includes(c_test_filet &test_file)
 {
   test_file.add_line_at_root_indentation("#include <assert.h>");
@@ -42,6 +48,14 @@ void c_simple_test_case_generatort::add_includes(c_test_filet &test_file)
   c_test_case_generatort::add_includes(test_file);
 }
 
+/*******************************************************************\
+Function: c_simple_test_case_generatort::add_main_method
+Inputs:
+ test_file - The C file to add the includes to
+ tests - The tests that need to be called
+Purpose: To create the main method that will call all the tests
+         included inside this file
+\*******************************************************************/
 void c_simple_test_case_generatort::add_main_method(c_test_filet &test_file,
   const std::vector<testt> &tests)
 {
