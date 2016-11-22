@@ -66,9 +66,6 @@ private:
   interpretert::input_varst filter_inputs_to_function_parameters(
     const interpretert::input_varst &all_inputs, const exprt &func_expr);
 
-  interpretert::input_entryt get_function_return_parameter(
-    const interpretert::input_varst &all_inputs);
-
   void add_asserts(class c_test_filet &test_file,
     const exprt &expected_value, std::string return_var_name);
 

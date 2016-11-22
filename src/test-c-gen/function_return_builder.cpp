@@ -29,7 +29,6 @@ function_return_buildert::function_return_buildert(
   for(const interpretert::input_entryt &input : all_inputs)
   {
     // TODO(tkiley): this isn't a great way to find returns
-    // TODO(tkiley): duplicated in c_test_case_generatort
     if(input.first=="return'")
     {
       has_return=true;
@@ -79,6 +78,13 @@ std::string function_return_buildert::get_return_variable_name() const
   // be called
   assert(has_return);
   return return_var_name;
+}
+
+interpretert::input_entryt function_return_buildert::
+  get_function_return_parameter() const
+{
+  assert(has_return);
+  return return_entry;
 }
 
 /*******************************************************************\

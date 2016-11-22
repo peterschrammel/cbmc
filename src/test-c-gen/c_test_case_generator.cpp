@@ -210,7 +210,7 @@ void c_test_case_generatort::generate_c_test_case_from_inputs(
   if(return_builder.get_function_has_return())
   {
     const interpretert::input_entryt &return_entry=
-      get_function_return_parameter(input_vars);
+      return_builder.get_function_return_parameter();
 
     add_asserts(test_file, return_entry.second,
       return_builder.get_return_variable_name());
@@ -300,30 +300,6 @@ interpretert::input_varst c_test_case_generatort::
   }
 
   return filtered_inputs;
-}
-
-/*******************************************************************\
-Function: c_test_case_generatort::get_function_return_parameter
-Inputs:
- all_inputs - The variables and their values returned from the
-              interpreter
-Outputs: The entry representing the return value (throws if no such
-         entry).
-Pupose: To find the value of the return value of the function
- \*******************************************************************/
-interpretert::input_entryt c_test_case_generatort::
-  get_function_return_parameter(const interpretert::input_varst &all_inputs)
-{
-  for(const interpretert::input_entryt &input : all_inputs)
-  {
-    // TODO(tkiley): this isn't a great way to find returns
-    if(input.first=="return'")
-    {
-      return input;
-    }
-  }
-
-  throw "no return value when trying to get the input";
 }
 
 /*******************************************************************\

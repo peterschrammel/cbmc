@@ -24,6 +24,8 @@ public:
   std::string get_return_declaration() const;
   std::string get_return_variable_name() const;
 
+  interpretert::input_entryt get_function_return_parameter() const;
+
 private:
   void set_return_variable_name(const irep_idt &function_id);
 
