@@ -37,8 +37,7 @@ Purpose: Start creating the main method
 \*******************************************************************/
 void c_test_filet::emit_main_method()
 {
-  add_line_at_current_indentation("int test_main(int argc, char* argv)");
-  add_opening_brace(0);
+  add_function("int", "main", {{"int", "argv"}, {"char*", "argv[]"}});
 }
 
 /*******************************************************************\
@@ -49,9 +48,7 @@ void c_test_filet::end_main_method()
 {
   add_line_at_current_indentation("exit(0);");
   add_line_at_current_indentation("return 0;");
-  add_closing_brace(0);
-  assert(current_indentation==0);
-  add_empty_line();
+  end_function();
 }
 
 /*******************************************************************\
@@ -134,7 +131,7 @@ void c_test_filet::add_empty_line()
 }
 
 /*******************************************************************\
-Function: c_test_filet::add_function
+Function: c_test_filet::add_function_call
 Inputs:
  function_name - The name of the function to call
  function_inputs - A list to use as the arguments to the function
@@ -143,9 +140,9 @@ Inputs:
 Purpose: Add a function call to the file and potentially assign its
          result to a variable
 \*******************************************************************/
-void c_test_filet::add_function(const irep_idt &function_name,
-                                const std::vector<std::string> function_inputs,
-                                const function_return_buildert &function_return)
+void c_test_filet::add_function_call(const irep_idt &function_name,
+  const std::vector<std::string> function_inputs,
+  const function_return_buildert &function_return)
 {
   std::ostringstream function_call_builder;
   if(function_return.get_function_has_return()>0)
@@ -173,6 +170,61 @@ void c_test_filet::add_function(const irep_idt &function_name,
   function_call_builder << ");";
 
   add_line_at_current_indentation(function_call_builder.str());
+}
+
+/*******************************************************************\
+Function: c_test_filet::add_function
+Inputs:
+ return_type - The string of the type the function returns
+ function_name - The name of the function
+ parameters - A list of key-value pairs of types and parameter names
+Purpose: To create a function declartion and opening brace for a function
+\*******************************************************************/
+void c_test_filet::add_function(const std::string &return_type,
+  const std::string function_name,
+  const c_test_filet::function_parameter_listt &parameters)
+{
+  // Only support functions at the root
+  assert(current_indentation==0);
+
+  std::ostringstream function_decl_builder;
+  function_decl_builder << return_type;
+  function_decl_builder << " " << function_name;
+  function_decl_builder << "(";
+
+  bool first=true;
+  for(const auto &param : parameters)
+  {
+    if(!first)
+    {
+      function_decl_builder << ", ";
+    }
+    else
+    {
+      first=false;
+    }
+
+    function_decl_builder << param.first << " " << param.second;
+  }
+
+  function_decl_builder << ")";
+  add_line_at_current_indentation(function_decl_builder.str());
+  add_opening_brace(0);
+}
+
+/*******************************************************************\
+Function: c_test_filet::end_function
+Inputs:
+ level - The level of indentation
+Outputs: A string of whitespace characters that would indent text to a
+         specific level
+Purpose: To create indentation for a specific level
+\*******************************************************************/
+void c_test_filet::end_function()
+{
+  add_closing_brace(0);
+  assert(current_indentation==0);
+  add_empty_line();
 }
 
 /*******************************************************************\

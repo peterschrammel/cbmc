@@ -106,14 +106,6 @@ public:
       return disjunction(tmp);
     }
   };
-
-  struct testt
-  {
-    goto_tracet goto_trace;
-    std::vector<irep_idt> covered_goals;
-    std::string source_code;
-    std::string test_function_name;
-  };
   
   inline irep_idt id(goto_programt::const_targett loc)
   {
@@ -315,10 +307,16 @@ bool bmc_covert::operator()()
   
   if (bmc.options.get_bool_option("gen-c-test-case"))
   {
+    c_test_case_generatort gen(get_message_handler(), bmc.options,
+      bmc.ns.get_symbol_table(), goto_functions, tests);
+
+    gen();
+
+#if 0
     size_t test_case_no=0;
     for(auto& test : tests)
     {
-      c_test_case_generatort gen(get_message_handler());
+
       std::vector<std::string> goal_names;
       for(const auto& goalid : test.covered_goals)
       {
@@ -339,6 +337,7 @@ bool bmc_covert::operator()()
 
       ++test_case_no;
     }
+#endif
   }
 
   switch(bmc.ui)
@@ -364,6 +363,7 @@ bool bmc_covert::operator()()
 
       for(const auto& it : tests)
       {
+        status() << it.test_function_name << ":" << eom;
         if(it.source_code.length()!=0)
           status() << it.source_code << '\n';
       }

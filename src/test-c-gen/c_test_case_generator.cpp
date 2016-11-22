@@ -20,32 +20,94 @@
 
 #include <goto-programs/interpreter_class.h>
 
+/*******************************************************************\
+Function: c_test_case_generatort::c_test_case_generatort
+Inputs:
+  options - Command line options passed to the interpreter
+  symbol_table - The symbol table for the GOTO program
+  goto_functions - The GOTO program
+  tests - The tests (e.g. traces) to create
+Purpose: To generate all the tests described in this generator.
+\*******************************************************************/
+c_test_case_generatort::c_test_case_generatort(
+  message_handlert &_message_handler,
+  const optionst &options,
+  const symbol_tablet &symbol_table,
+  const goto_functionst &goto_functions,
+  const std::vector<testt> &tests)
+  : messaget(_message_handler),
+    options(options),
+    symbol_table(symbol_table),
+    goto_functions(goto_functions),
+    tests(tests)
+{
+
+}
+
+/*******************************************************************\
+Function: c_test_case_generatort::operator()
+Purpose: To generate all the tests described in this generator.
+\*******************************************************************/
+void c_test_case_generatort::operator()()
+{
+  c_test_filet test_file;
+
+  // Add standard includes
+  test_file.emit_standard_includes();
+
+  // Get the file the entry function is in to include it
+  const exprt &entry_func=interpretert::get_entry_function(goto_functions);
+  const irep_idt &file_name=entry_func.source_location().get_file();
+
+  test_file.emit_file_include(file_name);
+
+  size_t test_index=0;
+
+  for(testt &test : tests)
+  {
+    // Create method for each test
+    test.test_function_name = get_test_function_name(test_index);
+
+    generate_test(test, test_file);
+
+    ++test_index;
+  }
+
+  // Create main method
+  test_file.emit_main_method();
+
+  for(testt &test : tests)
+  {
+    std::ostringstream test_function_call_builder;
+    test_function_call_builder << test.test_function_name;
+    test_function_call_builder << "();";
+    test_file.add_line_at_current_indentation(test_function_call_builder.str());
+  }
+
+  test_file.end_main_method();
+
+  status() << test_file.get_file() << eom;
+}
+
 
 /*******************************************************************\
 Function: c_test_case_generatort::get_test_function_name
 Inputs:
- st - The symbol table of the trace
- gf - The goto code the trace is over
  test_idx - The index of the test
 Outputs: The name of the test based on the function being tested and the test
          index.
 Purpose: To name a given test.
 \*******************************************************************/
 const std::string c_test_case_generatort::get_test_function_name(
-    const symbol_tablet &st, const goto_functionst &gf, size_t test_idx)
+  size_t test_idx)
 {
-  const irep_idt called_function_name=get_entry_function_id(gf);
+  const irep_idt called_function_name=get_entry_function_id(goto_functions);
+  const symbolt &function_symbol = symbol_table.lookup(called_function_name);
 
-  const std::string pretty_function_name=as_string(st.lookup(called_function_name).pretty_name);
+  const std::string pretty_function_name=as_string(function_symbol.pretty_name);
   const std::string sanitised_name=sanitize_function_name(pretty_function_name);
 
-  // In the java version we hash the function name and append it, but I don't
-  // see a reason for this
-  // It also pads the functions with 0's, again, I'm not sure why
-
   std::ostringstream test_name;
-
-
   test_name << sanitised_name << "_";
   test_name << std::setfill('0') << std::setw(3) << test_idx;
 
@@ -53,26 +115,17 @@ const std::string c_test_case_generatort::get_test_function_name(
 }
 
 /*******************************************************************\
-Function: c_test_case_generatort::generate_tests
+Function: c_test_case_generatort::generate_test
 Inputs:
- options - The command line options (used by the interpreter)
- st - The symbol table of the trace
- gf - The goto functions the trace is over
  trace - The trace to be reproduced by this test
  test_idx - The index of this test
- goals - The goals this test will cover
-Outputs:  An executable C test harness
 Purpose: To generate hte C test harness for a specific trace with a
          with a specific test generation function
 \*******************************************************************/
-std::string c_test_case_generatort::generate_tests(const optionst &options,
-                                                   const symbol_tablet &symbol_table,
-                                                   const goto_functionst &goto_functions,
-                                                   const goto_tracet &trace,
-                                                   const size_t test_idx,
-                                                   const std::vector<std::string> &goals_reached)
+void c_test_case_generatort::generate_test(const testt &test,
+  c_test_filet &test_file)
 {
-  status() << "Producing test " << test_idx << eom;
+  status() << "Producing test " << test.test_function_name << eom;
 
   interpretert::input_varst input_vars;
 
@@ -82,42 +135,35 @@ std::string c_test_case_generatort::generate_tests(const optionst &options,
   interpretert::list_input_varst function_inputs;
   interpretert::side_effects_differencet side_effects;
 
-  input_vars=interpreter.load_counter_example_inputs(trace, function_inputs,
-                                                       side_effects);
-
-  // Get the file the entry function is in to include it
   const exprt &entry_func=interpretert::get_entry_function(goto_functions);
-  const irep_idt &file_name=entry_func.source_location().get_file();
 
-  std::string test_contents=generate_c_test_case_from_inputs(
-        symbol_table, entry_func, get_entry_function_id(goto_functions),
-        input_vars, file_name);
+  input_vars=interpreter.load_counter_example_inputs(test.goto_trace,
+    function_inputs,
+    side_effects);
 
-  return test_contents;
+  generate_c_test_case_from_inputs(
+        entry_func, get_entry_function_id(goto_functions),
+        input_vars, test.test_function_name, test_file);
 }
 
 /*******************************************************************\
 Function: generate_c_test_case_from_inputs
 Inputs:
- st - The symbol table
  func_call_expr - The entry point for the users code
  function_id - The ID of the entry point function
  input_vars - The inputs required for the function to recreate the race
  file_name - The name of the file we are testing
-Outputs: An executable C test harness
 Purpose: To generate a test harness to reproduce a specific trace
 \*******************************************************************/
-std::string c_test_case_generatort::generate_c_test_case_from_inputs(
-    const symbol_tablet &symbol_table,
-    const exprt & func_call_expr,
-    const irep_idt &function_id,
-    const interpretert::input_varst &input_vars,
-    const irep_idt &file_name)
+void c_test_case_generatort::generate_c_test_case_from_inputs(
+  const exprt & func_call_expr,
+  const irep_idt &function_id,
+  const interpretert::input_varst &input_vars,
+  const std::string &test_name,
+  c_test_filet &test_file)
 {
-  c_test_filet test_file;
-  test_file.emit_standard_includes();
-  test_file.emit_file_include(file_name);
-  test_file.emit_main_method();
+  test_file.add_function("void", test_name,
+    c_test_filet::function_parameter_listt());
 
   test_file.add_line_at_current_indentation("printf(\"Running tests...\\n\");");
 
@@ -146,7 +192,7 @@ std::string c_test_case_generatort::generate_c_test_case_from_inputs(
       return_builder.get_return_declaration());
   }
 
-  test_file.add_function(function_id, input_entries, return_builder);
+  test_file.add_function_call(function_id, input_entries, return_builder);
 
   if(return_builder.get_function_has_return())
   {
@@ -159,9 +205,7 @@ std::string c_test_case_generatort::generate_c_test_case_from_inputs(
     }
   }
 
-  test_file.end_main_method();
-
-  return test_file.get_file();
+  test_file.end_function();
 }
 
 /*******************************************************************\

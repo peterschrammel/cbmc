@@ -27,9 +27,18 @@ public:
   void add_line_at_indentation(std::string line, int level);
   void add_empty_line();
 
-  void add_function(const irep_idt &function_name,
+  void add_function_call(const irep_idt &function_name,
     const std::vector<std::string> function_inputs,
     const class function_return_buildert &function_return);
+
+  typedef std::vector<std::pair<std::string, std::string>>
+    function_parameter_listt;
+
+  void add_function(const std::string &return_type,
+    const std::string function_name,
+    const function_parameter_listt &paramters);
+
+  void end_function();
 
   void add_opening_brace(int level);
   void add_closing_brace(int level);
