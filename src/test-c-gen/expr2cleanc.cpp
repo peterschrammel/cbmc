@@ -11,7 +11,7 @@ Purpose: To convert a type in to ANSI-C but with the identifier in place
          the type
 \*******************************************************************/
 std::string expr2cleanct::convert_with_identifier(const typet &src,
-                                                  const std::string &identifier)
+  const std::string &identifier)
 {
   return convert_rec(src, c_qualifierst(), identifier);
 }
@@ -43,17 +43,17 @@ Purpose: To produce a C type decleration for a given struct
          struct in line.
  \*******************************************************************/
 std::string expr2cleanct::convert_struct_type(const typet &src,
-                                              const std::string &qualifer_str,
-                                              const std::string &declarator_str)
+  const std::string &qualifer_str,
+  const std::string &declarator_str)
 {
   // Disable including the body of the struct when getting the type
   return expr2ct::convert_struct_type(src, qualifer_str, declarator_str,
-                                      false, false);
+    false, false);
 }
 
 std::string expr2cleanct::convert_array_type(const typet &src,
-                                             const c_qualifierst &qualifiers,
-                                             const std::string &declarator_str)
+const c_qualifierst &qualifiers,
+  const std::string &declarator_str)
 {
   return expr2ct::convert_array_type(src, qualifiers, declarator_str, false);
 }

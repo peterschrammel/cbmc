@@ -28,8 +28,8 @@ public:
   void add_empty_line();
 
   void add_function(const irep_idt &function_name,
-                    const std::vector<std::string> function_inputs,
-                    const class function_return_buildert &function_return);
+    const std::vector<std::string> function_inputs,
+    const class function_return_buildert &function_return);
 
   void add_opening_brace(int level);
   void add_closing_brace(int level);

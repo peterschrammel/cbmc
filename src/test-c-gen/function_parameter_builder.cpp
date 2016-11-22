@@ -14,9 +14,10 @@ Inputs:
 Purpose: To create relevant parts for assigning a specific value as a
          function parameter
  \*******************************************************************/
-function_parameter_buildert::function_parameter_buildert(const interpretert::input_entryt &entry,
-                                                         expr2cleanct &e2c,
-                                                         const symbol_tablet &symbol_table)
+function_parameter_buildert::function_parameter_buildert(
+  const interpretert::input_entryt &entry,
+  expr2cleanct &e2c,
+  const symbol_tablet &symbol_table)
 {
   std::ostringstream var_assignment_builder;
 

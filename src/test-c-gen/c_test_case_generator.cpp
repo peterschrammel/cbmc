@@ -123,7 +123,7 @@ std::string c_test_case_generatort::generate_c_test_case_from_inputs(
   expr2cleanct e2c(ns);
 
   interpretert::input_varst function_inputs=
-      filter_inputs_to_function_parameters(input_vars, func_call_expr);
+    filter_inputs_to_function_parameters(input_vars, func_call_expr);
 
   std::vector<std::string> input_entries;
   for(const interpretert::input_entryt &entry : function_inputs)
@@ -183,7 +183,7 @@ Outputs: The ID of the given function
 Purpose: To get the name of a specific function being called
 \*******************************************************************/
 const irep_idt c_test_case_generatort::get_calling_function_name(
-    const exprt &func_expr)
+  const exprt &func_expr)
 {
   return to_symbol_expr(func_expr).get_identifier();
 }
@@ -196,7 +196,7 @@ Outputs: A clean version of the name.
 Purpose: Remove ., <, > from names.
 \*******************************************************************/
 std::string c_test_case_generatort::sanitize_function_name(
-    const std::string called_function_name)
+  const std::string called_function_name)
 {
   const size_t bracket_offset=called_function_name.find('(');
   std::string isolated_function_name=called_function_name.substr(0, bracket_offset);
@@ -219,7 +219,7 @@ Purpose: To pull out from the inputs the relevant ones for the function
          call
 \*******************************************************************/
 interpretert::input_varst c_test_case_generatort::filter_inputs_to_function_parameters(
-    const interpretert::input_varst &all_inputs, const exprt &func_expr)
+  const interpretert::input_varst &all_inputs, const exprt &func_expr)
 {
   const code_typet::parameterst &params=
       to_code_type(func_expr.type()).parameters();

@@ -15,8 +15,8 @@ class function_parameter_buildert
 {
 public:
   function_parameter_buildert(const interpretert::input_entryt &entry,
-                              class expr2cleanct &e2c,
-                              const symbol_tablet &symbol_table);
+    class expr2cleanct &e2c,
+    const symbol_tablet &symbol_table);
 
   std::string get_parameter_declaration() const;
   std::string get_parameter_variable_name() const;

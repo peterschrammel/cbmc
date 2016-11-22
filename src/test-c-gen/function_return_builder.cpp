@@ -11,8 +11,8 @@ Inputs:
 Purpose: A builder class for dealing with function returns
  \*******************************************************************/
 function_return_buildert::function_return_buildert(const interpretert::input_varst &all_inputs,
-                                                   const irep_idt &function_id,
-                                                   expr2cleanct &e2c_converter)
+  const irep_idt &function_id,
+  expr2cleanct &e2c_converter)
   :e2c(e2c_converter)
 {
   has_return=false;
@@ -39,7 +39,7 @@ Inputs:
 Purpose: Store the variable named used to store the result of the function
  \*******************************************************************/
 void function_return_buildert::set_return_variable_name(
-    const irep_idt &function_id)
+  const irep_idt &function_id)
 {
   std::ostringstream ret_name_builder;
   ret_name_builder << "ret_";
@@ -54,8 +54,9 @@ Inputs:
  ret_value_var - The name of the variable (including relevant nesting)
 Pupose: Add assertions to the assertions list for the return value
  \*******************************************************************/
-void function_return_buildert::add_assertions_for_expression(const exprt &correct_expression,
-                                                             std::string ret_value_var)
+void function_return_buildert::add_assertions_for_expression(
+  const exprt &correct_expression,
+  std::string ret_value_var)
 {
   assert(has_return);
 
@@ -85,7 +86,7 @@ Purpose: Look through all the components of the struct and add assertions for
          each of them.
  \*******************************************************************/
 void function_return_buildert::add_assertions_for_struct_expression(
-    const exprt &correct_expression, std::string ret_value_var)
+  const exprt &correct_expression, std::string ret_value_var)
 {
   const struct_typet &struct_type=to_struct_type(correct_expression.type());
 
@@ -119,7 +120,7 @@ Inputs:
 Purpose: Add an assertion for a simple expression
  \*******************************************************************/
 void function_return_buildert::add_assertions_for_simple_expression(
-    const exprt &correct_expression, std::string return_value_var)
+  const exprt &correct_expression, std::string return_value_var)
 {
   std::ostringstream assert_builder;
 

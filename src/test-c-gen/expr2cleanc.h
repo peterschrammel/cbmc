@@ -15,22 +15,22 @@ class expr2cleanct : public expr2ct
 {
 public:
   expr2cleanct(const namespacet &ns)
-    : expr2ct(ns)
+  : expr2ct(ns)
   {}
 
   std::string convert_with_identifier(const typet &src,
-                                      const std::string &identifier);
+    const std::string &identifier);
 
 protected:
   virtual std::string convert_struct(const exprt &src, unsigned &precedence) override;
 
   virtual std::string convert_struct_type(const typet &src,
-                                          const std::string &qualifer_str,
-                                          const std::string &declarator_str) override;
+    const std::string &qualifer_str,
+    const std::string &declarator_str) override;
 
   virtual std::string convert_array_type(const typet &src,
-                                         const c_qualifierst &qualifiers,
-                                         const std::string &declarator_str) override;
+    const c_qualifierst &qualifiers,
+    const std::string &declarator_str) override;
 
   virtual std::string convert_constant_bool(bool boolean_value) override;
 };
