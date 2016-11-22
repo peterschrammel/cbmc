@@ -37,7 +37,8 @@ public:
     const class symbol_tablet &symbol_table,
     const class goto_functionst &goto_functions,
     const testt &test,
-    size_t test_index);
+    size_t test_index,
+    bool using_test_main);
 
   void operator()();
 
@@ -52,6 +53,9 @@ protected:
     const testt &test)=0;
   virtual void add_simple_assert(class c_test_filet &test_file,
     const exprt &expected_value, std::string return_var_name)=0;
+
+  void start_main(class c_test_filet &test_file);
+  void end_main(const std::string &return_code, class c_test_filet &test_file);
 
 private:
   void generate_c_test_case_from_inputs(const exprt & func_call_expr,
@@ -85,6 +89,8 @@ private:
 protected:
   std::unique_ptr<expr2cleanct> e2c;
 
+private:
+  bool using_test_main;
 };
 
 #endif // CPROVER_TEST_C_GEN_C_TEST_CASE_GENERATOR_H

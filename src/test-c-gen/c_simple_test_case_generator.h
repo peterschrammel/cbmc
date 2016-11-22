@@ -31,10 +31,7 @@ protected:
 
   virtual void add_simple_assert(class c_test_filet &test_file,
     const exprt &correct_expression,
-    std::string ret_value_var);
-
-private:
-  bool using_test_main;
+    std::string ret_value_var) override;
 };
 
 #endif // CPROVER_TEST_C_GEN_C_SIMPLE_TEST_CASE_GENERATOR_H

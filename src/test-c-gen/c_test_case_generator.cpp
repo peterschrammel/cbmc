@@ -43,7 +43,8 @@ c_test_case_generatort::c_test_case_generatort(
   const symbol_tablet &symbol_table,
   const goto_functionst &goto_functions,
   const testt &test,
-  size_t test_index)
+  size_t test_index,
+  bool using_test_main)
   : messaget(_message_handler),
     options(options),
     symbol_table(symbol_table),
@@ -51,7 +52,8 @@ c_test_case_generatort::c_test_case_generatort(
     test(test),
     test_index(test_index),
     ns(symbol_table),
-    e2c(new expr2cleanct(ns))
+    e2c(new expr2cleanct(ns)),
+    using_test_main(using_test_main)
 {
 }
 
@@ -129,6 +131,60 @@ void c_test_case_generatort::add_includes(c_test_filet &test_file)
   include_line_builder << file_name;
   include_line_builder << "\"";
   test_file.add_line_at_root_indentation(include_line_builder.str());
+
+  // We only require stdlib if we are making a main method that isn't called
+  // main (in this case we need to call things like exit(0) when the function
+  // is done.
+  if(using_test_main)
+  {
+    test_file.add_line_at_root_indentation("#include <stdlib.h>");
+  }
+}
+
+/*******************************************************************\
+Function: c_test_case_generatort::start_main
+Inputs:
+ test_file - The C file to add the includes to
+Purpose: To create a main method declaration in the file called
+         either main or test_main depending on using_test_main
+\*******************************************************************/
+void c_test_case_generatort::start_main(c_test_filet &test_file)
+{
+  // Create main method
+  const std::string main_method_name=using_test_main?"test_main":"main";
+
+  test_file.add_function("int", main_method_name,
+    {{"int", "argc"}, {"char*", "argv"}});
+}
+
+/*******************************************************************\
+Function: c_test_case_generatort::end_main
+Inputs:
+ return_code - The return code to return (and use in exit(...) if
+               required
+ test_file - The C file to add the includes to
+Purpose: To finish the main method for a given return code
+\*******************************************************************/
+void c_test_case_generatort::end_main(const std::string &return_code,
+  c_test_filet &test_file)
+{
+  // Shutdown the application correctly
+  if(using_test_main)
+  {
+    std::ostringstream exit_line_builder;
+    exit_line_builder << "exit(";
+    exit_line_builder << return_code;
+    exit_line_builder << ");";
+    test_file.add_line_at_current_indentation(exit_line_builder.str());
+  }
+
+  std::ostringstream return_line_builder;
+  return_line_builder << "return ";
+  return_line_builder << return_code;
+  return_line_builder << ";";
+
+  test_file.add_line_at_current_indentation(return_line_builder.str());
+  test_file.end_function();
 }
 
 /*******************************************************************\
@@ -186,7 +242,7 @@ void c_test_case_generatort::generate_c_test_case_from_inputs(
     filter_inputs_to_function_parameters(input_vars, func_call_expr);
 
   std::vector<std::string> input_entries;
-  if(function_inputs.size() > 0)
+  if(function_inputs.size()>0)
   {
     test_file.add_line_at_current_indentation(
       "// Initalize function arguments");
