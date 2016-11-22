@@ -45,7 +45,9 @@ const std::string c_test_case_generatort::get_test_function_name(
 
   std::ostringstream test_name;
 
-  test_name << sanitised_name << "_" << test_idx;
+
+  test_name << sanitised_name << "_";
+  test_name << std::setfill('0') << std::setw(3) << test_idx;
 
   return test_name.str();
 }

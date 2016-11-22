@@ -335,7 +335,7 @@ bool bmc_covert::operator()()
       // Compute the test code
       test.source_code=gen.generate_tests(bmc.options,bmc.ns.get_symbol_table(),
                                                    goto_functions,test.goto_trace,
-                                                   ++test_case_no,goal_names);
+                                                   test_case_no,goal_names);
 
       ++test_case_no;
     }
