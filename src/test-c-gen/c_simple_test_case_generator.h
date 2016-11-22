@@ -10,6 +10,8 @@
 #define CPROVER_TEST_C_GEN_C_SIMPLE_TEST_CASE_GENERATOR_H
 
 #include <test-c-gen/c_test_case_generator.h>
+#include <string>
+#include <vector>
 
 class c_simple_test_case_generatort : public c_test_case_generatort
 {

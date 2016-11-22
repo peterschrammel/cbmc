@@ -10,6 +10,8 @@
 #define CPROVER_TEST_C_GEN_FUNCTION_RETURN_BUILDER_H
 
 #include <goto-programs/interpreter_class.h>
+#include <string>
+#include <vector>
 
 class function_return_buildert
 {

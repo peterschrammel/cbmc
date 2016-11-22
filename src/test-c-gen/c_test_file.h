@@ -10,6 +10,9 @@
 #define CPROVER_TEST_C_GEN_C_TEST_FILE_H
 
 #include <util/irep.h>
+#include <string>
+#include <vector>
+#include <utility>
 
 class c_test_filet
 {

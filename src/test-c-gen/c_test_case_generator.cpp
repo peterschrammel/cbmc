@@ -94,7 +94,7 @@ const std::string c_test_case_generatort::get_test_function_name(
   size_t test_idx)
 {
   const irep_idt called_function_name=get_entry_function_id(goto_functions);
-  const symbolt &function_symbol = symbol_table.lookup(called_function_name);
+  const symbolt &function_symbol=symbol_table.lookup(called_function_name);
 
   const std::string pretty_function_name=as_string(function_symbol.pretty_name);
   const std::string sanitised_name=sanitize_function_name(pretty_function_name);
@@ -209,7 +209,7 @@ void c_test_case_generatort::generate_c_test_case_from_inputs(
 
   if(return_builder.get_function_has_return())
   {
-    const interpretert::input_entryt &return_entry =
+    const interpretert::input_entryt &return_entry=
       get_function_return_parameter(input_vars);
 
     add_asserts(test_file, return_entry.second,
@@ -257,7 +257,8 @@ std::string c_test_case_generatort::sanitize_function_name(
   const std::string called_function_name)
 {
   const size_t bracket_offset=called_function_name.find('(');
-  std::string isolated_function_name=called_function_name.substr(0, bracket_offset);
+  std::string isolated_function_name=called_function_name.
+    substr(0, bracket_offset);
 
   // Remove '<', '>', '.' and replace with _ to get valid name
   substitute(isolated_function_name, ".", "_");
@@ -276,7 +277,8 @@ Outputs: The inputs which are parameters for the supplied function
 Purpose: To pull out from the inputs the relevant ones for the function
          call
 \*******************************************************************/
-interpretert::input_varst c_test_case_generatort::filter_inputs_to_function_parameters(
+interpretert::input_varst c_test_case_generatort::
+  filter_inputs_to_function_parameters(
   const interpretert::input_varst &all_inputs, const exprt &func_expr)
 {
   const code_typet::parameterst &params=
@@ -309,8 +311,8 @@ Outputs: The entry representing the return value (throws if no such
          entry).
 Pupose: To find the value of the return value of the function
  \*******************************************************************/
-interpretert::input_entryt c_test_case_generatort::get_function_return_parameter(
-  const interpretert::input_varst &all_inputs)
+interpretert::input_entryt c_test_case_generatort::
+  get_function_return_parameter(const interpretert::input_varst &all_inputs)
 {
   for(const interpretert::input_entryt &input : all_inputs)
   {
@@ -343,7 +345,7 @@ void c_test_case_generatort::add_asserts(c_test_filet &test_file,
   }
   else if(type.id()==ID_pointer)
   {
-    // TODO - this should check pointers dereferenced == something sensible?
+    // TODO(tkiley): this should check pointers dereferenced == something sensible?
     add_simple_assert(test_file, correct_expression, ret_value_var);
   }
   else

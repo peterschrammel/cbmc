@@ -18,7 +18,8 @@ Inputs:
  e2c_converter - The expr2c converter being used to generate C code
 Purpose: A builder class for dealing with function returns
  \*******************************************************************/
-function_return_buildert::function_return_buildert(const interpretert::input_varst &all_inputs,
+function_return_buildert::function_return_buildert(
+  const interpretert::input_varst &all_inputs,
   const irep_idt &function_id,
   expr2cleanct &e2c_converter)
   :e2c(e2c_converter)

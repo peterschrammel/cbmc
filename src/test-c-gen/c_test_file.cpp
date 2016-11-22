@@ -121,7 +121,6 @@ void c_test_filet::add_function_call(const irep_idt &function_name,
 
   for(const std::string &entry : function_inputs)
   {
-
     function_call_builder << entry;
     if(entry!=*last)
     {

@@ -10,6 +10,7 @@
 #define CPROVER_TEST_C_GEN_EXPR2CLEANC_H
 
 #include <ansi-c/expr2c_class.h>
+#include <string>
 
 class expr2cleanct : public expr2ct
 {
@@ -22,7 +23,8 @@ public:
     const std::string &identifier);
 
 protected:
-  virtual std::string convert_struct(const exprt &src, unsigned &precedence) override;
+  virtual std::string convert_struct(const exprt &src,
+    unsigned &precedence) override;
 
   virtual std::string convert_struct_type(const typet &src,
     const std::string &qualifer_str,
