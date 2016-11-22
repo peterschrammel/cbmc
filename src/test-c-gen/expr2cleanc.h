@@ -6,15 +6,15 @@
 
 \*******************************************************************/
 
-#ifndef CPROVER_EXPR2CLEANC_H
-#define CPROVER_EXPR2CLEANC_H
+#ifndef CPROVER_TEST_C_GEN_EXPR2CLEANC_H
+#define CPROVER_TEST_C_GEN_EXPR2CLEANC_H
 
 #include <ansi-c/expr2c_class.h>
 
 class expr2cleanct : public expr2ct
 {
 public:
-  expr2cleanct(const namespacet &ns)
+  explicit expr2cleanct(const namespacet &ns)
   : expr2ct(ns)
   {}
 
@@ -35,4 +35,4 @@ protected:
   virtual std::string convert_constant_bool(bool boolean_value) override;
 };
 
-#endif // CPROVER_EXPR2CLEANC_H_
+#endif // CPROVER_TEST_C_GEN_EXPR2CLEANC_H_

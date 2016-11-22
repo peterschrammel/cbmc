@@ -1,4 +1,4 @@
-/*******************************************************************
+/*******************************************************************\
 
  Module: C Test Case Generator
 
@@ -6,8 +6,8 @@
 
 \*******************************************************************/
 
-#ifndef CPROVER_C_TEST_CASE_GENERATOR_H
-#define CPROVER_C_TEST_CASE_GENERATOR_H
+#ifndef CPROVER_TEST_C_GEN_C_TEST_CASE_GENERATOR_H
+#define CPROVER_TEST_C_GEN_C_TEST_CASE_GENERATOR_H
 
 #include <functional>
 #include <string>
@@ -65,4 +65,4 @@ private:
   std::vector<testt> tests;
 };
 
-#endif // CPROVER_C_TEST_CASE_GENERATOR_H
+#endif // CPROVER_TEST_C_GEN_C_TEST_CASE_GENERATOR_H

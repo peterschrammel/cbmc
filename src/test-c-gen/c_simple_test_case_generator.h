@@ -1,5 +1,13 @@
-#ifndef CPROVER_C_SIMPLE_TEST_CASE_GENERATORT_H
-#define CPROVER_C_SIMPLE_TEST_CASE_GENERATORT_H
+/*******************************************************************\
+
+ Module: C Test Case Generator
+
+ Author: Thomas Kiley, thomas@diffblue.com
+
+\*******************************************************************/
+
+#ifndef CPROVER_TEST_C_GEN_C_SIMPLE_TEST_CASE_GENERATOR_H
+#define CPROVER_TEST_C_GEN_C_SIMPLE_TEST_CASE_GENERATOR_H
 
 #include <test-c-gen/c_test_case_generator.h>
 
@@ -20,4 +28,4 @@ private:
   bool using_test_main;
 };
 
-#endif // CPROVER_C_SIMPLE_TEST_CASE_GENERATORT_H
+#endif // CPROVER_TEST_C_GEN_C_SIMPLE_TEST_CASE_GENERATOR_H

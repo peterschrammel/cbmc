@@ -1,5 +1,15 @@
+/*******************************************************************\
+
+ Module: C Test Case Generator
+
+ Author: Thomas Kiley, thomas@diffblue.com
+
+\*******************************************************************/
+
 #include <test-c-gen/c_simple_test_case_generator.h>
 #include <test-c-gen/c_test_file.h>
+#include <string>
+#include <vector>
 
 c_simple_test_case_generatort::c_simple_test_case_generatort(
   message_handlert &_message_handler,

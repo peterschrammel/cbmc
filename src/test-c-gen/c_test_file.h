@@ -6,8 +6,8 @@
 
 \*******************************************************************/
 
-#ifndef CPROVER_C_TEST_FILE_H
-#define CPROVER_C_TEST_FILE_H
+#ifndef CPROVER_TEST_C_GEN_C_TEST_FILE_H
+#define CPROVER_TEST_C_GEN_C_TEST_FILE_H
 
 #include <util/irep.h>
 
@@ -53,4 +53,4 @@ private:
   const std::string indentation_character;
 };
 
-#endif // CPROVER_C_TEST_FILE_H
+#endif // CPROVER_TEST_C_GEN_C_TEST_FILE_H

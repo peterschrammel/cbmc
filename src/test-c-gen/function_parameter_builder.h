@@ -6,8 +6,8 @@
 
 \*******************************************************************/
 
-#ifndef CPROVER_FUNCTION_PARAMETER_BUILDER_H
-#define CPROVER_FUNCTION_PARAMETER_BUILDER_H
+#ifndef CPROVER_TEST_C_GEN_FUNCTION_PARAMETER_BUILDER_H
+#define CPROVER_TEST_C_GEN_FUNCTION_PARAMETER_BUILDER_H
 
 #include <goto-programs/interpreter_class.h>
 
@@ -27,4 +27,4 @@ private:
 
 };
 
-#endif // CPROVER_FUNCTION_PARAMETER_BUILDERT_H
+#endif // CPROVER_TEST_C_GEN_FUNCTION_PARAMETER_BUILDERT_H

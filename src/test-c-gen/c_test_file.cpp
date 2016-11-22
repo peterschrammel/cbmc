@@ -1,3 +1,11 @@
+/*******************************************************************\
+
+ Module: C Test Case Generator
+
+ Author: Thomas Kiley, thomas@diffblue.com
+
+\*******************************************************************/
+
 #include <test-c-gen/c_test_file.h>
 
 #include <sstream>

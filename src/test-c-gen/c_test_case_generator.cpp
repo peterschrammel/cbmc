@@ -1,3 +1,11 @@
+/*******************************************************************\
+
+ Module: C Test Case Generator
+
+ Author: Thomas Kiley, thomas@diffblue.com
+
+\*******************************************************************/
+
 #include <test-c-gen/c_test_case_generator.h>
 
 #include <algorithm>
@@ -60,7 +68,7 @@ void c_test_case_generatort::operator()()
   for(testt &test : tests)
   {
     // Create method for each test
-    test.test_function_name = get_test_function_name(test_index);
+    test.test_function_name=get_test_function_name(test_index);
 
     generate_test(test, test_file);
 
@@ -229,7 +237,8 @@ Inputs:
 Outputs: The ID of the entry function where the users code starts
 Purpose: To find the ID of the first user function called
 \*******************************************************************/
-const irep_idt c_test_case_generatort::get_entry_function_id(const goto_functionst &gf)
+const irep_idt c_test_case_generatort::get_entry_function_id(
+  const goto_functionst &gf)
 {
   const exprt &func_expr=interpretert::get_entry_function(gf);
   return get_calling_function_name(func_expr);
