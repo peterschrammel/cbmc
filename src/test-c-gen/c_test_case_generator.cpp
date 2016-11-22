@@ -226,8 +226,7 @@ interpretert::input_varst c_test_case_generatort::filter_inputs_to_function_para
 
   interpretert::input_varst filtered_inputs;
 
-  typedef code_typet::parametert parametert;
-  for(const parametert &parameter : params)
+  for(const code_typet::parametert &parameter : params)
   {
     const irep_idt &parameter_identifer=parameter.get_identifier();
     typedef interpretert::input_varst::const_iterator const_inputs_itert;

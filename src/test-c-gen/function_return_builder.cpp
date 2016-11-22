@@ -92,8 +92,8 @@ void function_return_buildert::add_assertions_for_struct_expression(
 
   exprt::operandst::const_iterator o_it=correct_expression.operands().begin();
 
-  typedef struct_union_typet::componentt componentt;
-  for(const componentt &component : struct_type.components())
+  for(const struct_union_typet::componentt &component :
+    struct_type.components())
   {
     // Skip padding parameters
     if(component.get_is_padding())

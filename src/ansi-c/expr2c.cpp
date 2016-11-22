@@ -701,8 +701,8 @@ std::string expr2ct::convert_struct_type(const typet &src,
   {
     dest+=" {";
 
-    typedef struct_union_typet::componentt componentt;
-    for(const componentt &component : struct_type.components())
+    for(const struct_union_typet::componentt &component :
+      struct_type.components())
     {
       // Skip padding parameters unless we including them
       if(component.get_is_padding() && !inc_padding_parameters)
@@ -2412,8 +2412,8 @@ std::string expr2ct::convert_struct(const exprt &src, unsigned &precedence,
   bool newline=false;
   size_t last_size=0;
 
-  typedef struct_union_typet::componentt componentt;
-  for(const componentt &component : struct_type.components())
+  for(const struct_union_typet::componentt &component :
+    struct_type.components())
   {
     if(o_it->type().id()==ID_code)
       continue;
