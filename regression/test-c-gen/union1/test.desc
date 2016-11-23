@@ -1,0 +1,30 @@
+CORE
+main.c
+--function fun --cover branch --gen-c-test-case unity
+^EXIT=0$
+^SIGNAL=0$
+^#include "unity\.h"$
+^#include <stdlib\.h>$
+
+^#include "main\.c"$
+
+^void fun_000()$
+^  union u_type arg_fun_u = { .i = 1};
+^void fun_001()$
+^  union u_type arg_fun_u = { .i = -1};
+^  signed int ret_fun;
+^  ret_fun = fun();$
+^  TEST_ASSERT_EQUAL_INT32(-1, ret_fun);$
+^  TEST_ASSERT_EQUAL_INT32(1, ret_fun);$
+
+^int test_main(int argc, char\* argv)$
+^\{$
+^  UNITY_BEGIN();$
+^  RUN_TEST(fun_000);$
+^  RUN_TEST(fun_001);$
+^  int result = UNITY_END();$
+^  exit(result);$
+^  return result;$
+^\}$
+--
+^warning: ignoring
