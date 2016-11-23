@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <util/config.h>
 
 c_unity_test_case_generatort::c_unity_test_case_generatort(
   message_handlert &_message_handler,
@@ -149,13 +150,8 @@ bool c_unity_test_case_generatort::get_two_param_custom_assert(
   }
   else if(type.id()==ID_floatbv)
   {
-    // TODO(tkiley): I'm not sure if this is a good way to do this, or if there
-    // is a better way. Clearly the test generated will depend on the platform
-    // the test is generated rather than the platform the code is run on.
-    // One way would be to generate this code in the test but doesn't feel great
-    size_t size=type.get_unsigned_int(ID_width) / 8;
-
-    if(size>=sizeof(double))
+    size_t size=type.get_unsigned_int(ID_width);
+    if(size>=config.ansi_c.double_width)
     {
       out_assert_message="TEST_ASSERT_EQUAL_DOUBLE";
     }
