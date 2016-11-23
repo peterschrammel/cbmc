@@ -11,9 +11,9 @@ main.c
 ^void fun_000()$
 ^  struct example_s ret_fun;
 ^  ret_fun = fun();$
-^  TEST_ASSERT(ret_fun.b == 1);$
-^  TEST_ASSERT(ret_fun.x == 4);$
-^  TEST_ASSERT(ret_fun.internal.y == 3.141590e+0f);$
+^  TEST_ASSERT_FALSE(ret_fun.b);$
+^  TEST_ASSERT_EQUAL_INT(4, ret_fun.x);$
+^  TEST_ASSERT_EQUAL_FLOAT(3.141590e+0f, ret_fun.internal.y);$
 
 ^int test_main(int argc, char\* argv)$
 ^\{$

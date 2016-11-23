@@ -13,7 +13,7 @@ main.c
 ^  char \*\*arg_main_params = ((char \*\*)NULL);$
 ^  signed int ret_main;$
 ^  ret_main = main(arg_main_argc, arg_main_params);$
-^  assert(ret_main == 45);$
+^  TEST_ASSERT_EQUAL_INT(45, ret_main);$
 
 ^int test_main(int argc, char\* argv)$
 ^\{$

@@ -9,23 +9,17 @@ main.c
 ^#include "main\.c"$
 
 ^void fun_000()$
-^  signed int \* arg_fun_array = ((signed int \*)NULL);$
-^void fun_001()$
-^  signed int arg_fun_array\[\] = {1, 2, 3, 4, 5};$
-^  signed int ret_fun;$
+^  double ret_fun;
 ^  ret_fun = fun();$
-^  TEST_ASSERT_EQUAL_INT(7, ret_fun);$
+^  TEST_ASSERT_EQUAL_DOUBLE(3.141500e+0, ret_fun);$
 
 ^int test_main(int argc, char\* argv)$
 ^\{$
 ^  UNITY_BEGIN();$
 ^  RUN_TEST(fun_000);$
-^  RUN_TEST(fun_001);$
 ^  int result = UNITY_END();$
 ^  exit(result);$
 ^  return result;$
 ^\}$
-
-
 --
 ^warning: ignoring

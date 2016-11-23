@@ -15,8 +15,8 @@ main.c
 ^  *arg_fun_ptr_x = -1;$
 ^  signed int ret_fun;$
 ^  ret_fun = fun();$
-^  TEST_ASSERT(ret_fun == 4);$
-^  TEST_ASSERT(ret_fun == 0);$
+^  TEST_ASSERT_EQUAL_INT(4, ret_fun);$
+^  TEST_ASSERT_EQUAL_INT(0, ret_fun);$
 
 ^int test_main(int argc, char\* argv)$
 ^\{$

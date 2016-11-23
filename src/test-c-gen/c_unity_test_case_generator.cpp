@@ -86,14 +86,82 @@ void c_unity_test_case_generatort::add_simple_assert(c_test_filet &test_file,
 {
   std::ostringstream assert_builder;
 
-  assert_builder << "TEST_ASSERT(";
-  assert_builder << return_value_var;
-  assert_builder << " == ";
-
   std::string expected_return_value=e2c->convert(correct_expression);
+  const typet &type=correct_expression.type();
+  if(type.id()==ID_signedbv)
+  {
+    assert_builder << "TEST_ASSERT_EQUAL_INT(";
+    assert_builder << expected_return_value << ", ";
+    assert_builder << return_value_var << ");";
+  }
+  else if(type.id()==ID_unsignedbv)
+  {
+    assert_builder << "TEST_ASSERT_EQUAL_UINT(";
+    assert_builder << expected_return_value << ", ";
+    assert_builder << return_value_var << ");";
+  }
+  else if(type.id()==ID_floatbv)
+  {
+    // TODO(tkiley): I'm not sure if this is a good way to do this, or if there
+    // is a better way. Clearly the test generated will depend on the platform
+    // the test is generated rather than the platform the code is run on.
+    // One way would be to generate this code in the test but doesn't feel great
+    size_t size=type.get_unsigned_int(ID_width) / 8;
 
-  assert_builder << expected_return_value;
-  assert_builder << ");";
+    if(size>=sizeof(double))
+    {
+      assert_builder << "TEST_ASSERT_EQUAL_DOUBLE(";
+    }
+    else
+    {
+      assert_builder << "TEST_ASSERT_EQUAL_FLOAT(";
+    }
+
+    assert_builder << expected_return_value << ", ";
+    assert_builder << return_value_var << ");";
+  }
+  else if(type.id() == ID_bool)
+  {
+    if(correct_expression.is_true())
+    {
+      assert_builder << "TEST_ASSERT_TRUE(";
+    }
+    else
+    {
+      assert_builder << "TEST_ASSERT_FALSE(";
+    }
+    assert_builder << return_value_var;
+    assert_builder << ");";
+  }
+  else if(type.id()==ID_c_bool)
+  {
+    // TODO(tkiley): Could this logic be moved into the same place as
+    // exprt::is_true()?
+    constant_exprt const_correct=to_constant_expr(correct_expression);
+    const irep_idt &value=const_correct.get_value();
+    mp_integer int_value=binary2integer(id2string(value), false);
+    if(int_value!=0)
+    {
+      assert_builder << "TEST_ASSERT_TRUE(";
+    }
+    else
+    {
+      assert_builder << "TEST_ASSERT_FALSE(";
+    }
+    assert_builder << return_value_var;
+    assert_builder << ");";
+  }
+  else
+  {
+    warning() << "Could not identify special type for ";
+    warning() << type.id() << eom;
+
+    assert_builder << "TEST_ASSERT(";
+    assert_builder << return_value_var;
+    assert_builder << " == ";
+    assert_builder << expected_return_value;
+    assert_builder << ");";
+  }
 
   test_file.add_line_at_current_indentation(assert_builder.str());
 }

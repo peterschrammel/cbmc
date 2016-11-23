@@ -14,7 +14,7 @@ main.c
 ^  signed int arg_fun_array\[\] = {1, 2, 3, 4, 5};$
 ^  signed int ret_fun;$
 ^  ret_fun = fun();$
-^  TEST_ASSERT(ret_fun == 7);$
+^  TEST_ASSERT_EQUAL_INT(7, ret_fun);$
 
 ^int test_main(int argc, char\* argv)$
 ^\{$
