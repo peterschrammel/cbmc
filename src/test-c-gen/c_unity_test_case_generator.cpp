@@ -11,6 +11,7 @@
 #include <test-c-gen/expr2cleanc.h>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 c_unity_test_case_generatort::c_unity_test_case_generatort(
   message_handlert &_message_handler,
@@ -134,14 +135,15 @@ bool c_unity_test_case_generatort::get_two_param_custom_assert(
   const typet &type,
   std::string &out_assert_message)
 {
+  std::string width_str=get_width_str(type);
   if(type.id()==ID_signedbv)
   {
-    out_assert_message="TEST_ASSERT_EQUAL_INT";
+    out_assert_message="TEST_ASSERT_EQUAL_INT" + width_str;
     return true;
   }
   else if(type.id()==ID_unsignedbv)
   {
-    out_assert_message="TEST_ASSERT_EQUAL_UINT";
+    out_assert_message="TEST_ASSERT_EQUAL_UINT" + width_str;
     return true;
   }
   else if(type.id()==ID_floatbv)
@@ -210,4 +212,36 @@ bool c_unity_test_case_generatort::get_bool_custom_assert(
 
   out_assert_message=expr_value?"TEST_ASSERT_TRUE":"TEST_ASSERT_FALSE";
   return true;
+}
+
+/*******************************************************************\
+Function: c_unity_test_case_generatort::get_width_str
+Inputs:
+ type - The type of the assertion parmeter. Must be either a signedbv or
+        or unsignedbv.
+Output: Returns a string showing the width of this binary variable if
+        if it is a width that is supported by Unity
+Purpose: Generate a string that can be used for making the interger
+         assertions more precise.
+ \*******************************************************************/
+std::string c_unity_test_case_generatort::get_width_str(const typet &type)
+{
+  assert(type.id()==ID_signedbv||type.id()==ID_unsignedbv);
+  size_t width=type.get_unsigned_int(ID_width);
+
+  // Unity only supports custom asserts for 8, 16, 32, 64. If it isn't any
+  // we can just use the non-specific one
+  std::vector<size_t> supported_widths={8, 16, 32, 64};
+
+  if(std::find(supported_widths.cbegin(), supported_widths.cend(), width) !=
+    supported_widths.cend())
+  {
+    std::ostringstream size_builder;
+    size_builder << width;
+    return size_builder.str();
+  }
+  else
+  {
+    return "";
+  }
 }

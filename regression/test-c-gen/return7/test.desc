@@ -1,6 +1,6 @@
 CORE
 main.c
---function main --cover branch --gen-c-test-case unity
+--function fun --cover branch --gen-c-test-case unity
 ^EXIT=0$
 ^SIGNAL=0$
 ^#include "unity\.h"$
@@ -9,11 +9,9 @@ main.c
 ^#include "main\.c"$
 
 ^void fun_000()$
-^  signed int arg_main_argc = 4098;$
-^  char \*\*arg_main_params = ((char \*\*)NULL);$
-^  signed int ret_main;$
-^  ret_main = main(arg_main_argc, arg_main_params);$
-^  TEST_ASSERT_EQUAL_INT32(45, ret_main);$
+^  char ret_fun;
+^  ret_fun = fun();$
+^  TEST_ASSERT_EQUAL_INT8('t', ret_fun);$
 
 ^int test_main(int argc, char\* argv)$
 ^\{$
@@ -23,7 +21,5 @@ main.c
 ^  exit(result);$
 ^  return result;$
 ^\}$
-
-
 --
 ^warning: ignoring

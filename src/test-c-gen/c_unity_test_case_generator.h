@@ -39,6 +39,8 @@ private:
   static bool get_bool_custom_assert(const typet &type,
     const exprt &expected_expr,
     std::string &out_assert_message);
+
+  static std::string get_width_str(const typet &type);
 };
 
 #endif // CPROVER_TEST_C_GEN_C_UNITY_TEST_CASE_GENERATOR_H

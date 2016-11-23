@@ -11,7 +11,7 @@ main.c
 ^void fun_000()$
 ^  unsigned int ret_fun;
 ^  ret_fun = fun();$
-^  TEST_ASSERT_EQUAL_UINT(5u, ret_fun);$
+^  TEST_ASSERT_EQUAL_UINT32(5u, ret_fun);$
 
 ^int test_main(int argc, char\* argv)$
 ^\{$

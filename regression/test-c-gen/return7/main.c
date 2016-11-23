@@ -1,0 +1,4 @@
+char fun()
+{
+  return 't';
+}
