@@ -458,7 +458,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("graphml-cex", cmdline.get_value("graphml-cex"));
 
   if(cmdline.isset("gen-c-test-case"))
-    options.set_option("gen-c-test-case", true);
+    options.set_option("gen-c-test-case", cmdline.get_values("gen-c-test-case"));
 }
 
 /*******************************************************************\
@@ -1174,7 +1174,9 @@ void cbmc_parse_optionst::help()
     " --partial-loops              permit paths with partial loops\n"
     " --no-pretty-names            do not simplify identifiers\n"
     " --graphml-cex filename       write the counterexample in GraphML format to filename\n"
-    " --gen-c-test-case            generate test harnesses in C\n"
+    " --gen-c-test-case  gen       generate test harnesses in C using gen, gen options are: \n"
+    "                              \"unity\" - use Unity style tests\n"
+    "                              \"simple\" - generate a simple C file that calls the tests\n "
     "\n"
     "Backend options:\n"
     " --dimacs                     generate CNF in DIMACS format\n"

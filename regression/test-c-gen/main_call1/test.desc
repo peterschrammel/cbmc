@@ -1,6 +1,6 @@
 CORE
 main.c
---function main --cover branch --gen-c-test-case
+--function main --cover branch --gen-c-test-case unity
 ^EXIT=0$
 ^SIGNAL=0$
 ^#include "unity\.h"$

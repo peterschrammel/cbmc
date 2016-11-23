@@ -306,9 +306,10 @@ bool bmc_covert::operator()()
   for(const auto & it : goal_map)
     if(it.second.satisfied) goals_covered++;
   
-  if (bmc.options.get_bool_option("gen-c-test-case"))
+  if (bmc.options.get_option("gen-c-test-case") != "")
   {
 
+    std::string generator_str = bmc.options.get_option("gen-c-test-case");
     size_t test_case_no=0;
     for(auto& test : tests)
     {
@@ -321,8 +322,29 @@ bool bmc_covert::operator()()
           +id2string(goal_map.at(goalid).source_location.get_line()));
       }
 
-      c_simple_test_case_generatort gen(get_message_handler(), bmc.options,
-        bmc.ns.get_symbol_table(), goto_functions, test, test_case_no, true);
+      std::unique_ptr<c_test_case_generatort> gen;
+      if(generator_str == "unity")
+      {
+        gen = std::unique_ptr<c_test_case_generatort>(
+          new c_unity_test_case_generatort(get_message_handler(), bmc.options,
+          bmc.ns.get_symbol_table(), goto_functions, tests, true));
+      }
+      else if(generator_str == "simple")
+      {
+        gen = std::unique_ptr<c_test_case_generatort>(
+          new c_simple_test_case_generatort(get_message_handler(), bmc.options,
+          bmc.ns.get_symbol_table(), goto_functions, tests, true));
+      }
+      else
+      {
+        warning() << "unrecognized generator option \"" << generator_str;
+        warning() << "\", use either \"unity\" or \"simple\"" << eom;
+        warning() << "Defaulting to unity" << eom;
+
+        gen = std::unique_ptr<c_test_case_generatort>(
+          new c_unity_test_case_generatort(get_message_handler(), bmc.options,
+        bmc.ns.get_symbol_table(), goto_functions, test, test_case_no, true));
+      }
 
       // Generate a full file for this test
       gen();
