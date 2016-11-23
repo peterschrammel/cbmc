@@ -91,6 +91,7 @@ protected:
 
 private:
   bool using_test_main;
+  std::string test_body;
 };
 
 #endif // CPROVER_TEST_C_GEN_C_TEST_CASE_GENERATOR_H

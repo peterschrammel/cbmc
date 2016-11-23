@@ -74,7 +74,6 @@ void c_test_case_generatort::operator()()
   generate_test(test, test_file);
 
   add_main_method(test_file, test);
-
   test_body = test_file.get_file();
 }
 
