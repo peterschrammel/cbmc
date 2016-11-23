@@ -3,18 +3,23 @@ main.c
 --function fun --cover branch --gen-c-test-case
 ^EXIT=0$
 ^SIGNAL=0$
-^#include <assert\.h>$
-^#include <stdio\.h>$
+^#include "unity\.h"$
 ^#include <stdlib\.h>$
 
 ^#include "main\.c"$
-^int test_main(int argc, char\* argv)$
-^\{$
+
+^void fun_000()$
 ^  signed int ret_fun;$
 ^  ret_fun = fun();$
-^  assert(ret_fun == 4)
-^  exit(0);$
-^  return 0;$
+^  TEST_ASSERT(ret_fun == 4);$
+
+^int test_main(int argc, char\* argv)$
+^\{$
+^  UNITY_BEGIN();$
+^  RUN_TEST(fun_000);$
+^  int result = UNITY_END();$
+^  exit(result);$
+^  return result;$
 ^\}$
 --
 ^warning: ignoring

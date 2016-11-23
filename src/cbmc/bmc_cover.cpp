@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/xml_goto_trace.h>
 #include <goto-programs/json_goto_trace.h>
 
+#include <test-c-gen/c_unity_test_case_generator.h>
 #include <test-c-gen/c_simple_test_case_generator.h>
 
 #include "bmc.h"

@@ -3,20 +3,31 @@ main.c
 --function fun --cover branch --gen-c-test-case
 ^EXIT=0$
 ^SIGNAL=0$
-^#include <assert\.h>$
-^#include <stdio\.h>$
+^#include "unity\.h"$
 ^#include <stdlib\.h>$
 
 ^#include "main\.c"$
-^int test_main(int argc, char\* argv)$
-^\{$
+
+^void fun_000()$
 ^  struct example_s arg_fun_struct_param = { \.b=1, \.x=-2147483648, \.internal={ .y=5.739719e-42f } };$
+^void fun_001()$
 ^  struct example_s arg_fun_struct_param = { \.b=1, \.x=1, \.internal={ .y=5.739719e-42f } };$
+^void fun_002()$
 ^  struct example_s arg_fun_struct_param = { \.b=1, \.x=1, \.internal={ .y=2.000977e+0f } };$
+^void fun_003()$
 ^  struct example_s arg_fun_struct_param = { \.b=0, \.x=1, \.internal={ .y=2.000977e+0f } };$
 ^  fun(arg_fun_struct_param);$
-^  exit(0);$
-^  return 0;$
+
+^int test_main(int argc, char\* argv)$
+^\{$
+^  UNITY_BEGIN();$
+^  RUN_TEST(fun_000);$
+^  RUN_TEST(fun_001);$
+^  RUN_TEST(fun_002);$
+^  RUN_TEST(fun_003);$
+^  int result = UNITY_END();$
+^  exit(result);$
+^  return result;
 ^\}$
 
 

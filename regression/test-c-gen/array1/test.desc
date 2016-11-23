@@ -3,24 +3,27 @@ main.c
 --function fun --cover branch --gen-c-test-case
 ^EXIT=0$
 ^SIGNAL=0$
-^#include <assert\.h>$
-^#include <stdio\.h>$
+^#include "unity\.h"$
 ^#include <stdlib\.h>$
 
 ^#include "main\.c"$
-^int test_main(int argc, char\* argv)$
-^\{$
+
+^void fun_000()$
 ^  signed int \* arg_fun_array = ((signed int \*)NULL);$
-
+^void fun_001()$
 ^  signed int arg_fun_array\[\] = {1, 2, 3, 4, 5};$
-
 ^  signed int ret_fun;$
 ^  ret_fun = fun();$
+^  TEST_ASSERT(ret_fun == 7);$
 
-^  assert(ret_fun == 7);$
-^  exit(0);$
-^\}$
-^  return 0;$
+^int test_main(int argc, char\* argv)$
+^\{$
+^  UNITY_BEGIN();$
+^  RUN_TEST(fun_000);$
+^  RUN_TEST(fun_001);$
+^  int result = UNITY_END();$
+^  exit(result);$
+^  return result;$
 ^\}$
 
 
