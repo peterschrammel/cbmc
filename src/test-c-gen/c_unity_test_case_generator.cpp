@@ -88,66 +88,17 @@ void c_unity_test_case_generatort::add_simple_assert(c_test_filet &test_file,
 
   std::string expected_return_value=e2c->convert(correct_expression);
   const typet &type=correct_expression.type();
-  if(type.id()==ID_signedbv)
-  {
-    assert_builder << "TEST_ASSERT_EQUAL_INT(";
-    assert_builder << expected_return_value << ", ";
-    assert_builder << return_value_var << ");";
-  }
-  else if(type.id()==ID_unsignedbv)
-  {
-    assert_builder << "TEST_ASSERT_EQUAL_UINT(";
-    assert_builder << expected_return_value << ", ";
-    assert_builder << return_value_var << ");";
-  }
-  else if(type.id()==ID_floatbv)
-  {
-    // TODO(tkiley): I'm not sure if this is a good way to do this, or if there
-    // is a better way. Clearly the test generated will depend on the platform
-    // the test is generated rather than the platform the code is run on.
-    // One way would be to generate this code in the test but doesn't feel great
-    size_t size=type.get_unsigned_int(ID_width) / 8;
 
-    if(size>=sizeof(double))
-    {
-      assert_builder << "TEST_ASSERT_EQUAL_DOUBLE(";
-    }
-    else
-    {
-      assert_builder << "TEST_ASSERT_EQUAL_FLOAT(";
-    }
-
+  std::string custom_assert;
+  if(get_two_param_custom_assert(type, custom_assert))
+  {
+    assert_builder << custom_assert << "(";
     assert_builder << expected_return_value << ", ";
     assert_builder << return_value_var << ");";
   }
-  else if(type.id() == ID_bool)
+  else if(get_bool_custom_assert(type, correct_expression, custom_assert))
   {
-    if(correct_expression.is_true())
-    {
-      assert_builder << "TEST_ASSERT_TRUE(";
-    }
-    else
-    {
-      assert_builder << "TEST_ASSERT_FALSE(";
-    }
-    assert_builder << return_value_var;
-    assert_builder << ");";
-  }
-  else if(type.id()==ID_c_bool)
-  {
-    // TODO(tkiley): Could this logic be moved into the same place as
-    // exprt::is_true()?
-    constant_exprt const_correct=to_constant_expr(correct_expression);
-    const irep_idt &value=const_correct.get_value();
-    mp_integer int_value=binary2integer(id2string(value), false);
-    if(int_value!=0)
-    {
-      assert_builder << "TEST_ASSERT_TRUE(";
-    }
-    else
-    {
-      assert_builder << "TEST_ASSERT_FALSE(";
-    }
+    assert_builder << custom_assert << "(";
     assert_builder << return_value_var;
     assert_builder << ");";
   }
@@ -164,4 +115,99 @@ void c_unity_test_case_generatort::add_simple_assert(c_test_filet &test_file,
   }
 
   test_file.add_line_at_current_indentation(assert_builder.str());
+}
+
+/*******************************************************************\
+Function: c_unity_test_case_generatort::get_two_param_custom_assert
+Inputs:
+ type - The type of the assertion parmeter
+Output:
+  Returns true if the type is a two parameter style Unity assert
+  Returns false otherwise
+  out_assert_message - Will contain the assert string if this is a
+                       valid two parameter assert. Otherwise will be empty
+
+Purpose: Get the two parameter assert string (if possible) for the given
+         type
+ \*******************************************************************/
+bool c_unity_test_case_generatort::get_two_param_custom_assert(
+  const typet &type,
+  std::string &out_assert_message)
+{
+  if(type.id()==ID_signedbv)
+  {
+    out_assert_message="TEST_ASSERT_EQUAL_INT";
+    return true;
+  }
+  else if(type.id()==ID_unsignedbv)
+  {
+    out_assert_message="TEST_ASSERT_EQUAL_UINT";
+    return true;
+  }
+  else if(type.id()==ID_floatbv)
+  {
+    // TODO(tkiley): I'm not sure if this is a good way to do this, or if there
+    // is a better way. Clearly the test generated will depend on the platform
+    // the test is generated rather than the platform the code is run on.
+    // One way would be to generate this code in the test but doesn't feel great
+    size_t size=type.get_unsigned_int(ID_width) / 8;
+
+    if(size>=sizeof(double))
+    {
+      out_assert_message="TEST_ASSERT_EQUAL_DOUBLE";
+    }
+    else
+    {
+      out_assert_message="TEST_ASSERT_EQUAL_FLOAT";
+    }
+    return true;
+  }
+  else
+  {
+    out_assert_message="";
+    return false;
+  }
+}
+
+/*******************************************************************\
+Function: c_unity_test_case_generatort::get_bool_custom_assert
+Inputs:
+ type - The type of the assertion parmeter
+ expected_expr - The value the assertion is checking against
+Output:
+  Returns true if the type is a boolean so can use custom bool assert
+  Returns false otherwise
+  out_assert_message - Will contain the boolean assert corresponding to
+                       the value in the expression. Otherwise will be empty
+
+Purpose: Get the boolean assert string (if possible) for the given
+         type and value (e.g. assert true if expr is true)
+ \*******************************************************************/
+bool c_unity_test_case_generatort::get_bool_custom_assert(
+  const typet &type,
+  const exprt &expected_expr,
+  std::string &out_assert_message)
+{
+  bool expr_value;
+  if(type.id()==ID_bool)
+  {
+    expr_value=expected_expr.is_true();
+  }
+  else if(type.id()==ID_c_bool)
+  {
+    // TODO(tkiley): Could this logic be moved into the same place as
+    // exprt::is_true()?
+    constant_exprt const_correct=to_constant_expr(expected_expr);
+    const irep_idt &value=const_correct.get_value();
+    mp_integer int_value=binary2integer(id2string(value), false);
+    expr_value=int_value!=0;
+  }
+  else
+  {
+    out_assert_message="";
+    return false;
+  }
+
+  out_assert_message=expr_value?"TEST_ASSERT_TRUE":"TEST_ASSERT_FALSE";
+  return true;
 }

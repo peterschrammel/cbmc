@@ -31,6 +31,14 @@ protected:
   virtual void add_simple_assert(class c_test_filet &test_file,
     const exprt &correct_expression,
     std::string ret_value_var) override;
+
+private:
+  static bool get_two_param_custom_assert(const typet &type,
+    std::string &out_assert_message);
+
+  static bool get_bool_custom_assert(const typet &type,
+    const exprt &expected_expr,
+    std::string &out_assert_message);
 };
 
 #endif // CPROVER_TEST_C_GEN_C_UNITY_TEST_CASE_GENERATOR_H
