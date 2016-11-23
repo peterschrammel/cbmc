@@ -135,14 +135,15 @@ bool c_unity_test_case_generatort::get_two_param_custom_assert(
   const typet &type,
   std::string &out_assert_message)
 {
-  std::string width_str=get_width_str(type);
   if(type.id()==ID_signedbv)
   {
+    const std::string width_str=get_width_str(type);
     out_assert_message="TEST_ASSERT_EQUAL_INT" + width_str;
     return true;
   }
   else if(type.id()==ID_unsignedbv)
   {
+    const std::string width_str=get_width_str(type);
     out_assert_message="TEST_ASSERT_EQUAL_UINT" + width_str;
     return true;
   }
