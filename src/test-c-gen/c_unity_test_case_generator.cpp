@@ -14,15 +14,15 @@
 #include <algorithm>
 #include <util/config.h>
 
-c_unity_test_case_generatort::c_unity_test_case_generatort(
-  message_handlert &_message_handler,
+c_unity_test_case_generatort::c_unity_test_case_generatort(message_handlert &_message_handler,
   const optionst &options,
   const symbol_tablet &symbol_table,
   const goto_functionst &goto_functions,
-  const std::vector<testt> &tests,
+  const testt &test,
+  size_t test_index,
   bool using_test_main)
   : c_test_case_generatort(_message_handler, options, symbol_table,
-      goto_functions, tests, using_test_main)
+      goto_functions, test, test_index, using_test_main)
 {
 }
 
@@ -50,7 +50,7 @@ Purpose: To create the main method that will call all the tests
          included inside this file
 \*******************************************************************/
 void c_unity_test_case_generatort::add_main_method(c_test_filet &test_file,
-  const std::vector<testt> &tests)
+  const testt &test)
 {
   // Create main method
   test_file.add_function("int", "test_main",
@@ -58,14 +58,11 @@ void c_unity_test_case_generatort::add_main_method(c_test_filet &test_file,
 
   test_file.add_line_at_current_indentation("UNITY_BEGIN();");
 
-  for(const testt &test : tests)
-  {
-    std::ostringstream test_function_call_builder;
-    test_function_call_builder << "RUN_TEST(";
-    test_function_call_builder << test.test_function_name;
-    test_function_call_builder << ");";
-    test_file.add_line_at_current_indentation(test_function_call_builder.str());
-  }
+  std::ostringstream test_function_call_builder;
+  test_function_call_builder << "RUN_TEST(";
+  test_function_call_builder << test.test_function_name;
+  test_function_call_builder << ");";
+  test_file.add_line_at_current_indentation(test_function_call_builder.str());
 
   test_file.add_empty_line();
 

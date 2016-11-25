@@ -327,13 +327,13 @@ bool bmc_covert::operator()()
       {
         gen = std::unique_ptr<c_test_case_generatort>(
           new c_unity_test_case_generatort(get_message_handler(), bmc.options,
-          bmc.ns.get_symbol_table(), goto_functions, tests, true));
+          bmc.ns.get_symbol_table(), goto_functions, test, test_case_no, true));
       }
       else if(generator_str == "simple")
       {
         gen = std::unique_ptr<c_test_case_generatort>(
           new c_simple_test_case_generatort(get_message_handler(), bmc.options,
-          bmc.ns.get_symbol_table(), goto_functions, tests, true));
+          bmc.ns.get_symbol_table(), goto_functions, test, test_case_no, true));
       }
       else
       {
@@ -347,9 +347,9 @@ bool bmc_covert::operator()()
       }
 
       // Generate a full file for this test
-      gen();
-      test.test_function_name=gen.get_test_function_name(test_case_no);
-      test.source_code=gen.get_test_body();
+      (*gen)();
+      test.test_function_name=gen->get_test_function_name(test_case_no);
+      test.source_code=gen->get_test_body();
 
       ++test_case_no;
     }

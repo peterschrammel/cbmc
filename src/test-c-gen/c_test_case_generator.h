@@ -49,7 +49,7 @@ public:
 
 protected:
   virtual void add_includes(c_test_filet &test_file);
-  virtual void add_main_method(c_test_filet &test_file,
+  virtual void add_main_method(class c_test_filet &test_file,
     const testt &test)=0;
   virtual void add_simple_assert(class c_test_filet &test_file,
     const exprt &expected_value, std::string return_var_name)=0;
@@ -91,7 +91,6 @@ protected:
 
 private:
   bool using_test_main;
-  std::string test_body;
 };
 
 #endif // CPROVER_TEST_C_GEN_C_TEST_CASE_GENERATOR_H
