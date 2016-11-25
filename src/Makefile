@@ -1,7 +1,7 @@
 DIRS = ansi-c big-int cbmc cpp goto-cc goto-instrument goto-programs \
        goto-symex langapi pointer-analysis solvers util linking xmllang \
        assembler analyses java_bytecode aa-path-symex path-symex musketeer \
-       json cegis goto-analyzer jsil symex goto-diff
+       json cegis goto-analyzer jsil symex goto-diff test-c-gen
 
 all: cbmc.dir goto-cc.dir goto-instrument.dir symex.dir goto-analyzer.dir goto-diff.dir
 
@@ -29,7 +29,7 @@ musketeer.dir: goto-instrument.dir
 
 cbmc.dir: languages solvers.dir goto-symex.dir analyses.dir \
           pointer-analysis.dir goto-programs.dir linking.dir \
-          goto-instrument.dir
+          goto-instrument.dir test-c-gen.dir json.dir
 
 goto-analyzer.dir: languages analyses.dir goto-programs.dir linking.dir \
                    json.dir goto-instrument.dir
@@ -53,7 +53,7 @@ $(patsubst %, %.dir, $(DIRS)):
 
 $(patsubst %, %_generated_files, $(DIRS)):
 	$(MAKE) $(MAKEARGS) -C $(patsubst %_generated_files, %, $@) generated_files
-	
+
 generated_files: $(patsubst %, %_generated_files, $(DIRS))
 
 # cleaning

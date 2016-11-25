@@ -35,6 +35,7 @@ class member_offset_iterator {
   const refst* operator->() const { return &current; }
 };
 
+
 mp_integer member_offset(
   const struct_typet &type,
   const irep_idt &member,

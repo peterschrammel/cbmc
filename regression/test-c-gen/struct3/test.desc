@@ -1,0 +1,23 @@
+CORE
+main.c
+--function fun --cover branch --gen-c-test-case
+^EXIT=0$
+^SIGNAL=0$
+^#include <assert\.h>$
+^#include <stdio\.h>$
+^#include <stdlib\.h>$
+
+^#include "main\.c"$
+^int test_main(int argc, char\* argv)$
+^\{$
+^  example_s arg_fun_struct_param = { \.b=1, \.x=-2147483648 };$
+^  example_s arg_fun_struct_param = { \.b=0, \.x=-2147483648 };$
+^  example_s arg_fun_struct_param = { \.b=0, \.x=1 };$
+^  fun(arg_fun_struct_param);$
+^  exit(0);$
+^  return 0;$
+^\}$
+
+
+--
+^warning: ignoring

@@ -37,6 +37,25 @@ protected:
     const c_qualifierst &qualifiers,
     const std::string &declarator);
 
+  virtual std::string convert_struct_type(const typet &src,
+                                          const std::string &qualifiers_str,
+                                          const std::string &declarator_str);
+
+  std::string convert_struct_type(const typet &src,
+                                  const std::string &qualifer_str,
+                                  const std::string &declarator_str,
+                                  bool inc_struct_body,
+                                  bool inc_padding_parameters);
+
+  virtual std::string convert_array_type(const typet &src,
+                                         const c_qualifierst &qualifiers,
+                                         const std::string &declarator_str);
+
+  std::string convert_array_type(const typet &src,
+                                 const c_qualifierst &qualifiers,
+                                 const std::string &declarator_str,
+                                 bool inc_size_if_possible);
+
   static std::string indent_str(unsigned indent);
 
   hash_map_cont<irep_idt,
@@ -196,6 +215,7 @@ protected:
   std::string convert_object_descriptor(const exprt &src, unsigned &precedence);
   std::string convert_literal(const exprt &src, unsigned &precedence);
   virtual std::string convert_constant(const constant_exprt &src, unsigned &precedence);
+  virtual std::string convert_constant_bool(bool boolean_value);
 
   std::string convert_norep(const exprt &src, unsigned &precedence);
 
@@ -208,6 +228,10 @@ protected:
   std::string convert_designated_initializer(const exprt &src, unsigned &precedence);
   std::string convert_concatenation(const exprt &src, unsigned &precedence);
   std::string convert_sizeof(const exprt &src, unsigned &precedence);
+
+  std::string convert_struct(const exprt &src,
+                             unsigned &precedence,
+                             bool include_padding_members);
 };
 
 #endif

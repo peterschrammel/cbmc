@@ -1,0 +1,20 @@
+CORE
+main.c
+--function fun --cover branch --gen-c-test-case
+^EXIT=0$
+^SIGNAL=0$
+^#include <assert\.h>$
+^#include <stdio\.h>$
+^#include <stdlib\.h>$
+
+^#include "main\.c"$
+^int test_main(int argc, char\* argv)$
+^\{$
+^  fun();$
+^  exit(0);$
+^  return 0;$
+^\}$
+
+
+--
+^warning: ignoring

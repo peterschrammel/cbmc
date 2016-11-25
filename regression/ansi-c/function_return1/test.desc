@@ -1,0 +1,9 @@
+CORE
+main.c
+--verbosity 2
+^Function fun has return void but a return statement returning signedbv was found on line.*$
+^SIGNAL=0$
+
+--
+^warning: ignoring
+^CONVERSION ERROR$

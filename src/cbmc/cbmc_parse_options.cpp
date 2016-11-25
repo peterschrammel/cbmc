@@ -456,6 +456,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("graphml-cex"))
     options.set_option("graphml-cex", cmdline.get_value("graphml-cex"));
+
+  if(cmdline.isset("gen-c-test-case"))
+    options.set_option("gen-c-test-case", true);
 }
 
 /*******************************************************************\
@@ -1171,6 +1174,7 @@ void cbmc_parse_optionst::help()
     " --partial-loops              permit paths with partial loops\n"
     " --no-pretty-names            do not simplify identifiers\n"
     " --graphml-cex filename       write the counterexample in GraphML format to filename\n"
+    " --gen-c-test-case            generate test harnesses in C\n"
     "\n"
     "Backend options:\n"
     " --dimacs                     generate CNF in DIMACS format\n"
