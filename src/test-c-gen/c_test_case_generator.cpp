@@ -42,12 +42,14 @@ c_test_case_generatort::c_test_case_generatort(
   const optionst &options,
   const symbol_tablet &symbol_table,
   const goto_functionst &goto_functions,
-  const std::vector<testt> &tests)
+  const testt &test,
+  size_t test_index)
   : messaget(_message_handler),
     options(options),
     symbol_table(symbol_table),
     goto_functions(goto_functions),
-    tests(tests),
+    test(test),
+    test_index(test_index),
     ns(symbol_table),
     e2c(new expr2cleanct(ns))
 {
@@ -64,21 +66,14 @@ void c_test_case_generatort::operator()()
   // Add standard includes
   add_includes(test_file);
 
-  size_t test_index=0;
+  // Create method for each test
+  test.test_function_name=get_test_function_name(test_index);
 
-  for(testt &test : tests)
-  {
-    // Create method for each test
-    test.test_function_name=get_test_function_name(test_index);
+  generate_test(test, test_file);
 
-    generate_test(test, test_file);
+  add_main_method(test_file, test);
 
-    ++test_index;
-  }
-
-  add_main_method(test_file, tests);
-
-  status() << test_file.get_file() << eom;
+  test_body = test_file.get_file();
 }
 
 
@@ -104,6 +99,16 @@ const std::string c_test_case_generatort::get_test_function_name(
   test_name << std::setfill('0') << std::setw(3) << test_idx;
 
   return test_name.str();
+}
+
+/*******************************************************************\
+Function: c_test_case_generatort::get_test_body
+Outputs: The full body of the test
+Purpose: Get the body of the test
+\*******************************************************************/
+const std::string c_test_case_generatort::get_test_body() const
+{
+  return test_body;
 }
 
 /*******************************************************************\

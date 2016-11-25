@@ -307,16 +307,10 @@ bool bmc_covert::operator()()
   
   if (bmc.options.get_bool_option("gen-c-test-case"))
   {
-    c_simple_test_case_generatort gen(get_message_handler(), bmc.options,
-      bmc.ns.get_symbol_table(), goto_functions, tests, true);
 
-    gen();
-
-#if 0
     size_t test_case_no=0;
     for(auto& test : tests)
     {
-
       std::vector<std::string> goal_names;
       for(const auto& goalid : test.covered_goals)
       {
@@ -326,18 +320,16 @@ bool bmc_covert::operator()()
           +id2string(goal_map.at(goalid).source_location.get_line()));
       }
 
-      // Compute the test function name
-      test.test_function_name=gen.get_test_function_name(bmc.ns.get_symbol_table(),
-                                                          goto_functions, test_case_no);
+      c_simple_test_case_generatort gen(get_message_handler(), bmc.options,
+        bmc.ns.get_symbol_table(), goto_functions, test, test_case_no, true);
 
-      // Compute the test code
-      test.source_code=gen.generate_tests(bmc.options,bmc.ns.get_symbol_table(),
-                                                   goto_functions,test.goto_trace,
-                                                   test_case_no,goal_names);
+      // Generate a full file for this test
+      gen();
+      test.test_function_name=gen.get_test_function_name(test_case_no);
+      test.source_code=gen.get_test_body();
 
       ++test_case_no;
     }
-#endif
   }
 
   switch(bmc.ui)
