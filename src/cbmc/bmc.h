@@ -103,6 +103,9 @@ protected:
   virtual void report_failure();
 
   virtual void error_trace();
+  void output_graphml(
+    resultt result,
+    const goto_functionst &goto_functions);
   
   bool cover(
     const goto_functionst &goto_functions,
