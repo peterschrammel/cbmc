@@ -6,10 +6,12 @@
 
 \*******************************************************************/
 
-#ifndef CPROVER_FUNCTION_RETURN_BUILDER_H
-#define CPROVER_FUNCTION_RETURN_BUILDER_H
+#ifndef CPROVER_TEST_C_GEN_FUNCTION_RETURN_BUILDER_H
+#define CPROVER_TEST_C_GEN_FUNCTION_RETURN_BUILDER_H
 
 #include <goto-programs/interpreter_class.h>
+#include <string>
+#include <vector>
 
 class function_return_buildert
 {
@@ -21,19 +23,11 @@ public:
   bool get_function_has_return() const;
   std::string get_return_declaration() const;
   std::string get_return_variable_name() const;
-  std::vector<std::string> get_assertion_lines();
+
+  interpretert::input_entryt get_function_return_parameter() const;
 
 private:
   void set_return_variable_name(const irep_idt &function_id);
-
-  void add_assertions_for_expression(const exprt &correct_expression,
-    std::string ret_value_var);
-
-  void add_assertions_for_struct_expression(const exprt &correct_expression,
-    std::string ret_value_var);
-
-  void add_assertions_for_simple_expression(const exprt &correct_expression,
-    std::string return_value_var);
 
   class expr2cleanct &e2c;
   bool has_return;
@@ -43,4 +37,4 @@ private:
   std::vector<std::string> assertions;
 };
 
-#endif // CPROVER_FUNCTION_RETURN_BUILDERT_H
+#endif // CPROVER_TEST_C_GEN_FUNCTION_RETURN_BUILDERT_H

@@ -6,16 +6,18 @@
 
 \*******************************************************************/
 
-#ifndef CPROVER_FUNCTION_PARAMETER_BUILDER_H
-#define CPROVER_FUNCTION_PARAMETER_BUILDER_H
+#ifndef CPROVER_TEST_C_GEN_FUNCTION_PARAMETER_BUILDER_H
+#define CPROVER_TEST_C_GEN_FUNCTION_PARAMETER_BUILDER_H
 
 #include <goto-programs/interpreter_class.h>
+#include <test-c-gen/expr2cleanc.h>
+#include <string>
 
 class function_parameter_buildert
 {
 public:
   function_parameter_buildert(const interpretert::input_entryt &entry,
-    class expr2cleanct &e2c,
+    expr2cleanct &e2c,
     const symbol_tablet &symbol_table);
 
   std::string get_parameter_declaration() const;
@@ -24,7 +26,6 @@ public:
 private:
   std::string variable_name;
   std::string variable_declaration_line;
-
 };
 
-#endif // CPROVER_FUNCTION_PARAMETER_BUILDERT_H
+#endif // CPROVER_TEST_C_GEN_FUNCTION_PARAMETER_BUILDERT_H

@@ -21,7 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/xml_goto_trace.h>
 #include <goto-programs/json_goto_trace.h>
 
-#include <test-c-gen/c_test_case_generator.h>
+#include <test-c-gen/c_simple_test_case_generator.h>
 
 #include "bmc.h"
 #include "bv_cbmc.h"
@@ -105,14 +105,6 @@ public:
 
       return disjunction(tmp);
     }
-  };
-
-  struct testt
-  {
-    goto_tracet goto_trace;
-    std::vector<irep_idt> covered_goals;
-    std::string source_code;
-    std::string test_function_name;
   };
   
   inline irep_idt id(goto_programt::const_targett loc)
@@ -315,10 +307,10 @@ bool bmc_covert::operator()()
   
   if (bmc.options.get_bool_option("gen-c-test-case"))
   {
+
     size_t test_case_no=0;
     for(auto& test : tests)
     {
-      c_test_case_generatort gen(get_message_handler());
       std::vector<std::string> goal_names;
       for(const auto& goalid : test.covered_goals)
       {
@@ -328,14 +320,13 @@ bool bmc_covert::operator()()
           +id2string(goal_map.at(goalid).source_location.get_line()));
       }
 
-      // Compute the test function name
-      test.test_function_name=gen.get_test_function_name(bmc.ns.get_symbol_table(),
-                                                          goto_functions, test_case_no);
+      c_simple_test_case_generatort gen(get_message_handler(), bmc.options,
+        bmc.ns.get_symbol_table(), goto_functions, test, test_case_no, true);
 
-      // Compute the test code
-      test.source_code=gen.generate_tests(bmc.options,bmc.ns.get_symbol_table(),
-                                                   goto_functions,test.goto_trace,
-                                                   test_case_no,goal_names);
+      // Generate a full file for this test
+      gen();
+      test.test_function_name=gen.get_test_function_name(test_case_no);
+      test.source_code=gen.get_test_body();
 
       ++test_case_no;
     }
@@ -364,6 +355,7 @@ bool bmc_covert::operator()()
 
       for(const auto& it : tests)
       {
+        status() << it.test_function_name << ":" << eom;
         if(it.source_code.length()!=0)
           status() << it.source_code << '\n';
       }

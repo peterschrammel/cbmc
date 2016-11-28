@@ -1,58 +1,17 @@
+/*******************************************************************\
+
+ Module: C Test Case Generator
+
+ Author: Thomas Kiley, thomas@diffblue.com
+
+\*******************************************************************/
+
 #include <test-c-gen/c_test_file.h>
 
 #include <sstream>
 
 #include <test-c-gen/function_return_builder.h>
 
-/*******************************************************************\
-Function: c_test_filet::emit_standard_includes
-Purpose: Add the normal includes needed for the test harness
-\*******************************************************************/
-void c_test_filet::emit_standard_includes()
-{
-  add_line_at_root_indentation("#include <assert.h>");
-  add_line_at_root_indentation("#include <stdio.h>");
-  add_line_at_root_indentation("#include <stdlib.h>");
-  add_empty_line();
-}
-
-/*******************************************************************\
-Function: c_test_filet::emit_file_include
-Inputs:
- file_name - The file being tested
-Purpose: To add an include for the file being tested
-\*******************************************************************/
-void c_test_filet::emit_file_include(const irep_idt &file_name)
-{
-  std::ostringstream include_line_builder;
-  include_line_builder << "#include \"";
-  include_line_builder << file_name;
-  include_line_builder << "\"";
-  add_line_at_root_indentation(include_line_builder.str());
-}
-
-/*******************************************************************\
-Function: c_test_filet::emit_main_method
-Purpose: Start creating the main method
-\*******************************************************************/
-void c_test_filet::emit_main_method()
-{
-  add_line_at_current_indentation("int test_main(int argc, char* argv)");
-  add_opening_brace(0);
-}
-
-/*******************************************************************\
-Function: c_test_filet::end_main_method
-Purpose: Put the closing brace on the main method
-\*******************************************************************/
-void c_test_filet::end_main_method()
-{
-  add_line_at_current_indentation("exit(0);");
-  add_line_at_current_indentation("return 0;");
-  add_closing_brace(0);
-  assert(current_indentation==0);
-  add_empty_line();
-}
 
 /*******************************************************************\
 Function: c_test_filet::get_file
@@ -134,7 +93,7 @@ void c_test_filet::add_empty_line()
 }
 
 /*******************************************************************\
-Function: c_test_filet::add_function
+Function: c_test_filet::add_function_call
 Inputs:
  function_name - The name of the function to call
  function_inputs - A list to use as the arguments to the function
@@ -143,9 +102,9 @@ Inputs:
 Purpose: Add a function call to the file and potentially assign its
          result to a variable
 \*******************************************************************/
-void c_test_filet::add_function(const irep_idt &function_name,
-                                const std::vector<std::string> function_inputs,
-                                const function_return_buildert &function_return)
+void c_test_filet::add_function_call(const irep_idt &function_name,
+  const std::vector<std::string> function_inputs,
+  const function_return_buildert &function_return)
 {
   std::ostringstream function_call_builder;
   if(function_return.get_function_has_return()>0)
@@ -162,7 +121,6 @@ void c_test_filet::add_function(const irep_idt &function_name,
 
   for(const std::string &entry : function_inputs)
   {
-
     function_call_builder << entry;
     if(entry!=*last)
     {
@@ -173,6 +131,58 @@ void c_test_filet::add_function(const irep_idt &function_name,
   function_call_builder << ");";
 
   add_line_at_current_indentation(function_call_builder.str());
+}
+
+/*******************************************************************\
+Function: c_test_filet::add_function
+Inputs:
+ return_type - The string of the type the function returns
+ function_name - The name of the function
+ parameters - A list of key-value pairs of types and parameter names
+Purpose: To create a function declartion and opening brace for a function
+\*******************************************************************/
+void c_test_filet::add_function(const std::string &return_type,
+  const std::string function_name,
+  const c_test_filet::function_parameter_listt &parameters)
+{
+  // Only support functions at the root
+  assert(current_indentation==0);
+
+  std::ostringstream function_decl_builder;
+  function_decl_builder << return_type;
+  function_decl_builder << " " << function_name;
+  function_decl_builder << "(";
+
+  bool first=true;
+  for(const auto &param : parameters)
+  {
+    if(!first)
+    {
+      function_decl_builder << ", ";
+    }
+    else
+    {
+      first=false;
+    }
+
+    function_decl_builder << param.first << " " << param.second;
+  }
+
+  function_decl_builder << ")";
+  add_line_at_current_indentation(function_decl_builder.str());
+  add_opening_brace(0);
+}
+
+/*******************************************************************\
+Function: c_test_filet::end_function
+Purpose: To put the closing brace on a given function, checking braces
+         match.
+\*******************************************************************/
+void c_test_filet::end_function()
+{
+  add_closing_brace(0);
+  assert(current_indentation==0);
+  add_empty_line();
 }
 
 /*******************************************************************\
