@@ -19,9 +19,15 @@ c_simple_test_case_generatort::c_simple_test_case_generatort(
   const goto_functionst &goto_functions,
   const testt &test,
   size_t test_index,
-  bool using_test_main)
-  : c_test_case_generatort(_message_handler, options, symbol_table,
-      goto_functions, test, test_index, using_test_main)
+  bool using_test_main):
+  c_test_case_generatort(
+    _message_handler,
+    options,
+    symbol_table,
+    goto_functions,
+    test,
+    test_index,
+    using_test_main)
 {
 }
 

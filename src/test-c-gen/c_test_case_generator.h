@@ -32,7 +32,8 @@ struct testt
 class c_test_case_generatort : public messaget
 {
 public:
-  c_test_case_generatort(message_handlert &_message_handler,
+  c_test_case_generatort(
+    message_handlert &_message_handler,
     const class optionst &options,
     const class symbol_tablet &symbol_table,
     const class goto_functionst &goto_functions,
@@ -49,7 +50,8 @@ public:
 
 protected:
   virtual void add_includes(c_test_filet &test_file);
-  virtual void add_main_method(class c_test_filet &test_file,
+  virtual void add_main_method(
+    class c_test_filet &test_file,
     const testt &test)=0;
   virtual void add_simple_assert(class c_test_filet &test_file,
     const exprt &expected_value, std::string return_var_name)=0;

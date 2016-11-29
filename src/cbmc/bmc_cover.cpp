@@ -306,10 +306,10 @@ bool bmc_covert::operator()()
   for(const auto & it : goal_map)
     if(it.second.satisfied) goals_covered++;
   
-  if (bmc.options.get_option("gen-c-test-case") != "")
+  if (bmc.options.get_option("gen-c-test-case")!="")
   {
 
-    std::string generator_str = bmc.options.get_option("gen-c-test-case");
+    std::string generator_str=bmc.options.get_option("gen-c-test-case");
     size_t test_case_no=0;
     for(auto& test : tests)
     {
@@ -323,17 +323,29 @@ bool bmc_covert::operator()()
       }
 
       std::unique_ptr<c_test_case_generatort> gen;
-      if(generator_str == "unity")
+      if(generator_str=="unity")
       {
-        gen = std::unique_ptr<c_test_case_generatort>(
-          new c_unity_test_case_generatort(get_message_handler(), bmc.options,
-          bmc.ns.get_symbol_table(), goto_functions, test, test_case_no, true));
+        gen=std::unique_ptr<c_test_case_generatort>(
+          new c_unity_test_case_generatort(
+            get_message_handler(),
+            bmc.options,
+            bmc.ns.get_symbol_table(),
+            goto_functions,
+            test,
+            test_case_no,
+            true));
       }
-      else if(generator_str == "simple")
+      else if(generator_str=="simple")
       {
-        gen = std::unique_ptr<c_test_case_generatort>(
-          new c_simple_test_case_generatort(get_message_handler(), bmc.options,
-          bmc.ns.get_symbol_table(), goto_functions, test, test_case_no, true));
+        gen=std::unique_ptr<c_test_case_generatort>(
+          new c_simple_test_case_generatort(
+            get_message_handler(),
+            bmc.options,
+            bmc.ns.get_symbol_table(),
+            goto_functions,
+            test,
+            test_case_no,
+            true));
       }
       else
       {
@@ -341,9 +353,15 @@ bool bmc_covert::operator()()
         warning() << "\", use either \"unity\" or \"simple\"" << eom;
         warning() << "Defaulting to unity" << eom;
 
-        gen = std::unique_ptr<c_test_case_generatort>(
-          new c_unity_test_case_generatort(get_message_handler(), bmc.options,
-        bmc.ns.get_symbol_table(), goto_functions, test, test_case_no, true));
+        gen=std::unique_ptr<c_test_case_generatort>(
+          new c_unity_test_case_generatort(
+            get_message_handler(),
+            bmc.options,
+            bmc.ns.get_symbol_table(),
+            goto_functions,
+            test,
+            test_case_no,
+            true));
       }
 
       // Generate a full file for this test

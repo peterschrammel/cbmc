@@ -13,10 +13,11 @@
 #include <string>
 #include <vector>
 
-class c_unity_test_case_generatort : public c_test_case_generatort
+class c_unity_test_case_generatort: public c_test_case_generatort
 {
 public:
-  c_unity_test_case_generatort(message_handlert &_message_handler,
+  c_unity_test_case_generatort(
+    message_handlert &_message_handler,
     const class optionst &options,
     const class symbol_tablet &symbol_table,
     const class goto_functionst &goto_functions,
@@ -26,18 +27,22 @@ public:
 
 protected:
   virtual void add_includes(class c_test_filet &test_file) override;
-  virtual void add_main_method(class c_test_filet &test_file,
+  virtual void add_main_method(
+    class c_test_filet &test_file,
     const testt &test) override;
 
-  virtual void add_simple_assert(class c_test_filet &test_file,
+  virtual void add_simple_assert(
+    class c_test_filet &test_file,
     const exprt &correct_expression,
     std::string ret_value_var) override;
 
 private:
-  static bool get_two_param_custom_assert(const typet &type,
+  static bool get_two_param_custom_assert(
+    const typet &type,
     std::string &out_assert_message);
 
-  static bool get_bool_custom_assert(const typet &type,
+  static bool get_bool_custom_assert(
+    const typet &type,
     const exprt &expected_expr,
     std::string &out_assert_message);
 

@@ -14,15 +14,22 @@
 #include <algorithm>
 #include <util/config.h>
 
-c_unity_test_case_generatort::c_unity_test_case_generatort(message_handlert &_message_handler,
+c_unity_test_case_generatort::c_unity_test_case_generatort(
+  message_handlert &_message_handler,
   const optionst &options,
   const symbol_tablet &symbol_table,
   const goto_functionst &goto_functions,
   const testt &test,
   size_t test_index,
-  bool using_test_main)
-  : c_test_case_generatort(_message_handler, options, symbol_table,
-      goto_functions, test, test_index, using_test_main)
+  bool using_test_main):
+  c_test_case_generatort(
+    _message_handler,
+    options,
+    symbol_table,
+    goto_functions,
+    test,
+    test_index,
+    using_test_main)
 {
 }
 
@@ -49,12 +56,16 @@ Inputs:
 Purpose: To create the main method that will call all the tests
          included inside this file
 \*******************************************************************/
-void c_unity_test_case_generatort::add_main_method(c_test_filet &test_file,
+void c_unity_test_case_generatort::add_main_method(
+  c_test_filet &test_file,
   const testt &test)
 {
   // Create main method
-  test_file.add_function("int", "test_main",
-    {{"int", "argc"}, {"char*", "argv"}});
+  test_file.add_function(
+    "int",
+    "test_main",
+    {{"int", "argc"},
+    {"char*", "argv"}});
 
   test_file.add_line_at_current_indentation("UNITY_BEGIN();");
 
@@ -79,7 +90,8 @@ Inputs:
  return_value_var - The name of the variable (including relevant nesting)
 Purpose: Add an assertion for a unity expression
  \*******************************************************************/
-void c_unity_test_case_generatort::add_simple_assert(c_test_filet &test_file,
+void c_unity_test_case_generatort::add_simple_assert(
+  c_test_filet &test_file,
   const exprt &correct_expression,
   std::string return_value_var)
 {
@@ -136,13 +148,13 @@ bool c_unity_test_case_generatort::get_two_param_custom_assert(
   if(type.id()==ID_signedbv)
   {
     const std::string width_str=get_width_str(type);
-    out_assert_message="TEST_ASSERT_EQUAL_INT" + width_str;
+    out_assert_message="TEST_ASSERT_EQUAL_INT"+width_str;
     return true;
   }
   else if(type.id()==ID_unsignedbv)
   {
     const std::string width_str=get_width_str(type);
-    out_assert_message="TEST_ASSERT_EQUAL_UINT" + width_str;
+    out_assert_message="TEST_ASSERT_EQUAL_UINT"+width_str;
     return true;
   }
   else if(type.id()==ID_floatbv)
@@ -220,14 +232,14 @@ Purpose: Generate a string that can be used for making the interger
  \*******************************************************************/
 std::string c_unity_test_case_generatort::get_width_str(const typet &type)
 {
-  assert(type.id()==ID_signedbv||type.id()==ID_unsignedbv);
+  assert(type.id()==ID_signedbv || type.id()==ID_unsignedbv);
   size_t width=type.get_unsigned_int(ID_width);
 
   // Unity only supports custom asserts for 8, 16, 32, 64. If it isn't any
   // we can just use the non-specific one
   std::vector<size_t> supported_widths={8, 16, 32, 64};
 
-  if(std::find(supported_widths.cbegin(), supported_widths.cend(), width) !=
+  if(std::find(supported_widths.cbegin(), supported_widths.cend(), width)!=
     supported_widths.cend())
   {
     std::ostringstream size_builder;

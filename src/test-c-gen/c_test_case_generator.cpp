@@ -44,8 +44,8 @@ c_test_case_generatort::c_test_case_generatort(
   const goto_functionst &goto_functions,
   const testt &test,
   size_t test_index,
-  bool using_test_main)
-  : messaget(_message_handler),
+  bool using_test_main):
+  messaget(_message_handler),
     options(options),
     symbol_table(symbol_table),
     goto_functions(goto_functions),
@@ -164,7 +164,8 @@ Inputs:
  test_file - The C file to add the includes to
 Purpose: To finish the main method for a given return code
 \*******************************************************************/
-void c_test_case_generatort::end_main(const std::string &return_code,
+void c_test_case_generatort::end_main(
+  const std::string &return_code,
   c_test_filet &test_file)
 {
   // Shutdown the application correctly
