@@ -31,10 +31,14 @@
 /*******************************************************************\
 Function: c_test_case_generatort::c_test_case_generatort
 Inputs:
-  options - Command line options passed to the interpreter
-  symbol_table - The symbol table for the GOTO program
-  goto_functions - The GOTO program
-  tests - The tests (e.g. traces) to create
+ _message_handler - The message handler to report any messages with
+ options - Command line options passed to the interpreter
+ symbol_table - The symbol table for the GOTO program
+ goto_functions - The GOTO program
+ tests - The tests (e.g. traces) to create
+ test_index - The index of the test (used to name the tests)
+ using_test_main - Should the test use a specially named main method
+                   for its entry point
 Purpose: To generate all the tests described in this generator.
 \*******************************************************************/
 c_test_case_generatort::c_test_case_generatort(

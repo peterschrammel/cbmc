@@ -14,6 +14,19 @@
 #include <algorithm>
 #include <util/config.h>
 
+/*******************************************************************\
+Function: c_unity_test_case_generatort::c_unity_test_case_generatort
+Inputs:
+ _message_handler - The message handler to report any messages with
+ options - Command line options passed on to the interpreter
+ symbol_table - The symbol table of the program
+ goto_functions - The goto functions of the program
+ test - The details of the test run we are trying to generate
+ test_index - The index of the test (used to name the tests)
+ using_test_main - Should the test use a specially named main method
+                   for its entry point
+Purpose: Generate test code in the Unity framework style.
+\*******************************************************************/
 c_unity_test_case_generatort::c_unity_test_case_generatort(
   message_handlert &_message_handler,
   const optionst &options,
