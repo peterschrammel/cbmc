@@ -346,6 +346,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
 
   if(ns.follow(expr.type()).id()==ID_floatbv)
   {
+#if 0
     // we only merge neighboring constants!
     Forall_expr(it, operands)
     {
@@ -363,6 +364,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
         }
       }
     }
+#endif
   }
   else
   {
