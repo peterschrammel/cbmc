@@ -932,7 +932,7 @@ long double sqrtl(long double d)
 #endif
 
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB
-double fmax(double f, double g) { return ((f >= g) || isnan(g)) ? x : y; }
+double fmax(double f, double g) { return ((f >= g) || isnan(g)) ? f : g; }
 
 /* FUNCTION : fmaxf */
 
@@ -942,7 +942,7 @@ double fmax(double f, double g) { return ((f >= g) || isnan(g)) ? x : y; }
 #endif
 
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB
-float fmaxf(float f, float g) { return ((f >= g) || isnan(g)) ? x : y; }
+float fmaxf(float f, float g) { return ((f >= g) || isnan(g)) ? f : g; }
 
 
 /* FUNCTION : fmaxl */
@@ -953,7 +953,7 @@ float fmaxf(float f, float g) { return ((f >= g) || isnan(g)) ? x : y; }
 #endif
 
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB
-long double fmaxl(long double f, long double g) { return ((f >= g) || isnan(g)) ? x : y; }
+long double fmaxl(long double f, long double g) { return ((f >= g) || isnan(g)) ? f : g; }
 
 
 /* ISO 9899:2011
@@ -1014,7 +1014,7 @@ long double fminl(long double f, long double g) { return (f <= g) || isnan(g); }
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-double fdim(double f, double g) { return (x > y) ? x - y : +0.0; }
+double fdim(double f, double g) { return ((f > g) ? f - g : +0.0); }
 
 
 /* FUNCTION: fdimf */
@@ -1024,7 +1024,7 @@ double fdim(double f, double g) { return (x > y) ? x - y : +0.0; }
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-float fdimf(float f, float g) { return (x > y) ? x - y : +0.0f; }
+float fdimf(float f, float g) { return ((f > g) ? f - g : +0.0f); }
 
 
 /* FUNCTION: fdiml */
@@ -1034,7 +1034,7 @@ float fdimf(float f, float g) { return (x > y) ? x - y : +0.0f; }
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-long double fdim(long double f, long double g) { return (x > y) ? x - y : +0.0; }
+long double fdim(long double f, long double g) { return ((f > g) ? f - g : +0.0); }
 
 
 
@@ -1139,7 +1139,7 @@ long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d)
+double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
 
 double ceil(double x)
 {
@@ -1153,7 +1153,7 @@ double ceil(double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d)
+float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
 
 float ceilf(float x)
 {
@@ -1168,7 +1168,7 @@ float ceilf(float x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d)
+long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
 
 long double ceill(long double x)
 {
@@ -1188,7 +1188,7 @@ long double ceill(long double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d)
+double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
 
 double floor(double x)
 {
@@ -1202,7 +1202,7 @@ double floor(double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d)
+float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
 
 float floorf(float x)
 {
@@ -1217,7 +1217,7 @@ float floorf(float x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d)
+long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
 
 long double floorl(long double x)
 {
@@ -1238,7 +1238,7 @@ long double floorl(long double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d)
+double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
 
 double trunc(double x)
 {
@@ -1252,7 +1252,7 @@ double trunc(double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d)
+float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
 
 float truncf(float x)
 {
@@ -1267,7 +1267,7 @@ float truncf(float x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d)
+long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
 
 long double truncl(long double x)
 {
@@ -1288,7 +1288,7 @@ long double truncl(long double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d)
+double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
 
 double round(double x)
 {
@@ -1303,7 +1303,7 @@ double round(double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d)
+float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
 
 float roundf(float x)
 {
@@ -1319,7 +1319,7 @@ float roundf(float x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d)
+long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
 
 long double roundl(long double x)
 {
@@ -1343,7 +1343,7 @@ long double roundl(long double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d)
+double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
 
 double nearbyint(double x)
 {
@@ -1357,7 +1357,7 @@ double nearbyint(double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d)
+float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
 
 float nearbyintf(float x)
 {
@@ -1372,7 +1372,7 @@ float nearbyintf(float x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d)
+long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
 
 long double nearbyintl(long double x)
 {
@@ -1395,7 +1395,7 @@ long double nearbyintl(long double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d)
+double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
 
 double rint(double x)
 {
@@ -1409,7 +1409,7 @@ double rint(double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d)
+float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
 
 float rintf(float x)
 {
@@ -1423,7 +1423,7 @@ float rintf(float x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d)
+long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
 
 long double rintl(long double x)
 {
@@ -1448,7 +1448,7 @@ long double rintl(long double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d)
+double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
 
 long int lrint(double x)
 {
@@ -1465,7 +1465,7 @@ long int lrint(double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d)
+float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
 
 float lrintf(float x)
 {
@@ -1483,7 +1483,7 @@ float lrintf(float x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d)
+long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
 
 long double lrintl(long double x)
 {
@@ -1501,7 +1501,7 @@ long double lrintl(long double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d)
+double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
 
 long long int llrint(double x)
 {
@@ -1518,7 +1518,7 @@ long long int llrint(double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d)
+float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
 
 float llrintf(float x)
 {
@@ -1536,7 +1536,7 @@ float llrintf(float x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d)
+long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
 
 long double llrintl(long double x)
 {
@@ -1563,7 +1563,7 @@ long double llrintl(long double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d)
+double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
 
 long int lround(double x)
 {
@@ -1581,7 +1581,7 @@ long int lround(double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d)
+float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
 
 float lroundf(float x)
 {
@@ -1600,7 +1600,7 @@ float lroundf(float x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d)
+long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
 
 long double lroundl(long double x)
 {
@@ -1619,7 +1619,7 @@ long double lroundl(long double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d)
+double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
 
 long long int llround(double x)
 {
@@ -1637,7 +1637,7 @@ long long int llround(double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d)
+float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
 
 float llroundf(float x)
 {
@@ -1656,7 +1656,7 @@ float llroundf(float x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d)
+long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
 
 long double llroundl(long double x)
 {
@@ -1683,7 +1683,7 @@ long double llroundl(long double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d)
+double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
 
 double modf(double x, double *iptr)
 {
@@ -1698,7 +1698,7 @@ double modf(double x, double *iptr)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d)
+float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
 
   float modff(float x, float *iptr)
 {
@@ -1714,7 +1714,7 @@ float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d)
+long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
 
   long double modfl(long double x, long double *iptr)
 {
