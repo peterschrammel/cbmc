@@ -974,7 +974,7 @@ long double fmaxl(long double f, long double g) { return ((f >= g) || isnan(g)) 
 #endif
  
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB
-double fmin(double f, double g) { return (f <= g) || isnan(g); }
+double fmin(double f, double g) { return ((f <= g) || isnan(g)) ? f : g; }
 
 /* FUNCTION: fminf */
 
@@ -984,7 +984,7 @@ double fmin(double f, double g) { return (f <= g) || isnan(g); }
 #endif
 
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB 
-float fminf(float f, float g) { return (f <= g) || isnan(g); }
+float fminf(float f, float g) { return ((f <= g) || isnan(g)) ? f : g; }
 
 /* FUNCTION: fminl */
 
@@ -994,7 +994,7 @@ float fminf(float f, float g) { return (f <= g) || isnan(g); }
 #endif
 
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB 
-long double fminl(long double f, long double g) { return (f <= g) || isnan(g); }
+long double fminl(long double f, long double g) { return ((f <= g) || isnan(g)) ? f : g; }
 
 
 /* ISO 9899:2011
