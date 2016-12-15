@@ -1056,7 +1056,7 @@ double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d)
   int saved_rounding_mode = fegetround();
   fesetround(rounding_mode);
   
-  if (fabs(d) >= magicConst)
+  if (fabs(d) >= magicConst || d == 0.0)
   {
     return_value = d;
   }
@@ -1095,7 +1095,7 @@ float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d)
   int saved_rounding_mode = fegetround();
   fesetround(rounding_mode);
   
-  if (fabsf(d) >= magicConst)
+  if (fabsf(d) >= magicConst || d == 0.0)
   {
     return_value = d;
   }
@@ -1135,7 +1135,7 @@ long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double
   int saved_rounding_mode = fegetround();
   fesetround(rounding_mode);
   
-  if (fabsl(d) >= magicConst)
+  if (fabsl(d) >= magicConst || d == 0.0)
   {
     return_value = d;
   }
