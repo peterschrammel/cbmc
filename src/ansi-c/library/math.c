@@ -694,8 +694,6 @@ __CPROVER_hide:;
 
 float nextUpf(float f);
 
-extern int __CPROVER_rounding_mode;
-
 float sqrtf(float f)
 {
  __CPROVER_hide:;
@@ -731,7 +729,7 @@ float sqrtf(float f)
     __CPROVER_assume(f < upperSquare);
 
     // Select between them to work out which to return
-    switch(__CPROVER_rounding_mode)
+    switch(fegetround())
     {
     case FE_TONEAREST :
       return (f - lowerSquare < upperSquare - f) ? lower : upper; break;
@@ -806,7 +804,7 @@ double sqrt(double d)
     __CPROVER_assume(lowerSquare <= d);
     __CPROVER_assume(d < upperSquare);
 
-    switch(__CPROVER_rounding_mode)
+    switch(fegetround())
     {
     case FE_TONEAREST:
       return (d - lowerSquare < upperSquare - d) ? lower : upper; break;
@@ -875,7 +873,7 @@ long double sqrtl(long double d)
     __CPROVER_assume(lowerSquare <= d);
     __CPROVER_assume(d < upperSquare);
 
-    switch(__CPROVER_rounding_mode)
+    switch(fegetround())
     {
     case FE_TONEAREST:
       return (d - lowerSquare < upperSquare - d) ? lower : upper; break;
@@ -1046,14 +1044,19 @@ long double fdim(long double f, long double g) { return ((f > g) ? f - g : +0.0)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
 double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d)
 {
   double magicConst = 0x1.0p+52;
   double return_value;
-  int saved_rounding_mode = __CPROVER_rounding_mode;
-  __CPROVER_rounding_mode = rounding_mode;
+  int saved_rounding_mode = fegetround();
+  fesetround(rounding_mode);
   
-  if (fabsf(d) >= magicConst)
+  if (fabs(d) >= magicConst)
   {
     return_value = d;
   }
@@ -1061,14 +1064,14 @@ double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d)
   {
     if (!signbit(d)) {
       double tmp = d + magicConst;
-      return_value = tmp - magicConst;    
+      return_value = tmp - magicConst;
     } else {
       double tmp = d - magicConst;
       return_value = tmp + magicConst;    
     }
   }
 
-  __CPROVER_rounding_mode = saved_rounding_mode;
+  fesetround(saved_rounding_mode);
   return return_value;
 }
 
@@ -1080,12 +1083,17 @@ double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
 float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d)
 {
   float magicConst = 0x1.0p+23f;  // 23 is significant
   float return_value;
-  int saved_rounding_mode = __CPROVER_rounding_mode;
-  __CPROVER_rounding_mode = rounding_mode;
+  int saved_rounding_mode = fegetround();
+  fesetround(rounding_mode);
   
   if (fabsf(d) >= magicConst)
   {
@@ -1102,7 +1110,7 @@ float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d)
     }
   }
 
-  __CPROVER_rounding_mode = saved_rounding_mode;
+  fesetround(saved_rounding_mode);
   return return_value;
 }
 
@@ -1115,14 +1123,19 @@ float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
 long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d)
 {
   long double magicConst = 0x1.0p+64d;
   long double return_value;
-  int saved_rounding_mode = __CPROVER_rounding_mode;
-  __CPROVER_rounding_mode = rounding_mode;
+  int saved_rounding_mode = fegetround();
+  fesetround(rounding_mode);
   
-  if (fabsf(d) >= magicConst)
+  if (fabsl(d) >= magicConst)
   {
     return_value = d;
   }
@@ -1137,7 +1150,7 @@ long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double
     }
   }
 
-  __CPROVER_rounding_mode = saved_rounding_mode;
+  fesetround(saved_rounding_mode);
   return return_value;
 }
 
@@ -1418,11 +1431,16 @@ long double roundl(long double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
 double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
 
 double nearbyint(double x)
 {
-  return __sort_of_CPROVER_round_to_integral(__CPROVER_rounding_mode, x);
+  return __sort_of_CPROVER_round_to_integral(fegetround(), x);
 }
 
 /* FUNCTION: nearbyintf */
@@ -1432,11 +1450,16 @@ double nearbyint(double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
 float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
 
 float nearbyintf(float x)
 {
-  return __sort_of_CPROVER_round_to_integralf(__CPROVER_rounding_mode, x);
+  return __sort_of_CPROVER_round_to_integralf(fegetround(), x);
 }
 
 
@@ -1447,11 +1470,16 @@ float nearbyintf(float x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
 long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
 
 long double nearbyintl(long double x)
 {
-  return __sort_of_CPROVER_round_to_integrall(__CPROVER_rounding_mode, x);
+  return __sort_of_CPROVER_round_to_integrall(fegetround(), x);
 }
 
 
@@ -1470,11 +1498,16 @@ long double nearbyintl(long double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
 double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
 
 double rint(double x)
 {
-  return __sort_of_CPROVER_round_to_integral(__CPROVER_rounding_mode, x);
+  return __sort_of_CPROVER_round_to_integral(fegetround(), x);
 }
 
 /* FUNCTION: rintf */
@@ -1484,11 +1517,16 @@ double rint(double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
 float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
 
 float rintf(float x)
 {
-  return __sort_of_CPROVER_round_to_integralf(__CPROVER_rounding_mode, x);
+  return __sort_of_CPROVER_round_to_integralf(fegetround(), x);
 }
 
 /* FUNCTION: rintl */
@@ -1498,11 +1536,16 @@ float rintf(float x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
 long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
 
 long double rintl(long double x)
 {
-  return __sort_of_CPROVER_round_to_integrall(__CPROVER_rounding_mode, x);
+  return __sort_of_CPROVER_round_to_integrall(fegetround(), x);
 }
 
 
@@ -1523,13 +1566,18 @@ long double rintl(long double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
 double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
 
 long int lrint(double x)
 {
   // TODO : should be an all-in-one __CPROVER function to allow
   // conversion to SMT
-  double rti = __sort_of_CPROVER_round_to_integral(__CPROVER_rounding_mode, x);
+  double rti = __sort_of_CPROVER_round_to_integral(fegetround(), x);
   return (long int)rti;
 }
 
@@ -1540,13 +1588,18 @@ long int lrint(double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
 float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
 
 float lrintf(float x)
 {
   // TODO : should be an all-in-one __CPROVER function to allow
   // conversion to SMT
-  float rti = __sort_of_CPROVER_round_to_integralf(__CPROVER_rounding_mode, x);
+  float rti = __sort_of_CPROVER_round_to_integralf(fegetround(), x);
   return (long int)rti;
 }
 
@@ -1558,13 +1611,18 @@ float lrintf(float x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
 long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
 
 long double lrintl(long double x)
 {
   // TODO : should be an all-in-one __CPROVER function to allow
   // conversion to SMT
-  long double rti = __sort_of_CPROVER_round_to_integrall(__CPROVER_rounding_mode, x);
+  long double rti = __sort_of_CPROVER_round_to_integrall(fegetround(), x);
   return (long int)rti;
 }
 
@@ -1576,13 +1634,18 @@ long double lrintl(long double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
 double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
 
 long long int llrint(double x)
 {
   // TODO : should be an all-in-one __CPROVER function to allow
   // conversion to SMT
-  double rti = __sort_of_CPROVER_round_to_integral(__CPROVER_rounding_mode, x);
+  double rti = __sort_of_CPROVER_round_to_integral(fegetround(), x);
   return (long long int)rti;
 }
 
@@ -1593,13 +1656,18 @@ long long int llrint(double x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
 float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
 
 float llrintf(float x)
 {
   // TODO : should be an all-in-one __CPROVER function to allow
   // conversion to SMT
-  float rti = __sort_of_CPROVER_round_to_integralf(__CPROVER_rounding_mode, x);
+  float rti = __sort_of_CPROVER_round_to_integralf(fegetround(), x);
   return (long long int)rti;
 }
 
@@ -1611,13 +1679,18 @@ float llrintf(float x)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
 long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
 
 long double llrintl(long double x)
 {
   // TODO : should be an all-in-one __CPROVER function to allow
   // conversion to SMT
-  long double rti = __sort_of_CPROVER_round_to_integrall(__CPROVER_rounding_mode, x);
+  long double rti = __sort_of_CPROVER_round_to_integrall(fegetround(), x);
   return (long long int)rti;
 }
 
