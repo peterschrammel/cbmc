@@ -40,7 +40,7 @@ int __builtin_islessequal(float f, float g) { return f <= g; }
 
 /* FUNCTION: __builtin_islessgreater */
 
-int __builtin_islessgreater(float f, float g) { return (f < g) || (g > f); }
+int __builtin_islessgreater(float f, float g) { return (f < g) || (f > g); }
 
 /* FUNCTION: __builtin_isunordered */
 
