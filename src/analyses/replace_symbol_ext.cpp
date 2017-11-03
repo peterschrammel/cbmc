@@ -62,6 +62,13 @@ bool replace_symbol_extt::replace(exprt &dest) const
       return false;
     }
   }
+  // Do not replace p->f.
+  else if(dest.id()==ID_member)
+  {
+    const exprt &struct_op=to_member_expr(dest).struct_op();
+    if (struct_op.id()==ID_dereference)
+      return false;
+  }
 
   Forall_operands(it, dest)
     if(!replace(*it))

@@ -144,6 +144,11 @@ bool replace_symbolt::have_to_replace(const exprt &dest) const
   if(dest.id()==ID_symbol)
     return expr_map.find(dest.get(ID_identifier))!=expr_map.end();
 
+  // Do not replace p->f
+  if (dest.id()==ID_member &&
+      to_member_expr(dest).struct_op().id()==ID_dereference)
+    return false;
+
   forall_operands(it, dest)
     if(have_to_replace(*it))
       return true;
