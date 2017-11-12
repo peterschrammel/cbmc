@@ -43,6 +43,7 @@ SRC = accelerate/accelerate.cpp \
       race_check.cpp \
       reachability_slicer.cpp \
       remove_function.cpp \
+      loop_to_recursion.cpp \
       rw_set.cpp \
       show_locations.cpp \
       skip_loops.cpp \
