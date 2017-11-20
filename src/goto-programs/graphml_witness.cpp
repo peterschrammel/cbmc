@@ -350,35 +350,13 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
         else if(it->type==goto_trace_stept::GOTO &&
                 it->pc->is_goto())
         {
+#if 0
+          // TODO: this requires knowledge about the phase of the
+          //   condition in the source code
           xmlt &val=edge.new_element("data");
-          val.set_attribute("key", "sourcecode");
-          exprt clean_cond=it->cond_expr;
-          remove_l0_l1(clean_cond);
-          const std::string cond=from_expr(ns, "", clean_cond);
-          const std::string neg_cond=
-            from_expr(ns, "", not_exprt(clean_cond));
-          val.data="["+(it->cond_value ? cond : neg_cond)+"]";
-
-          #if 0
-          xmlt edge2("edge");
-          edge2.set_attribute("source", graphml[from].node_name);
-          edge2.set_attribute("target", graphml[sink].node_name);
-
-          xmlt &data_f2=edge2.new_element("data");
-          data_f2.set_attribute("key", "originfile");
-          data_f2.data=id2string(graphml[from].file);
-
-          xmlt &data_l2=edge2.new_element("data");
-          data_l2.set_attribute("key", "startline");
-          data_l2.data=id2string(graphml[from].line);
-
-          xmlt &val2=edge2.new_element("data");
-          val2.set_attribute("key", "sourcecode");
-          val2.data="["+(it->cond_value ? neg_cond : cond)+"]";
-
-          graphml[sink].in[from].xml_node=edge2;
-          graphml[from].out[sink].xml_node=edge2;
-          #endif
+          val.set_attribute("key", "control");
+          val.data=(it->cond_value?"condition-false":"condition-true");
+#endif
         }
 
         graphml[to].in[from].xml_node=edge;
