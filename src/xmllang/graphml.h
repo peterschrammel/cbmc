@@ -36,6 +36,7 @@ struct xml_graph_nodet:public graph_nodet<xml_edget>
   irep_idt line;
   bool is_violation;
   bool has_invariant;
+  bool is_cyclehead;
   std::string invariant;
   std::string invariant_scope;
 };
