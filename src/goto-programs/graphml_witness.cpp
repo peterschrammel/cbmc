@@ -376,6 +376,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     graphml[node].is_violation=
       it->type==goto_trace_stept::typet::ASSERT && !it->cond_value;
     graphml[node].has_invariant=false;
+    graphml[node].is_cyclehead=false;
 
     step_to_node[it->step_nr]=node;
   }
@@ -416,6 +417,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
         ;
       // we'll close the loop
       to=step_to_node[last->step_nr];
+      graphml[to].is_cyclehead=true;
     }
     else
     {
