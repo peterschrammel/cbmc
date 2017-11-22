@@ -408,21 +408,39 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     }
 
     std::size_t to=sink;
-    // nontermination lasso traces end in a backwards goto:
-    if(next==goto_trace.steps.end() &&
-       it->is_goto() && it->pc->is_backwards_goto())
+    if(next!=goto_trace.steps.end())
     {
-      goto_tracet::stepst::const_iterator last=it;
-      for(--last; last->pc==it->pc->get_target(); --last)
-        ;
-      // we'll close the loop
-      to=step_to_node[last->step_nr];
-      graphml[to].is_cyclehead=true;
+      goto_tracet::stepst::const_iterator after_next=next;
+      ++after_next;
+      // nontermination lasso traces do not end in assertions
+      if(after_next==goto_trace.steps.end() &&
+         !next->is_assert())
+      {
+        goto_tracet::stepst::const_iterator last=
+          goto_trace.steps.begin();
+        for(goto_tracet::stepst::const_iterator last_it=
+              goto_trace.steps.begin();
+            last_it!=goto_trace.steps.end() &&
+            last_it!=next;
+            ++last_it)
+        {
+          if(last_it->pc==next->pc)
+            last=last_it;
+        }
+        // we'll close the loop
+        to=step_to_node[last->step_nr];
+        graphml[to].is_cyclehead=true;
+      }
+      else
+      {
+        // advance to the next step
+        to=step_to_node[next->step_nr];
+      }
     }
-    else
+    else if(!it->is_assert())
     {
-      // advance to the next step
-      to=step_to_node[next->step_nr];
+      // do not output recurrent step in nontermination trace
+      break;
     }
 
     switch(it->type)
