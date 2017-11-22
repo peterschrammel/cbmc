@@ -1,0 +1,9 @@
+KNOWNBUG
+main.c
+--loop-to-recursion 
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+

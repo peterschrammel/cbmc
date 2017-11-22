@@ -95,6 +95,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "model_argc_argv.h"
 #include "undefined_functions.h"
 #include "remove_function.h"
+#include "loop_to_recursion.h"
 
 void goto_instrument_parse_optionst::eval_verbosity()
 {
@@ -949,7 +950,17 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       cmdline.get_values("remove-function-body"),
       get_message_handler());
   }
+ 
+  // convert loop into recursive function calls
 
+  if(cmdline.isset("loop-to-recursion"))
+  {
+    loop_to_recursion(
+      goto_functions,
+      symbol_table,
+      get_message_handler());
+  }
+  
   // we add the library in some cases, as some analyses benefit
 
   if(cmdline.isset("add-library") ||
@@ -1507,6 +1518,7 @@ void goto_instrument_parse_optionst::help()
     " --base-case                  k-induction: do base-case\n"
     " --havoc-loops                over-approximate all loops\n"
     " --accelerate                 add loop accelerators\n"
+    " --loop-to-recursion          convert loops into recursive function calls\n"
     " --skip-loops <loop-ids>      add gotos to skip selected loops during execution\n" // NOLINT(*)
     "\n"
     "Memory model instrumentations:\n"
