@@ -1062,6 +1062,7 @@ exprt java_bytecode_convert_methodt::get_or_create_clinit_wrapper(
   {
     code_function_callt call_real_init;
     call_real_init.function()=find_sym_it->second.symbol_expr();
+    call_real_init.function().set(ID_C_base_name, "<clinit>");
     init_body.move_to_operands(call_real_init);
   }
   wrapper_body.then_case()=init_body;
