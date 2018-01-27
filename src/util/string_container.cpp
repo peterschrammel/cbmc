@@ -75,8 +75,21 @@ unsigned string_containert::get(const std::string &s)
   return r;
 }
 
+const std::string &
+NOINLINE_WHEN_GCC_AND_DEBUG() string_containert::get_string_slowly(
+  size_t no) const
+{
+  return *string_vector[no];
+}
+
+bool NOINLINE_WHEN_GCC_AND_DEBUG() string_containert::is_number_valid(
+  const size_t no) const
+{
+  return no < string_vector.size() && string_vector.at(no) != nullptr;
+}
+
 /// Get a reference to the global string container.
-string_containert &get_string_container()
+string_containert & NOINLINE_WHEN_GCC_AND_DEBUG() get_string_container()
 {
   static string_containert ret;
   return ret;
