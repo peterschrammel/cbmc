@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "string_hash.h"
 
-#if defined(__GNUC__) && (defined(DEBUG) || defined(_DEBUG))
+#if defined(__GNUC__) && defined(PRETTYPRINT)
 #define NOINLINE_WHEN_GCC_AND_DEBUG() __attribute__ ((noinline, used))
 #else
 #define NOINLINE_WHEN_GCC_AND_DEBUG()
