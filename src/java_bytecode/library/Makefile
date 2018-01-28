@@ -46,6 +46,6 @@ all: java_core_models.inc
 converter$(EXEEXT): converter.cpp
 	$(CXX) $(CP_CXXFLAGS) -o $@ $<
 
-java_core_models.inc: converter$(EXEEXT) core-models.jar
+java_core_models.inc: converter$(EXEEXT)
 	./converter$(EXEEXT) JAVA_CORE_MODELS core-models.jar > $@
 ###############################################################################
