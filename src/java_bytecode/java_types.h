@@ -532,6 +532,27 @@ std::string erase_type_arguments(const std::string &src);
 ///   1. Signature: Lcom/package/OuterClass<TT;>.Inner;
 ///   2. Descriptor: Lcom.pacakge.OuterClass$Inner;
 /// into `com.package.OuterClass.Inner`
-std::string gather_full_class_name(const std::string &src);
+/// NOTE: the function implicitly converts '.' to 'S' in the class name.
+///       the parameter 'invert_dot_to_dollar_replacement' allows for the
+///       inverse conversion.
+std::string gather_full_class_name(
+  const std::string &src, const bool invert_dot_to_dollar_replacement=false);
+
+/// For parsing a class type reference
+/// \param src: The input string
+///   Either a signature: "Lpackage/class<TT;>.innerclass<Ljava/lang/Foo;>;
+///   Or a descriptor: "Lpackage.class$inner;
+/// \param class_name_prefix: The name of the class to use to prefix any found
+///   generic types
+/// \return The reference type if parsed correctly, no value if parsing fails.
+/// NOTE: the function implicitly converts '.' to 'S' in the class name.
+///       the parameter 'invert_dot_to_dollar_replacement' allows for the
+///       inverse conversion.
+reference_typet
+build_class_name(
+  const std::string &src,
+  const std::string &class_name_prefix,
+  const bool invert_dot_to_dollar_replacement=false);
+
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_TYPES_H

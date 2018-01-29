@@ -259,7 +259,11 @@ std::string erase_type_arguments(const std::string &src)
 ///   2. Descriptor: Lcom.package.OuterClass$Inner;
 /// \return The full name of the class like com.package.OuterClass.Inner (for
 ///   both examples).
-std::string gather_full_class_name(const std::string &src)
+/// NOTE: the function implicitly converts '.' to 'S' in the class name.
+///       the parameter 'invert_dot_to_dollar_replacement' allows for the
+///       inverse conversion.
+std::string gather_full_class_name(
+    const std::string &src, const bool invert_dot_to_dollar_replacement)
 {
   PRECONDITION(src.size() >= 2);
   PRECONDITION(src[0] == 'L');
@@ -269,7 +273,10 @@ std::string gather_full_class_name(const std::string &src)
 
   class_name = erase_type_arguments(class_name);
 
-  std::replace(class_name.begin(), class_name.end(), '$', '.');
+  if(invert_dot_to_dollar_replacement)
+    std::replace(class_name.begin(), class_name.end(), '$', '.');
+  else
+    std::replace(class_name.begin(), class_name.end(), '.', '$');
   std::replace(class_name.begin(), class_name.end(), '/', '.');
   return class_name;
 }
@@ -342,15 +349,22 @@ std::vector<typet> parse_list_types(
 /// \param class_name_prefix: The name of the class to use to prefix any found
 ///   generic types
 /// \return The reference type if parsed correctly, no value if parsing fails.
+/// NOTE: the function implicitly converts '.' to 'S' in the class name.
+///       the parameter 'invert_dot_to_dollar_replacement' allows for the
+///       inverse conversion.
 reference_typet
-build_class_name(const std::string &src, const std::string &class_name_prefix)
+build_class_name(
+  const std::string &src,
+  const std::string &class_name_prefix,
+  const bool invert_dot_to_dollar_replacement)
 {
   PRECONDITION(src[0] == 'L');
 
   // All reference types must end on a ;
   PRECONDITION(src[src.size() - 1] == ';');
 
-  std::string container_class = gather_full_class_name(src);
+  std::string container_class =
+    gather_full_class_name(src, invert_dot_to_dollar_replacement);
   std::string identifier = "java::" + container_class;
   symbol_typet symbol_type(identifier);
   symbol_type.set(ID_C_base_name, container_class);

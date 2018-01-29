@@ -190,8 +190,10 @@ exprt::operandst java_build_arguments(
   if(!is_main)
   {
     bool named_main=has_suffix(config.main, ".main");
-    const typet &string_array_type=
-      java_type_from_string("[Ljava.lang.String;");
+    typet string_array_type=java_array_type('a');
+    string_array_type.subtype().set(
+      ID_C_element_type, build_class_name("Ljava.lang.String;", "", true));
+
     // checks whether the function is static and has a single String[] parameter
     bool has_correct_type=
       to_code_type(function.type).return_type().id()==ID_empty &&
