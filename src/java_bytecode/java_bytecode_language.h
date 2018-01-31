@@ -32,6 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(java-max-vla-length):"                                                     \
   "(java-cp-include-files):"                                                   \
   "(lazy-methods)"                                                             \
+  "(no-lazy-methods)"                                                          \
   "(lazy-methods-extra-entry-point):"                                          \
   "(java-load-class):"
 
@@ -47,7 +48,9 @@ Author: Daniel Kroening, kroening@kroening.com
   " --java-max-vla-length            limit the length of user-code-created arrays\n"             /* NOLINT(*) */ \
   " --java-cp-include-files          regexp or JSON list of files to load (with '@' prefix)\n"   /* NOLINT(*) */ \
   " --lazy-methods                   only translate methods that appear to be reachable from\n"  /* NOLINT(*) */ \
-  "                                  the --function entry point or main class\n"                 /* NOLINT(*) */ \
+  "                                  the --function entry point or main class (default)\n"       /* NOLINT(*) */ \
+  " --no-lazy-methods                load and translate all methods given on the command line\n" /* NOLINT(*) */ \
+  "                                  and in --classpath\n"                                       /* NOLINT(*) */ \
   " --lazy-methods-extra-entry-point METHODNAME\n"                                               /* NOLINT(*) */ \
   "                                  treat METHODNAME as a possible program entry point for\n"   /* NOLINT(*) */ \
   "                                  the purpose of lazy method loading\n"                       /* NOLINT(*) */ \

@@ -1,6 +1,6 @@
 CORE
 Main.class
---no-core-models --function Main.main
+--no-core-models --function Main.main --no-lazy-methods --no-refine-strings
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

@@ -43,7 +43,7 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
 {
   assume_inputs_non_null=cmd.isset("java-assume-inputs-non-null");
   java_class_loader.use_core_models=!cmd.isset("no-core-models");
-  string_refinement_enabled=cmd.isset("refine-strings");
+  string_refinement_enabled=!cmd.isset("no-refine-strings");
   throw_runtime_exceptions=cmd.isset("java-throw-runtime-exceptions");
   if(cmd.isset("java-max-input-array-length"))
     object_factory_parameters.max_nondet_array_length=
@@ -59,10 +59,10 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
     max_user_array_length=std::stoi(cmd.get_value("java-max-vla-length"));
   if(cmd.isset("lazy-methods-context-sensitive"))
     lazy_methods_mode=LAZY_METHODS_MODE_CONTEXT_SENSITIVE;
-  else if(cmd.isset("lazy-methods"))
-    lazy_methods_mode=LAZY_METHODS_MODE_CONTEXT_INSENSITIVE;
-  else
+  else if(cmd.isset("no-lazy-methods"))
     lazy_methods_mode=LAZY_METHODS_MODE_EAGER;
+  else
+    lazy_methods_mode=LAZY_METHODS_MODE_CONTEXT_INSENSITIVE;
 
   if(cmd.isset("java-throw-runtime-exceptions"))
   {

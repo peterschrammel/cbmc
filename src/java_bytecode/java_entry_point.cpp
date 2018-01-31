@@ -331,6 +331,16 @@ void java_record_outputs(
   output.add_source_location()=function.location;
 
   init_code.move_to_operands(output);
+
+  // check that there is no uncaught exception
+  code_assertt assert_no_exception;
+  assert_no_exception.assertion() =
+    equal_exprt(exc_symbol.symbol_expr(),
+                null_pointer_exprt(to_pointer_type(exc_symbol.type)));
+  source_locationt assert_location = function.location;
+  assert_location.set_comment("no uncaught exception");
+  assert_no_exception.add_source_location() = assert_location;
+  init_code.move_to_operands(assert_no_exception);
 }
 
 main_function_resultt get_main_symbol(

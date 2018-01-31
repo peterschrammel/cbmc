@@ -1,6 +1,6 @@
 CORE
 DetectSplitPackagesTask.class
---show-symbol-table --no-core-models
+--show-symbol-table --no-core-models --no-lazy-methods --no-refine-strings
 ^EXIT=0$
 ^SIGNAL=0$
 --

@@ -1,6 +1,6 @@
 CORE
 Gn.class
---cover location --no-core-models
+--cover location --no-core-models --no-lazy-methods --no-refine-strings
 ^EXIT=0$
 ^SIGNAL=0$
 .*file Gn.java line 6 function java::Gn.\<init\>:\(\)V bytecode-index 1 block 1: FAILED

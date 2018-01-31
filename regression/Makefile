@@ -15,6 +15,7 @@ DIRS = ansi-c \
        goto-instrument-typedef \
        invariants \
        strings \
+       jbmc-cover \
        jbmc-strings \
        strings-smoke-tests \
        test-script \

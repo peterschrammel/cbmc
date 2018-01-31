@@ -45,7 +45,8 @@ class optionst;
   "(no-sat-preprocessor)" \
   "(no-pretty-names)(beautify)" \
   "(dimacs)(refine)(max-node-refinement):(refine-arrays)(refine-arithmetic)"\
-  "(refine-strings)" \
+  "(refine-strings)" /* will go away */ \
+  "(no-refine-strings)" \
   "(string-printable)" \
   "(string-max-length):" \
   "(string-max-input-length):" \
