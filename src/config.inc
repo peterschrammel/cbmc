@@ -10,7 +10,7 @@ endif
 
 # Select optimisation or debug info
 #CXXFLAGS += -O2 -DNDEBUG
-#CXXFLAGS += -O0 -g
+#CXXFLAGS += -O0 -g -DPRETTYPRINT
 
 # If GLPK is available; this is used by goto-instrument and musketeer.
 #LIB_GLPK = -lglpk

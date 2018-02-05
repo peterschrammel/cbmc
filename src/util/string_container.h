@@ -18,6 +18,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "string_hash.h"
 
+#if defined(__GNUC__) && defined(PRETTYPRINT)
+#define NOINLINE_WHEN_GCC_AND_DEBUG() __attribute__ ((noinline, used))
+#else
+#define NOINLINE_WHEN_GCC_AND_DEBUG()
+#endif
+
 struct string_ptrt
 {
   const char *s;
@@ -73,6 +79,11 @@ public:
     return *string_vector[no];
   }
 
+  const std::string &
+  NOINLINE_WHEN_GCC_AND_DEBUG() get_string_slowly(size_t no) const;
+
+  bool NOINLINE_WHEN_GCC_AND_DEBUG() is_number_valid(const size_t no) const;
+
 protected:
   // the 'unsigned' ought to be size_t
   typedef std::unordered_map<string_ptrt, unsigned, string_ptr_hash>
@@ -89,6 +100,6 @@ protected:
   string_vectort string_vector;
 };
 
-string_containert &get_string_container();
+string_containert & NOINLINE_WHEN_GCC_AND_DEBUG() get_string_container();
 
 #endif // CPROVER_UTIL_STRING_CONTAINER_H
