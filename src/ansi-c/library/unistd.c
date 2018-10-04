@@ -225,6 +225,7 @@ inline ret_type _write(int fildes, const void *buf, size_type nbyte)
 extern struct __CPROVER_pipet __CPROVER_pipes[];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
+extern void *malloc(unsigned long size);
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 ret_type __VERIFIER_nondet_ret_type();
@@ -254,7 +255,7 @@ ret_type read(int fildes, void *buf, size_type nbyte)
       // check that the memory is accessible
       (void)*(char *)buf;
       (void)*(((const char *)buf) + str_length - 1);
-      char contents_nondet[str_length];
+      char *contents_nondet = malloc(nbyte);
       __CPROVER_array_replace((char*)buf, contents_nondet);
     }
 #endif
