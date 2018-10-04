@@ -25,7 +25,7 @@ Author: Daniel Kroening, Peter Schrammel
 single_path_symex_only_checkert::single_path_symex_only_checkert(
   const optionst &options,
   ui_message_handlert &ui_message_handler,
-  abstract_goto_modelt &goto_model)
+  goto_modelt &goto_model)
   : incremental_goto_checkert(options, ui_message_handler),
     goto_model(goto_model),
     ns(goto_model.get_symbol_table(), symex_symbol_table),
@@ -75,8 +75,12 @@ void single_path_symex_only_checkert::initialize_worklist()
     unwindset);
   setup_symex(symex);
 
+  // for shadow memory instrumentation
+  const auto fields =
+    goto_symext::preprocess_field_decl(goto_model, ui_message_handler);
+
   symex.initialize_path_storage_from_entry_point_of(
-    goto_symext::get_goto_function(goto_model), symex_symbol_table);
+    goto_symext::get_goto_function(goto_model), symex_symbol_table, fields);
 }
 
 bool single_path_symex_only_checkert::has_finished_exploration(

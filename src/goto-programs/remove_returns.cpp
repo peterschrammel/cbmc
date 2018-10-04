@@ -225,7 +225,10 @@ void remove_returnst::operator()(goto_functionst &goto_functions)
         findit != goto_functions.function_map.end(),
         "called function `" + id2string(function_id) +
           "' should have an entry in the function map");
-      return !findit->second.body_available();
+      return !findit->second.body_available() &&
+             function_id != CPROVER_PREFIX "field_decl" &&
+             function_id != CPROVER_PREFIX "get_field" &&
+             function_id != CPROVER_PREFIX "set_field";
     };
 
     replace_returns(gf_entry.first, gf_entry.second);
