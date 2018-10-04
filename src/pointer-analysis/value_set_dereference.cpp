@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/cprover_prefix.h>
 #include <util/expr_iterator.h>
@@ -264,16 +265,20 @@ exprt value_set_dereferencet::handle_dereference_base_case(
 
   exprt result_value = nil_exprt{};
 
+  size_t mux_size = 0;
   for(const auto &value : values)
   {
     if(value.value.is_not_nil())
     {
+      ++mux_size;
       if(result_value.is_nil()) // first?
         result_value = value.value;
       else
         result_value = if_exprt(value.pointer_guard, value.value, result_value);
     }
   }
+
+  log.debug() << "mux size dereference: " << mux_size << messaget::eom;
 
   if(compare_against_pointer != pointer)
     result_value =
@@ -657,8 +662,22 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     result.pointer = typecast_exprt::conditional_cast(
       address_of_exprt{skip_typecast(o.root_object())}, pointer_type);
 
-    if(!memory_model(result.value, dereference_type, offset, ns))
+    if(memory_model(result.value, dereference_type, offset, ns))
+    {
+      // set pointer correctly
+      result.pointer =
+        typecast_exprt::conditional_cast(
+          plus_exprt(
+            typecast_exprt(
+              result.pointer,
+              pointer_typet(char_type(), pointer_type.get_width())),
+            offset),
+          pointer_type);
+    }
+    else
+    {
       return {}; // give up, no way that this is ok
+    }
 
     return result;
   }

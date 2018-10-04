@@ -230,7 +230,7 @@ goto_symext::cache_dereference(exprt &dereference_result, statet &state)
   lift_lets(state, cache_value);
 
   auto assign = symex_assignt{
-    state, symex_targett::assignment_typet::STATE, ns, symex_config, target};
+    *this, state, symex_targett::assignment_typet::STATE, ns, symex_config, target};
 
   auto cache_symbol_expr = cache_symbol.symbol_expr();
   assign.assign_symbol(
@@ -324,7 +324,7 @@ void goto_symext::dereference_rec(
       symex_dereference_state,
       language_mode,
       expr_is_not_null,
-      log);
+      log.get_message_handler());
 
     // std::cout << "**** " << format(tmp1) << '\n';
     exprt tmp2 =

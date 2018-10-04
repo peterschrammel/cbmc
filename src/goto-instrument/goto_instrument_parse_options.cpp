@@ -1506,7 +1506,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     {
       // removing pointers
       log.status() << "Removing Pointers" << messaget::eom;
-      remove_pointers(goto_model, value_set_analysis);
+      remove_pointers(
+        goto_model, value_set_analysis, log.get_message_handler());
     }
 
     if(cmdline.isset("race-check"))

@@ -313,7 +313,7 @@ char *fgets(char *str, int size, FILE *stream)
     int str_length=__VERIFIER_nondet_int();
     __CPROVER_assume(str_length >= 0 && str_length < size);
     __CPROVER_precondition(__CPROVER_w_ok(str, size), "fgets buffer writable");
-    char contents_nondet[str_length];
+    char *contents_nondet = malloc(size);
     __CPROVER_array_replace(str, contents_nondet);
     if(!error)
       str[str_length]='\0';

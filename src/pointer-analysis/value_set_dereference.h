@@ -12,10 +12,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_POINTER_ANALYSIS_VALUE_SET_DEREFERENCE_H
 #define CPROVER_POINTER_ANALYSIS_VALUE_SET_DEREFERENCE_H
 
+#include <util/message.h>
 #include <util/std_expr.h>
 
 class dereference_callbackt;
-class messaget;
 class symbol_table_baset;
 
 /// Wrapper for a function dereferencing pointer expressions using a value set.
@@ -37,13 +37,13 @@ public:
     dereference_callbackt &_dereference_callback,
     const irep_idt _language_mode,
     bool _exclude_null_derefs,
-    const messaget &_log)
+    message_handlert &message_handler)
     : ns(_ns),
       new_symbol_table(_new_symbol_table),
       dereference_callback(_dereference_callback),
       language_mode(_language_mode),
       exclude_null_derefs(_exclude_null_derefs),
-      log(_log)
+      log(message_handler)
   { }
 
   virtual ~value_set_dereferencet() { }
@@ -105,7 +105,8 @@ private:
   /// Flag indicating whether `value_set_dereferencet::dereference` should
   /// disregard an apparent attempt to dereference NULL
   const bool exclude_null_derefs;
-  const messaget &log;
+
+  messaget log;
   valuet get_failure_value(const exprt &pointer, const typet &type);
   exprt handle_dereference_base_case(
     const exprt &pointer,
