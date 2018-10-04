@@ -892,6 +892,9 @@ bool cbmc_parse_optionst::process_goto_program(
   // instrument library preconditions
   instrument_preconditions(goto_model);
 
+    // shadow memory instrumentation
+    remove_shadow_memory(goto_model, log.get_message_handler());
+
   // remove returns, gcc vectors, complex
   remove_returns(goto_model);
   remove_vector(goto_model);
