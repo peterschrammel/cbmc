@@ -30,6 +30,14 @@ void __CPROVER_assert(__CPROVER_bool assertion, const char *description);
 void __CPROVER_precondition(__CPROVER_bool assertion, const char *description);
 void __CPROVER_postcondition(__CPROVER_bool assertion, const char *description);
 
+#if 0
+// shadow memory
+void __CPROVER_field_decl_local(const char *, int);
+void __CPROVER_field_decl_global(const char *, int);
+int __CPROVER_get_field(void *, const char *);
+void __CPROVER_set_field(void *, const char *, int);
+#endif
+
 __CPROVER_bool __CPROVER_is_zero_string(const void *);
 __CPROVER_size_t __CPROVER_zero_string_length(const void *);
 __CPROVER_size_t __CPROVER_buffer_size(const void *);

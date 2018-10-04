@@ -141,8 +141,8 @@ void goto_symext::parameter_assignments(
       rhs = clean_expr(std::move(rhs), state, false);
 
       exprt::operandst lhs_conditions;
-      symex_assignt{state, assignment_type, ns, symex_config, target}
-        .assign_rec(lhs, expr_skeletont{}, rhs, lhs_conditions);
+      symex_assignt{*this, state, assignment_type, ns, symex_config, target}
+          .assign_rec(lhs, expr_skeletont{}, rhs, lhs_conditions);
     }
 
     if(it1!=arguments.end())
@@ -210,7 +210,17 @@ void goto_symext::symex_function_call_symbol(
   const irep_idt &identifier=
     to_symbol_expr(code.function()).get_identifier();
 
-  if(has_prefix(id2string(identifier), CPROVER_FKT_PREFIX))
+  if(identifier == CPROVER_PREFIX "get_field")
+  {
+    symex_get_field(ns, state, code);
+    symex_transition(state);
+  }
+  else if(identifier == CPROVER_PREFIX "set_field")
+  {
+    symex_set_field(ns, state, code);
+    symex_transition(state);
+  }
+  else if(has_prefix(id2string(identifier), CPROVER_FKT_PREFIX))
   {
     symex_fkt(state, code);
   }

@@ -25,6 +25,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string2int.h>
 #include <util/string_constant.h>
 
+#include <langapi/language_util.h>
+
 inline static optionalt<typet> c_sizeof_type_rec(const exprt &expr)
 {
   const irept &sizeof_type=expr.find(ID_C_c_sizeof_type);
@@ -180,7 +182,16 @@ void goto_symext::symex_allocate(
   {
     const auto zero_value =
       zero_initializer(*object_type, code.source_location(), ns);
-    CHECK_RETURN(zero_value.has_value());
+    if(!zero_value.has_value())
+    {
+      log.error() << "failed to zero-initialize object:\n"
+                  << code.pretty()
+                  << '\n'
+                  << object_type->pretty()
+                  << messaget::eom;
+      throw 0;
+    }
+
     code_assignt assignment(value_symbol.symbol_expr(), *zero_value);
     symex_assign(state, assignment);
   }
@@ -200,11 +211,43 @@ void goto_symext::symex_allocate(
     index_exprt index_expr(
       value_symbol.symbol_expr(), from_integer(0, index_type()));
     rhs = address_of_exprt(index_expr, pointer_type(array_type.subtype()));
+    mp_integer size;
+    bool per_object = shadow_per_object;
+    if(!per_object)
+    {
+      if(!array_type.size().is_constant())
+      {
+        if(variable_array_size > 0)
+        {
+          log.warning() << "constant array size expected '"
+                        << from_expr(ns, "", array_type.size())
+                        << "' replaced by "
+                        << variable_array_size << messaget::eom;
+          size = variable_array_size;
+        }
+        else
+        {
+          log.warning() << "constant malloc size expected: "
+                        << from_expr(ns, "", array_type.size())
+                        << messaget::eom;
+          log.warning() << "falling back to shadow-per-object for "
+                        << from_expr(ns, "", index_expr) << messaget::eom;
+          per_object = true;
+        }
+      }
+      else
+      {
+        to_integer(to_constant_expr(array_type.size()), size);
+      }
+    }
+    symex_field_dynamic_init(ns, state, index_expr, size, per_object);
   }
   else
   {
     rhs=address_of_exprt(
       value_symbol.symbol_expr(), pointer_type(value_symbol.type));
+    symex_field_dynamic_init(
+      ns, state, value_symbol.symbol_expr(), mp_integer(1), shadow_per_object);
   }
 
   symex_assign(

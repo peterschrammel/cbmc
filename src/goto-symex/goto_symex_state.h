@@ -123,6 +123,19 @@ public:
 
   field_sensitivityt field_sensitivity;
 
+  std::map<irep_idt, typet> global_fields;
+  std::map<irep_idt, typet> local_fields;
+
+  struct shadowed_addresst
+  {    
+    exprt address;
+    symbol_exprt shadow;
+    bool per_object;
+  };
+  
+  // addresses must remain in sequence
+  std::map<irep_idt, std::vector<shadowed_addresst>> address_fields;
+
 protected:
   template <levelt>
   void rename_address(exprt &expr, const namespacet &ns);

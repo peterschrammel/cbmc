@@ -15,11 +15,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/options.h>
 #include <util/message.h>
 
-#include <goto-programs/abstract_goto_model.h>
+#include <goto-programs/goto_model.h>
 
 #include "complexity_limiter.h"
+#include "goto_symex_state.h"
 #include "path_storage.h"
 #include "symex_config.h"
+#include "symex_target_equation.h"
 
 class byte_extract_exprt;
 class function_application_exprt;
@@ -80,6 +82,11 @@ public:
       _remaining_vccs(std::numeric_limits<unsigned>::max()),
       complexity_module(mh, options)
   {
+    if(options.is_set("variable-array-size"))
+       variable_array_size =
+         options.get_unsigned_int_option("variable-array-size");
+    if(options.is_set("shadow-per-object"))
+       shadow_per_object = options.get_bool_option("shadow-per-object");
   }
 
   /// A virtual destructor allowing derived classes to be cleaned up correctly
@@ -115,12 +122,16 @@ public:
   /// symbolic execution
   virtual void symex_from_entry_point_of(
     const get_goto_functiont &get_goto_function,
-    symbol_tablet &new_symbol_table);
+    symbol_tablet &new_symbol_table,
+    const std::pair<std::map<irep_idt, typet>,
+      std::map<irep_idt, typet>> &fields);
 
   /// Puts the initial state of the entry point function into the path storage
   virtual void initialize_path_storage_from_entry_point_of(
     const get_goto_functiont &get_goto_function,
-    symbol_tablet &new_symbol_table);
+    symbol_tablet &new_symbol_table,
+    const std::pair<std::map<irep_idt, typet>,
+      std::map<irep_idt, typet>> &fields);
 
   /// Performs symbolic execution using a state and equation that have
   /// already been used to symbolically execute part of the program. The state
@@ -844,6 +855,72 @@ public:
   {
     target.validate(ns, vm);
   }
+
+  // Shadow memory
+public:
+  static std::pair<std::map<irep_idt, typet>, std::map<irep_idt, typet>>
+  preprocess_field_decl(
+    goto_modelt &goto_model,
+    message_handlert &message_handler);
+
+
+  void symex_field_static_init(const namespacet &ns, goto_symex_statet &state,
+                               const ssa_exprt &expr);
+  void symex_field_static_init_string_constant(
+    const namespacet &ns, goto_symex_statet &state,
+    const ssa_exprt &expr, const exprt &rhs);
+
+protected:
+  mp_integer variable_array_size = 0;
+  bool shadow_per_object = false;
+
+  void symex_get_field(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const code_function_callt &code_function_call);
+
+  void symex_set_field(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const code_function_callt &code_function_call);
+
+  void symex_field_local_init(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const ssa_exprt &expr);
+
+  void symex_field_dynamic_init(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const exprt &expr,
+    const mp_integer &size,
+    bool per_object);
+
+private:
+  static void convert_field_decl(
+    const namespacet &ns,
+    message_handlert &message_handler,
+    const code_function_callt &code_function_call,
+    std::map<irep_idt, typet> &fields);
+
+  symbol_exprt add_field(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const exprt &expr,
+    const irep_idt &field_name,
+    bool per_object,
+    const typet &field_type);
+
+  void initialize_rec(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const exprt &expr,
+    bool per_object,
+    std::map<irep_idt, typet> &fields);
+
+  bool can_be_initialized_rec(
+    const namespacet &ns,
+    const exprt &expr);
 };
 
 /// Transition to the next instruction, which increments the internal program
