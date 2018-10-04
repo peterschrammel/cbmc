@@ -29,14 +29,14 @@ public:
   single_path_symex_only_checkert(
     const optionst &options,
     ui_message_handlert &ui_message_handler,
-    abstract_goto_modelt &goto_model);
+    goto_modelt &goto_model);
 
   resultt operator()(propertiest &) override;
 
   virtual ~single_path_symex_only_checkert() = default;
 
 protected:
-  abstract_goto_modelt &goto_model;
+  goto_modelt &goto_model;
   symbol_tablet symex_symbol_table;
   namespacet ns;
   guard_managert guard_manager;

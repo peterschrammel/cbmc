@@ -48,11 +48,11 @@ public:
     symbol_tablet &_new_symbol_table,
     const optionst &_options,
     value_setst &_value_sets,
-    const messaget &_log = messaget())
+    message_handlert &message_handler)
     : options(_options),
       ns(_ns),
       value_sets(_value_sets),
-      dereference(_ns, _new_symbol_table, *this, ID_nil, false, _log)
+      dereference(_ns, _new_symbol_table, *this, ID_nil, false, message_handler)
   {
   }
 
@@ -101,11 +101,10 @@ void dereference(
   goto_programt::const_targett target,
   exprt &expr,
   const namespacet &,
-  value_setst &);
+  value_setst &,
+  message_handlert &);
 
-void remove_pointers(
-  goto_modelt &,
-  value_setst &);
+void remove_pointers(goto_modelt &, value_setst &, message_handlert &);
 
 #define OPT_REMOVE_POINTERS "(remove-pointers)"
 

@@ -13,6 +13,7 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <util/ui_message.h>
 
+#include <goto-symex/goto_symex.h>
 #include <goto-symex/show_program.h>
 #include <goto-symex/show_vcc.h>
 
@@ -23,7 +24,7 @@ Author: Daniel Kroening, Peter Schrammel
 multi_path_symex_only_checkert::multi_path_symex_only_checkert(
   const optionst &options,
   ui_message_handlert &ui_message_handler,
-  abstract_goto_modelt &goto_model)
+  goto_modelt &goto_model)
   : incremental_goto_checkert(options, ui_message_handler),
     goto_model(goto_model),
     ns(goto_model.get_symbol_table(), symex_symbol_table),
@@ -74,10 +75,14 @@ operator()(propertiest &properties)
 
 void multi_path_symex_only_checkert::generate_equation()
 {
+  // for shadow memory instrumentation
+  const auto fields =
+    goto_symext::preprocess_field_decl(goto_model, ui_message_handler);
+
   const auto symex_start = std::chrono::steady_clock::now();
 
   symex.symex_from_entry_point_of(
-    goto_symext::get_goto_function(goto_model), symex_symbol_table);
+    goto_symext::get_goto_function(goto_model), symex_symbol_table, fields);
 
   const auto symex_stop = std::chrono::steady_clock::now();
   std::chrono::duration<double> symex_runtime =

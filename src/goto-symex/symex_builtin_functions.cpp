@@ -25,6 +25,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "path_storage.h"
 
+#include <langapi/language_util.h>
+
 inline static optionalt<typet> c_sizeof_type_rec(const exprt &expr)
 {
   const irept &sizeof_type=expr.find(ID_C_c_sizeof_type);
@@ -180,7 +182,16 @@ void goto_symext::symex_allocate(
   {
     const auto zero_value =
       zero_initializer(*object_type, code.source_location(), ns);
-    CHECK_RETURN(zero_value.has_value());
+    if(!zero_value.has_value())
+    {
+      log.error() << "failed to zero-initialize object:\n"
+                  << code.pretty()
+                  << '\n'
+                  << object_type->pretty()
+                  << messaget::eom;
+      throw 0;
+    }
+
     symex_assign(state, value_symbol.symbol_expr(), *zero_value);
   }
   else
@@ -199,11 +210,14 @@ void goto_symext::symex_allocate(
     index_exprt index_expr(
       value_symbol.symbol_expr(), from_integer(0, array_type.index_type()));
     rhs = address_of_exprt(index_expr, pointer_type(array_type.element_type()));
+    symex_field_dynamic_init(ns, state, index_expr, code);
   }
   else
   {
     rhs=address_of_exprt(
       value_symbol.symbol_expr(), pointer_type(value_symbol.type));
+    symex_field_dynamic_init(
+      ns, state, value_symbol.symbol_expr(), code);
   }
 
   symex_assign(state, lhs, typecast_exprt::conditional_cast(rhs, lhs.type()));
