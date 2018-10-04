@@ -102,12 +102,16 @@ public:
   /// symbolic execution
   virtual void symex_from_entry_point_of(
     const get_goto_functiont &get_goto_function,
-    symbol_tablet &new_symbol_table);
+    symbol_tablet &new_symbol_table,
+    const std::pair<std::map<irep_idt, typet>,
+      std::map<irep_idt, typet>> &fields);
 
   /// Puts the initial state of the entry point function into the path storage
   virtual void initialize_path_storage_from_entry_point_of(
     const get_goto_functiont &get_goto_function,
-    symbol_tablet &new_symbol_table);
+    symbol_tablet &new_symbol_table,
+    const std::pair<std::map<irep_idt, typet>,
+      std::map<irep_idt, typet>> &fields);
 
   /// Performs symbolic execution using a state and equation that have
   /// already been used to symbolically execute part of the program. The state
@@ -836,6 +840,62 @@ public:
   {
     target.validate(ns, vm);
   }
+
+  // Shadow memory
+public:
+  static std::pair<std::map<irep_idt, typet>, std::map<irep_idt, typet>>
+  preprocess_field_decl(
+    goto_modelt &goto_model,
+    message_handlert &message_handler);
+
+
+  void symex_field_static_init(const namespacet &ns, goto_symex_statet &state,
+                               const ssa_exprt &expr);
+  void symex_field_static_init_string_constant(
+    const namespacet &ns, goto_symex_statet &state,
+    const ssa_exprt &expr, const exprt &rhs);
+
+protected:
+  void symex_get_field(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const code_function_callt &code_function_call);
+
+  void symex_set_field(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const code_function_callt &code_function_call);
+
+  void symex_field_local_init(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const ssa_exprt &expr);
+
+  void symex_field_dynamic_init(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const exprt &expr,
+    const side_effect_exprt &code);
+
+private:
+  static void convert_field_decl(
+    const namespacet &ns,
+    message_handlert &message_handler,
+    const code_function_callt &code_function_call,
+    std::map<irep_idt, typet> &fields);
+
+  symbol_exprt add_field(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const exprt &expr,
+    const irep_idt &field_name,
+    const typet &field_type);
+
+  void initialize_shadow_memory(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const exprt &expr,
+    std::map<irep_idt, typet> &fields);
 };
 
 /// Transition to the next instruction, which increments the internal program

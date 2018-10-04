@@ -684,7 +684,8 @@ void rw_range_set_value_sett::get_objects_dereference(
     size);
 
   exprt object=deref;
-  dereference(function, target, object, ns, value_sets);
+  null_message_handlert message_handler;
+  dereference(function, target, object, ns, value_sets, message_handler);
 
   auto type_bits = pointer_offset_bits(object.type(), ns);
 

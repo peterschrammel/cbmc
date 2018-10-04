@@ -156,7 +156,8 @@ void _rw_set_loct::read_write_rec(
       read_write_rec(*it, r, w, suffix, guard_conjuncts);
     }
     #else
-    dereference(function_id, target, tmp, ns, value_sets);
+    null_message_handlert message_handler;
+    dereference(function_id, target, tmp, ns, value_sets, message_handler);
 
     read_write_rec(tmp, r, w, suffix, guard_conjuncts);
 #endif
