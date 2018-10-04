@@ -62,6 +62,7 @@ SRC = arith_tools.cpp \
       pointer_offset_size.cpp \
       pointer_offset_sum.cpp \
       pointer_predicates.cpp \
+      pointer_resolve.cpp \
       prefix_filter.cpp \
       rational.cpp \
       rational_tools.cpp \

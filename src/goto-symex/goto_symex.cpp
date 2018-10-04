@@ -102,7 +102,7 @@ void goto_symext::symex_assign(
       assignment_type = symex_targett::assignment_typet::HIDDEN;
 
     symex_assignt symex_assign{
-      state, assignment_type, ns, symex_config, target};
+      *this, state, assignment_type, ns, symex_config, target};
 
     // Try to constant propagate potential side effects of the assignment, when
     // simplification is turned on and there is one thread only. Constant
@@ -116,8 +116,8 @@ void goto_symext::symex_assign(
     }
 
     exprt::operandst lhs_if_then_else_conditions;
-    symex_assign.assign_rec(
-      lhs, expr_skeletont{}, rhs, lhs_if_then_else_conditions);
+    symex_assignt{*this, state, assignment_type, ns, symex_config, target}
+        .assign_rec(lhs, expr_skeletont{}, rhs, lhs_if_then_else_conditions);
   }
 }
 
