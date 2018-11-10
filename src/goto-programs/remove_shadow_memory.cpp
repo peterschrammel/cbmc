@@ -15,6 +15,7 @@ Author: Peter Schrammel
 #include <util/base_type.h>
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
+#include <util/find_symbols.h>
 #include <util/fresh_symbol.h>
 #include <util/invariant.h>
 #include <util/message.h>
@@ -178,8 +179,10 @@ void remove_shadow_memoryt::operator()(goto_modelt &goto_model)
   // initialize fields
   Forall_goto_functions(f_it, goto_model.goto_functions)
   {
+#if 0
     if(f_it->first != "main" && f_it->first != CPROVER_PREFIX "initialize")
       continue;
+#endif
 
     goto_programt &goto_program = f_it->second.body;
     Forall_goto_program_instructions(target, goto_program)
@@ -238,6 +241,37 @@ void remove_shadow_memoryt::operator()(goto_modelt &goto_model)
           ns,
           fields,
           code_decl.symbol(),
+          goto_model.symbol_table,
+          f_it->first,
+          target,
+          goto_program,
+          address_fields);
+      }
+      else if(target->is_assign() && f_it->first == CPROVER_PREFIX "initialize")
+      {
+        const code_assignt &code_assign = to_code_assign(target->code);
+        find_symbols_sett identifiers;
+        find_symbols(code_assign.lhs(), identifiers);
+        if(identifiers.size() != 1)
+          continue;
+
+        const irep_idt &identifier = *identifiers.begin();
+        if(has_prefix(id2string(identifier), CPROVER_PREFIX))
+          continue;
+
+        const symbolt &symbol = goto_model.symbol_table.lookup_ref(identifier);
+
+        if(symbol.is_auxiliary || !symbol.is_static_lifetime)
+          continue;
+
+        const typet &type = symbol.type;
+        debug() << "memory " << id2string(symbol.name) << " of type "
+                << from_type(ns, "", type) << eom;
+
+        initialize_rec(
+          ns,
+          fields,
+          symbol.symbol_expr(),
           goto_model.symbol_table,
           f_it->first,
           target,
