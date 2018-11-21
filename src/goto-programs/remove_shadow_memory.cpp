@@ -231,6 +231,8 @@ void remove_shadow_memoryt::operator()(goto_modelt &goto_model)
 
         if(symbol.is_auxiliary)
           continue;
+        if(id2string(symbol.name).find("__cs_") != std::string::npos)
+          continue;
 
         const typet &type = code_decl.symbol().type();
         debug()
@@ -262,6 +264,8 @@ void remove_shadow_memoryt::operator()(goto_modelt &goto_model)
         const symbolt &symbol = goto_model.symbol_table.lookup_ref(identifier);
 
         if(symbol.is_auxiliary || !symbol.is_static_lifetime)
+          continue;
+        if(id2string(symbol.name).find("__cs_") != std::string::npos)
           continue;
 
         const typet &type = symbol.type;
