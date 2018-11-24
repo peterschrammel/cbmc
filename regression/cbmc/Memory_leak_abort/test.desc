@@ -12,3 +12,4 @@ main\.memory-leak\.1.*FAILURE
 --
 main\.assertion\.1.*FAILURE
 ^warning: ignoring
+

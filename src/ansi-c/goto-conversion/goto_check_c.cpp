@@ -230,7 +230,6 @@ protected:
   void conversion_check(const exprt &, const guardt &);
   void float_overflow_check(const exprt &, const guardt &);
   void nan_check(const exprt &, const guardt &);
-  void memory_leak_check(const irep_idt &function_id);
 
   std::string array_name(const exprt &);
 
@@ -2088,44 +2087,6 @@ void goto_check_ct::memory_leak_check(const irep_idt &function_id)
     identity);
 }
 
-/*******************************************************************\
-Function: goto_check_ct::memory_leak_check
-  Inputs:
- Outputs:
- Purpose:
-\*******************************************************************/
-
-void goto_check_ct::memory_leak_check(const irep_idt &function_id)
-{
-  const symbolt &leak=ns.lookup(CPROVER_PREFIX "memory_leak");
-  const symbol_exprt leak_expr=leak.symbol_expr();
-
-  // add self-assignment to get helpful counterexample output
-  code_assignt code(leak_expr, leak_expr);
-  goto_programt::instructiont t=goto_programt::make_assignment(code);
-
-  source_locationt source_location;
-  source_location.set_function(function_id);
-
-  equal_exprt eq(
-    leak_expr,
-    null_pointer_exprt(to_pointer_type(leak.type)));
-  add_guarded_property(
-    eq,
-    "dynamically allocated memory never freed",
-    "memory-leak",
-    source_location,
-    eq,
-    identity);
-}
-
-/*******************************************************************\
-Function: goto_checkt::goto_check
-  Inputs:
- Outputs:
- Purpose:[B
-\*******************************************************************/
-
 void goto_check_ct::goto_check(
   const irep_idt &function_identifier,
   goto_functiont &goto_function)
@@ -2283,13 +2244,17 @@ void goto_check_ct::goto_check(
     {
       // These are further 'exit points' of the program
       const exprt simplified_guard = simplify_expr(i.condition(), ns);
+      // The function may be inlined to only __CPROVER_start, use the
+      // original location (if it is still valid thanks to setting
+      // adjust_false=false in goto_inlinet).
+      const irep_idt &former_function = i.source_location().get_function();
       if(
         enable_memory_cleanup_check && simplified_guard.is_false() &&
-        (function_identifier == "abort" || function_identifier == "exit" ||
-         function_identifier == "_Exit" ||
+        (former_function == "abort" || former_function == "exit" ||
+         former_function == "_Exit" ||
          (i.labels.size() == 1 && i.labels.front() == "__VERIFIER_abort")))
       {
-        memory_leak_check(function_identifier);
+        memory_leak_check(former_function);
       }
     }
     else if(i.is_dead())
