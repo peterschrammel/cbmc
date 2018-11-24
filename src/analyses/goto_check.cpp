@@ -2138,6 +2138,15 @@ void goto_checkt::goto_check(
     }
     else if(i.is_assume())
     {
+      // These are further 'exit points' of the program
+      const exprt simplified_guard = simplify_expr(i.guard, ns);
+      if(
+        enable_memory_leak_check && simplified_guard.is_false() &&
+        (function_identifier == "abort" || function_identifier == "exit" ||
+         function_identifier == "_Exit"))
+      {
+        memory_leak_check(function_identifier);
+      }
       if(!enable_assumptions)
       {
         i.turn_into_skip();
