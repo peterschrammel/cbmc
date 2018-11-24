@@ -2216,6 +2216,22 @@ void goto_check_ct::goto_check(
       // this has no successor
       assertions.clear();
     }
+    else if(i.is_assume())
+    {
+      // These are further 'exit points' of the program
+      const exprt simplified_guard = simplify_expr(i.condition(), ns);
+      // The function may be inlined to only __CPROVER_start, use the
+      // original location (if it is still valid thanks to setting
+      // adjust_false=false in goto_inlinet).
+      const irep_idt &former_function = i.source_location().get_function();
+      if(
+        enable_memory_cleanup_check && simplified_guard.is_false() &&
+        (former_function == "abort" || former_function == "exit" ||
+         former_function == "_Exit"))
+      {
+        memory_leak_check(former_function);
+      }
+    }
     else if(i.is_dead())
     {
       if(enable_pointer_check || enable_pointer_primitive_check)
