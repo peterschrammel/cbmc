@@ -421,13 +421,14 @@ void remove_shadow_memoryt::convert_set_field(
           << from_expr(ns, "", expr) << " to " << from_expr(ns, "", value)
           << eom;
 
+  const auto &addresses = address_fields.at(field_name);
+
   // t1: IF address_pair.first != expr THEN GOTO t0
   // t2: address_field[field_name] = value
   // t3: GOTO target
   // t0: IF ...
   // ...
   // target:
-  const auto &addresses = address_fields.at(field_name);
   goto_programt::targett t0 = goto_program.insert_before(target);
   t0->make_goto(target);
   for(const auto &address_pair : addresses)
@@ -502,16 +503,18 @@ void remove_shadow_memoryt::convert_get_field(
   debug() << "get " << id2string(field_name) << " for "
           << from_expr(ns, "", expr) << eom;
 
+  INVARIANT(
+    address_fields.count(field_name) == 1,
+    id2string(field_name) + " should exist");
+  const auto &addresses = address_fields.at(field_name);
+
+#if 0
   // t1: IF address_pair.first != expr THEN GOTO n
   // t2: lhs = address_pair.second[field_name]
   // t3: GOTO target
   // t0: IF ...
   // ...
   // target:
-  INVARIANT(
-    address_fields.count(field_name) == 1,
-    id2string(field_name) + " should exist");
-  const auto &addresses = address_fields.at(field_name);
   goto_programt::targett t0 = goto_program.insert_before(target);
   t0->make_goto(target);
   for(const auto &address_pair : addresses)
@@ -538,6 +541,37 @@ void remove_shadow_memoryt::convert_get_field(
     }
   }
   target->make_skip();
+#else
+  exprt lhs = to_code_function_call(target->code).lhs();
+  exprt rhs;
+  bool first = true;
+  for(const auto &address_pair : addresses)
+  {
+    const exprt &address = address_pair.first;
+    if(
+      expr.type() == address.type() ||
+      to_pointer_type(expr.type()).get_width() ==
+        to_pointer_type(address.type()).get_width())
+    {
+      const exprt &field = address_pair.second;
+      if(first)
+      {
+        first = false;
+        rhs = typecast_exprt::conditional_cast(field, lhs.type());
+      }
+      else
+      {
+        exprt cond = equal_exprt(
+          address, typecast_exprt::conditional_cast(expr, address.type()));
+        rhs = if_exprt(
+          cond, typecast_exprt::conditional_cast(field, lhs.type()), rhs);
+      }
+    }
+  }
+  target->make_assignment();
+  target->code =
+    code_assignt(lhs, typecast_exprt::conditional_cast(rhs, lhs.type()));
+#endif
 }
 
 void remove_shadow_memoryt::convert_field_decl(
