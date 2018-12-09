@@ -45,7 +45,6 @@ SRC = adjust_float_expressions.cpp \
       remove_const_function_pointers.cpp \
       remove_function_pointers.cpp \
       remove_returns.cpp \
-      remove_shadow_memory.cpp \
       remove_skip.cpp \
       remove_unreachable.cpp \
       remove_unused_functions.cpp \
