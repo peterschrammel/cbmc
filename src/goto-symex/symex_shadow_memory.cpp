@@ -1,15 +1,15 @@
 /*******************************************************************\
 
-Module: Remove Shadow Memory Instrumentation
+Module: Symex Shadow Memory Instrumentation
 
 Author: Peter Schrammel
 
 \*******************************************************************/
 
 /// \file
-/// Remove Shadow Memory Instrumentation
+/// Symex Shadow Memory Instrumentation
 
-#include "symex_shadow_memory.h"
+#include "goto_symex.h"
 
 #include <util/arith_tools.h>
 #include <util/base_type.h>
@@ -29,7 +29,21 @@ Author: Peter Schrammel
 
 #include <goto-programs/goto_model.h>
 
-#include "goto_symex_state.h"
+static irep_idt get_field_name(const exprt &string_expr)
+{
+  if(string_expr.id() == ID_typecast)
+    return get_field_name(to_typecast_expr(string_expr).op());
+  else if(string_expr.id() == ID_address_of)
+    return get_field_name(to_address_of_expr(string_expr).object());
+  else if(string_expr.id() == ID_index)
+    return get_field_name(to_index_expr(string_expr).array());
+  else if(string_expr.id() == ID_string_constant)
+  {
+    return string_expr.get(ID_value);
+  }
+  else
+    UNREACHABLE;
+}
 
 #if 0
 static typet c_sizeof_type_rec(const exprt &expr)
@@ -83,17 +97,12 @@ static mp_integer get_malloc_size(const exprt &size, const namespacet &ns)
   else
     INVARIANT(false, "constant malloc size expected");
 }
+#endif
 
-void symex_shadow_memoryt::initialize_rec(
+void goto_symext::initialize_rec(
   const namespacet &ns,
-  const std::map<irep_idt, typet> &fields,
-  const exprt &expr,
-  symbol_tablet &symbol_table,
-  const irep_idt &function_id,
-  goto_programt::targett target,
-  goto_programt &goto_program,
-  std::map<irep_idt, std::vector<std::pair<exprt, symbol_exprt>>>
-    &address_fields)
+  goto_symex_statet &state,
+  const exprt &expr)
 {
   typet type = ns.follow(expr.type());
   if(type.id() == ID_array)
@@ -106,64 +115,38 @@ void symex_shadow_memoryt::initialize_rec(
     {
       initialize_rec(
         ns,
-        fields,
-        index_exprt(expr, from_integer(index, signed_long_int_type())),
-        symbol_table,
-        function_id,
-        target,
-        goto_program,
-        address_fields);
+        state,
+        index_exprt(expr, from_integer(index, signed_long_int_type())));
     }
   }
   else if(type.id() == ID_struct)
   {
     for(const auto &component : to_struct_type(type).components())
     {
-      initialize_rec(
-        ns,
-        fields,
-        member_exprt(expr, component),
-        symbol_table,
-        function_id,
-        target,
-        goto_program,
-        address_fields);
+      initialize_rec(ns, state, member_exprt(expr, component));
     }
   }
   else
   {
     for(const auto &field_pair : fields)
     {
-      symbol_exprt field = add_field(
-            ns,
-            fields,
-            address_of_exprt(expr),
-            symbol_table,
-            function_id,
-            target->source_location,
-            address_fields,
-            field_pair.first);
-      goto_programt::targett t = goto_program.insert_before(target);
-      t->make_assignment();
-      t->code = code_assignt(
+      symbol_exprt field =
+        add_field(ns, state, address_of_exprt(expr), field_pair.first);
+      code_assignt code_assign(
         field, from_integer(mp_integer(0), field.type()));
+      symex_assign(state, code_assign);
 
-      debug() << "initialize field " << id2string(field.get_identifier())
-              << " for " << from_expr(ns, "", address_of_exprt(expr)) << eom;
+      log.debug() << "initialize field " << id2string(field.get_identifier())
+                  << " for " << from_expr(ns, "", address_of_exprt(expr))
+                  << messaget::eom;
     }
   }
 }
 
-
-symbol_exprt symex_shadow_memoryt::add_field(
+symbol_exprt goto_symext::add_field(
   const namespacet &ns,
-  const std::map<irep_idt, typet> &fields,
+  goto_symex_statet &state,
   const exprt &expr,
-  symbol_tablet &symbol_table,
-  const irep_idt &function_id,
-  const source_locationt &source_location,
-  std::map<irep_idt, std::vector<std::pair<exprt, symbol_exprt>>>
-    &address_fields,
   const irep_idt &field_name)
 {
   auto &addresses = address_fields[field_name];
@@ -171,23 +154,20 @@ symbol_exprt symex_shadow_memoryt::add_field(
     fields.at(field_name),
     id2string(state.source.function_id),
     from_expr(ns, "", expr) + "." + id2string(field_name),
-    source_location,
+    state.source.pc->source_location,
     ID_C,
-    symbol_table);
+    state.symbol_table);
 
   addresses.push_back(
     std::pair<exprt, symbol_exprt>(expr, new_symbol.symbol_expr()));
   return new_symbol.symbol_expr();
 }
 
-#endif
-
-void symex_shadow_memoryt::symex_set_field(
+void goto_symext::symex_set_field(
   const namespacet &ns,
   goto_symex_statet &state,
   const code_function_callt &code_function_call)
 {
-#if 0
   INVARIANT(
     code_function_call.arguments().size() == 3,
     CPROVER_PREFIX "set_field requires 3 arguments");
@@ -200,10 +180,11 @@ void symex_shadow_memoryt::symex_set_field(
 
   exprt value = code_function_call.arguments()[2];
 
-  debug() << "set " << id2string(field_name) << " for "
-          << from_expr(ns, "", expr) << " to " << from_expr(ns, "", value)
-          << eom;
+  log.debug() << "set " << id2string(field_name) << " for "
+              << from_expr(ns, "", expr) << " to " << from_expr(ns, "", value)
+              << messaget::eom;
 
+#if 0
   const auto &addresses = address_fields.at(field_name);
 
   // t1: IF address_pair.first != expr THEN GOTO t0
@@ -240,12 +221,11 @@ void symex_shadow_memoryt::symex_set_field(
 #endif
 }
 
-void symex_shadow_memoryt::symex_get_field(
+void goto_symext::symex_get_field(
   const namespacet &ns,
   goto_symex_statet &state,
   const code_function_callt &code_function_call)
 {
-#if 0  
   INVARIANT(
     code_function_call.arguments().size() == 2,
     CPROVER_PREFIX "get_field requires 2 arguments");
@@ -256,9 +236,10 @@ void symex_shadow_memoryt::symex_get_field(
     expr.type().id() == ID_pointer,
     "shadow memory requires a pointer expression");
 
-  debug() << "get " << id2string(field_name) << " for "
-          << from_expr(ns, "", expr) << eom;
+  log.debug() << "get " << id2string(field_name) << " for "
+              << from_expr(ns, "", expr) << messaget::eom;
 
+#if 0  
   INVARIANT(
     address_fields.count(field_name) == 1,
     id2string(field_name) + " should exist");
@@ -295,41 +276,39 @@ void symex_shadow_memoryt::symex_get_field(
 #endif
 }
 
-void symex_shadow_memoryt::symex_field_static_init()
+void goto_symext::symex_field_static_init(
+  const namespacet &ns,
+  goto_symex_statet &state,
+  const code_assignt &code_assign)
 {
   if(state.source.function_id != CPROVER_PREFIX "initialize")
     return;
 
-        const irep_idt &identifier = *identifiers.begin();
-        if(has_prefix(id2string(identifier), CPROVER_PREFIX))
-          continue;
+  find_symbols_sett identifiers;
+  find_symbols(code_assign.lhs(), identifiers);
+  if(identifiers.size() != 1)
+    return;
 
-        const symbolt &symbol = goto_model.symbol_table.lookup_ref(identifier);
+  const irep_idt &identifier = *identifiers.begin();
+  if(has_prefix(id2string(identifier), CPROVER_PREFIX))
+    return;
 
-        if(symbol.is_auxiliary || !symbol.is_static_lifetime)
-          continue;
-        if(id2string(symbol.name).find("__cs_") != std::string::npos)
-          continue;
+  const symbolt &symbol = ns.lookup(identifier);
 
-        const typet &type = symbol.type;
-        debug() << "memory " << id2string(symbol.name) << " of type "
-                << from_type(ns, "", type) << eom;
+  if(symbol.is_auxiliary || !symbol.is_static_lifetime)
+    return;
+  if(id2string(symbol.name).find("__cs_") != std::string::npos)
+    return;
 
-        initialize_rec(
-          ns,
-          fields,
-          symbol.symbol_expr(),
-          goto_model.symbol_table,
-          f_it->first,
-          target,
-          goto_program,
-          address_fields);
-      }
-#endif
+  const typet &type = symbol.type;
+  log.debug() << "memory " << id2string(symbol.name) << " of type "
+              << from_type(ns, "", type) << messaget::eom;
+
+  initialize_rec(ns, state, symbol.symbol_expr());
 }
 
 #if 0
-void symex_shadow_memoryt::symex_field_local_init()
+void goto_symext::symex_field_local_init()
 {
 if(target->is_decl())
       {
@@ -344,9 +323,9 @@ if(target->is_decl())
           continue;
 
         const typet &type = code_decl.symbol().type();
-        debug()
+        log.debug()
           << "memory " << id2string(code_decl.get_identifier()) << " of type "
-          << from_type(ns, "", type) << eom;
+          << from_type(ns, "", type) << messaget::eom;
 
         initialize_rec(
           ns,
@@ -361,7 +340,7 @@ if(target->is_decl())
 }
 #endif
 
-void symex_shadow_memoryt::symex_field_dynamic_init()
+void goto_symext::symex_field_dynamic_init()
 {
 #if 0
   mp_integer malloc_size = get_malloc_size(size_expr, ns);
@@ -381,26 +360,46 @@ void symex_shadow_memoryt::symex_field_dynamic_init()
 #endif
 }
 
-static irep_idt get_field_name(const exprt &string_expr)
+std::map<irep_idt, typet> goto_symext::preprocess_field_decl(
+  goto_modelt &goto_model,
+  message_handlert &message_handler)
 {
-  if(string_expr.id() == ID_typecast)
-    return get_field_name(to_typecast_expr(string_expr).op());
-  else if(string_expr.id() == ID_address_of)
-    return get_field_name(to_address_of_expr(string_expr).object());
-  else if(string_expr.id() == ID_index)
-    return get_field_name(to_index_expr(string_expr).array());
-  else if(string_expr.id() == ID_string_constant)
+  std::map<irep_idt, typet> fields;
+  namespacet ns(goto_model.symbol_table);
+
+  // get declarations
+  Forall_goto_functions(f_it, goto_model.goto_functions)
   {
-    return string_expr.get(ID_value);
+    goto_programt &goto_program = f_it->second.body;
+    Forall_goto_program_instructions(target, goto_program)
+    {
+      if(!target->is_function_call())
+        continue;
+
+      const code_function_callt &code_function_call =
+        to_code_function_call(target->code);
+      const exprt &function = code_function_call.function();
+
+      if(function.id() != ID_symbol)
+        continue;
+
+      const irep_idt &identifier = to_symbol_expr(function).get_identifier();
+
+      if(identifier == CPROVER_PREFIX "field_decl")
+      {
+        convert_field_decl(ns, message_handler, code_function_call, fields);
+        target->make_skip();
+      }
+    }
   }
-  else
-    UNREACHABLE;
+  return fields;
 }
 
-void symex_shadow_memoryt::symex_field_decl(
+void goto_symext::convert_field_decl(
   const namespacet &ns,
-  goto_symex_statet &state,
-  const code_function_callt &code_function_call)
+  message_handlert &message_handler,
+  const code_function_callt &code_function_call,
+  std::map<irep_idt, typet> &fields)
 {
   INVARIANT(
     code_function_call.arguments().size() == 2,
@@ -409,8 +408,9 @@ void symex_shadow_memoryt::symex_field_decl(
 
   exprt expr = code_function_call.arguments()[1];
 
-  debug() << "declare " << id2string(field_name) << " of type "
-          << from_type(ns, "", expr.type()) << eom;
+  messaget log(message_handler);
+  log.debug() << "declare " << id2string(field_name) << " of type "
+              << from_type(ns, "", expr.type()) << messaget::eom;
 
   // record field type
   fields[field_name] = expr.type();

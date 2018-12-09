@@ -77,7 +77,6 @@ public:
       atomic_section_counter(0),
       log(mh),
       path_storage(path_storage),
-      shadow_memory(mh),
       path_segment_vccs(0),
       _total_vccs(std::numeric_limits<unsigned>::max()),
       _remaining_vccs(std::numeric_limits<unsigned>::max()),
@@ -798,8 +797,6 @@ protected:
   /// whose execution can be resumed later
   path_storaget &path_storage;
 
-  symex_shadow_memoryt shadow_memory;
-
 public:
   /// \brief Number of VCCs generated during the run of this goto_symext object
   ///
@@ -849,6 +846,54 @@ public:
   {
     target.validate(ns, vm);
   }
+
+  // Shadow memory
+public:
+  static std::map<irep_idt, typet> preprocess_field_decl(
+    goto_modelt &goto_model,
+    message_handlert &message_handler);
+
+  std::map<irep_idt, typet> fields;
+
+protected:
+  // addresses must remain in sequence
+  std::map<irep_idt, std::vector<std::pair<exprt, symbol_exprt>>>
+    address_fields;
+
+  void symex_get_field(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const code_function_callt &code_function_call);
+
+  void symex_set_field(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const code_function_callt &code_function_call);
+
+  void symex_field_static_init(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const code_assignt &code_assign);
+
+  void symex_field_dynamic_init();
+
+private:
+  static void convert_field_decl(
+    const namespacet &ns,
+    message_handlert &message_handler,
+    const code_function_callt &code_function_call,
+    std::map<irep_idt, typet> &fields);
+
+  symbol_exprt add_field(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const exprt &expr,
+    const irep_idt &field_name);
+
+  void initialize_rec(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const exprt &expr);
 };
 
 /// Transition to the next instruction, which increments the internal program

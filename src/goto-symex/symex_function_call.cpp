@@ -214,18 +214,15 @@ void goto_symext::symex_function_call_symbol(
   {
     symex_trace(state, code);
   }
-  else if(identifier == CPROVER_PREFIX "field_decl")
-  {
-    shadow_memory.symex_field_decl(ns, state, code);
-    symex_transition(state);
-  }
   else if(identifier == CPROVER_PREFIX "get_field")
   {
-    shadow_memory.symex_get_field(ns, state, code);
+    symex_get_field(ns, state, code);
+    symex_transition(state);
   }
   else if(identifier == CPROVER_PREFIX "set_field")
   {
-    shadow_memory.symex_set_field(ns, state, code);
+    symex_set_field(ns, state, code);
+    symex_transition(state);
   }
   else if(has_prefix(id2string(identifier), CPROVER_FKT_PREFIX))
   {
