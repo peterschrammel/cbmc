@@ -65,4 +65,6 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
       ssa,
       state.atomic_section_id,
       state.source);
+
+  symex_field_local_init(ns, state, expr);
 }
