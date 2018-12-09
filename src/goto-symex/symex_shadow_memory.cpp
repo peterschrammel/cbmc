@@ -9,7 +9,7 @@ Author: Peter Schrammel
 /// \file
 /// Remove Shadow Memory Instrumentation
 
-#include "remove_shadow_memory.h"
+#include "symex_shadow_memory.h"
 
 #include <util/arith_tools.h>
 #include <util/base_type.h>
@@ -27,7 +27,7 @@ Author: Peter Schrammel
 
 #include <langapi/language_util.h>
 
-#include "goto_model.h"
+#include <goto-programs/goto_model.h>
 
 class remove_shadow_memoryt : public messaget
 {
