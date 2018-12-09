@@ -45,60 +45,6 @@ static irep_idt get_field_name(const exprt &string_expr)
     UNREACHABLE;
 }
 
-#if 0
-static typet c_sizeof_type_rec(const exprt &expr)
-{
-  const irept &sizeof_type=expr.find(ID_C_c_sizeof_type);
-
-  if(!sizeof_type.is_nil())
-  {
-    return static_cast<const typet &>(sizeof_type);
-  }
-  else if(expr.id()==ID_mult)
-  {
-    forall_operands(it, expr)
-    {
-      typet t=c_sizeof_type_rec(*it);
-      if(t.is_not_nil())
-        return t;
-    }
-  }
-
-  return empty_typet();
-}
-
-static mp_integer get_malloc_size(const exprt &size, const namespacet &ns)
-{
-  if(size.id() == ID_typecast)
-  {
-    return get_malloc_size(size.op0(), ns);
-  }
-  else if(size.id() == ID_mult &&
-          size.operands().size()==2)
-  {
-    return get_malloc_size(size.op0(), ns) *
-      get_malloc_size(size.op1(), ns);
-  }
-#if 0
-  else if(size.find(ID_C_c_sizeof_type).is_not_nil())
-  {
-    const auto offset = pointer_offset_size(c_sizeof_type_rec(size), ns);
-    INVARIANT(offset.has_value(), "failed to get sizeof type size");
-    return offset.value();
-  }
-#endif
-  else if(size.id() == ID_constant)
-  {
-    mp_integer result;
-    bool error = to_integer(size, result);
-    CHECK_RETURN(!error);
-    return result;
-  }
-  else
-    INVARIANT(false, "constant malloc size expected");
-}
-#endif
-
 void goto_symext::initialize_rec(
   const namespacet &ns,
   goto_symex_statet &state,
@@ -180,45 +126,47 @@ void goto_symext::symex_set_field(
 
   exprt value = code_function_call.arguments()[2];
 
-  log.debug() << "set " << id2string(field_name) << " for "
+  log.debug() << "set field " << id2string(field_name) << " for "
               << from_expr(ns, "", expr) << " to " << from_expr(ns, "", value)
               << messaget::eom;
 
-#if 0
+  INVARIANT(
+    address_fields.count(field_name) == 1,
+    id2string(field_name) + " should exist");
   const auto &addresses = address_fields.at(field_name);
-
-  // t1: IF address_pair.first != expr THEN GOTO t0
-  // t2: address_field[field_name] = value
-  // t3: GOTO target
-  // t0: IF ...
-  // ...
-  // target:
-  goto_programt::targett t0 = goto_program.insert_before(target);
-  t0->make_goto(target);
+  const exprt &rhs = value;
+  exprt lhs;
+  bool first = true;
   for(const auto &address_pair : addresses)
   {
     const exprt &address = address_pair.first;
-    if(expr.type() == address.type() ||
-       to_pointer_type(expr.type()).get_width() ==
-       to_pointer_type(address.type()).get_width())
+    if(
+      expr.type() == address.type() ||
+      to_pointer_type(expr.type()).get_width() ==
+        to_pointer_type(address.type()).get_width())
     {
       const exprt &field = address_pair.second;
-      goto_programt::targett t4 = goto_program.insert_before(target);
-      t4->make_goto(target);
-      goto_programt::targett t3 = goto_program.insert_before(t4);
-      t3->make_goto(target);
-      goto_programt::targett t2 = goto_program.insert_before(t3);
-      t2->make_assignment();
-      t2->code = code_assignt(
-        field, typecast_exprt::conditional_cast(value, field.type()));
-      goto_programt::targett t1 = t0;
-      t1->make_goto(t4, not_exprt(equal_exprt(address, typecast_exprt::conditional_cast(expr, address.type()))));
-
-      t0 = t4;
+      if(first)
+      {
+        first = false;
+        lhs = address_of_exprt(field);
+      }
+      else
+      {
+        exprt cond = equal_exprt(
+          address, typecast_exprt::conditional_cast(expr, address.type()));
+        // do_simplify(cond);
+        // if(cond != false_exprt())
+        {
+          lhs = if_exprt(cond, address_of_exprt(field), lhs);
+        }
+      }
     }
   }
-  target->make_skip();
-#endif
+  lhs = dereference_exprt(lhs);
+  symex_assign(
+    state,
+    code_assignt(lhs, typecast_exprt::conditional_cast(rhs, lhs.type())));
 }
 
 void goto_symext::symex_get_field(
@@ -236,15 +184,15 @@ void goto_symext::symex_get_field(
     expr.type().id() == ID_pointer,
     "shadow memory requires a pointer expression");
 
-  log.debug() << "get " << id2string(field_name) << " for "
+  log.debug() << "get field " << id2string(field_name) << " for "
               << from_expr(ns, "", expr) << messaget::eom;
 
-#if 0  
   INVARIANT(
     address_fields.count(field_name) == 1,
     id2string(field_name) + " should exist");
   const auto &addresses = address_fields.at(field_name);
-  exprt lhs = to_code_function_call(target->code).lhs();
+  // Should actually be fields.at(field_name)
+  symbol_exprt lhs(CPROVER_PREFIX "get_field#return_value", signedbv_typet(32));
   exprt rhs;
   bool first = true;
   for(const auto &address_pair : addresses)
@@ -265,15 +213,18 @@ void goto_symext::symex_get_field(
       {
         exprt cond = equal_exprt(
           address, typecast_exprt::conditional_cast(expr, address.type()));
-        rhs = if_exprt(
-          cond, typecast_exprt::conditional_cast(field, lhs.type()), rhs);
+        // do_simplify(cond);
+        // if(cond != false_exprt())
+        {
+          rhs = if_exprt(
+            cond, typecast_exprt::conditional_cast(field, lhs.type()), rhs);
+        }
       }
     }
   }
-  target->make_assignment();
-  target->code =
-    code_assignt(lhs, typecast_exprt::conditional_cast(rhs, lhs.type()));
-#endif
+  symex_assign(
+    state,
+    code_assignt(lhs, typecast_exprt::conditional_cast(rhs, lhs.type())));
 }
 
 void goto_symext::symex_field_static_init(
@@ -301,63 +252,48 @@ void goto_symext::symex_field_static_init(
     return;
 
   const typet &type = symbol.type;
-  log.debug() << "memory " << id2string(symbol.name) << " of type "
+  log.debug() << "global memory " << id2string(symbol.name) << " of type "
               << from_type(ns, "", type) << messaget::eom;
 
   initialize_rec(ns, state, symbol.symbol_expr());
 }
 
-#if 0
-void goto_symext::symex_field_local_init()
+void goto_symext::symex_field_local_init(
+  const namespacet &ns,
+  goto_symex_statet &state,
+  const symbol_exprt &expr)
 {
-if(target->is_decl())
-      {
-        const code_declt &code_decl = to_code_decl(target->code);
+  const symbolt &symbol = ns.lookup(expr.get_identifier());
 
-        const symbolt &symbol =
-          goto_model.symbol_table.lookup_ref(code_decl.get_identifier());
+  if(symbol.is_auxiliary)
+    return;
+  if(id2string(symbol.name).find("__cs_") != std::string::npos)
+    return;
 
-        if(symbol.is_auxiliary)
-          continue;
-        if(id2string(symbol.name).find("__cs_") != std::string::npos)
-          continue;
+  const typet &type = expr.type();
+  log.debug() << "local memory " << id2string(expr.get_identifier())
+              << " of type " << from_type(ns, "", type) << messaget::eom;
 
-        const typet &type = code_decl.symbol().type();
-        log.debug()
-          << "memory " << id2string(code_decl.get_identifier()) << " of type "
-          << from_type(ns, "", type) << messaget::eom;
-
-        initialize_rec(
-          ns,
-          fields,
-          code_decl.symbol(),
-          goto_model.symbol_table,
-          f_it->first,
-          target,
-          goto_program,
-          address_fields);
-      }
+  initialize_rec(ns, state, expr);
 }
-#endif
 
-void goto_symext::symex_field_dynamic_init()
+void goto_symext::symex_field_dynamic_init(
+  const namespacet &ns,
+  goto_symex_statet &state,
+  const exprt &expr,
+  const mp_integer &size)
 {
-#if 0
-  mp_integer malloc_size = get_malloc_size(size_expr, ns);
-  for(mp_integer index = 0; index < malloc_size; ++index)
+  log.debug() << "dynamic memory of type " << from_type(ns, "", expr.type())
+              << " and " << size << " element(s)" << messaget::eom;
+
+  for(mp_integer index = 0; index < size; ++index)
   {
     initialize_rec(
-              ns,
-              fields,
-              dereference_exprt(
-                plus_exprt(code_function_call.lhs(), from_integer(index, signed_long_int_type()))),
-              goto_model.symbol_table,
-              f_it->first,
-              target,
-              goto_program,
-              address_fields);
-   }
-#endif
+      ns,
+      state,
+      dereference_exprt(
+        plus_exprt(expr, from_integer(index, signed_long_int_type()))));
+  }
 }
 
 std::map<irep_idt, typet> goto_symext::preprocess_field_decl(
