@@ -13,6 +13,7 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <util/invariant.h>
 
+#include <goto-symex/goto_symex.h>
 #include <goto-symex/memory_model.h>
 #include <goto-symex/show_program.h>
 #include <goto-symex/show_vcc.h>
@@ -22,7 +23,7 @@ Author: Daniel Kroening, Peter Schrammel
 multi_path_symex_only_checkert::multi_path_symex_only_checkert(
   const optionst &options,
   ui_message_handlert &ui_message_handler,
-  abstract_goto_modelt &goto_model)
+  goto_modelt &goto_model)
   : incremental_goto_checkert(options, ui_message_handler),
     goto_model(goto_model),
     ns(goto_model.get_symbol_table(), symex_symbol_table),
@@ -36,6 +37,12 @@ multi_path_symex_only_checkert::multi_path_symex_only_checkert(
       guard_manager)
 {
   setup_symex(symex, ns, options, ui_message_handler);
+
+  // for shadow memory instrumentation
+  const auto fields =
+    goto_symext::preprocess_field_decl(goto_model, ui_message_handler);
+  symex.global_fields = fields.first;
+  symex.local_fields = fields.second;
 }
 
 incremental_goto_checkert::resultt multi_path_symex_only_checkert::
