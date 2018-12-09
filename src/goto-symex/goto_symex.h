@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "complexity_limiter.h"
 #include "path_storage.h"
 #include "symex_config.h"
+#include "symex_shadow_memory.h"
 
 class byte_extract_exprt;
 class function_application_exprt;
@@ -75,6 +76,7 @@ public:
       atomic_section_counter(0),
       log(mh),
       path_storage(path_storage),
+      shadow_memory(mh),
       path_segment_vccs(0),
       _total_vccs(std::numeric_limits<unsigned>::max()),
       _remaining_vccs(std::numeric_limits<unsigned>::max()),
@@ -794,6 +796,8 @@ protected:
   /// Partially-executed symbolic execution \ref path_storaget::patht "paths"
   /// whose execution can be resumed later
   path_storaget &path_storage;
+
+  symex_shadow_memoryt shadow_memory;
 
 public:
   /// \brief Number of VCCs generated during the run of this goto_symext object
