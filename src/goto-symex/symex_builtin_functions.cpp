@@ -200,19 +200,20 @@ void goto_symext::symex_allocate(
     index_exprt index_expr(
       value_symbol.symbol_expr(), from_integer(0, index_type()));
     rhs = address_of_exprt(index_expr, pointer_type(array_type.subtype()));
+    mp_integer size;
+    to_integer(to_constant_expr(array_type.size()), size);
+    symex_field_dynamic_init(ns, state, rhs, size);
   }
   else
   {
     rhs=address_of_exprt(
       value_symbol.symbol_expr(), pointer_type(value_symbol.type));
+    symex_field_dynamic_init(ns, state, rhs, mp_integer(1));
   }
 
   symex_assign(
     state,
     code_assignt(lhs, typecast_exprt::conditional_cast(rhs, lhs.type())));
-
-  // TODO
-  symex_field_dynamic_init();
 }
 
 /// Construct an entry for the var args array. Visual Studio complicates this as

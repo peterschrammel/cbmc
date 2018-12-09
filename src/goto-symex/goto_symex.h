@@ -875,7 +875,16 @@ protected:
     goto_symex_statet &state,
     const code_assignt &code_assign);
 
-  void symex_field_dynamic_init();
+  void symex_field_local_init(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const symbol_exprt &expr);
+
+  void symex_field_dynamic_init(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const exprt &expr,
+    const mp_integer &size);
 
 private:
   static void convert_field_decl(
