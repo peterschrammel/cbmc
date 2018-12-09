@@ -29,67 +29,9 @@ Author: Peter Schrammel
 
 #include <goto-programs/goto_model.h>
 
-class remove_shadow_memoryt : public messaget
-{
-public:
-  explicit remove_shadow_memoryt(message_handlert &message_handler)
-    : messaget(message_handler)
-  {
-  }
+#include "goto_symex_state.h"
 
-  void operator()(goto_modelt &goto_model);
-
-protected:
-  irep_idt get_field_name(const exprt &string_expr);
-
-  void convert_field_decl(
-    const namespacet &ns,
-    const code_function_callt &code_function_call,
-    std::map<irep_idt, typet> &fields);
-
-  void convert_get_field(
-    const namespacet &ns,
-    const code_function_callt &code_function_call,
-    const std::map<irep_idt, typet> &fields,
-    goto_programt::targett target,
-    goto_programt &goto_program,
-    const std::map<irep_idt, std::vector<std::pair<exprt, symbol_exprt>>>
-      &address_fields);
-
-  void convert_set_field(
-    const namespacet &ns,
-    const code_function_callt &code_function_call,
-    const std::map<irep_idt, typet> &fields,
-    symbol_tablet &symbol_table,
-    const irep_idt &function_id,
-    goto_programt::targett target,
-    goto_programt &goto_program,
-    std::map<irep_idt, std::vector<std::pair<exprt, symbol_exprt>>>
-      &address_fields);
-
-  symbol_exprt add_field(
-    const namespacet &ns,
-    const std::map<irep_idt, typet> &fields,
-    const exprt &expr,
-    symbol_tablet &symbol_table,
-    const irep_idt &function_id,
-    const source_locationt &source_location,
-    std::map<irep_idt, std::vector<std::pair<exprt, symbol_exprt>>>
-      &address_fields,
-    const irep_idt &field_name);
-
-  void initialize_rec(
-    const namespacet &ns,
-    const std::map<irep_idt, typet> &fields,
-    const exprt &expr,
-    symbol_tablet &symbol_table,
-    const irep_idt &function_id,
-    goto_programt::targett target,
-    goto_programt &goto_program,
-    std::map<irep_idt, std::vector<std::pair<exprt, symbol_exprt>>>
-      &address_fields);
-};
-
+#if 0
 static typet c_sizeof_type_rec(const exprt &expr)
 {
   const irept &sizeof_type=expr.find(ID_C_c_sizeof_type);
@@ -123,14 +65,14 @@ static mp_integer get_malloc_size(const exprt &size, const namespacet &ns)
     return get_malloc_size(size.op0(), ns) *
       get_malloc_size(size.op1(), ns);
   }
-  #if 0
+#if 0
   else if(size.find(ID_C_c_sizeof_type).is_not_nil())
   {
     const auto offset = pointer_offset_size(c_sizeof_type_rec(size), ns);
     INVARIANT(offset.has_value(), "failed to get sizeof type size");
     return offset.value();
   }
-  #endif
+#endif
   else if(size.id() == ID_constant)
   {
     mp_integer result;
@@ -142,7 +84,7 @@ static mp_integer get_malloc_size(const exprt &size, const namespacet &ns)
     INVARIANT(false, "constant malloc size expected");
 }
 
-void remove_shadow_memoryt::operator()(goto_modelt &goto_model)
+void symex_shadow_memoryt::operator()(goto_modelt &goto_model)
 {
   std::map<irep_idt, typet> fields;
   // addresses must remain in sequence
@@ -324,7 +266,7 @@ void remove_shadow_memoryt::operator()(goto_modelt &goto_model)
   }
 }
 
-void remove_shadow_memoryt::initialize_rec(
+void symex_shadow_memoryt::initialize_rec(
   const namespacet &ns,
   const std::map<irep_idt, typet> &fields,
   const exprt &expr,
@@ -394,7 +336,7 @@ void remove_shadow_memoryt::initialize_rec(
   }
 }
 
-void remove_shadow_memoryt::convert_set_field(
+void symex_shadow_memoryt::convert_set_field(
   const namespacet &ns,
   const code_function_callt &code_function_call,
   const std::map<irep_idt, typet> &fields,
@@ -456,7 +398,7 @@ void remove_shadow_memoryt::convert_set_field(
   target->make_skip();
 }
 
-symbol_exprt remove_shadow_memoryt::add_field(
+symbol_exprt symex_shadow_memoryt::add_field(
   const namespacet &ns,
   const std::map<irep_idt, typet> &fields,
   const exprt &expr,
@@ -481,7 +423,7 @@ symbol_exprt remove_shadow_memoryt::add_field(
   return new_symbol.symbol_expr();
 }
 
-void remove_shadow_memoryt::convert_get_field(
+void symex_shadow_memoryt::convert_get_field(
   const namespacet &ns,
   const code_function_callt &code_function_call,
   const std::map<irep_idt, typet> &fields,
@@ -573,27 +515,9 @@ void remove_shadow_memoryt::convert_get_field(
     code_assignt(lhs, typecast_exprt::conditional_cast(rhs, lhs.type()));
 #endif
 }
+#endif
 
-void remove_shadow_memoryt::convert_field_decl(
-  const namespacet &ns,
-  const code_function_callt &code_function_call,
-  std::map<irep_idt, typet> &fields)
-{
-  INVARIANT(
-    code_function_call.arguments().size() == 2,
-    CPROVER_PREFIX "field_decl requires 2 arguments");
-  irep_idt field_name = get_field_name(code_function_call.arguments()[0]);
-
-  exprt expr = code_function_call.arguments()[1];
-
-  debug() << "declare " << id2string(field_name) << " of type "
-          << from_type(ns, "", expr.type()) << eom;
-
-  // record field type
-  fields[field_name] = expr.type();
-}
-
-irep_idt remove_shadow_memoryt::get_field_name(const exprt &string_expr)
+static irep_idt get_field_name(const exprt &string_expr)
 {
   if(string_expr.id() == ID_typecast)
     return get_field_name(to_typecast_expr(string_expr).op());
@@ -609,10 +533,21 @@ irep_idt remove_shadow_memoryt::get_field_name(const exprt &string_expr)
     UNREACHABLE;
 }
 
-void remove_shadow_memory(
-  goto_modelt &goto_model,
-  message_handlert &_message_handler)
+void symex_shadow_memoryt::symex_field_decl(
+  const namespacet &ns,
+  goto_symex_statet &state,
+  const code_function_callt &code_function_call)
 {
-  remove_shadow_memoryt rsm(_message_handler);
-  rsm(goto_model);
+  INVARIANT(
+    code_function_call.arguments().size() == 2,
+    CPROVER_PREFIX "field_decl requires 2 arguments");
+  irep_idt field_name = get_field_name(code_function_call.arguments()[0]);
+
+  exprt expr = code_function_call.arguments()[1];
+
+  debug() << "declare " << id2string(field_name) << " of type "
+          << from_type(ns, "", expr.type()) << eom;
+
+  // record field type
+  fields[field_name] = expr.type();
 }
