@@ -63,4 +63,7 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
       ssa,
       state.atomic_section_id,
       state.source);
+
+  // TODO
+  shadow_memory.symex_field_static_init();
 }

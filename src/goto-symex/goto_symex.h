@@ -15,12 +15,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/options.h>
 #include <util/message.h>
 
-#include <goto-programs/abstract_goto_model.h>
+#include <goto-programs/goto_model.h>
 
 #include "complexity_limiter.h"
+#include "goto_symex_state.h"
 #include "path_storage.h"
 #include "symex_config.h"
-#include "symex_shadow_memory.h"
+#include "symex_target_equation.h"
 
 class byte_extract_exprt;
 class function_application_exprt;
