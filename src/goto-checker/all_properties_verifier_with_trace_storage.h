@@ -27,7 +27,7 @@ public:
   all_properties_verifier_with_trace_storaget(
     const optionst &options,
     ui_message_handlert &ui_message_handler,
-    abstract_goto_modelt &goto_model)
+    goto_modelt &goto_model)
     : goto_verifiert(options, ui_message_handler),
       goto_model(goto_model),
       incremental_goto_checker(options, ui_message_handler, goto_model),
@@ -86,7 +86,7 @@ public:
   }
 
 protected:
-  abstract_goto_modelt &goto_model;
+  goto_modelt &goto_model;
   incremental_goto_checkerT incremental_goto_checker;
   std::size_t iterations = 1;
   goto_trace_storaget traces;

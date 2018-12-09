@@ -20,7 +20,7 @@ Author: Daniel Kroening, Peter Schrammel
 multi_path_symex_checkert::multi_path_symex_checkert(
   const optionst &options,
   ui_message_handlert &ui_message_handler,
-  abstract_goto_modelt &goto_model)
+  goto_modelt &goto_model)
   : multi_path_symex_only_checkert(options, ui_message_handler, goto_model),
     equation_generated(false),
     property_decider(options, ui_message_handler, equation, ns)
