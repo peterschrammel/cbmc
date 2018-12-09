@@ -211,7 +211,23 @@ void goto_symext::symex_function_call_symbol(
   const irep_idt &identifier=
     to_symbol_expr(code.function()).get_identifier();
 
-  if(has_prefix(id2string(identifier), CPROVER_FKT_PREFIX))
+  if(identifier=="CBMC_trace")
+  {
+    symex_trace(state, code);
+  }
+  else if(identifier == CPROVER_PREFIX "field_decl")
+  {
+    shadow_memory.symex_field_decl(ns, state, code);
+  }
+  else if(identifier == CPROVER_PREFIX "get_field")
+  {
+    // shadow_memory.symex_get_field(state, code);
+  }
+  else if(identifier == CPROVER_PREFIX "set_field")
+  {
+    // shadow_memory.symex_set_field(state, code);
+  }
+  else if(has_prefix(id2string(identifier), CPROVER_FKT_PREFIX))
   {
     symex_fkt(state, code);
   }
