@@ -835,11 +835,13 @@ public:
 
   // Shadow memory
 public:
-  static std::map<irep_idt, typet> preprocess_field_decl(
+  static std::pair<std::map<irep_idt, typet>, std::map<irep_idt, typet>>
+  preprocess_field_decl(
     goto_modelt &goto_model,
     message_handlert &message_handler);
 
-  std::map<irep_idt, typet> fields;
+  std::map<irep_idt, typet> global_fields;
+  std::map<irep_idt, typet> local_fields;
 
 protected:
   // addresses must remain in sequence
@@ -883,12 +885,14 @@ private:
     const namespacet &ns,
     goto_symex_statet &state,
     const exprt &expr,
-    const irep_idt &field_name);
+    const irep_idt &field_name,
+    std::map<irep_idt, typet> &fields);
 
   void initialize_rec(
     const namespacet &ns,
     goto_symex_statet &state,
-    const exprt &expr);
+    const exprt &expr,
+    std::map<irep_idt, typet> &fields);
 };
 
 /// Transition to the next instruction, which increments the internal program

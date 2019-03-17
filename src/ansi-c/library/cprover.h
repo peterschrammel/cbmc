@@ -24,7 +24,8 @@ void __CPROVER_postcondition(__CPROVER_bool assertion, const char *description);
 
 #if 0
 // shadow memory
-void __CPROVER_field_decl(const char *, int);
+void __CPROVER_field_decl_local(const char *, int);
+void __CPROVER_field_decl_global(const char *, int);
 int __CPROVER_get_field(void *, const char *);
 void __CPROVER_set_field(void *, const char *, int);
 #endif
