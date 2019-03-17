@@ -48,7 +48,8 @@ static irep_idt get_field_name(const exprt &string_expr)
 void goto_symext::initialize_rec(
   const namespacet &ns,
   goto_symex_statet &state,
-  const exprt &expr)
+  const exprt &expr,
+  std::map<irep_idt, typet> &fields)
 {
   typet type = ns.follow(expr.type());
   if(type.id() == ID_array)
@@ -62,14 +63,15 @@ void goto_symext::initialize_rec(
       initialize_rec(
         ns,
         state,
-        index_exprt(expr, from_integer(index, signed_long_int_type())));
+        index_exprt(expr, from_integer(index, signed_long_int_type())),
+        fields);
     }
   }
   else if(type.id() == ID_struct)
   {
     for(const auto &component : to_struct_type(type).components())
     {
-      initialize_rec(ns, state, member_exprt(expr, component));
+      initialize_rec(ns, state, member_exprt(expr, component), fields);
     }
   }
   else
@@ -77,7 +79,7 @@ void goto_symext::initialize_rec(
     for(const auto &field_pair : fields)
     {
       symbol_exprt field =
-        add_field(ns, state, address_of_exprt(expr), field_pair.first);
+        add_field(ns, state, address_of_exprt(expr), field_pair.first, fields);
       code_assignt code_assign(
         field, from_integer(mp_integer(0), field.type()));
       symex_assign(state, code_assign);
@@ -93,7 +95,8 @@ symbol_exprt goto_symext::add_field(
   const namespacet &ns,
   goto_symex_statet &state,
   const exprt &expr,
-  const irep_idt &field_name)
+  const irep_idt &field_name,
+  std::map<irep_idt, typet> &fields)
 {
   auto &addresses = address_fields[field_name];
   symbolt &new_symbol = get_fresh_aux_symbol(
@@ -255,7 +258,7 @@ void goto_symext::symex_field_static_init(
   log.debug() << "global memory " << id2string(symbol.name) << " of type "
               << from_type(ns, "", type) << messaget::eom;
 
-  initialize_rec(ns, state, symbol.symbol_expr());
+  initialize_rec(ns, state, symbol.symbol_expr(), global_fields);
 }
 
 void goto_symext::symex_field_local_init(
@@ -274,7 +277,7 @@ void goto_symext::symex_field_local_init(
   log.debug() << "local memory " << id2string(expr.get_identifier())
               << " of type " << from_type(ns, "", type) << messaget::eom;
 
-  initialize_rec(ns, state, expr);
+  initialize_rec(ns, state, expr, local_fields);
 }
 
 void goto_symext::symex_field_dynamic_init(
@@ -292,15 +295,18 @@ void goto_symext::symex_field_dynamic_init(
       ns,
       state,
       dereference_exprt(
-        plus_exprt(expr, from_integer(index, signed_long_int_type()))));
+        plus_exprt(expr, from_integer(index, signed_long_int_type()))),
+      global_fields);
   }
 }
 
-std::map<irep_idt, typet> goto_symext::preprocess_field_decl(
+std::pair<std::map<irep_idt, typet>, std::map<irep_idt, typet>>
+goto_symext::preprocess_field_decl(
   goto_modelt &goto_model,
   message_handlert &message_handler)
 {
-  std::map<irep_idt, typet> fields;
+  std::map<irep_idt, typet> global_fields;
+  std::map<irep_idt, typet> local_fields;
   namespacet ns(goto_model.symbol_table);
 
   // get declarations
@@ -321,14 +327,21 @@ std::map<irep_idt, typet> goto_symext::preprocess_field_decl(
 
       const irep_idt &identifier = to_symbol_expr(function).get_identifier();
 
-      if(identifier == CPROVER_PREFIX "field_decl")
+      if(identifier == CPROVER_PREFIX "field_decl_global")
       {
-        convert_field_decl(ns, message_handler, code_function_call, fields);
+        convert_field_decl(
+          ns, message_handler, code_function_call, global_fields);
+        target->make_skip();
+      }
+      else if(identifier == CPROVER_PREFIX "field_decl_local")
+      {
+        convert_field_decl(
+          ns, message_handler, code_function_call, local_fields);
         target->make_skip();
       }
     }
   }
-  return fields;
+  return std::make_pair(global_fields, local_fields);
 }
 
 void goto_symext::convert_field_decl(
