@@ -2126,12 +2126,12 @@ unsigned __CPROVER_bitvector[2] __CSEQ_CAT(__cs_thread_out,2,3,152,NULL,NULL);
                                         }
                                         void __cs_init(void)
                                         {
-                                        __CPROVER_field_decl("round_in", (unsigned __CPROVER_bitvector[3]) 0);
-                                        __CPROVER_field_decl("thread_in", (unsigned __CPROVER_bitvector[2]) 0);
-                                        __CPROVER_field_decl("round_out", (unsigned __CPROVER_bitvector[3]) 0);
-                                        __CPROVER_field_decl("thread_out", (unsigned __CPROVER_bitvector[2]) 0);
-                                        __CPROVER_field_decl("max_round_out", (unsigned __CPROVER_bitvector[3]) 0);
-                                        __CPROVER_field_decl("max_thread_out", (unsigned __CPROVER_bitvector[2]) 0);
+                                        __CPROVER_field_decl_global("round_in", (unsigned __CPROVER_bitvector[3]) 0);
+                                        __CPROVER_field_decl_global("thread_in", (unsigned __CPROVER_bitvector[2]) 0);
+                                        __CPROVER_field_decl_global("round_out", (unsigned __CPROVER_bitvector[3]) 0);
+                                        __CPROVER_field_decl_global("thread_out", (unsigned __CPROVER_bitvector[2]) 0);
+                                        __CPROVER_field_decl_global("max_round_out", (unsigned __CPROVER_bitvector[3]) 0);
+                                        __CPROVER_field_decl_global("max_thread_out", (unsigned __CPROVER_bitvector[2]) 0);
                                         __CSEQ_CAT(__cs_execution_round, 2, 0, 0, NULL, NULL) = 1;
                                         __CSEQ_CAT(__cs_round_out, 2, 0, 0, NULL, NULL) = __CSEQ_CAT(__cs_execution_round, 2, 0, 0, NULL, NULL) + 0;
                                         __CSEQ_CAT(__cs_thread_out, 2, 0, 0, NULL, NULL) = 0 + 0;
