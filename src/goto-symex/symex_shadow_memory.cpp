@@ -138,8 +138,7 @@ void goto_symext::symex_set_field(
     id2string(field_name) + " should exist");
   const auto &addresses = address_fields.at(field_name);
   const exprt &rhs = value;
-  exprt lhs;
-  bool first = true;
+  exprt lhs = nil_exprt();
   for(const auto &address_pair : addresses)
   {
     const exprt &address = address_pair.first;
@@ -149,9 +148,8 @@ void goto_symext::symex_set_field(
         to_pointer_type(address.type()).get_width())
     {
       const exprt &field = address_pair.second;
-      if(first)
+      if(lhs.is_nil())
       {
-        first = false;
         lhs = address_of_exprt(field);
       }
       else
@@ -196,8 +194,7 @@ void goto_symext::symex_get_field(
   const auto &addresses = address_fields.at(field_name);
   // Should actually be fields.at(field_name)
   symbol_exprt lhs(CPROVER_PREFIX "get_field#return_value", signedbv_typet(32));
-  exprt rhs;
-  bool first = true;
+  exprt rhs = nil_exprt();
   for(const auto &address_pair : addresses)
   {
     const exprt &address = address_pair.first;
@@ -207,9 +204,8 @@ void goto_symext::symex_get_field(
         to_pointer_type(address.type()).get_width())
     {
       const exprt &field = address_pair.second;
-      if(first)
+      if(rhs.is_nil())
       {
-        first = false;
         rhs = typecast_exprt::conditional_cast(field, lhs.type());
       }
       else
