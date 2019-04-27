@@ -112,6 +112,35 @@ symbol_exprt goto_symext::add_field(
   return new_symbol.symbol_expr();
 }
 
+bool goto_symext::filter_by_value_set(
+  const value_setst::valuest &value_set,
+  const exprt &address)
+{
+  if(address.id() != ID_address_of)
+    return false;
+
+  const auto &expr2 = to_address_of_expr(address).object();
+  if(expr2.id() != ID_symbol)
+    return false;
+
+  for(const auto &e : value_set)
+  {
+    if(e.id() != ID_object_descriptor)
+      continue;
+
+    const auto &expr1 = to_object_descriptor_expr(e).object();
+    if(expr1.id() != ID_symbol)
+      continue;
+
+    if(to_symbol_expr(expr1).get_identifier() ==
+       to_symbol_expr(expr2).get_identifier())
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
 void goto_symext::symex_set_field(
   const namespacet &ns,
   goto_symex_statet &state,
@@ -129,7 +158,7 @@ void goto_symext::symex_set_field(
 
   exprt value = code_function_call.arguments()[2];
 
-  log.debug() << "set field " << id2string(field_name) << " for "
+  log.debug() << "set_field: " << id2string(field_name) << " for "
               << from_expr(ns, "", expr) << " to " << from_expr(ns, "", value)
               << messaget::eom;
 
@@ -139,31 +168,51 @@ void goto_symext::symex_set_field(
   const auto &addresses = address_fields.at(field_name);
   const exprt &rhs = value;
   exprt lhs = nil_exprt();
+  size_t mux_size = 0;
+  value_setst::valuest value_set;
+  state.value_set.get_value_set(expr, value_set, ns);
+
+  bool has_entry = false;
+  for(const auto &address_pair : addresses)
+  {
+    if(filter_by_value_set(value_set, address_pair.first))
+    {
+      has_entry = true;
+      break;
+    }
+  }
+
   for(const auto &address_pair : addresses)
   {
     const exprt &address = address_pair.first;
+
+    if(has_entry && !filter_by_value_set(value_set, address))
+      continue;
+
     if(
       expr.type() == address.type() ||
       to_pointer_type(expr.type()).get_width() ==
         to_pointer_type(address.type()).get_width())
     {
       const exprt &field = address_pair.second;
-      if(lhs.is_nil())
+      exprt cond = equal_exprt(
+        address, typecast_exprt::conditional_cast(expr, address.type()));
+      // do_simplify(cond);
+      if(!cond.is_false())
       {
-        lhs = address_of_exprt(field);
-      }
-      else
-      {
-        exprt cond = equal_exprt(
-          address, typecast_exprt::conditional_cast(expr, address.type()));
-        // do_simplify(cond);
-        // if(cond != false_exprt())
+        mux_size++;
+        if(lhs.is_nil())
+        {
+          lhs = address_of_exprt(field);
+        }
+        else
         {
           lhs = if_exprt(cond, address_of_exprt(field), lhs);
         }
       }
     }
   }
+  log.debug() << "set_field: " << mux_size << messaget::eom;
   lhs = dereference_exprt(lhs);
   symex_assign(
     state,
@@ -185,7 +234,7 @@ void goto_symext::symex_get_field(
     expr.type().id() == ID_pointer,
     "shadow memory requires a pointer expression");
 
-  log.debug() << "get field " << id2string(field_name) << " for "
+  log.debug() << "get_field: " << id2string(field_name) << " for "
               << from_expr(ns, "", expr) << messaget::eom;
 
   INVARIANT(
@@ -195,25 +244,44 @@ void goto_symext::symex_get_field(
   // Should actually be fields.at(field_name)
   symbol_exprt lhs(CPROVER_PREFIX "get_field#return_value", signedbv_typet(32));
   exprt rhs = nil_exprt();
+  size_t mux_size = 0;
+  value_setst::valuest value_set;
+  state.value_set.get_value_set(expr, value_set, ns);
+
+  bool has_entry = false;
+  for(const auto &address_pair : addresses)
+  {
+    if(filter_by_value_set(value_set, address_pair.first))
+    {
+      has_entry = true;
+      break;
+    }
+  }
+
   for(const auto &address_pair : addresses)
   {
     const exprt &address = address_pair.first;
+
+    if(has_entry && !filter_by_value_set(value_set, address))
+      continue;
+
     if(
       expr.type() == address.type() ||
       to_pointer_type(expr.type()).get_width() ==
         to_pointer_type(address.type()).get_width())
     {
       const exprt &field = address_pair.second;
-      if(rhs.is_nil())
+      exprt cond = equal_exprt(
+        address, typecast_exprt::conditional_cast(expr, address.type()));
+      // do_simplify(cond);
+      if(!cond.is_false())
       {
-        rhs = typecast_exprt::conditional_cast(field, lhs.type());
-      }
-      else
-      {
-        exprt cond = equal_exprt(
-          address, typecast_exprt::conditional_cast(expr, address.type()));
-        // do_simplify(cond);
-        // if(cond != false_exprt())
+        mux_size++;
+        if(rhs.is_nil())
+        {
+          rhs = typecast_exprt::conditional_cast(field, lhs.type());
+        }
+        else
         {
           rhs = if_exprt(
             cond, typecast_exprt::conditional_cast(field, lhs.type()), rhs);
@@ -224,6 +292,7 @@ void goto_symext::symex_get_field(
   symex_assign(
     state,
     code_assignt(lhs, typecast_exprt::conditional_cast(rhs, lhs.type())));
+  log.debug() << "get_field: " << mux_size << messaget::eom;
 }
 
 void goto_symext::symex_field_static_init(
