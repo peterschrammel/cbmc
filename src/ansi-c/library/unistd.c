@@ -255,7 +255,7 @@ ret_type read(int fildes, void *buf, size_type nbyte)
       // check that the memory is accessible
       (void)*(char *)buf;
       (void)*(((const char *)buf) + str_length - 1);
-      char contents_nondet[str_length];
+      char *contents_nondet = malloc(nbyte);
       __CPROVER_array_replace((char*)buf, contents_nondet);
     }
 #endif

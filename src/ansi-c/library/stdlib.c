@@ -405,7 +405,11 @@ inline char *getenv(const char *name)
   __CPROVER_bool found=__VERIFIER_nondet___CPROVER_bool();
   if(!found) return 0;
 
+#ifdef GETENV_BUF_SIZE
+  __CPROVER_size_t buf_size = GET_ENV_BUF_SIZE;
+#else
   __CPROVER_size_t buf_size=__VERIFIER_nondet___CPROVER_size_t();
+#endif
 
   // It's reasonable to assume this won't exceed the signed
   // range in practice, but in principle, this could exceed
