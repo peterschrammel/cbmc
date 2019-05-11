@@ -200,6 +200,13 @@ void goto_symext::symex_allocate(
     index_exprt index_expr(
       value_symbol.symbol_expr(), from_integer(0, index_type()));
     rhs = address_of_exprt(index_expr, pointer_type(array_type.subtype()));
+    if(!array_type.size().is_constant())
+    {
+      log.error() << "constant malloc size expected:\n"
+                  << lhs.pretty()
+                  << messaget::eom;
+      throw 0;
+    }
     mp_integer size;
     to_integer(to_constant_expr(array_type.size()), size);
     symex_field_dynamic_init(ns, state, rhs, size);
