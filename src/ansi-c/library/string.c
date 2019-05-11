@@ -585,8 +585,13 @@ inline size_t strlen(const char *s)
 inline char *strdup(const char *str)
 {
   __CPROVER_HIDE:;
+#ifdef STRDUP_BUF_SIZE
+  __CPROVER_size_t bufsz = STRDUP_BUF_SIZE;
+  __CPROVER_assume(strlen(str)+1 <= bufsz);
+#else
   __CPROVER_size_t bufsz;
   bufsz=(strlen(str)+1);
+#endif
   char *cpy = (char *)calloc(bufsz * sizeof(char), sizeof(char));
   if(cpy==((void *)0)) return 0;
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -640,7 +645,7 @@ __CPROVER_HIDE:;
   if(n > 0)
   {
     //for(__CPROVER_size_t i=0; i<n ; i++) ((char *)dst)[i]=((const char *)src)[i];
-    char src_n[n];
+    char *src_n = malloc(n*sizeof(char));
     __CPROVER_array_copy(src_n, (char *)src);
     __CPROVER_array_replace((char *)dst, src_n);
   }
@@ -687,7 +692,7 @@ __CPROVER_HIDE:
   if(n > 0)
   {
     //for(__CPROVER_size_t i=0; i<n ; i++) ((char *)dst)[i]=((const char *)src)[i];
-    char src_n[n];
+    char *src_n = malloc(n*sizeof(char));
     __CPROVER_array_copy(src_n, (char *)src);
     __CPROVER_array_replace((char *)dst, src_n);
   }
@@ -731,7 +736,7 @@ void *memset(void *s, int c, size_t n)
   {
     //char *sp=s;
     //for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
-    unsigned char s_n[n];
+    unsigned char *s_n = malloc(n*sizeof(unsigned char));
     __CPROVER_array_set(s_n, (unsigned char)c);
     __CPROVER_array_replace((unsigned char *)s, s_n);
   }
@@ -770,7 +775,7 @@ void *__builtin_memset(void *s, int c, __CPROVER_size_t n)
   {
     //char *sp=s;
     //for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
-    unsigned char s_n[n];
+    unsigned char *s_n = malloc(n*sizeof(unsigned char));
     __CPROVER_array_set(s_n, (unsigned char)c);
     __CPROVER_array_replace((unsigned char *)s, s_n);
   }
@@ -810,7 +815,7 @@ void *__builtin___memset_chk(void *s, int c, __CPROVER_size_t n, __CPROVER_size_
   {
     //char *sp=s;
     //for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
-    unsigned char s_n[n];
+    unsigned char *s_n = malloc(n*sizeof(unsigned_char));
     __CPROVER_array_set(s_n, (unsigned char)c);
     __CPROVER_array_replace((unsigned char *)s, s_n);
   }
@@ -850,7 +855,7 @@ void *memmove(void *dest, const void *src, size_t n)
 
   if(n > 0)
   {
-    char src_n[n];
+    char *src_n = malloc(n*sizeof(char));
     __CPROVER_array_copy(src_n, (char *)src);
     __CPROVER_array_replace((char *)dest, src_n);
   }
@@ -895,7 +900,7 @@ void *__builtin___memmove_chk(void *dest, const void *src, size_t n, __CPROVER_s
 
   if(n > 0)
   {
-    char src_n[n];
+    char *src_n = malloc(n*sizeof(char));
     __CPROVER_array_copy(src_n, (char *)src);
     __CPROVER_array_replace((char *)dest, src_n);
   }
