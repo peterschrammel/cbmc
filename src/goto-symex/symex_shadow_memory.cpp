@@ -54,10 +54,16 @@ void goto_symext::initialize_rec(
   typet type = ns.follow(expr.type());
   if(type.id() == ID_array)
   {
-    const constant_exprt &size_expr =
-      to_constant_expr(to_array_type(type).size());
+    exprt size_expr = to_array_type(type).size();
+    if(!size_expr.is_constant())
+    {
+      log.error() << "constant array size expected:\n"
+                  << size_expr.pretty()
+                  << messaget::eom;
+      throw 0;
+    }
     mp_integer array_size;
-    to_integer(size_expr, array_size);
+    to_integer(to_constant_expr(size_expr), array_size);
     for(mp_integer index = 0; index < array_size; ++index)
     {
       initialize_rec(
