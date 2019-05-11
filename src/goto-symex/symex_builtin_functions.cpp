@@ -180,7 +180,16 @@ void goto_symext::symex_allocate(
   {
     const auto zero_value =
       zero_initializer(*object_type, code.source_location(), ns);
-    CHECK_RETURN(zero_value.has_value());
+    if(!zero_value.has_value())
+    {
+      log.error() << "failed to zero-initialize object:\n"
+                  << code.pretty()
+                  << '\n'
+                  << object_type->pretty()
+                  << messaget::eom;
+      throw 0;
+    }
+
     code_assignt assignment(value_symbol.symbol_expr(), *zero_value);
     symex_assign(state, assignment);
   }
