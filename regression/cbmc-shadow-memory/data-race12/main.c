@@ -1497,7 +1497,7 @@ IF(0,39,tmain_40)
                                                                                                                         __cs_nondetmain_loop_return_value_strlen$6 = strlen(__cs_nondetmain_loop_cp + ((signed long int) 1));
 tmain_40:
 IF(0,40,tmain_41)
-                                                                                                                        memmove((void *) __cs_nondetmain_loop_buf, (const void *) (__cs_nondetmain_loop_cp + ((signed long int) 1)), __cs_nondetmain_loop_return_value_strlen$6 + ((unsigned long int) 1));
+                                                                                                                        memmove((void *) __cs_nondetmain_loop_buf, (const void *) (__cs_nondetmain_loop_cp + ((signed long int) 1)), maxBufferSize - ((unsigned long int) 1));
                                                                                                                         static unsigned long int __cs_nondetmain_loop_return_value_strlen$7;
 tmain_41:
 IF(0,41,tmain_42)
