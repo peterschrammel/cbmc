@@ -1339,7 +1339,7 @@ IF(0,0,tmain_1)
                                                                       static unsigned long int __cs_nondetstr_duplicate_len;
                                                                       __cs_nondetstr_duplicate_len = strlen(__cs_param_str_duplicate_str);
                                                                       static void *__cs_nondetstr_duplicate_return_value_malloc$1;
-                                                                      __cs_nondetstr_duplicate_return_value_malloc$1 = __cs_safe_malloc(__cs_nondetstr_duplicate_len + ((unsigned long int) 1));
+                                                                      __cs_nondetstr_duplicate_return_value_malloc$1 = malloc(101 * sizeof(char)); //__cs_nondetstr_duplicate_len + ((unsigned long int) 1));
                                                                       __cs_nondetstr_duplicate_new = (char *) __cs_nondetstr_duplicate_return_value_malloc$1;
                                                                       ;
                                                                       ;
@@ -2256,7 +2256,7 @@ IF(0,0,tmain_1)
                                                                                           }
                                                                                           ;
                                                                                           static void *__cs_nondetinsert_field_return_value_malloc$2;
-                                                                                          __cs_nondetinsert_field_return_value_malloc$2 = __cs_safe_malloc(__cs_param_insert_field_len + ((unsigned long int) 1));
+                                                                                          __cs_nondetinsert_field_return_value_malloc$2 = malloc(101 * sizeof(char)); // __cs_safe_malloc(__cs_param_insert_field_len + ((unsigned long int) 1));
                                                                                           (*__cs_nondetinsert_field_node).name = (char *) __cs_nondetinsert_field_return_value_malloc$2;
                                                                                           ;
                                                                                           ;
@@ -2629,7 +2629,7 @@ IF(0,0,tmain_1)
                                                                       static unsigned long int __cs_nondetstr_duplicate_len;
                                                                       __cs_nondetstr_duplicate_len = strlen(__cs_param_str_duplicate_str);
                                                                       static void *__cs_nondetstr_duplicate_return_value_malloc$1;
-                                                                      __cs_nondetstr_duplicate_return_value_malloc$1 = __cs_safe_malloc(__cs_nondetstr_duplicate_len + ((unsigned long int) 1));
+                                                                      __cs_nondetstr_duplicate_return_value_malloc$1 = malloc(101 * sizeof(char)); //__cs_safe_malloc(__cs_nondetstr_duplicate_len + ((unsigned long int) 1));
                                                                       __cs_nondetstr_duplicate_new = (char *) __cs_nondetstr_duplicate_return_value_malloc$1;
                                                                       ;
                                                                       ;
