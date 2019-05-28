@@ -1,6 +1,6 @@
 THOROUGH
 main.c
---verbosity 10 --unwind 9 -DGETENV_BUF_SIZE=8 -DSTRDUP_BUF_SIZE=8
+--verbosity 10 --unwind 9 --variable-array-size 8
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
