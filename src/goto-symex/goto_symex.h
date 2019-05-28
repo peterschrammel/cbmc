@@ -82,6 +82,9 @@ public:
       _remaining_vccs(std::numeric_limits<unsigned>::max()),
       complexity_module(mh, options)
   {
+    if(options.is_set("variable-array-size"))
+       variable_array_size =
+         options.get_unsigned_int_option("variable-array-size");
   }
 
   /// A virtual destructor allowing derived classes to be cleaned up correctly
@@ -847,6 +850,8 @@ protected:
   // addresses must remain in sequence
   std::map<irep_idt, std::vector<std::pair<exprt, symbol_exprt>>>
     address_fields;
+
+  mp_integer variable_array_size;
 
   void symex_get_field(
     const namespacet &ns,

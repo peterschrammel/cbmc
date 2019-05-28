@@ -48,6 +48,7 @@ class optionst;
   "(document-subgoals)(outfile):(test-preprocessor)" \
   "D:I:(c89)(c99)(c11)(cpp98)(cpp03)(cpp11)" \
   "(object-bits):" \
+  "(variable-array-size):" \
   OPT_GOTO_CHECK \
   "(no-assertions)(no-assumptions)" \
   OPT_XML_INTERFACE \

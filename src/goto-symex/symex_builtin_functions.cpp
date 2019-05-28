@@ -25,6 +25,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string2int.h>
 #include <util/string_constant.h>
 
+#include <langapi/language_util.h>
+
 inline static optionalt<typet> c_sizeof_type_rec(const exprt &expr)
 {
   const irept &sizeof_type=expr.find(ID_C_c_sizeof_type);
@@ -209,15 +211,29 @@ void goto_symext::symex_allocate(
     index_exprt index_expr(
       value_symbol.symbol_expr(), from_integer(0, index_type()));
     rhs = address_of_exprt(index_expr, pointer_type(array_type.subtype()));
+    mp_integer size;
     if(!array_type.size().is_constant())
     {
-      log.error() << "constant malloc size expected:\n"
-                  << lhs.pretty()
-                  << messaget::eom;
-      throw 0;
+      if(variable_array_size > 0)
+      {
+        log.warning() << "constant array size expected '"
+                      << from_expr(ns, "", array_type.size())
+                      << "' replaced by "
+                      << variable_array_size << messaget::eom;
+        size = variable_array_size;
+      }
+      else
+      {
+        log.error() << "constant malloc size expected:\n"
+                    << lhs.pretty()
+                    << messaget::eom;
+        throw 0;
+      }
     }
-    mp_integer size;
-    to_integer(to_constant_expr(array_type.size()), size);
+    else
+    {
+      to_integer(to_constant_expr(array_type.size()), size);
+    }
     symex_field_dynamic_init(ns, state, rhs, size);
   }
   else
