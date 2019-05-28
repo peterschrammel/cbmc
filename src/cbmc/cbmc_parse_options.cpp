@@ -299,6 +299,12 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("unwindset"))
     options.set_option("unwindset", cmdline.get_values("unwindset"));
 
+  if(cmdline.isset("variable-array-size"))
+  {
+    options.set_option("variable-array-size",
+                       cmdline.get_value("variable-array-size"));
+  }
+
   // constant propagation
   if(cmdline.isset("no-propagation"))
     options.set_option("propagation", false);
