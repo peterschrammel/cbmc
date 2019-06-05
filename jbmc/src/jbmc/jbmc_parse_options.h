@@ -53,6 +53,7 @@ class optionst;
   "(classpath):(cp):" \
   "(jar):" \
   "(main-class):" \
+  "(gb):" \
   "(no-assertions)(no-assumptions)" \
   OPT_XML_INTERFACE \
   OPT_JSON_INTERFACE \

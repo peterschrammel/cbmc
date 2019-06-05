@@ -1077,6 +1077,12 @@ void jbmc_parse_optionst::help()
     "                              of the class specified by --main-class or the main\n" // NOLINT(*)
     "                              class specified in the JAR manifest\n"
     "                              (checked in this order).\n"
+    " jbmc --gb goto-binary        goto-binary file to be checked\n"
+    "                              The entry point is the method specified by\n" // NOLINT(*)
+    "                              --function, or otherwise, the\n"
+    "                              public static void main(String[])\n"
+    "                              of the class specified by --main-class\n"
+    "                              (checked in this order).\n"
     "\n"
     " -classpath dirs/jars\n"
     " -cp dirs/jars\n"
