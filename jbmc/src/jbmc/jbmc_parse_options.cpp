@@ -521,7 +521,7 @@ int jbmc_parse_optionst::doit()
     return CPROVER_EXIT_USAGE_ERROR;
   }
 
-  if((cmdline.args.size() == 1) && !cmdline.isset("show-parse-tree"))
+  if(cmdline.args.size() == 1)
   {
     std::string main_class = cmdline.args[0];
     // 'java' accepts slashes instead of dots
@@ -540,44 +540,20 @@ int jbmc_parse_optionst::doit()
     cmdline.args.push_back(cmdline.get_value("gb"));
   }
 
+  // Shows the parse tree of the main class
   if(cmdline.isset("show-parse-tree"))
   {
-    if(cmdline.args.size()!=1)
-    {
-      log.error() << "Please give exactly one source file" << messaget::eom;
-      return CPROVER_EXIT_INCORRECT_TASK;
-    }
-
-    std::string filename=cmdline.args[0];
-
-    #ifdef _MSC_VER
-    std::ifstream infile(widen(filename));
-    #else
-    std::ifstream infile(filename);
-    #endif
-
-    if(!infile)
-    {
-      log.error() << "failed to open input file '" << filename << "'"
-                  << messaget::eom;
-      return CPROVER_EXIT_INCORRECT_TASK;
-    }
-
-    std::unique_ptr<languaget> language=
-      get_language_from_filename(filename);
-
-    if(language==nullptr)
-    {
-      log.error() << "failed to figure out type of file '" << filename << "'"
-                  << messaget::eom;
-      return CPROVER_EXIT_INCORRECT_TASK;
-    }
+    std::unique_ptr<languaget> language = get_language_from_mode(ID_java);
+    CHECK_RETURN(language != nullptr);
 
     language->set_language_options(options);
     language->set_message_handler(ui_message_handler);
 
-    log.status() << "Parsing " << filename << messaget::eom;
+    log.status() << "Parsing..." << messaget::eom;
 
+    const std::string filename = "";
+    std::ifstream infile(filename);
+    // Both arguments to parse() are discarded.
     if(language->parse(infile, filename))
     {
       log.error() << "PARSING ERROR" << messaget::eom;
