@@ -701,6 +701,21 @@ void janalyzer_parse_optionst::help()
     "                              class specified in the JAR manifest\n"
     "                              (checked in this order).\n"
     "\n"
+    " -classpath dirs/jars\n"
+    " -cp dirs/jars\n"
+    " --classpath dirs/jars        set class search path of directories and\n"
+    "                              jar files\n"
+    "                              A "
+    #ifdef _WIN32
+    ";"
+    #else
+    ":"
+    #endif
+    " separated list of directories and JAR\n"
+    "                               archives to search for class files.\n" // NOLINT(*)
+    " --main-class class-name      set the name of the main class\n"
+    HELP_FUNCTIONS
+    "\n"
     "Task options:\n"
     " --show                       display the abstract domains\n"
     // NOLINTNEXTLINE(whitespace/line_length)
@@ -736,10 +751,7 @@ void janalyzer_parse_optionst::help()
     " --taint file_name            perform taint analysis using rules in given file\n"
     "\n"
     "Java Bytecode frontend options:\n"
-    " --classpath dir/jar          set the classpath\n"
-    " --main-class class-name      set the name of the main class\n"
     JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
-    HELP_FUNCTIONS
     "\n"
     "Program representations:\n"
     " --show-parse-tree            show parse tree\n"
