@@ -1071,6 +1071,13 @@ void jbmc_parse_optionst::help()
     "                              manifest (checked in this order), the behavior is\n" // NOLINT(*)
     "                              the same as running jbmc on the corresponding\n" // NOLINT(*)
     "                              class file."
+    " jbmc -jar jarfile            JAR file to be checked\n"
+    "                              The entry point is the method specified by\n" // NOLINT(*)
+    "                              --function or otherwise, the\n"
+    "                              public static void main(String[]) method\n"
+    "                              of the class specified by --main-class or the main\n" // NOLINT(*)
+    "                              class specified in the JAR manifest\n"
+    "                              (checked in this order).\n"
     "\n"
     "Analysis options:\n"
     HELP_SHOW_PROPERTIES
