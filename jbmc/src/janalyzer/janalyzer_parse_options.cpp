@@ -688,12 +688,11 @@ void janalyzer_parse_optionst::help()
     "Usage:                       Purpose:\n"
     "\n"
     " janalyzer [-?] [-h] [--help] show help\n"
-    " janalyzer class              name of class or JAR file to be checked\n"
-    "                              In the case of a JAR file, if a main class can be\n" // NOLINT(*)
-    "                              inferred from --main-class, --function, or the JAR\n" // NOLINT(*)
-    "                              manifest (checked in this order), the behavior is\n" // NOLINT(*)
-    "                              the same as running janalyzer on the corresponding\n" // NOLINT(*)
-    "                              class file."
+    " janalyzer class-name         name of class\n"
+    "                              The entry point is the method specified by\n" // NOLINT(*)
+    "                              --function, or otherwise, the\n"
+    "                              public static void main(String[])\n"
+    "                              method of the given class.\n"
     " janalyzer -jar jarfile       JAR file to be checked\n"
     "                              The entry point is the method specified by\n" // NOLINT(*)
     "                              --function or otherwise, the\n"
