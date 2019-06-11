@@ -49,6 +49,18 @@ bool ansi_c_languaget::preprocess(
   return c_preprocess(path, outstream, get_message_handler());
 }
 
+bool ansi_c_languaget::parse()
+{
+  // not supported: we always need a file as input
+  UNREACHABLE;
+}
+
+bool ansi_c_languaget::parse(const std::string &path)
+{
+  // not supported: we always need a file as input
+  UNREACHABLE;
+}
+
 bool ansi_c_languaget::parse(
   std::istream &instream,
   const std::string &path)

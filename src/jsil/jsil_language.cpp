@@ -50,6 +50,18 @@ bool jsil_languaget::preprocess(
   return true;
 }
 
+bool jsil_languaget::parse()
+{
+  // not supported: we always need a file as input
+  UNREACHABLE;
+}
+
+bool jsil_languaget::parse(const std::string &path)
+{
+  // not supported: we always need a file as input
+  UNREACHABLE;
+}
+
 bool jsil_languaget::parse(
   std::istream &instream,
   const std::string &path)

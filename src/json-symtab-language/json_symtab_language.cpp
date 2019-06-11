@@ -26,6 +26,18 @@ bool json_symtab_languaget::parse(
   return parse_json(instream, path, get_message_handler(), parsed_json_file);
 }
 
+bool json_symtab_languaget::parse()
+{
+  // not supported: we always need a file as input
+  UNREACHABLE;
+}
+
+bool json_symtab_languaget::parse(const std::string &path)
+{
+  // not supported: we always need a file as input
+  UNREACHABLE;
+}
+
 /// Typecheck a goto program in json form.
 /// \param symbol_table: The symbol table containing symbols read from file.
 /// \param module: A useless parameter, there for interface consistency.

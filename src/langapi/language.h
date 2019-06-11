@@ -58,6 +58,12 @@ public:
     return false;
   }
 
+  /// Parse based on information that is not a file
+  virtual bool parse() = 0;
+
+  /// Parse from given \p path
+  virtual bool parse(const std::string &path) = 0;
+
   virtual bool parse(
     std::istream &instream,
     const std::string &path)=0;

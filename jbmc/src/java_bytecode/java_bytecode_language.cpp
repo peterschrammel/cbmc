@@ -304,6 +304,7 @@ void java_bytecode_languaget::set_message_handler(
 /// 2) the class implied by the argument of the --function option,
 /// 3) the manifest file of the JAR.
 /// If no main class was found, all classes in the JAR file are loaded.
+
 bool java_bytecode_languaget::parse(
   std::istream &,
   const std::string &path)

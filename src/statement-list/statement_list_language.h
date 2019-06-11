@@ -28,6 +28,9 @@ public:
   ///   typecheck process.
   void set_language_options(const optionst &options) override;
 
+  bool parse() override;
+  bool parse(const std::string &path) override;
+
   /// Parses input given by \p instream and saves this result to this
   /// instance's parse tree.
   /// \param instream: Input to parse.
