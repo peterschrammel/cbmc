@@ -113,7 +113,7 @@ void lazy_goto_modelt::initialize(
 {
   messaget msg(message_handler);
 
-  if(files.empty())
+  if(files.empty() && config.java.main_class.empty())
   {
     throw invalid_command_line_argument_exceptiont(
       "no program provided",
@@ -134,7 +134,35 @@ void lazy_goto_modelt::initialize(
       sources.push_back(file);
   }
 
-  if(!sources.empty())
+  if(sources.empty() && !config.java.main_class.empty())
+  {
+    // We assume it's Java.
+    const std::string filename = "";
+    language_filet &lf = add_language_file(filename);
+    lf.language = get_language_from_mode(ID_java);
+    CHECK_RETURN(lf.language != nullptr);
+
+    languaget &language = *lf.language;
+    language.set_message_handler(message_handler);
+    language.set_language_options(options);
+
+    msg.status() << "Parsing ..." << messaget::eom;
+
+    std::ifstream infile(filename);
+    // Both arguments to parse() are discarded.
+    if(language.parse(infile, filename))
+    {
+      throw invalid_source_file_exceptiont("PARSING ERROR");
+    }
+
+    msg.status() << "Converting" << messaget::eom;
+
+    if(language_files.typecheck(symbol_table))
+    {
+      throw invalid_source_file_exceptiont("CONVERSION ERROR");
+    }
+  }
+  else
   {
     for(const auto &filename : sources)
     {
