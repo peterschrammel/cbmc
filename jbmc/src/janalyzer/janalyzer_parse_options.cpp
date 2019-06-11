@@ -375,6 +375,24 @@ int janalyzer_parse_optionst::doit()
     return CPROVER_EXIT_USAGE_ERROR;
   }
 
+  if(cmdline.args.size() == 1)
+  {
+    std::string main_class = cmdline.args[0];
+    std::replace(main_class.begin(), main_class.end(), '/', '.');
+    config.java.main_class = main_class;
+    cmdline.args.pop_back();
+  }
+
+  if(cmdline.isset("jar"))
+  {
+    cmdline.args.push_back(cmdline.get_value("jar"));
+  }
+
+  if(cmdline.isset("gb"))
+  {
+    cmdline.args.push_back(cmdline.get_value("gb"));
+  }
+
   lazy_goto_modelt lazy_goto_model =
     lazy_goto_modelt::from_handler_object(*this, options, ui_message_handler);
   lazy_goto_model.initialize(cmdline.args, options);
