@@ -238,6 +238,7 @@ private:
   std::unordered_map<std::string, object_creation_referencet> references;
 
   void load_main_class();
+  void initialize_class_loader();
 };
 
 std::unique_ptr<languaget> new_java_bytecode_language();

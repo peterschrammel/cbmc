@@ -206,6 +206,28 @@ bool java_bytecode_languaget::preprocess(
   return true;
 }
 
+void java_bytecode_languaget::initialize_class_loader()
+{
+  java_class_loader.clear_classpath();
+
+  for(const auto &p : config.java.classpath)
+    java_class_loader.add_classpath_entry(p);
+
+  java_class_loader.set_message_handler(get_message_handler());
+  java_class_loader.set_java_cp_include_files(java_cp_include_files);
+  java_class_loader.add_load_classes(java_load_classes);
+  if(string_refinement_enabled)
+  {
+    string_preprocess.initialize_known_type_table();
+
+    auto get_string_base_classes = [this](const irep_idt &id) {
+      return string_preprocess.get_string_type_base_classes(id);
+    };
+
+    java_class_loader.set_extra_class_refs_function(get_string_base_classes);
+  }
+}
+
 void java_bytecode_languaget::load_main_class()
 {
   if(!config.java.main_class.empty())
@@ -230,24 +252,7 @@ bool java_bytecode_languaget::parse(
 {
   PRECONDITION(language_options_initialized);
 
-  java_class_loader.clear_classpath();
-
-  for(const auto &p : config.java.classpath)
-    java_class_loader.add_classpath_entry(p);
-
-  java_class_loader.set_message_handler(get_message_handler());
-  java_class_loader.set_java_cp_include_files(java_cp_include_files);
-  java_class_loader.add_load_classes(java_load_classes);
-  if(string_refinement_enabled)
-  {
-    string_preprocess.initialize_known_type_table();
-
-    auto get_string_base_classes = [this](const irep_idt &id) {
-      return string_preprocess.get_string_type_base_classes(id);
-    };
-
-    java_class_loader.set_extra_class_refs_function(get_string_base_classes);
-  }
+  initialize_class_loader();
 
   // look at extension
   if(has_suffix(path, ".class"))
