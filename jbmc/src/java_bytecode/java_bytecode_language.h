@@ -236,6 +236,8 @@ private:
   /// It tracks objects that should be reference-equal to each other by mapping
   /// IDs of such objects to symbols that store their values.
   std::unordered_map<std::string, object_creation_referencet> references;
+
+  void load_main_class();
 };
 
 std::unique_ptr<languaget> new_java_bytecode_language();

@@ -206,6 +206,15 @@ bool java_bytecode_languaget::preprocess(
   return true;
 }
 
+void java_bytecode_languaget::load_main_class()
+{
+  if(!config.java.main_class.empty())
+  {
+    status() << "Java main class: " << config.java.main_class << eom;
+    java_class_loader(config.java.main_class);
+  }
+}
+
 /// We set the main class (i.e.\ class to start the class loading analysis from,
 /// see \ref java_class_loadert) depending on the file type of `path`.
 /// `path` can be the name of either a .class file or a .jar file.
@@ -215,7 +224,6 @@ bool java_bytecode_languaget::preprocess(
 /// 2) the class implied by the argument of the --function option,
 /// 3) the manifest file of the JAR.
 /// If no main class was found, all classes in the JAR file are loaded.
-
 bool java_bytecode_languaget::parse(
   std::istream &,
   const std::string &path)
@@ -245,7 +253,7 @@ bool java_bytecode_languaget::parse(
   if(has_suffix(path, ".class"))
   {
     // override main_class
-    main_class=java_class_loadert::file_to_class_name(path);
+    config.java.main_class = java_class_loadert::file_to_class_name(path);
   }
   else if(has_suffix(path, ".jar"))
   {
@@ -260,7 +268,7 @@ bool java_bytecode_languaget::parse(
       {
         const std::string &entry_method = config.main.value();
         const auto last_dot_position = entry_method.find_last_of('.');
-        main_class = entry_method.substr(0, last_dot_position);
+        config.java.main_class = entry_method.substr(0, last_dot_position);
       }
       else
       {
@@ -269,14 +277,12 @@ bool java_bytecode_languaget::parse(
 
         // if the manifest declares a Main-Class line, we got a main class
         if(!manifest_main_class.empty())
-          main_class = manifest_main_class;
+          config.java.main_class = manifest_main_class;
       }
     }
-    else
-      main_class=config.java.main_class;
 
     // do we have one now?
-    if(main_class.empty())
+    if(config.java.main_class.empty())
     {
       status() << "JAR file without entry point: loading class files" << eom;
       const auto classes = java_class_loader.load_entire_jar(path);
@@ -289,11 +295,7 @@ bool java_bytecode_languaget::parse(
   else
     UNREACHABLE;
 
-  if(!main_class.empty())
-  {
-    status() << "Java main class: " << main_class << eom;
-    java_class_loader(main_class);
-  }
+  load_main_class();
 
   return false;
 }
