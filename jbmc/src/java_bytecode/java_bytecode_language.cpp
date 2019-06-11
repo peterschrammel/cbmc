@@ -324,12 +324,7 @@ bool java_bytecode_languaget::parse(
   }
 
   // look at extension
-  if(has_suffix(path, ".class"))
-  {
-    // override main_class
-    main_class=java_class_loadert::file_to_class_name(path);
-  }
-  else if(has_suffix(path, ".jar"))
+  if(has_suffix(path, ".jar"))
   {
     // build an object to potentially limit which classes are loaded
     java_class_loader_limitt class_loader_limit(
@@ -372,12 +367,17 @@ bool java_bytecode_languaget::parse(
       java_class_loader.add_classpath_entry(path);
   }
   else
-    UNREACHABLE;
+    main_class = config.java.main_class;
 
   if(!main_class.empty())
   {
     status() << "Java main class: " << main_class << eom;
-    java_class_loader(main_class);
+    const auto &parse_trees = java_class_loader(main_class);
+    if(parse_trees.empty() || !parse_trees.front().loading_successful)
+    {
+      throw invalid_source_file_exceptiont(
+        "Error: Could not find or load main class " + id2string(main_class));
+    }
   }
 
   return false;

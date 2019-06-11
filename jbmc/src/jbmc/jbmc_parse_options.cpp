@@ -510,6 +510,36 @@ int jbmc_parse_optionst::doit()
   register_language(new_ansi_c_language);
   register_language(new_java_bytecode_language);
 
+  if(!((cmdline.isset("jar") && cmdline.args.empty()) ||
+       (cmdline.isset("gb") && cmdline.args.empty()) ||
+       (!cmdline.isset("jar") && !cmdline.isset("gb") &&
+        (cmdline.args.size() == 1))))
+  {
+    log.error() << "Please give exactly one class name, "
+                << "and/or use -jar jarfile or --gb goto-binary"
+                << messaget::eom;
+    return CPROVER_EXIT_USAGE_ERROR;
+  }
+
+  if((cmdline.args.size() == 1) && !cmdline.isset("show-parse-tree"))
+  {
+    std::string main_class = cmdline.args[0];
+    // 'java' accepts slashes instead of dots
+    std::replace(main_class.begin(), main_class.end(), '/', '.');
+    config.java.main_class = main_class;
+    cmdline.args.pop_back();
+  }
+
+  if(cmdline.isset("jar"))
+  {
+    cmdline.args.push_back(cmdline.get_value("jar"));
+  }
+
+  if(cmdline.isset("gb"))
+  {
+    cmdline.args.push_back(cmdline.get_value("gb"));
+  }
+
   if(cmdline.isset("show-parse-tree"))
   {
     if(cmdline.args.size()!=1)
@@ -562,23 +592,6 @@ int jbmc_parse_optionst::doit()
 
   stub_objects_are_not_null =
     options.get_bool_option("java-assume-inputs-non-null");
-
-  if(cmdline.args.empty())
-  {
-    log.error() << "Please provide a program to verify" << messaget::eom;
-    return CPROVER_EXIT_INCORRECT_TASK;
-  }
-
-  if(cmdline.args.size() != 1)
-  {
-    log.error() << "Only one .class, .jar or .gbf file should be directly "
-                   "specified on the command-line. To force loading another "
-                   "another class use '--java-load-class somepackage.SomeClass'"
-                   " or '--lazy-methods-extra-entry-point "
-                   "somepackage.SomeClass.method' along with '--classpath'"
-                << messaget::eom;
-    return CPROVER_EXIT_INCORRECT_TASK;
-  }
 
   std::unique_ptr<abstract_goto_modelt> goto_model_ptr;
   int get_goto_program_ret = get_goto_program(goto_model_ptr, options);
