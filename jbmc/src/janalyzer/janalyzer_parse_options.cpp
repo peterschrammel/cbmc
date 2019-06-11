@@ -393,6 +393,30 @@ int janalyzer_parse_optionst::doit()
     cmdline.args.push_back(cmdline.get_value("gb"));
   }
 
+  // Shows the parse tree of the main class
+  if(cmdline.isset("show-parse-tree"))
+  {
+    std::unique_ptr<languaget> language = get_language_from_mode(ID_java);
+    CHECK_RETURN(language != nullptr);
+
+    language->set_language_options(options);
+    language->set_message_handler(ui_message_handler);
+
+    log.status() << "Parsing..." << messaget::eom;
+
+    const std::string filename = "";
+    std::ifstream infile(filename);
+    // Both arguments to parse() are discarded.
+    if(language->parse(infile, filename))
+    {
+      log.error() << "PARSING ERROR" << messaget::eom;
+      return CPROVER_EXIT_PARSE_ERROR;
+    }
+
+    language->show_parse(std::cout);
+    return CPROVER_EXIT_SUCCESS;
+  }
+
   lazy_goto_modelt lazy_goto_model =
     lazy_goto_modelt::from_handler_object(*this, options, ui_message_handler);
   lazy_goto_model.initialize(cmdline.args, options);
