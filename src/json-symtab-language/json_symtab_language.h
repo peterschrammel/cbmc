@@ -24,6 +24,9 @@ class json_symtab_languaget : public languaget
 public:
   bool parse(std::istream &instream, const std::string &path) override;
 
+  bool parse() override;
+  bool parse(const std::string &path) override;
+
   bool
   typecheck(symbol_tablet &symbol_table, const std::string &module) override;
 

@@ -44,6 +44,9 @@ public:
     const std::string &path,
     std::ostream &outstream) override;
 
+  bool parse() override;
+  bool parse(const std::string &path) override;
+
   bool parse(
     std::istream &instream,
     const std::string &path) override;

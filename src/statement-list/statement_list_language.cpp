@@ -48,6 +48,18 @@ bool statement_list_languaget::typecheck(
   return false;
 }
 
+bool statement_list_languaget::parse()
+{
+  // not supported: we always need a file as input
+  UNREACHABLE;
+}
+
+bool statement_list_languaget::parse(const std::string &path)
+{
+  // not supported: we always need a file as input
+  UNREACHABLE;
+}
+
 bool statement_list_languaget::parse(
   std::istream &instream,
   const std::string &path)
