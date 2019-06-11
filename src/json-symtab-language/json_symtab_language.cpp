@@ -32,7 +32,7 @@ bool json_symtab_languaget::parse()
   UNREACHABLE;
 }
 
-bool json_symtab_languaget::parse(const std::string &path)
+bool json_symtab_languaget::parse(const std::string &)
 {
   // not supported: we always need a file as input
   UNREACHABLE;

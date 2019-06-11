@@ -55,7 +55,7 @@ bool ansi_c_languaget::parse()
   UNREACHABLE;
 }
 
-bool ansi_c_languaget::parse(const std::string &path)
+bool ansi_c_languaget::parse(const std::string &)
 {
   // not supported: we always need a file as input
   UNREACHABLE;

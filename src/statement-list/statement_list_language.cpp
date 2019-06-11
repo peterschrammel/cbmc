@@ -54,7 +54,7 @@ bool statement_list_languaget::parse()
   UNREACHABLE;
 }
 
-bool statement_list_languaget::parse(const std::string &path)
+bool statement_list_languaget::parse(const std::string &)
 {
   // not supported: we always need a file as input
   UNREACHABLE;
