@@ -138,18 +138,6 @@ void lazy_goto_modelt::initialize(
   {
     for(const auto &filename : sources)
     {
-#ifdef _MSC_VER
-      std::ifstream infile(widen(filename));
-#else
-      std::ifstream infile(filename);
-#endif
-
-      if(!infile)
-      {
-        throw system_exceptiont(
-          "failed to open input file `" + filename + '\'');
-      }
-
       language_filet &lf=add_language_file(filename);
       lf.language=get_language_from_filename(filename);
 
@@ -165,7 +153,7 @@ void lazy_goto_modelt::initialize(
 
       msg.status() << "Parsing " << filename << messaget::eom;
 
-      if(language.parse(infile, filename))
+      if(language.parse(filename))
       {
         throw invalid_source_file_exceptiont("PARSING ERROR");
       }
