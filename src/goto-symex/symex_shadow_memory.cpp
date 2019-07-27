@@ -309,8 +309,7 @@ void goto_symext::symex_field_static_init(
   if(state.source.function_id != CPROVER_PREFIX "initialize")
     return;
 
-  find_symbols_sett identifiers;
-  find_symbols(code_assign.lhs(), identifiers);
+  find_symbols_sett identifiers = find_symbol_identifiers(code_assign.lhs());
   if(identifiers.size() != 1)
     return;
 
