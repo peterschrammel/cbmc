@@ -1,3 +1,5 @@
+#include <assert.h>
+#include <stdlib.h>
 
 struct STRUCTNAME
 {
