@@ -174,9 +174,6 @@ void goto_symext::symex_set_field(
   if(shadow_per_object)
   {
     expr = pointer_object(expr);
-    log.debug() << "set_field: corresponds to "
-                << from_expr(ns, "", expr)
-                << messaget::eom;
   }
   
   INVARIANT(
@@ -206,10 +203,13 @@ void goto_symext::symex_set_field(
     if(has_entry && !filter_by_value_set(value_set, address))
       continue;
 
-    if(
-      expr_type == address.type() ||
-      to_pointer_type(expr_type).get_width() ==
-        to_pointer_type(address.type()).get_width())
+    const typet &expr_subtype = to_pointer_type(expr_type).subtype();
+    const typet &address_subtype = to_pointer_type(address.type()).subtype();
+    if(expr_subtype == address_subtype ||
+       (can_cast_type<bitvector_typet>(expr_subtype) &&
+        can_cast_type<bitvector_typet>(address_subtype) &&
+        to_bitvector_type(expr_subtype).get_width() ==
+          to_bitvector_type(address_subtype).get_width()))
     {
       const exprt &field = address_pair.second;
       exprt cond = equal_exprt(
@@ -258,9 +258,6 @@ void goto_symext::symex_get_field(
   if(shadow_per_object)
   {
     expr = pointer_object(expr);
-    log.debug() << "get_field: corresponds to "
-                << from_expr(ns, "", expr)
-                << messaget::eom;
   }
 
   INVARIANT(
@@ -291,10 +288,13 @@ void goto_symext::symex_get_field(
     if(has_entry && !filter_by_value_set(value_set, address))
       continue;
 
-    if(
-      expr_type == address.type() ||
-      to_pointer_type(expr_type).get_width() ==
-        to_pointer_type(address.type()).get_width())
+    const typet &expr_subtype = to_pointer_type(expr_type).subtype();
+    const typet &address_subtype = to_pointer_type(address.type()).subtype();
+    if(expr_subtype == address_subtype ||
+       (can_cast_type<bitvector_typet>(expr_subtype) &&
+        can_cast_type<bitvector_typet>(address_subtype) &&
+        to_bitvector_type(expr_subtype).get_width() ==
+          to_bitvector_type(address_subtype).get_width()))
     {
       const exprt &field = address_pair.second;
       exprt cond = equal_exprt(
