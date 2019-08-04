@@ -294,6 +294,10 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("variable-array-size",
                        cmdline.get_value("variable-array-size"));
   }
+  if(cmdline.isset("shadow-per-object"))
+  {
+    options.set_option("shadow-per-object", true);
+  }
 
   // constant propagation
   if(cmdline.isset("no-propagation"))

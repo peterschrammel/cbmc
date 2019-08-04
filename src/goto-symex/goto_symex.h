@@ -85,6 +85,8 @@ public:
     if(options.is_set("variable-array-size"))
        variable_array_size =
          options.get_unsigned_int_option("variable-array-size");
+    if(options.is_set("shadow-per-object"))
+       shadow_per_object = options.get_bool_option("shadow-per-object");
   }
 
   /// A virtual destructor allowing derived classes to be cleaned up correctly
@@ -851,7 +853,8 @@ protected:
   std::map<irep_idt, std::vector<std::pair<exprt, symbol_exprt>>>
     address_fields;
 
-  mp_integer variable_array_size;
+  mp_integer variable_array_size = 0;
+  bool shadow_per_object = false;
 
   void symex_get_field(
     const namespacet &ns,
