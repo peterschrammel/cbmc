@@ -200,6 +200,13 @@ void goto_symext::symex_set_field(
   {
     const exprt &address = address_pair.first;
 
+    // exact match
+    if(address == code_function_call.arguments()[0])
+    {
+      lhs = address_of_exprt(address_pair.second);
+      break;
+    }
+
     if(has_entry && !filter_by_value_set(value_set, address))
       continue;
 
@@ -284,6 +291,13 @@ void goto_symext::symex_get_field(
   for(const auto &address_pair : addresses)
   {
     const exprt &address = address_pair.first;
+
+    // exact match
+    if(address == code_function_call.arguments()[0])
+    {
+      rhs = typecast_exprt::conditional_cast(address_pair.second, lhs.type());
+      break;
+    }
 
     if(has_entry && !filter_by_value_set(value_set, address))
       continue;
