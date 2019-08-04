@@ -17,6 +17,7 @@ Author: Peter Schrammel
 #include <util/cprover_prefix.h>
 #include <util/find_symbols.h>
 #include <util/fresh_symbol.h>
+#include <util/pointer_predicates.h>
 #include <util/prefix.h>
 #include <util/invariant.h>
 #include <util/message.h>
@@ -52,7 +53,7 @@ void goto_symext::initialize_rec(
   std::map<irep_idt, typet> &fields)
 {
   typet type = ns.follow(expr.type());
-  if(type.id() == ID_array)
+  if(type.id() == ID_array && !shadow_per_object)
   {
     exprt size_expr = to_array_type(type).size();
     if(!size_expr.is_constant())
@@ -73,14 +74,15 @@ void goto_symext::initialize_rec(
         fields);
     }
   }
-  else if(type.id() == ID_struct)
+  else if(type.id() == ID_struct && !shadow_per_object)
   {
     for(const auto &component : to_struct_type(type).components())
     {
       initialize_rec(ns, state, member_exprt(expr, component), fields);
     }
   }
-  else
+
+  if(shadow_per_object || (type.id() != ID_array && type.id() != ID_struct))
   {
     for(const auto &field_pair : fields)
     {
@@ -158,16 +160,25 @@ void goto_symext::symex_set_field(
   irep_idt field_name = get_field_name(code_function_call.arguments()[1]);
 
   exprt expr = code_function_call.arguments()[0];
+  typet expr_type = expr.type();
   DATA_INVARIANT(
     expr.type().id() == ID_pointer,
     "shadow memory requires a pointer expression");
 
   exprt value = code_function_call.arguments()[2];
-
+  
   log.debug() << "set_field: " << id2string(field_name) << " for "
               << from_expr(ns, "", expr) << " to " << from_expr(ns, "", value)
               << messaget::eom;
 
+  if(shadow_per_object)
+  {
+    expr = pointer_object(expr);
+    log.debug() << "set_field: corresponds to "
+                << from_expr(ns, "", expr)
+                << messaget::eom;
+  }
+  
   INVARIANT(
     address_fields.count(field_name) == 1,
     id2string(field_name) + " should exist");
@@ -187,7 +198,7 @@ void goto_symext::symex_set_field(
       break;
     }
   }
-
+  
   for(const auto &address_pair : addresses)
   {
     const exprt &address = address_pair.first;
@@ -196,8 +207,8 @@ void goto_symext::symex_set_field(
       continue;
 
     if(
-      expr.type() == address.type() ||
-      to_pointer_type(expr.type()).get_width() ==
+      expr_type == address.type() ||
+      to_pointer_type(expr_type).get_width() ==
         to_pointer_type(address.type()).get_width())
     {
       const exprt &field = address_pair.second;
@@ -236,12 +247,21 @@ void goto_symext::symex_get_field(
   irep_idt field_name = get_field_name(code_function_call.arguments()[1]);
 
   exprt expr = code_function_call.arguments()[0];
+  typet expr_type = expr.type();
   DATA_INVARIANT(
-    expr.type().id() == ID_pointer,
+    expr_type.id() == ID_pointer,
     "shadow memory requires a pointer expression");
 
   log.debug() << "get_field: " << id2string(field_name) << " for "
               << from_expr(ns, "", expr) << messaget::eom;
+
+  if(shadow_per_object)
+  {
+    expr = pointer_object(expr);
+    log.debug() << "get_field: corresponds to "
+                << from_expr(ns, "", expr)
+                << messaget::eom;
+  }
 
   INVARIANT(
     address_fields.count(field_name) == 1,
@@ -272,8 +292,8 @@ void goto_symext::symex_get_field(
       continue;
 
     if(
-      expr.type() == address.type() ||
-      to_pointer_type(expr.type()).get_width() ==
+      expr_type == address.type() ||
+      to_pointer_type(expr_type).get_width() ==
         to_pointer_type(address.type()).get_width())
     {
       const exprt &field = address_pair.second;
@@ -359,14 +379,25 @@ void goto_symext::symex_field_dynamic_init(
   log.debug() << "dynamic memory of type " << from_type(ns, "", expr.type())
               << " and " << size << " element(s)" << messaget::eom;
 
-  for(mp_integer index = 0; index < size; ++index)
+  if(shadow_per_object)
   {
     initialize_rec(
       ns,
       state,
-      dereference_exprt(
-        plus_exprt(expr, from_integer(index, signed_long_int_type()))),
+      expr,
       global_fields);
+  }
+  else
+  {
+    for(mp_integer index = 0; index < size; ++index)
+    {
+      initialize_rec(
+        ns,
+        state,
+        dereference_exprt(
+          plus_exprt(expr, from_integer(index, signed_long_int_type()))),
+        global_fields);
+    }
   }
 }
 
