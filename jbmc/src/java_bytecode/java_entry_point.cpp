@@ -606,7 +606,7 @@ bool java_entry_point(
     string_refinement_enabled,
     message_handler);
 
-  return generate_java_start_function(
+  const bool error = generate_java_start_function(
     symbol,
     symbol_table,
     message_handler,
@@ -614,6 +614,17 @@ bool java_entry_point(
     object_factory_parameters,
     pointer_type_selector,
     build_arguments);
+
+  java_static_lifetime_init(
+    symbol_table,
+    symbol.location,
+    assume_init_pointers_not_null,
+    object_factory_parameters,
+    pointer_type_selector,
+    string_refinement_enabled,
+    message_handler);
+
+  return error;
 }
 
 bool generate_java_start_function(
