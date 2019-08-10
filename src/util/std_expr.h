@@ -4154,7 +4154,7 @@ inline bool can_cast_expr<nil_exprt>(const exprt &base)
 class null_pointer_exprt:public constant_exprt
 {
 public:
-  explicit null_pointer_exprt(pointer_typet type)
+  explicit null_pointer_exprt(typet type)
     : constant_exprt(ID_NULL, std::move(type))
   {
   }
