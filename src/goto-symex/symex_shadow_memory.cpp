@@ -53,6 +53,7 @@ void goto_symext::initialize_rec(
   std::map<irep_idt, typet> &fields)
 {
   typet type = ns.follow(expr.type());
+#if 0
   if(type.id() == ID_array && !shadow_per_object)
   {
     exprt size_expr = to_array_type(type).size();
@@ -81,19 +82,29 @@ void goto_symext::initialize_rec(
       initialize_rec(ns, state, member_exprt(expr, component), fields);
     }
   }
-
+#endif
   if(shadow_per_object || (type.id() != ID_array && type.id() != ID_struct))
   {
     for(const auto &field_pair : fields)
     {
+      exprt address_expr;
+      if(type.id() != ID_array)
+        address_expr = address_of_exprt(expr);
+      else
+      {
+        // arrays appear as &array[0]
+        address_expr = address_of_exprt(
+          index_exprt(expr, from_integer(0, signed_long_int_type())));
+      }
+
       symbol_exprt field =
-        add_field(ns, state, address_of_exprt(expr), field_pair.first, fields);
+        add_field(ns, state, address_expr, field_pair.first, fields);
       code_assignt code_assign(
         field, from_integer(mp_integer(0), field.type()));
       symex_assign(state, code_assign);
 
       log.debug() << "initialize field " << id2string(field.get_identifier())
-                  << " for " << from_expr(ns, "", address_of_exprt(expr))
+                  << " for " << from_expr(ns, "", address_expr)
                   << messaget::eom;
     }
   }
@@ -122,7 +133,7 @@ symbol_exprt goto_symext::add_field(
 
 bool goto_symext::filter_by_value_set(
   const value_setst::valuest &value_set,
-  const exprt &address)
+  const ssa_exprt &address)
 {
   if(address.id() != ID_address_of)
     return false;
@@ -185,7 +196,7 @@ void goto_symext::symex_set_field(
   size_t mux_size = 0;
   value_setst::valuest value_set;
   state.value_set.get_value_set(expr, value_set, ns);
-
+/*
   bool has_entry = false;
   for(const auto &address_pair : addresses)
   {
@@ -195,28 +206,36 @@ void goto_symext::symex_set_field(
       break;
     }
   }
-  
+*/
   for(const auto &address_pair : addresses)
   {
     const exprt &address = address_pair.first;
 
     // exact match
-    if(address == code_function_call.arguments()[0])
+    log.debug() << "exact match: " << from_expr(ns, "", address)
+            << " == " << from_expr(ns, "", code_function_call.arguments()[0])
+            << messaget::eom;
+    if(
+      address == code_function_call.arguments()[0] ||
+      (code_function_call.arguments()[0].id() == ID_typecast &&
+       address == to_typecast_expr(code_function_call.arguments()[0]).op()))
     {
+      log.debug() << "yes" << messaget::eom;
       lhs = address_of_exprt(address_pair.second);
       break;
     }
 
+/*
     if(has_entry && !filter_by_value_set(value_set, address))
       continue;
-
-    const typet &expr_subtype = to_pointer_type(expr_type).subtype();
+*/
+/*    const typet &expr_subtype = to_pointer_type(expr_type).subtype();
     const typet &address_subtype = to_pointer_type(address.type()).subtype();
     if(expr_subtype == address_subtype ||
        (can_cast_type<bitvector_typet>(expr_subtype) &&
         can_cast_type<bitvector_typet>(address_subtype) &&
         to_bitvector_type(expr_subtype).get_width() ==
-          to_bitvector_type(address_subtype).get_width()))
+        to_bitvector_type(address_subtype).get_width()))*/
     {
       const exprt &field = address_pair.second;
       exprt cond = equal_exprt(
@@ -277,7 +296,7 @@ void goto_symext::symex_get_field(
   size_t mux_size = 0;
   value_setst::valuest value_set;
   state.value_set.get_value_set(expr, value_set, ns);
-
+/*
   bool has_entry = false;
   for(const auto &address_pair : addresses)
   {
@@ -287,28 +306,35 @@ void goto_symext::symex_get_field(
       break;
     }
   }
-
+*/
   for(const auto &address_pair : addresses)
   {
     const exprt &address = address_pair.first;
 
     // exact match
-    if(address == code_function_call.arguments()[0])
+    log.debug() << "exact match: " << from_expr(ns, "", address)
+            << " == " << from_expr(ns, "", code_function_call.arguments()[0])
+            << messaget::eom;
+    if(
+      address == code_function_call.arguments()[0] ||
+      (code_function_call.arguments()[0].id() == ID_typecast &&
+       address == to_typecast_expr(code_function_call.arguments()[0]).op()))
     {
+      log.debug() << "yes" << messaget::eom;
       rhs = typecast_exprt::conditional_cast(address_pair.second, lhs.type());
       break;
     }
-
+/*
     if(has_entry && !filter_by_value_set(value_set, address))
       continue;
-
-    const typet &expr_subtype = to_pointer_type(expr_type).subtype();
+*/
+/*    const typet &expr_subtype = to_pointer_type(expr_type).subtype();
     const typet &address_subtype = to_pointer_type(address.type()).subtype();
     if(expr_subtype == address_subtype ||
        (can_cast_type<bitvector_typet>(expr_subtype) &&
         can_cast_type<bitvector_typet>(address_subtype) &&
         to_bitvector_type(expr_subtype).get_width() ==
-          to_bitvector_type(address_subtype).get_width()))
+        to_bitvector_type(address_subtype).get_width()))*/
     {
       const exprt &field = address_pair.second;
       exprt cond = equal_exprt(
@@ -368,9 +394,10 @@ void goto_symext::symex_field_static_init(
 void goto_symext::symex_field_local_init(
   const namespacet &ns,
   goto_symex_statet &state,
-  const symbol_exprt &expr)
+  const ssa_exprt &expr)
 {
-  const symbolt &symbol = ns.lookup(expr.get_identifier());
+  const symbolt &symbol =
+    ns.lookup(to_symbol_expr(expr.get_original_expr()).get_identifier());
 
   if(symbol.is_auxiliary)
     return;
@@ -378,10 +405,11 @@ void goto_symext::symex_field_local_init(
     return;
 
   const typet &type = expr.type();
-  log.debug() << "local memory " << id2string(expr.get_identifier())
+  ssa_exprt expr_l1 = remove_level_2(expr);
+  log.debug() << "local memory " << id2string(expr_l1.get_identifier())
               << " of type " << from_type(ns, "", type) << messaget::eom;
 
-  initialize_rec(ns, state, expr, local_fields);
+  initialize_rec(ns, state, expr_l1, local_fields);
 }
 
 void goto_symext::symex_field_dynamic_init(
@@ -401,6 +429,7 @@ void goto_symext::symex_field_dynamic_init(
       expr,
       global_fields);
   }
+#if 0
   else
   {
     for(mp_integer index = 0; index < size; ++index)
@@ -413,6 +442,7 @@ void goto_symext::symex_field_dynamic_init(
         global_fields);
     }
   }
+#endif
 }
 
 std::pair<std::map<irep_idt, typet>, std::map<irep_idt, typet>>
