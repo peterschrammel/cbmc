@@ -88,14 +88,16 @@ void goto_symext::initialize_rec(
     for(const auto &field_pair : fields)
     {
       exprt address_expr;
-      if(type.id() != ID_array)
+      //if(type.id() != ID_array)
         address_expr = address_of_exprt(expr);
-      else
+        /*else
       {
         // arrays appear as &array[0]
         address_expr = address_of_exprt(
           index_exprt(expr, from_integer(0, signed_long_int_type())));
-      }
+        log.debug() << "array: " << from_expr(ns, "", address_expr)
+                    << messaget::eom;
+                    }*/
 
       symbol_exprt field =
         add_field(ns, state, address_expr, field_pair.first, fields);
@@ -185,7 +187,18 @@ void goto_symext::symex_set_field(
   if(shadow_per_object)
   {
     expr = pointer_object(expr);
+    do_simplify(expr);
+    if(
+      expr.id() == ID_pointer_object &&
+      expr.op0().id() == ID_address_of)
+    {
+      expr = expr.op0();
+    }
   }
+
+  log.debug() << "set_field: " << id2string(field_name) << " for "
+              << from_expr(ns, "", expr) << " to " << from_expr(ns, "", value)
+              << messaget::eom;
   
   INVARIANT(
     address_fields.count(field_name) == 1,
@@ -213,15 +226,16 @@ void goto_symext::symex_set_field(
 
     // exact match
     log.debug() << "exact match: " << from_expr(ns, "", address)
-            << " == " << from_expr(ns, "", code_function_call.arguments()[0])
+            << " == " << from_expr(ns, "", expr)
             << messaget::eom;
-    if(
-      address == code_function_call.arguments()[0] ||
+    if(address == expr)
+/*      address == code_function_call.arguments()[0] ||
       (code_function_call.arguments()[0].id() == ID_typecast &&
-       address == to_typecast_expr(code_function_call.arguments()[0]).op()))
+      address == to_typecast_expr(code_function_call.arguments()[0]).op()))*/
     {
       log.debug() << "yes" << messaget::eom;
       lhs = address_of_exprt(address_pair.second);
+      mux_size = 1;
       break;
     }
 
@@ -240,6 +254,7 @@ void goto_symext::symex_set_field(
       const exprt &field = address_pair.second;
       exprt cond = equal_exprt(
         address, typecast_exprt::conditional_cast(expr, address.type()));
+      log.debug() << "cond: " << from_expr(ns, "", cond) << messaget::eom;
       // do_simplify(cond);
       if(!cond.is_false())
       {
@@ -255,7 +270,7 @@ void goto_symext::symex_set_field(
       }
     }
   }
-  log.debug() << "set_field: " << mux_size << messaget::eom;
+  log.debug() << "mux size set_field: " << mux_size << messaget::eom;
   lhs = dereference_exprt(lhs);
   symex_assign(
     state,
@@ -284,8 +299,18 @@ void goto_symext::symex_get_field(
   if(shadow_per_object)
   {
     expr = pointer_object(expr);
+    do_simplify(expr);
+    if(
+      expr.id() == ID_pointer_object &&
+      expr.op0().id() == ID_address_of)
+    {
+      expr = expr.op0();
+    }
   }
 
+  log.debug() << "get_field: " << id2string(field_name) << " for "
+              << from_expr(ns, "", expr) << messaget::eom;
+  
   INVARIANT(
     address_fields.count(field_name) == 1,
     id2string(field_name) + " should exist");
@@ -313,15 +338,13 @@ void goto_symext::symex_get_field(
 
     // exact match
     log.debug() << "exact match: " << from_expr(ns, "", address)
-            << " == " << from_expr(ns, "", code_function_call.arguments()[0])
+            << " == " << from_expr(ns, "", expr)
             << messaget::eom;
-    if(
-      address == code_function_call.arguments()[0] ||
-      (code_function_call.arguments()[0].id() == ID_typecast &&
-       address == to_typecast_expr(code_function_call.arguments()[0]).op()))
+    if(address == expr)
     {
       log.debug() << "yes" << messaget::eom;
       rhs = typecast_exprt::conditional_cast(address_pair.second, lhs.type());
+      mux_size = 1;
       break;
     }
 /*
@@ -339,13 +362,17 @@ void goto_symext::symex_get_field(
       const exprt &field = address_pair.second;
       exprt cond = equal_exprt(
         address, typecast_exprt::conditional_cast(expr, address.type()));
+      log.debug() << "cond: " << from_expr(ns, "", cond) << messaget::eom;
       // do_simplify(cond);
       if(!cond.is_false())
       {
         mux_size++;
         if(rhs.is_nil())
         {
-          rhs = typecast_exprt::conditional_cast(field, lhs.type());
+          rhs = if_exprt(
+            cond, typecast_exprt::conditional_cast(field, lhs.type()),
+            from_integer(-1, lhs.type()));
+//          rhs = typecast_exprt::conditional_cast(field, lhs.type());
         }
         else
         {
@@ -358,7 +385,7 @@ void goto_symext::symex_get_field(
   symex_assign(
     state,
     code_assignt(lhs, typecast_exprt::conditional_cast(rhs, lhs.type())));
-  log.debug() << "get_field: " << mux_size << messaget::eom;
+  log.debug() << "mux size get_field: " << mux_size << messaget::eom;
 }
 
 void goto_symext::symex_field_static_init(
