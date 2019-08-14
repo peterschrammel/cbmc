@@ -9,9 +9,9 @@ struct struct1
 
 int test()
 {
-  struct struct1 y;
-  double z;
   short a[2];
+  double z;
+  struct struct1 y;
 
   assert(__CPROVER_get_field(&y, "field1") == 0);
   assert(__CPROVER_get_field(&y.x1, "field1") == 0);
