@@ -141,8 +141,8 @@ void goto_symext::parameter_assignments(
       rhs = clean_expr(std::move(rhs), state, false);
 
       exprt::operandst lhs_conditions;
-      symex_assignt{state, assignment_type, ns, symex_config, target}
-        .assign_rec(lhs, expr_skeletont{}, rhs, lhs_conditions);
+      symex_assignt{*this, state, assignment_type, ns, symex_config, target}
+          .assign_rec(lhs, expr_skeletont{}, rhs, lhs_conditions);
     }
 
     if(it1!=arguments.end())
