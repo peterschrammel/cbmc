@@ -1,6 +1,6 @@
-THOROUGH
+CORE
 main.c
---verbosity 10 --nondet-static --shadow-per-object
+--verbosity 10 --shadow-per-object
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
