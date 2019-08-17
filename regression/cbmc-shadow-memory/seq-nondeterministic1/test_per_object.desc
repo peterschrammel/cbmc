@@ -1,8 +1,8 @@
 THOROUGH
 main.c
 --verbosity 10 --nondet-static --shadow-per-object
-^EXIT=10$
+^EXIT=0$
 ^SIGNAL=0$
-^VERIFICATION FAILED$
+^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring

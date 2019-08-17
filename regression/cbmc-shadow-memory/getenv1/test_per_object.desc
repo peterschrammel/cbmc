@@ -1,6 +1,6 @@
-KNOWNBUG
+CORE
 main.c
---verbosity 10 --variable-array-size 8
+--verbosity 10 --shadow-per-object
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
