@@ -151,14 +151,15 @@ symbol_exprt goto_symext::add_field(
   return new_symbol.symbol_expr();
 }
 
-bool goto_symext::filter_by_value_set(
-  const value_setst::valuest &value_set,
-  const ssa_exprt &address)
-{
+bool goto_symext::filter_by_value_set(const value_setst::valuest &value_set,
+                                      const exprt &address) {
   if(address.id() != ID_address_of)
     return false;
 
-  const auto &expr2 = to_address_of_expr(address).object();
+  exprt expr2 = to_address_of_expr(address).object();
+  if (expr2.id() == ID_index) {
+    expr2 = to_index_expr(expr2).array();
+  }
   if(expr2.id() != ID_symbol)
     return false;
 
@@ -167,7 +168,10 @@ bool goto_symext::filter_by_value_set(
     if(e.id() != ID_object_descriptor)
       continue;
 
-    const auto &expr1 = to_object_descriptor_expr(e).object();
+    exprt expr1 = to_object_descriptor_expr(e).object();
+    if (expr1.id() == ID_index) {
+      expr1 = to_index_expr(expr1).array();
+    }
     if(expr1.id() != ID_symbol)
       continue;
 
@@ -225,25 +229,25 @@ void goto_symext::symex_set_field(
   size_t mux_size = 0;
   value_setst::valuest value_set;
   state.value_set.get_value_set(expr, value_set, ns);
-/*
-  bool has_entry = false;
-  for(const auto &address_pair : addresses)
-  {
-    if(filter_by_value_set(value_set, address_pair.first))
-    {
-      has_entry = true;
-      break;
-    }
+  for (const auto &e : value_set) {
+    log.debug() << "value set: " << from_expr(ns, "", e) << messaget::eom;
   }
-*/
+  /*
+    bool has_entry = false;
+    for(const auto &address_pair : addresses)
+    {
+      if(filter_by_value_set(value_set, address_pair.first))
+      {
+        has_entry = true;
+        break;
+      }
+    }
+  */
   for(const auto &address_pair : addresses)
   {
     const exprt &address = address_pair.first;
 
     // exact match
-    log.debug() << "exact match: " << from_expr(ns, "", address)
-            << " == " << from_expr(ns, "", expr)
-            << messaget::eom;
     /*    log.debug() << address.pretty() << messaget::eom
                         << " == " << messaget::eom
                         << expr.pretty() << messaget::eom;*/
@@ -252,23 +256,33 @@ void goto_symext::symex_set_field(
       (code_function_call.arguments()[0].id() == ID_typecast &&
       address == to_typecast_expr(code_function_call.arguments()[0]).op()))*/
     {
+      log.debug() << "exact match: " << from_expr(ns, "", address)
+                  << " == " << from_expr(ns, "", expr) << messaget::eom;
       log.debug() << "yes" << messaget::eom;
       lhs = address_of_exprt(address_pair.second);
       mux_size = 1;
       break;
     }
 
-/*
-    if(has_entry && !filter_by_value_set(value_set, address))
-      continue;
-*/
-/*    const typet &expr_subtype = to_pointer_type(expr_type).subtype();
-    const typet &address_subtype = to_pointer_type(address.type()).subtype();
-    if(expr_subtype == address_subtype ||
-       (can_cast_type<bitvector_typet>(expr_subtype) &&
-        can_cast_type<bitvector_typet>(address_subtype) &&
-        to_bitvector_type(expr_subtype).get_width() ==
-        to_bitvector_type(address_subtype).get_width()))*/
+    if (filter_by_value_set(value_set, address)) {
+      log.debug() << "value set match: " << from_expr(ns, "", address)
+                  << " <-- " << from_expr(ns, "", expr) << messaget::eom;
+      lhs = address_of_exprt(address_pair.second);
+      mux_size = 1;
+      break;
+    }
+    /*
+        if(has_entry && !filter_by_value_set(value_set, address))
+          continue;
+    */
+    /*    const typet &expr_subtype = to_pointer_type(expr_type).subtype();
+        const typet &address_subtype =
+       to_pointer_type(address.type()).subtype();
+        if(expr_subtype == address_subtype ||
+           (can_cast_type<bitvector_typet>(expr_subtype) &&
+            can_cast_type<bitvector_typet>(address_subtype) &&
+            to_bitvector_type(expr_subtype).get_width() ==
+            to_bitvector_type(address_subtype).get_width()))*/
     {
       const exprt &field = address_pair.second;
       exprt cond = equal_exprt(
@@ -338,28 +352,37 @@ void goto_symext::symex_get_field(
   size_t mux_size = 0;
   value_setst::valuest value_set;
   state.value_set.get_value_set(expr, value_set, ns);
-/*
-  bool has_entry = false;
-  for(const auto &address_pair : addresses)
-  {
-    if(filter_by_value_set(value_set, address_pair.first))
-    {
-      has_entry = true;
-      break;
-    }
+  for (const auto &e : value_set) {
+    log.debug() << "value set: " << from_expr(ns, "", e) << messaget::eom;
   }
-*/
+  /*
+    bool has_entry = false;
+    for(const auto &address_pair : addresses)
+    {
+      if(filter_by_value_set(value_set, address_pair.first))
+      {
+        has_entry = true;
+        break;
+      }
+    }
+  */
   for(const auto &address_pair : addresses)
   {
     const exprt &address = address_pair.first;
 
     // exact match
-    log.debug() << "exact match: " << from_expr(ns, "", address)
-            << " == " << from_expr(ns, "", expr)
-            << messaget::eom;
     if(address == expr)
     {
-      log.debug() << "yes" << messaget::eom;
+      log.debug() << "exact match: " << from_expr(ns, "", address)
+                  << " == " << from_expr(ns, "", expr) << messaget::eom;
+      rhs = typecast_exprt::conditional_cast(address_pair.second, lhs.type());
+      mux_size = 1;
+      break;
+    }
+
+    if (filter_by_value_set(value_set, address)) {
+      log.debug() << "value set match: " << from_expr(ns, "", address)
+                  << " <-- " << from_expr(ns, "", expr) << messaget::eom;
       rhs = typecast_exprt::conditional_cast(address_pair.second, lhs.type());
       mux_size = 1;
       break;
