@@ -234,13 +234,13 @@ void goto_symext::symex_allocate(
     {
       to_integer(to_constant_expr(array_type.size()), size);
     }
-    symex_field_dynamic_init(ns, state, rhs, size);
+    symex_field_dynamic_init(ns, state, index_expr, size);
   }
   else
   {
     rhs=address_of_exprt(
       value_symbol.symbol_expr(), pointer_type(value_symbol.type));
-    symex_field_dynamic_init(ns, state, rhs, mp_integer(1));
+    symex_field_dynamic_init(ns, state, value_symbol.symbol_expr(), mp_integer(1));
   }
 
   symex_assign(
