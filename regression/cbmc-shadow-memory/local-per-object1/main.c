@@ -12,6 +12,9 @@ int test()
   short a[2];
   double z;
   struct struct1 y;
+  int size;
+  __CPROVER_assume(size >= 2);
+  long b[size];
 
   assert(__CPROVER_get_field(&y, "field1") == 0);
   assert(__CPROVER_get_field(&y.x1, "field1") == 0);
@@ -40,6 +43,18 @@ int test()
   assert(__CPROVER_get_field(a, "field1") == 5);
   assert(__CPROVER_get_field(&a[0], "field1") == 5);
   assert(__CPROVER_get_field(&a[1], "field1") == 5);
+
+  assert(__CPROVER_get_field(b, "field1") == 0);
+  assert(__CPROVER_get_field(&b[0], "field1") == 0);
+  assert(__CPROVER_get_field(&b[1], "field1") == 0);
+  __CPROVER_set_field(b, "field1", 3);
+  assert(__CPROVER_get_field(b, "field1") == 3);
+  assert(__CPROVER_get_field(&b[0], "field1") == 3);
+  assert(__CPROVER_get_field(&b[1], "field1") == 3);
+  __CPROVER_set_field(&b[1], "field1", 5);
+  assert(__CPROVER_get_field(b, "field1") == 5);
+  assert(__CPROVER_get_field(&b[0], "field1") == 5);
+  assert(__CPROVER_get_field(&b[1], "field1") == 5);
 }
 
 int main()
