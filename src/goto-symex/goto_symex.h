@@ -848,6 +848,9 @@ public:
   std::map<irep_idt, typet> global_fields;
   std::map<irep_idt, typet> local_fields;
 
+  void symex_field_static_init(const namespacet &ns, goto_symex_statet &state,
+                               const ssa_exprt &expr);
+
 protected:
   // addresses must remain in sequence
   std::map<irep_idt, std::vector<std::pair<exprt, symbol_exprt>>>
@@ -865,11 +868,6 @@ protected:
     const namespacet &ns,
     goto_symex_statet &state,
     const code_function_callt &code_function_call);
-
-  void symex_field_static_init(
-    const namespacet &ns,
-    goto_symex_statet &state,
-    const code_assignt &code_assign);
 
   void symex_field_local_init(
     const namespacet &ns,

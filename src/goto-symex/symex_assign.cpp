@@ -41,6 +41,7 @@ void symex_assignt::assign_rec(
   if(lhs.id() == ID_symbol && lhs.get_bool(ID_C_SSA_symbol))
   {
     assign_symbol(to_ssa_expr(lhs), full_lhs, rhs, guard);
+    goto_symex.symex_field_static_init(ns, state, to_ssa_expr(lhs));
   }
   else if(lhs.id() == ID_index)
     assign_array<use_update()>(to_index_expr(lhs), full_lhs, rhs, guard);
