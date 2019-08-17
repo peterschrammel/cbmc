@@ -188,9 +188,7 @@ void goto_symext::symex_set_field(
   {
     expr = pointer_object(expr);
     do_simplify(expr);
-    if(
-      expr.id() == ID_pointer_object &&
-      expr.op0().id() == ID_address_of)
+    if(expr.id() == ID_pointer_object)
     {
       expr = expr.op0();
     }
@@ -303,9 +301,7 @@ void goto_symext::symex_get_field(
   {
     expr = pointer_object(expr);
     do_simplify(expr);
-    if(
-      expr.id() == ID_pointer_object &&
-      expr.op0().id() == ID_address_of)
+    if(expr.id() == ID_pointer_object)
     {
       expr = expr.op0();
     }
