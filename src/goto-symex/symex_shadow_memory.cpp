@@ -258,7 +258,6 @@ void goto_symext::symex_set_field(
     {
       log.debug() << "exact match: " << from_expr(ns, "", address)
                   << " == " << from_expr(ns, "", expr) << messaget::eom;
-      log.debug() << "yes" << messaget::eom;
       lhs = address_of_exprt(address_pair.second);
       mux_size = 1;
       break;
