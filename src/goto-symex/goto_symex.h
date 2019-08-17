@@ -914,9 +914,8 @@ private:
     const exprt &expr,
     std::map<irep_idt, typet> &fields);
 
-  bool filter_by_value_set(
-    const value_setst::valuest &value_set,
-    const ssa_exprt &address);
+  bool filter_by_value_set(const value_setst::valuest &value_set,
+                           const exprt &address);
 };
 
 /// Transition to the next instruction, which increments the internal program
