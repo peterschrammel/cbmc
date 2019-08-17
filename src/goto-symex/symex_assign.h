@@ -12,6 +12,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #ifndef CPROVER_GOTO_SYMEX_SYMEX_ASSIGN_H
 #define CPROVER_GOTO_SYMEX_SYMEX_ASSIGN_H
 
+#include "goto_symex.h"
 #include "symex_target.h"
 #include <util/expr.h>
 
@@ -25,19 +26,12 @@ struct symex_configt;
 class symex_assignt
 {
 public:
-  symex_assignt(
-    goto_symex_statet &state,
-    symex_targett::assignment_typet assignment_type,
-    const namespacet &ns,
-    const symex_configt &symex_config,
-    symex_targett &target)
-    : state(state),
-      assignment_type(assignment_type),
-      ns(ns),
-      symex_config(symex_config),
-      target(target)
-  {
-  }
+  symex_assignt(goto_symext &goto_symex, goto_symex_statet &state,
+                symex_targett::assignment_typet assignment_type,
+                const namespacet &ns, const symex_configt &symex_config,
+                symex_targett &target)
+      : goto_symex(goto_symex), state(state), assignment_type(assignment_type),
+        ns(ns), symex_config(symex_config), target(target) {}
 
   /// Record the assignment of value \p rhs to variable \p lhs in \p state and
   /// add the equation to target: `lhs#{n+1} == guard ? rhs#{m} : lhs#{n}`
@@ -56,6 +50,7 @@ public:
     exprt::operandst &guard);
 
 private:
+  goto_symext &goto_symex;
   goto_symex_statet &state;
   symex_targett::assignment_typet assignment_type;
   const namespacet &ns;

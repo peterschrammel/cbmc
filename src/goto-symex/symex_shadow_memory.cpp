@@ -228,6 +228,9 @@ void goto_symext::symex_set_field(
     log.debug() << "exact match: " << from_expr(ns, "", address)
             << " == " << from_expr(ns, "", expr)
             << messaget::eom;
+    /*    log.debug() << address.pretty() << messaget::eom
+                    << " == " << messaget::eom
+                    << expr.pretty() << messaget::eom;*/
     if(address == expr)
 /*      address == code_function_call.arguments()[0] ||
       (code_function_call.arguments()[0].id() == ID_typecast &&
@@ -388,19 +391,14 @@ void goto_symext::symex_get_field(
   log.debug() << "mux size get_field: " << mux_size << messaget::eom;
 }
 
-void goto_symext::symex_field_static_init(
-  const namespacet &ns,
-  goto_symex_statet &state,
-  const code_assignt &code_assign)
-{
+void goto_symext::symex_field_static_init(const namespacet &ns,
+                                          goto_symex_statet &state,
+                                          const ssa_exprt &expr) {
   if(state.source.function_id != CPROVER_PREFIX "initialize")
     return;
 
-  find_symbols_sett identifiers = find_symbol_identifiers(code_assign.lhs());
-  if(identifiers.size() != 1)
-    return;
-
-  const irep_idt &identifier = *identifiers.begin();
+  const irep_idt &identifier =
+      to_symbol_expr(expr.get_original_expr()).get_identifier();
   if(has_prefix(id2string(identifier), CPROVER_PREFIX))
     return;
 
@@ -412,10 +410,10 @@ void goto_symext::symex_field_static_init(
     return;
 
   const typet &type = symbol.type;
-  log.debug() << "global memory " << id2string(symbol.name) << " of type "
+  log.debug() << "global memory " << id2string(identifier) << " of type "
               << from_type(ns, "", type) << messaget::eom;
 
-  initialize_rec(ns, state, symbol.symbol_expr(), global_fields);
+  initialize_rec(ns, state, expr, global_fields);
 }
 
 void goto_symext::symex_field_local_init(
