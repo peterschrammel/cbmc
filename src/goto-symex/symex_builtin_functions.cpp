@@ -212,27 +212,30 @@ void goto_symext::symex_allocate(
       value_symbol.symbol_expr(), from_integer(0, index_type()));
     rhs = address_of_exprt(index_expr, pointer_type(array_type.subtype()));
     mp_integer size;
-    if(!array_type.size().is_constant())
+    if(!shadow_per_object)
     {
-      if(variable_array_size > 0)
+      if(!array_type.size().is_constant())
       {
-        log.warning() << "constant array size expected '"
-                      << from_expr(ns, "", array_type.size())
-                      << "' replaced by "
-                      << variable_array_size << messaget::eom;
-        size = variable_array_size;
+        if(variable_array_size > 0)
+        {
+          log.warning() << "constant array size expected '"
+                        << from_expr(ns, "", array_type.size())
+                        << "' replaced by "
+                        << variable_array_size << messaget::eom;
+          size = variable_array_size;
+        }
+        else
+        {
+          log.error() << "constant malloc size expected:\n"
+                      << lhs.pretty()
+                      << messaget::eom;
+          throw 0;
+        }
       }
       else
       {
-        log.error() << "constant malloc size expected:\n"
-                    << lhs.pretty()
-                    << messaget::eom;
-        throw 0;
+        to_integer(to_constant_expr(array_type.size()), size);
       }
-    }
-    else
-    {
-      to_integer(to_constant_expr(array_type.size()), size);
     }
     symex_field_dynamic_init(ns, state, index_expr, size);
   }

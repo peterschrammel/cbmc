@@ -457,11 +457,11 @@ void goto_symext::symex_field_dynamic_init(
   const exprt &expr,
   const mp_integer &size)
 {
-  log.debug() << "dynamic memory of type " << from_type(ns, "", expr.type())
-              << " and " << size << " element(s)" << messaget::eom;
-
   if(shadow_per_object)
   {
+    log.debug() << "dynamic memory of type " << from_type(ns, "", expr.type())
+                << messaget::eom;
+
     initialize_rec(
       ns,
       state,
@@ -471,6 +471,8 @@ void goto_symext::symex_field_dynamic_init(
 #if 0
   else
   {
+    log.debug() << "dynamic memory of type " << from_type(ns, "", expr.type())
+                << " and " << size << " element(s)" << messaget::eom;
     for(mp_integer index = 0; index < size; ++index)
     {
       initialize_rec(
