@@ -46,6 +46,18 @@ static irep_idt get_field_name(const exprt &string_expr)
     UNREACHABLE;
 }
 
+static typet remove_array_type_l2(const typet &type) {
+  if (to_array_type(type).size().id() != ID_symbol)
+    return type;
+
+  array_typet array_type = to_array_type(type); // copy
+
+  ssa_exprt &size = to_ssa_expr(array_type.size());
+  size.remove_level_2();
+
+  return array_type;
+}
+
 void goto_symext::initialize_rec(
   const namespacet &ns,
   goto_symex_statet &state,
@@ -87,17 +99,23 @@ void goto_symext::initialize_rec(
   {
     for(const auto &field_pair : fields)
     {
-      exprt address_expr;
+      exprt address_expr = expr;
       //if(type.id() != ID_array)
-        address_expr = address_of_exprt(expr);
-        /*else
-      {
-        // arrays appear as &array[0]
-        address_expr = address_of_exprt(
-          index_exprt(expr, from_integer(0, signed_long_int_type())));
-        log.debug() << "array: " << from_expr(ns, "", address_expr)
-                    << messaget::eom;
-                    }*/
+      if (type.id() == ID_array) {
+        address_expr.type() = remove_array_type_l2(address_expr.type());
+        exprt original_expr = to_ssa_expr(expr).get_original_expr();
+        original_expr.type() = remove_array_type_l2(original_expr.type());
+        to_ssa_expr(address_expr).set_expression(original_expr);
+      }
+      address_expr = address_of_exprt(address_expr);
+      /*else
+    {
+      // arrays appear as &array[0]
+      address_expr = address_of_exprt(
+        index_exprt(expr, from_integer(0, signed_long_int_type())));
+      log.debug() << "array: " << from_expr(ns, "", address_expr)
+                  << messaget::eom;
+                  }*/
 
       symbol_exprt field =
         add_field(ns, state, address_expr, field_pair.first, fields);
@@ -179,7 +197,7 @@ void goto_symext::symex_set_field(
     "shadow memory requires a pointer expression");
 
   exprt value = code_function_call.arguments()[2];
-  
+
   log.debug() << "set_field: " << id2string(field_name) << " for "
               << from_expr(ns, "", expr) << " to " << from_expr(ns, "", value)
               << messaget::eom;
@@ -197,7 +215,7 @@ void goto_symext::symex_set_field(
   log.debug() << "set_field: " << id2string(field_name) << " for "
               << from_expr(ns, "", expr) << " to " << from_expr(ns, "", value)
               << messaget::eom;
-  
+
   INVARIANT(
     address_fields.count(field_name) == 1,
     id2string(field_name) + " should exist");
@@ -227,8 +245,8 @@ void goto_symext::symex_set_field(
             << " == " << from_expr(ns, "", expr)
             << messaget::eom;
     /*    log.debug() << address.pretty() << messaget::eom
-                    << " == " << messaget::eom
-                    << expr.pretty() << messaget::eom;*/
+                        << " == " << messaget::eom
+                        << expr.pretty() << messaget::eom;*/
     if(address == expr)
 /*      address == code_function_call.arguments()[0] ||
       (code_function_call.arguments()[0].id() == ID_typecast &&
@@ -309,7 +327,7 @@ void goto_symext::symex_get_field(
 
   log.debug() << "get_field: " << id2string(field_name) << " for "
               << from_expr(ns, "", expr) << messaget::eom;
-  
+
   INVARIANT(
     address_fields.count(field_name) == 1,
     id2string(field_name) + " should exist");
