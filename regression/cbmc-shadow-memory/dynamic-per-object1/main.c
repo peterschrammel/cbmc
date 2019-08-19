@@ -34,6 +34,7 @@ int test_scalar()
 int test_array()
 {
   short *a = malloc(2*sizeof(short));
+  short *c = malloc(2*sizeof(short));
   int size;
   __CPROVER_assume(size >= 2);
   short *b = malloc(size*sizeof(long));
@@ -61,6 +62,25 @@ int test_array()
   assert(__CPROVER_get_field(b, "field1") == 5);
   assert(__CPROVER_get_field(&b[0], "field1") == 5);
   assert(__CPROVER_get_field(&b[1], "field1") == 5);
+
+  short *ac;
+  int x;
+  __CPROVER_assume(x > 0);
+  if(x)
+    ac = c;
+  else
+    ac = a;
+  assert(__CPROVER_get_field(ac, "field1") == 0);
+  assert(__CPROVER_get_field(&ac[0], "field1") == 0);
+  assert(__CPROVER_get_field(&ac[1], "field1") == 0);
+  __CPROVER_set_field(ac, "field1", 3);
+  assert(__CPROVER_get_field(ac, "field1") == 3);
+  assert(__CPROVER_get_field(&ac[0], "field1") == 3);
+  assert(__CPROVER_get_field(&ac[1], "field1") == 3);
+  __CPROVER_set_field(&ac[1], "field1", 5);
+  assert(__CPROVER_get_field(ac, "field1") == 5);
+  assert(__CPROVER_get_field(&ac[0], "field1") == 5);
+  assert(__CPROVER_get_field(&ac[1], "field1") == 5);
 }
 
 int main()
