@@ -2,7 +2,11 @@
 
 void main()
 {
-  __CPROVER_field_decl_global("dr_write", (_Bool) 0);
+  __CPROVER_field_decl_global("dr_write", (_Bool)0);
   char *env = getenv("PATH");
-  assert(__CPROVER_get_field(env, "dr_write") == 0);
+  if(env == NULL)
+    return;
+  assert(!__CPROVER_get_field(env, "dr_write"));
+  __CPROVER_set_field(env, "dr_write", 1);
+  assert(__CPROVER_get_field(env, "dr_write"));
 }
