@@ -10,6 +10,7 @@ struct struct1
 int test()
 {
   short a[2];
+  short c[2];
   double z;
   struct struct1 y;
   int size;
@@ -55,6 +56,25 @@ int test()
   assert(__CPROVER_get_field(b, "field1") == 5);
   assert(__CPROVER_get_field(&b[0], "field1") == 5);
   assert(__CPROVER_get_field(&b[1], "field1") == 5);
+
+  short *ac;
+  int x;
+  __CPROVER_assume(x > 0);
+  if(x)
+    ac = c;
+  else
+    ac = a;
+  assert(__CPROVER_get_field(ac, "field1") == 0);
+  assert(__CPROVER_get_field(&ac[0], "field1") == 0);
+  assert(__CPROVER_get_field(&ac[1], "field1") == 0);
+  __CPROVER_set_field(ac, "field1", 3);
+  assert(__CPROVER_get_field(ac, "field1") == 3);
+  assert(__CPROVER_get_field(&ac[0], "field1") == 3);
+  assert(__CPROVER_get_field(&ac[1], "field1") == 3);
+  __CPROVER_set_field(&ac[1], "field1", 5);
+  assert(__CPROVER_get_field(ac, "field1") == 5);
+  assert(__CPROVER_get_field(&ac[0], "field1") == 5);
+  assert(__CPROVER_get_field(&ac[1], "field1") == 5);
 }
 
 int main()

@@ -263,13 +263,12 @@ void goto_symext::symex_set_field(
       break;
     }
 
-    if (filter_by_value_set(value_set, address)) {
-      log.debug() << "value set match: " << from_expr(ns, "", address)
-                  << " <-- " << from_expr(ns, "", expr) << messaget::eom;
-      lhs = address_of_exprt(address_pair.second);
-      mux_size = 1;
-      break;
-    }
+    if(!filter_by_value_set(value_set, address))
+      continue;
+
+    log.debug() << "value set match: " << from_expr(ns, "", address)
+                << " <-- " << from_expr(ns, "", expr) << messaget::eom;
+
     /*
         if(has_entry && !filter_by_value_set(value_set, address))
           continue;
@@ -379,13 +378,12 @@ void goto_symext::symex_get_field(
       break;
     }
 
-    if (filter_by_value_set(value_set, address)) {
-      log.debug() << "value set match: " << from_expr(ns, "", address)
-                  << " <-- " << from_expr(ns, "", expr) << messaget::eom;
-      rhs = typecast_exprt::conditional_cast(address_pair.second, lhs.type());
-      mux_size = 1;
-      break;
-    }
+    if(!filter_by_value_set(value_set, address))
+      continue;
+
+    log.debug() << "value set match: " << from_expr(ns, "", address)
+                << " <-- " << from_expr(ns, "", expr) << messaget::eom;
+
 /*
     if(has_entry && !filter_by_value_set(value_set, address))
       continue;
@@ -411,7 +409,7 @@ void goto_symext::symex_get_field(
           rhs = if_exprt(
             cond, typecast_exprt::conditional_cast(field, lhs.type()),
             from_integer(-1, lhs.type()));
-//          rhs = typecast_exprt::conditional_cast(field, lhs.type());
+          // rhs = typecast_exprt::conditional_cast(field, lhs.type());
         }
         else
         {
