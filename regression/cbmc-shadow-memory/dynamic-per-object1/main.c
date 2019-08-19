@@ -31,6 +31,14 @@ int test_scalar()
   assert(__CPROVER_get_field(z, "field1") == 3);
 }
 
+int test_alloca()
+{
+  float *w = alloca(sizeof(float));
+  assert(__CPROVER_get_field(w, "field1") == 0);
+  __CPROVER_set_field(w, "field1", 3);
+  assert(__CPROVER_get_field(w, "field1") == 3);
+}
+
 int test_array()
 {
   short *a = malloc(2*sizeof(short));
@@ -89,4 +97,5 @@ int main()
   test_struct();
   test_array();
   test_scalar();
+  test_alloca();
 }
