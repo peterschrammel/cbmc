@@ -152,7 +152,24 @@ symbol_exprt goto_symext::add_field(
 }
 
 bool goto_symext::filter_by_value_set(const value_setst::valuest &value_set,
-                                      const exprt &address) {
+                                      const exprt &address)
+{
+  if(address.id() == ID_constant &&
+     address.type().id() == ID_pointer &&
+     to_constant_expr(address).is_zero())
+  {
+    for(const auto &e : value_set)
+    {
+      if(e.id() != ID_object_descriptor)
+        continue;
+
+       const exprt &expr = to_object_descriptor_expr(e).object();
+       if(expr.id() == ID_null_object)
+         return true;
+    }
+    return false;
+  }
+
   if(address.id() != ID_address_of)
     return false;
 
@@ -229,7 +246,8 @@ void goto_symext::symex_set_field(
   size_t mux_size = 0;
   value_setst::valuest value_set;
   state.value_set.get_value_set(expr, value_set, ns);
-  for (const auto &e : value_set) {
+  for (const auto &e : value_set)
+  {
     log.debug() << "value set: " << from_expr(ns, "", e) << messaget::eom;
   }
   /*
@@ -350,7 +368,8 @@ void goto_symext::symex_get_field(
   size_t mux_size = 0;
   value_setst::valuest value_set;
   state.value_set.get_value_set(expr, value_set, ns);
-  for (const auto &e : value_set) {
+  for (const auto &e : value_set)
+  {
     log.debug() << "value set: " << from_expr(ns, "", e) << messaget::eom;
   }
   /*
@@ -364,6 +383,16 @@ void goto_symext::symex_get_field(
       }
     }
   */
+
+  const null_pointer_exprt null_pointer(to_pointer_type(expr.type()));
+  if(filter_by_value_set(value_set, null_pointer))
+  {
+    log.debug() << "value set match: " << from_expr(ns, "", null_pointer)
+                << " <-- " << from_expr(ns, "", expr) << messaget::eom;
+    rhs = if_exprt(equal_exprt(expr, null_pointer),
+      from_integer(0, lhs.type()), from_integer(-1, lhs.type()));
+  }
+
   for(const auto &address_pair : addresses)
   {
     const exprt &address = address_pair.first;
@@ -419,6 +448,8 @@ void goto_symext::symex_get_field(
       }
     }
   }
+  INVARIANT(rhs.is_not_nil(), "RHS must not be nil");
+
   symex_assign(
     state,
     code_assignt(lhs, typecast_exprt::conditional_cast(rhs, lhs.type())));
