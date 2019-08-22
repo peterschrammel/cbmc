@@ -154,6 +154,8 @@ symbol_exprt goto_symext::add_field(
 bool goto_symext::filter_by_value_set(const value_setst::valuest &value_set,
                                       const exprt &address)
 {
+  // log.debug() << "address: " << address.pretty() << messaget::eom;
+
   if(address.id() == ID_constant &&
      address.type().id() == ID_pointer &&
      to_constant_expr(address).is_zero())
@@ -182,6 +184,10 @@ bool goto_symext::filter_by_value_set(const value_setst::valuest &value_set,
 
   for(const auto &e : value_set)
   {
+    // log.debug() << "object: " << e.pretty() << messaget::eom;
+    if(e.id() == ID_unknown)
+      return true;
+
     if(e.id() != ID_object_descriptor)
       continue;
 
@@ -261,6 +267,14 @@ void goto_symext::symex_set_field(
       }
     }
   */
+  const null_pointer_exprt null_pointer(to_pointer_type(expr.type()));
+  if(value_set.size() == 1 && filter_by_value_set(value_set, null_pointer))
+  {
+    log.debug() << "value set match: " << from_expr(ns, "", null_pointer)
+                << " <-- " << from_expr(ns, "", expr) << messaget::eom;
+    log.debug() << "ignoring set field on NULL object" << messaget::eom;
+    return;
+  }
   for(const auto &address_pair : addresses)
   {
     const exprt &address = address_pair.first;
@@ -320,6 +334,7 @@ void goto_symext::symex_set_field(
     }
   }
   log.debug() << "mux size set_field: " << mux_size << messaget::eom;
+  INVARIANT(lhs.is_not_nil(), "LHS must not be nil");
   lhs = dereference_exprt(lhs);
   symex_assign(
     state,
@@ -391,6 +406,7 @@ void goto_symext::symex_get_field(
                 << " <-- " << from_expr(ns, "", expr) << messaget::eom;
     rhs = if_exprt(equal_exprt(expr, null_pointer),
       from_integer(0, lhs.type()), from_integer(-1, lhs.type()));
+    mux_size = 1;
   }
 
   for(const auto &address_pair : addresses)
