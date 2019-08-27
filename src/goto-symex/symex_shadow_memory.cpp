@@ -333,12 +333,15 @@ void goto_symext::symex_set_field(
       }
     }
   }
-  log.debug() << "mux size set_field: " << mux_size << messaget::eom;
-  INVARIANT(lhs.is_not_nil(), "LHS must not be nil");
-  lhs = dereference_exprt(lhs);
-  symex_assign(
-    state,
-    code_assignt(lhs, typecast_exprt::conditional_cast(rhs, lhs.type())));
+  if (lhs.is_not_nil()) {
+    log.debug() << "mux size set_field: " << mux_size << messaget::eom;
+    lhs = dereference_exprt(lhs);
+    symex_assign(state, code_assignt(lhs, typecast_exprt::conditional_cast(
+                                              rhs, lhs.type())));
+  } else {
+    log.debug() << "cannot set_field for " << from_expr(ns, "", expr)
+                << messaget::eom;
+  }
 }
 
 void goto_symext::symex_get_field(
@@ -464,12 +467,15 @@ void goto_symext::symex_get_field(
       }
     }
   }
-  INVARIANT(rhs.is_not_nil(), "RHS must not be nil");
-
-  symex_assign(
-    state,
-    code_assignt(lhs, typecast_exprt::conditional_cast(rhs, lhs.type())));
-  log.debug() << "mux size get_field: " << mux_size << messaget::eom;
+  if (rhs.is_not_nil()) {
+    log.debug() << "mux size get_field: " << mux_size << messaget::eom;
+    symex_assign(state, code_assignt(lhs, typecast_exprt::conditional_cast(
+                                              rhs, lhs.type())));
+  } else {
+    log.debug() << "cannot get_field for " << from_expr(ns, "", expr)
+                << messaget::eom;
+    symex_assign(state, code_assignt(lhs, from_integer(0, lhs.type())));
+  }
 }
 
 void goto_symext::symex_field_static_init(const namespacet &ns,
