@@ -17,6 +17,7 @@ Author: Peter Schrammel
 #include <util/cprover_prefix.h>
 #include <util/find_symbols.h>
 #include <util/fresh_symbol.h>
+#include <util/invariant.h>
 #include <util/pointer_predicates.h>
 #include <util/prefix.h>
 #include <util/invariant.h>
@@ -56,6 +57,24 @@ static typet remove_array_type_l2(const typet &type) {
   size.remove_level_2();
 
   return array_type;
+}
+
+static void remove_pointer_object(exprt &expr) {
+  if(expr.id() == ID_pointer_object)
+  {
+    expr = expr.op0();
+    return;
+  }
+  Forall_operands(it, expr)
+    remove_pointer_object(*it);
+  // pointer_object has size_type(): revert to original type after removal
+  if (expr.id() == ID_if) {
+    const if_exprt &if_expr = to_if_expr(expr);
+    expr.type() = if_expr.true_case().type();
+  } else if (expr.id() == ID_with) {
+    const with_exprt &with_expr = to_with_expr(expr);
+    expr.type() = with_expr.old().type();
+  }
 }
 
 void goto_symext::initialize_rec(
@@ -172,15 +191,14 @@ bool goto_symext::filter_by_value_set(const value_setst::valuest &value_set,
     return false;
   }
 
-  if(address.id() != ID_address_of)
-    return false;
+  INVARIANT(
+    address.id() == ID_address_of, "address of shadowed object expected");
 
   exprt expr2 = to_address_of_expr(address).object();
   if (expr2.id() == ID_index) {
     expr2 = to_index_expr(expr2).array();
   }
-  if(expr2.id() != ID_symbol)
-    return false;
+  INVARIANT(expr2.id() == ID_symbol, "symbol of shadowed object expected");
 
   for(const auto &e : value_set)
   {
@@ -233,10 +251,7 @@ void goto_symext::symex_set_field(
   {
     expr = pointer_object(expr);
     do_simplify(expr);
-    if(expr.id() == ID_pointer_object)
-    {
-      expr = expr.op0();
-    }
+    remove_pointer_object(expr);
   }
 
   log.debug() << "set_field: " << id2string(field_name) << " for "
@@ -367,10 +382,7 @@ void goto_symext::symex_get_field(
   {
     expr = pointer_object(expr);
     do_simplify(expr);
-    if(expr.id() == ID_pointer_object)
-    {
-      expr = expr.op0();
-    }
+    remove_pointer_object(expr);
   }
 
   log.debug() << "get_field: " << id2string(field_name) << " for "
