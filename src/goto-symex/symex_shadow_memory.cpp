@@ -9,6 +9,8 @@ Author: Peter Schrammel
 /// \file
 /// Symex Shadow Memory Instrumentation
 
+#include <iostream>
+
 #include "goto_symex.h"
 
 #include <util/arith_tools.h>
@@ -75,6 +77,17 @@ static void remove_pointer_object(exprt &expr) {
     const with_exprt &with_expr = to_with_expr(expr);
     expr.type() = with_expr.old().type();
   }
+    if(!((expr.id() != ID_with ||
+       expr.type() == to_with_expr(expr).old().type()) &&
+        (expr.id() != ID_if ||
+         (expr.type() == to_if_expr(expr).true_case().type() &&
+          expr.type() == to_if_expr(expr).false_case().type()))))
+    {
+      std::cout << "still mismatch" << std::endl;
+      std::cout << expr.pretty() << std::endl;
+    }
+    else
+      std::cout << "fixed" << std::endl;      
 }
 
 void goto_symext::initialize_rec(
