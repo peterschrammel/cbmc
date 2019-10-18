@@ -12,6 +12,8 @@ Author: Daniel Kroening, Peter Schrammel
 #ifndef CPROVER_GOTO_CHECKER_STOP_ON_FAIL_VERIFIER_H
 #define CPROVER_GOTO_CHECKER_STOP_ON_FAIL_VERIFIER_H
 
+#include <util/prefix.h>
+
 #include "bmc_util.h"
 #include "goto_verifier.h"
 
@@ -58,6 +60,7 @@ public:
         incremental_goto_checker.get_namespace(),
         trace_optionst(options),
         ui_message_handler);
+      report_unmodelled_function_calls(goto_trace);
       report_failure(ui_message_handler);
       incremental_goto_checker.output_error_witness(goto_trace);
       break;
@@ -77,6 +80,25 @@ public:
 protected:
   abstract_goto_modelt &goto_model;
   incremental_goto_checkerT incremental_goto_checker;
+
+  void report_unmodelled_function_calls(const goto_tracet &goto_trace) {
+    for (const auto step : goto_trace.steps) {
+      if (!step.is_function_call())
+        continue;
+
+      const auto &call = step.pc->call_function();
+      if (call.id() != ID_symbol)
+        continue;
+
+      if (has_prefix(
+              id2string(to_symbol_expr(call).get_identifier()),
+              "java::org.cprover.CProver.notModelled")) {
+        log.warning() << "Warning: "
+                      << "Unmodelled library functions have been called. "
+                      << "Results may be incorrect." << messaget::eom;
+      }
+    }
+  }
 };
 
 #endif // CPROVER_GOTO_CHECKER_STOP_ON_FAIL_VERIFIER_H
