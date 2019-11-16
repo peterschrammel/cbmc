@@ -77,7 +77,7 @@ minisat2-download:
 
 glucose-download:
 	@echo "Downloading glucose-syrup"
-	@lwp-download http://www.labri.fr/perso/lsimon/downloads/softwares/glucose-syrup.tgz
+	@wget http://www.labri.fr/perso/lsimon/downloads/softwares/glucose-syrup.tgz
 	@tar xfz glucose-syrup.tgz
 	@rm -Rf ../glucose-syrup
 	@mv glucose-syrup ../
