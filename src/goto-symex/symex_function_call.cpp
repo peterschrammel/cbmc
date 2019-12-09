@@ -211,11 +211,7 @@ void goto_symext::symex_function_call_symbol(
   const irep_idt &identifier=
     to_symbol_expr(code.function()).get_identifier();
 
-  if(identifier=="CBMC_trace")
-  {
-    symex_trace(state, code);
-  }
-  else if(identifier == CPROVER_PREFIX "get_field")
+  if(identifier == CPROVER_PREFIX "get_field")
   {
     symex_get_field(ns, state, code);
     symex_transition(state);
