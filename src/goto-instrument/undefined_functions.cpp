@@ -13,9 +13,12 @@ Date: July 2016
 
 #include "undefined_functions.h"
 
-#include <ostream>
+#include <algorithm>
+#include <iostream>
 
+#include <util/cprover_prefix.h>
 #include <util/invariant.h>
+#include <util/prefix.h>
 
 #include <goto-programs/goto_model.h>
 
@@ -26,14 +29,22 @@ void list_undefined_functions(
   const namespacet ns(goto_model.symbol_table);
 
   forall_goto_functions(it, goto_model.goto_functions)
-    if(!ns.lookup(it->first).is_macro &&
-       !it->second.body_available())
+    if(
+      !has_prefix(id2string(it->first), id2string(CPROVER_PREFIX)) &&
+      !ns.lookup(it->first).is_macro &&
+      !it->second.body_available())
+    {
       os << it->first << '\n';
+    }
 }
 
-void undefined_function_abort_path(goto_modelt &goto_model)
-{
-  Forall_goto_functions(it, goto_model.goto_functions)
+void undefined_function_abort_path(
+    goto_modelt &goto_model, const std::list<std::string> &ignore_functions,
+    std::ostream &out) {
+  std::set<std::string> replaced;
+  std::set<std::string> ignored;
+
+  Forall_goto_functions(it, goto_model.goto_functions) {
     for(auto &ins : it->second.body.instructions)
     {
       if(!ins.is_function_call())
@@ -44,7 +55,7 @@ void undefined_function_abort_path(goto_modelt &goto_model)
       if(call.function().id()!=ID_symbol)
         continue;
 
-      const irep_idt &function=
+      const irep_idt function=
         to_symbol_expr(call.function()).get_identifier();
 
       goto_functionst::function_mapt::const_iterator entry=
@@ -53,11 +64,37 @@ void undefined_function_abort_path(goto_modelt &goto_model)
         entry!=goto_model.goto_functions.function_map.end(),
         "called function must be in function_map");
 
-      if(entry->second.body_available())
+      if(
+        has_prefix(id2string(function), id2string(CPROVER_PREFIX)) ||
+        entry->second.body_available())
+      {
         continue;
+      }
 
-      ins = goto_programt::make_assumption(false_exprt(), ins.source_location);
+      if (std::find(ignore_functions.begin(), ignore_functions.end(),
+                    id2string(function)) != ignore_functions.end()) {
+        ignored.insert(id2string(function));
+        continue;
+      }
+
+      replaced.insert(id2string(function));
+
+      ins.make_assumption(false_exprt());
       ins.source_location.set_comment(
         "'" + id2string(function) + "' is undefined");
     }
+  }
+
+  out << "Replaced by assume(false):\n";
+  for (const auto &function : replaced) {
+    out << "  " << function << '\n';
+  }
+  out << "Not replaced:\n";
+  for (const auto &function : ignored) {
+    out << "  " << function << '\n';
+  }
+}
+
+void undefined_function_abort_path(goto_modelt &goto_model) {
+  undefined_function_abort_path(goto_model, {}, std::cout);
 }
