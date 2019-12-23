@@ -98,7 +98,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(z3)(add-library)(show-dependence-graph)" \
   "(horn)(skip-loops):(apply-code-contracts)(model-argc-argv):" \
   "(show-threaded)(list-calls-args)" \
-  "(undefined-function-is-assume-false)" \
+  "(undefined-function-is-assume-false)(ignore-undefined-function):" \
   "(remove-function-body):"\
   OPT_AGGRESSIVE_SLICER \
   OPT_FLUSH \
