@@ -13,7 +13,8 @@ Date: July 2016
 
 #include "undefined_functions.h"
 
-#include <ostream>
+#include <algorithm>
+#include <iostream>
 
 #include <util/cprover_prefix.h>
 #include <util/invariant.h>
@@ -37,9 +38,13 @@ void list_undefined_functions(
     }
 }
 
-void undefined_function_abort_path(goto_modelt &goto_model)
-{
-  Forall_goto_functions(it, goto_model.goto_functions)
+void undefined_function_abort_path(
+    goto_modelt &goto_model, const std::list<std::string> &ignore_functions,
+    std::ostream &out) {
+  std::set<std::string> replaced;
+  std::set<std::string> ignored;
+
+  Forall_goto_functions(it, goto_model.goto_functions) {
     Forall_goto_program_instructions(iit, it->second.body)
     {
       goto_programt::instructiont &ins=*iit;
@@ -68,8 +73,30 @@ void undefined_function_abort_path(goto_modelt &goto_model)
         continue;
       }
 
+      if (std::find(ignore_functions.begin(), ignore_functions.end(),
+                    id2string(function)) != ignore_functions.end()) {
+        ignored.insert(id2string(function));
+        continue;
+      }
+
+      replaced.insert(id2string(function));
+
       ins.make_assumption(false_exprt());
       ins.source_location.set_comment(
         "'" + id2string(function) + "' is undefined");
     }
+  }
+
+  out << "Replaced by assume(false):\n";
+  for (const auto &function : replaced) {
+    out << "  " << function << '\n';
+  }
+  out << "Not replaced:\n";
+  for (const auto &function : ignored) {
+    out << "  " << function << '\n';
+  }
+}
+
+void undefined_function_abort_path(goto_modelt &goto_model) {
+  undefined_function_abort_path(goto_model, {}, std::cout);
 }

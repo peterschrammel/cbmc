@@ -884,7 +884,10 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("undefined-function-is-assume-false"))
     {
       do_indirect_call_and_rtti_removal();
-      undefined_function_abort_path(goto_model);
+      undefined_function_abort_path(
+          goto_model,
+          cmdline.get_comma_separated_values("ignore-undefined-function"),
+          log.status());
     }
 
     // write new binary?
