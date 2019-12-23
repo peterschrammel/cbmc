@@ -106,7 +106,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(" FLAG_ENFORCE_CONTRACT "):" \
   "(" FLAG_ENFORCE_ALL_CONTRACTS ")" \
   "(show-threaded)(list-calls-args)" \
-  "(undefined-function-is-assume-false)" \
+  "(undefined-function-is-assume-false)(ignore-undefined-function):" \
   "(remove-function-body):"\
   OPT_AGGRESSIVE_SLICER \
   OPT_FLUSH \
