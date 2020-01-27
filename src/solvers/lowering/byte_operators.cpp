@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr_lowering.h"
 
 #include <algorithm>
+#include <iostream>
 
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
@@ -2076,6 +2077,16 @@ static exprt lower_byte_update(
         mp_integer{update_bytes.size()},
         ns);
       CHECK_RETURN(src_as_bytes.id() == ID_array);
+      // TODO: Not clear. A huge extractbits with 8 operands vs 4 update bytes
+      // $W/git-cbmc/src/cbmc/cbmc --nondet-static --unwind 1 --shadow-per-object  _dr_2liburcu-0.9.1_tests_benchmark_.libs_test_rwlock_timing.c
+      if(src_as_bytes.operands().size() != update_bytes.size())
+      {
+        std::cout << "src_as_bytes ==================" << std::endl;
+        std::cout << src_as_bytes.operands().size() << std::endl;
+        std::cout << src_as_bytes.pretty() << std::endl;
+        std::cout << "update_bytes.size ==================" << std::endl;
+        std::cout << update_bytes.size() << std::endl;
+      }
       CHECK_RETURN(src_as_bytes.operands().size() == update_bytes.size());
       for(std::size_t i = 0; i < update_bytes.size(); ++i)
       {
