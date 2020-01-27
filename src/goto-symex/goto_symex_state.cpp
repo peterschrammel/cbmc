@@ -254,6 +254,17 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
   }
   else
   {
+    if(expr.id() == ID_with)
+    {
+      std::cout << "================================" << std::endl;
+      std::cout << expr.type().pretty() << std::endl;
+      std::cout << "================================" << std::endl;
+      std::cout << to_with_expr(expr).old().type().pretty() << std::endl;
+      // TODO: It seems that constant propagation replaces one
+      // array size symbol_expr by another one, which results in a
+      // different type then.
+      // $W/git-cbmc/src/cbmc/cbmc --nondet-static --unwind 1 --shadow-per-object _dr_2xdffileio-0.3_tests_.libs_testgdf2.c
+    }
     rename<level>(expr.type(), irep_idt(), ns);
 
     // do this recursively
@@ -261,14 +272,21 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
       *it = rename<level>(std::move(*it), ns).get();
 
     const exprt &c_expr = as_const(expr);
-    INVARIANT(
+    if(!(
       (expr.id() != ID_with ||
        c_expr.type() == to_with_expr(c_expr).old().type()) &&
         (expr.id() != ID_if ||
          (c_expr.type() == to_if_expr(c_expr).true_case().type() &&
-          c_expr.type() == to_if_expr(c_expr).false_case().type())),
+          c_expr.type() == to_if_expr(c_expr).false_case().type()))))
+    {
+      std::cout << "================================" << std::endl;
+      std::cout << c_expr.type().pretty() << std::endl;
+      std::cout << "================================" << std::endl;
+      std::cout << to_with_expr(c_expr).old().type().pretty() << std::endl;
+      INVARIANT(false,
       "Type of renamed expr should be the same as operands for with_exprt and "
       "if_exprt");
+    }
 
     if(level == L2)
       expr = field_sensitivity.apply(ns, *this, std::move(expr), false);
