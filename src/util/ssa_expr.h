@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_SSA_EXPR_H
 #define CPROVER_UTIL_SSA_EXPR_H
 
+#include <iostream>
 #include "std_expr.h"
 
 /// Expression providing an SSA-renamed symbol of expressions
@@ -86,6 +87,12 @@ public:
     const exprt &expr,
     const validation_modet vm = validation_modet::INVARIANT)
   {
+    // TODO: an array access inside an SSA expression
+    // $W/git-cbmc/src/cbmc/cbmc --nondet-static --unwind 1 --shadow-per-object _dr_2pommed-1.39~dfsg_pommed_pommed.c
+    if(expr.has_operands())
+    {
+      std::cout << expr.pretty() << std::endl;
+    }
     DATA_CHECK(
       vm, !expr.has_operands(), "SSA expression should not have operands");
     DATA_CHECK(
