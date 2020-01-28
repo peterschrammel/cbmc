@@ -256,15 +256,24 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
   {
     if(expr.id() == ID_with)
     {
-      std::cout << "================================" << std::endl;
+      std::cout << "with ================================" << std::endl;
       std::cout << expr.type().pretty() << std::endl;
-      std::cout << "================================" << std::endl;
+      std::cout << "with.old ================================" << std::endl;
       std::cout << to_with_expr(expr).old().type().pretty() << std::endl;
       // TODO: It seems that constant propagation replaces one
       // array size symbol_expr by another one, which results in a
       // different type then.
       // $W/git-cbmc/src/cbmc/cbmc --nondet-static --unwind 1 --shadow-per-object _dr_2xdffileio-0.3_tests_.libs_testgdf2.c
     }
+    else
+    {
+      std::cout << "if ================================" << std::endl;
+      std::cout << expr.pretty() << std::endl;
+      // TODO: then and else branch have different types than the expression.
+      // cbmc --nondet-static --unwind 1 --shadow-per-object  _dr_2libtrace3-3.0.21_libwandio_tools_wandiocat_.libs_wandiocat.c
+
+    }
+
     rename<level>(expr.type(), irep_idt(), ns);
 
     // do this recursively
@@ -279,10 +288,18 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
          (c_expr.type() == to_if_expr(c_expr).true_case().type() &&
           c_expr.type() == to_if_expr(c_expr).false_case().type()))))
     {
-      std::cout << "================================" << std::endl;
-      std::cout << c_expr.type().pretty() << std::endl;
-      std::cout << "================================" << std::endl;
-      std::cout << to_with_expr(c_expr).old().type().pretty() << std::endl;
+      if(expr.id() == ID_with)
+      {
+        std::cout << "with' ================================" << std::endl;
+        std::cout << c_expr.type().pretty() << std::endl;
+        std::cout << "with'.old ================================" << std::endl;
+        std::cout << to_with_expr(c_expr).old().type().pretty() << std::endl;
+      }
+      else
+      {
+        std::cout << "if' ================================" << std::endl;
+        std::cout << c_expr.pretty() << std::endl;
+      }
       INVARIANT(false,
       "Type of renamed expr should be the same as operands for with_exprt and "
       "if_exprt");
