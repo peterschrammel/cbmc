@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 literalt boolbvt::convert_equality(const equal_exprt &expr)
 {
+  // TODO: tag-_GLFWthread_struct vs anonymous struct
+  // cbmc --nondet-static --unwind 1 --shadow-per-object _dr_2glfw-2.7.9_examples_mtbench.c
   const bool equality_types_match = expr.lhs().type() == expr.rhs().type();
   DATA_INVARIANT_WITH_DIAGNOSTICS(
     equality_types_match,
