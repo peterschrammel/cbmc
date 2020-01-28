@@ -1164,6 +1164,13 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
 
   auto subtype_bits = pointer_offset_bits(*subtype, ns);
 
+  if(subtype_bits.has_value() && *subtype_bits != 8)
+  {
+    // TODO: subtype_bits == 64
+    // cbmc --nondet-static --unwind 1 --shadow-per-object _dr_2jack-stdio-1.4_jack-stdin.c
+    std::cout << unpacked.pretty() << std::endl;
+    std::cout << *subtype_bits << std::endl;
+  }
   DATA_INVARIANT(
     subtype_bits.has_value() && *subtype_bits == 8,
     "offset bits are byte aligned");
