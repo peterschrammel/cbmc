@@ -122,12 +122,16 @@ public:
   /// symbolic execution
   virtual void symex_from_entry_point_of(
     const get_goto_functiont &get_goto_function,
-    symbol_tablet &new_symbol_table);
+    symbol_tablet &new_symbol_table,
+    const std::pair<std::map<irep_idt, typet>,
+      std::map<irep_idt, typet>> &fields);
 
   /// Puts the initial state of the entry point function into the path storage
   virtual void initialize_path_storage_from_entry_point_of(
     const get_goto_functiont &get_goto_function,
-    symbol_tablet &new_symbol_table);
+    symbol_tablet &new_symbol_table,
+    const std::pair<std::map<irep_idt, typet>,
+      std::map<irep_idt, typet>> &fields);
 
   /// Performs symbolic execution using a state and equation that have
   /// already been used to symbolically execute part of the program. The state
@@ -859,17 +863,11 @@ public:
     goto_modelt &goto_model,
     message_handlert &message_handler);
 
-  std::map<irep_idt, typet> global_fields;
-  std::map<irep_idt, typet> local_fields;
 
   void symex_field_static_init(const namespacet &ns, goto_symex_statet &state,
                                const ssa_exprt &expr);
 
 protected:
-  // addresses must remain in sequence
-  std::map<irep_idt, std::vector<std::pair<exprt, symbol_exprt>>>
-    address_fields;
-
   mp_integer variable_array_size = 0;
   bool shadow_per_object = false;
 

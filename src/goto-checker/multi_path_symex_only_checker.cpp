@@ -37,12 +37,6 @@ multi_path_symex_only_checkert::multi_path_symex_only_checkert(
       guard_manager)
 {
   setup_symex(symex, ns, options, ui_message_handler);
-
-  // for shadow memory instrumentation
-  const auto fields =
-    goto_symext::preprocess_field_decl(goto_model, ui_message_handler);
-  symex.global_fields = fields.first;
-  symex.local_fields = fields.second;
 }
 
 incremental_goto_checkert::resultt multi_path_symex_only_checkert::
@@ -78,8 +72,12 @@ operator()(propertiest &properties)
 
 void multi_path_symex_only_checkert::generate_equation()
 {
+  // for shadow memory instrumentation
+  const auto fields =
+    goto_symext::preprocess_field_decl(goto_model, ui_message_handler);
+
   symex.symex_from_entry_point_of(
-    goto_symext::get_goto_function(goto_model), symex_symbol_table);
+    goto_symext::get_goto_function(goto_model), symex_symbol_table, fields);
   postprocess_equation(symex, equation, options, ns, ui_message_handler);
 }
 
