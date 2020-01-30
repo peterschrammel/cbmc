@@ -156,7 +156,7 @@ symbol_exprt goto_symext::add_field(
   const irep_idt &field_name,
   std::map<irep_idt, typet> &fields)
 {
-  auto &addresses = address_fields[field_name];
+  auto &addresses = state.address_fields[field_name];
   symbolt &new_symbol = get_fresh_aux_symbol(
     fields.at(field_name),
     id2string(state.source.function_id),
@@ -259,9 +259,9 @@ void goto_symext::symex_set_field(
               << messaget::eom;
 
   INVARIANT(
-    address_fields.count(field_name) == 1,
+    state.address_fields.count(field_name) == 1,
     id2string(field_name) + " should exist");
-  const auto &addresses = address_fields.at(field_name);
+  const auto &addresses = state.address_fields.at(field_name);
   const exprt &rhs = value;
   exprt lhs = nil_exprt();
   size_t mux_size = 0;
@@ -389,9 +389,9 @@ void goto_symext::symex_get_field(
               << from_expr(ns, "", expr) << messaget::eom;
 
   INVARIANT(
-    address_fields.count(field_name) == 1,
+    state.address_fields.count(field_name) == 1,
     id2string(field_name) + " should exist");
-  const auto &addresses = address_fields.at(field_name);
+  const auto &addresses = state.address_fields.at(field_name);
   // Should actually be fields.at(field_name)
   symbol_exprt lhs(CPROVER_PREFIX "get_field#return_value", signedbv_typet(32));
   exprt rhs = nil_exprt();
@@ -512,7 +512,7 @@ void goto_symext::symex_field_static_init(const namespacet &ns,
   log.debug() << "global memory " << id2string(identifier) << " of type "
               << from_type(ns, "", type) << messaget::eom;
 
-  initialize_rec(ns, state, expr, global_fields);
+  initialize_rec(ns, state, expr, state.global_fields);
 }
 
 void goto_symext::symex_field_local_init(
@@ -533,7 +533,7 @@ void goto_symext::symex_field_local_init(
   log.debug() << "local memory " << id2string(expr_l1.get_identifier())
               << " of type " << from_type(ns, "", type) << messaget::eom;
 
-  initialize_rec(ns, state, expr_l1, local_fields);
+  initialize_rec(ns, state, expr_l1, state.local_fields);
 }
 
 void goto_symext::symex_field_dynamic_init(
@@ -551,7 +551,7 @@ void goto_symext::symex_field_dynamic_init(
       ns,
       state,
       expr,
-      global_fields);
+      state.global_fields);
   }
 #if 0
   else

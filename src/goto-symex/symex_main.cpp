@@ -467,18 +467,28 @@ std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
 
 void goto_symext::symex_from_entry_point_of(
   const get_goto_functiont &get_goto_function,
-  symbol_tablet &new_symbol_table)
+  symbol_tablet &new_symbol_table,
+  const std::pair<std::map<irep_idt, typet>, std::map<irep_idt, typet>> &fields)
 {
   auto state = initialize_entry_point_state(get_goto_function);
+
+  // for shadow memory instrumentation
+  state->global_fields = fields.first;
+  state->local_fields = fields.second;
 
   symex_with_state(*state, get_goto_function, new_symbol_table);
 }
 
 void goto_symext::initialize_path_storage_from_entry_point_of(
   const get_goto_functiont &get_goto_function,
-  symbol_tablet &new_symbol_table)
+  symbol_tablet &new_symbol_table,
+  const std::pair<std::map<irep_idt, typet>, std::map<irep_idt, typet>> &fields)
 {
   auto state = initialize_entry_point_state(get_goto_function);
+
+  // for shadow memory instrumentation
+  state->global_fields = fields.first;
+  state->local_fields = fields.second;
 
   path_storaget::patht entry_point_start(target, *state);
   entry_point_start.state.saved_target = state->source.pc;
