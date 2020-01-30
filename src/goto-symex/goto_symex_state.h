@@ -123,6 +123,13 @@ public:
 
   field_sensitivityt field_sensitivity;
 
+  std::map<irep_idt, typet> global_fields;
+  std::map<irep_idt, typet> local_fields;
+
+  // addresses must remain in sequence
+  std::map<irep_idt, std::vector<std::pair<exprt, symbol_exprt>>>
+    address_fields;
+
 protected:
   template <levelt>
   void rename_address(exprt &expr, const namespacet &ns);
