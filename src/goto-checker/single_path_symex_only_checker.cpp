@@ -86,6 +86,9 @@ bool single_path_symex_only_checkert::has_finished_exploration(
 
 bool single_path_symex_only_checkert::resume_path(path_storaget::patht &path)
 {
+  log.status() << "Remaining paths to explore: " << worklist->size()
+               << messaget::eom;
+
   symex_bmct symex(
     ui_message_handler,
     goto_model.get_symbol_table(),
