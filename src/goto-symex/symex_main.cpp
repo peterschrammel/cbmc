@@ -222,7 +222,14 @@ void goto_symext::symex_assume_l2(statet &state, const exprt &cond)
     return;
 
   if(cond.is_false())
+  {
     state.reachable = false;
+    if(symex_config.doing_path_exploration)
+    {
+      // We have reached the end of a path. Let's continue with the next.
+      should_pause_symex = true;
+    }
+  }
 
   // we are willing to re-write some quantified expressions
   exprt rewritten_cond = cond;
