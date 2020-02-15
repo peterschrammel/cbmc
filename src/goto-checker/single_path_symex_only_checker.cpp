@@ -90,6 +90,9 @@ bool single_path_symex_only_checkert::has_finished_exploration(
 
 bool single_path_symex_only_checkert::resume_path(path_storaget::patht &path)
 {
+  log.status() << "Remaining paths to explore: " << worklist->size()
+               << messaget::eom;
+
   const auto symex_start = std::chrono::steady_clock::now();
 
   symex_bmct symex(
