@@ -37,6 +37,7 @@ protected:
   namespacet ns;
   guard_managert guard_manager;
   std::unique_ptr<path_storaget> worklist;
+  std::size_t explored_paths = 0;
 
   void equation_output(
     const symex_bmct &symex,

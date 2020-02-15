@@ -107,6 +107,9 @@ bool single_path_symex_only_checkert::resume_path(path_storaget::patht &path)
 
   equation_output(symex, path.equation);
 
+  ++explored_paths;
+  log.statistics() << "Explored paths: " << explored_paths << messaget::eom;
+
   return is_ready_to_decide(symex, path);
 }
 
