@@ -52,6 +52,8 @@ struct symex_configt final
   /// enables certain analyses that otherwise aren't run.
   bool complexity_limits_active;
 
+  std::size_t merged_goto_count = 1;
+
   /// \brief Construct a symex_configt using options specified in an
   /// \ref optionst
   explicit symex_configt(const optionst &options);

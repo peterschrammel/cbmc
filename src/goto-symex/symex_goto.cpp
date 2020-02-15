@@ -305,7 +305,8 @@ void goto_symext::symex_goto(statet &state)
     (state.guard.is_true() ||
      // or there is another block, but we're doing path exploration so
      // we're going to skip over it for now and return to it later.
-     symex_config.doing_path_exploration))
+     (symex_config.doing_path_exploration &&
+      (goto_count % symex_config.merged_goto_count == 0))))
   {
     DATA_INVARIANT(
       instruction.targets.size() > 0,
@@ -372,7 +373,9 @@ void goto_symext::symex_goto(statet &state)
     log.debug() << "Resuming from next instruction '"
                 << state_pc->source_location << "'" << log.eom;
   }
-  else if(symex_config.doing_path_exploration)
+  else if(
+    symex_config.doing_path_exploration &&
+    (goto_count % symex_config.merged_goto_count == 0))
   {
     // We should save both the instruction after this goto, and the target of
     // the goto.
@@ -429,7 +432,8 @@ void goto_symext::symex_goto(statet &state)
 
     symex_transition(state, state_pc, backward);
 
-    if(!symex_config.doing_path_exploration)
+    if(!symex_config.doing_path_exploration ||
+       (goto_count % symex_config.merged_goto_count != 0))
     {
       // This doesn't work for --paths (single-path mode) yet, as in multi-path
       // mode we remove the implied constants at a control-flow merge, but in
@@ -509,6 +513,11 @@ void goto_symext::symex_goto(statet &state)
       }
     }
   }
+
+  ++goto_count;
+  log.warning() << "GOTO_COUNT%M == 0: "
+                << (goto_count % symex_config.merged_goto_count)
+                << messaget::eom;
 }
 
 void goto_symext::symex_unreachable_goto(statet &state)

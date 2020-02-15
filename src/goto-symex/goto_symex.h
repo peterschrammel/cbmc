@@ -821,6 +821,8 @@ protected:
 
   complexity_limitert complexity_module;
 
+  std::size_t goto_count = 0;
+
 public:
   unsigned get_total_vccs() const
   {

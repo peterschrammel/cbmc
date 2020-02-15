@@ -339,7 +339,9 @@ void goto_symext::symex_function_call_code(
 static void pop_frame(
   goto_symext::statet &state,
   const path_storaget &path_storage,
-  bool doing_path_exploration)
+  bool doing_path_exploration,
+  std::size_t merged_goto_count,
+  std::size_t goto_count)
 {
   PRECONDITION(!state.call_stack().empty());
 
@@ -365,7 +367,9 @@ static void pop_frame(
     // If we're doing path exploration then we do tail-duplication, and we
     // actually *are* in a more-restricted context than we were when the
     // function began.
-    if(state.threads.size() == 1 && !doing_path_exploration)
+    if(state.threads.size() == 1 &&
+       (!doing_path_exploration ||
+        goto_count % merged_goto_count != 0))
     {
       state.guard = frame.guard_at_function_start;
     }
@@ -410,7 +414,8 @@ void goto_symext::symex_end_of_function(statet &state)
     state.guard.as_expr(), state.source.function_id, state.source, hidden);
 
   // then get rid of the frame
-  pop_frame(state, path_storage, symex_config.doing_path_exploration);
+  pop_frame(state, path_storage, symex_config.doing_path_exploration,
+            symex_config.merged_goto_count, goto_count);
 }
 
 /// Preserves locality of parameters of a given function by applying L1

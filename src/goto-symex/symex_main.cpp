@@ -224,7 +224,9 @@ void goto_symext::symex_assume_l2(statet &state, const exprt &cond)
   if(cond.is_false())
   {
     state.reachable = false;
-    if(symex_config.doing_path_exploration)
+    if(
+      symex_config.doing_path_exploration &&
+      (goto_count % symex_config.merged_goto_count == 0))
     {
       // We have reached the end of a path. Let's continue with the next.
       should_pause_symex = true;
@@ -613,7 +615,9 @@ void goto_symext::execute_next_instruction(
 
   const goto_programt::instructiont &instruction=*state.source.pc;
 
-  if(!symex_config.doing_path_exploration)
+  if(
+    !symex_config.doing_path_exploration ||
+    (goto_count % symex_config.merged_goto_count != 0))
     merge_gotos(state);
 
   // depth exceeded?
