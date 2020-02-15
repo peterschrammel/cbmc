@@ -106,6 +106,11 @@ bool single_path_symex_only_checkert::resume_path(path_storaget::patht &path)
   ++explored_paths;
   log.statistics() << "Explored paths: " << explored_paths << messaget::eom;
 
+  if(symex.get_total_vccs() > 0)
+    ++paths_with_assertions;
+  log.statistics() << "Paths with assertions: " << paths_with_assertions
+                   << messaget::eom;
+
   if(symex.get_remaining_vccs() > 0)
     ++paths_requiring_solver;
   log.statistics() << "Paths requiring solver: " << paths_requiring_solver
