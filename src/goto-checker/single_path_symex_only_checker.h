@@ -39,6 +39,7 @@ protected:
   std::unique_ptr<path_storaget> worklist;
   std::size_t explored_paths = 0;
   std::size_t paths_requiring_solver = 0;
+  std::size_t paths_with_assertions = 0;
 
   void equation_output(
     const symex_bmct &symex,
