@@ -53,6 +53,8 @@ operator()(propertiest &properties)
 
   while(!has_finished_exploration(properties))
   {
+    log.status() << "Remaining paths to explore: " << worklist->size()
+                 << messaget::eom;
     path_storaget::patht &path = worklist->peek();
     const bool ready_to_decide = resume_path(path);
 
