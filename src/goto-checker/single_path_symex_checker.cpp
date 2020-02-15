@@ -176,6 +176,9 @@ void single_path_symex_checkert::output_error_witness(
 
 void single_path_symex_checkert::output_proof()
 {
+  if(worklist->empty())
+    return;
+
   // This is incorrect, but the best we can do at the moment.
   const path_storaget::patht &resume = worklist->peek();
   output_graphml(resume.equation, ns, options);
