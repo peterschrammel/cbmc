@@ -115,6 +115,11 @@ bool single_path_symex_only_checkert::resume_path(path_storaget::patht &path)
   log.statistics() << "Paths requiring solver: " << paths_requiring_solver
                    << messaget::eom;
 
+  if(symex.get_total_vccs() > 0)
+    ++paths_with_assertions;
+  log.status() << "Paths with assertions: " << paths_with_assertions
+               << messaget::eom;
+
   return is_ready_to_decide(symex, path);
 }
 
