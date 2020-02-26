@@ -30,6 +30,7 @@ Author: Peter Schrammel
 #include <langapi/language_util.h>
 
 #include <goto-programs/goto_model.h>
+#include <pointer-analysis/value_set_dereference.h>
 
 static irep_idt get_field_name(const exprt &string_expr)
 {
@@ -168,6 +169,45 @@ symbol_exprt goto_symext::add_field(
   addresses.push_back(
     std::pair<exprt, symbol_exprt>(expr, new_symbol.symbol_expr()));
   return new_symbol.symbol_expr();
+}
+
+std::vector<exprt> get_filtered_value_set(const value_setst::valuest &value_set,
+                                      const exprt &address)
+{
+  std::vector<exprt> result;
+  INVARIANT(
+    address.id() == ID_address_of, "address of shadowed object expected");
+
+  exprt expr2 = to_address_of_expr(address).object();
+  if (expr2.id() == ID_index) {
+    expr2 = to_index_expr(expr2).array();
+  }
+  INVARIANT(expr2.id() == ID_symbol, "symbol of shadowed object expected");
+
+  for(const auto &e : value_set)
+  {
+    // log.debug() << "object: " << e.pretty() << messaget::eom;
+    // TODO
+    // if(e.id() == ID_unknown)
+    //   return true;
+
+    if(e.id() != ID_object_descriptor)
+      continue;
+
+    exprt expr1 = to_object_descriptor_expr(e).object();
+    if (expr1.id() == ID_index) {
+      expr1 = to_index_expr(expr1).array();
+    }
+    if(expr1.id() != ID_symbol)
+      continue;
+
+    if(to_symbol_expr(expr1).get_identifier() ==
+       to_symbol_expr(expr2).get_identifier())
+    {
+      result.push_back(e);
+    }
+  }
+  return result;
 }
 
 bool goto_symext::filter_by_value_set(const value_setst::valuest &value_set,
@@ -378,16 +418,6 @@ void goto_symext::symex_get_field(
   log.debug() << "get_field: " << id2string(field_name) << " for "
               << from_expr(ns, "", expr) << messaget::eom;
 
-  if(shadow_per_object)
-  {
-    expr = pointer_object(expr);
-    do_simplify(expr);
-    remove_pointer_object(expr);
-  }
-
-  log.debug() << "get_field: " << id2string(field_name) << " for "
-              << from_expr(ns, "", expr) << messaget::eom;
-
   INVARIANT(
     state.address_fields.count(field_name) == 1,
     id2string(field_name) + " should exist");
@@ -402,65 +432,122 @@ void goto_symext::symex_get_field(
   {
     log.debug() << "value set: " << from_expr(ns, "", e) << messaget::eom;
   }
-  /*
-    bool has_entry = false;
+
+  if(shadow_per_object)
+  {
+    // exprt base_expr = pointer_object(expr);
+    // do_simplify(base_expr);
+    // remove_pointer_object(base_expr);
+
+    // log.debug() << "get_field: "
+    //              << id2string(field_name) << " for base "
+    //              << from_expr(ns, "", base_expr) << messaget::eom;
+
+    const null_pointer_exprt null_pointer(to_pointer_type(expr.type()));
+    if(filter_by_value_set(value_set, null_pointer))
+    {
+      log.debug() << "value set match: " << from_expr(ns, "", null_pointer)
+                   << " <-- " << from_expr(ns, "", expr) << messaget::eom;
+      rhs = if_exprt(equal_exprt(expr, null_pointer),
+                     from_integer(0, lhs.type()), from_integer(-1, lhs.type()));
+      mux_size = 1;
+    }
+
     for(const auto &address_pair : addresses)
     {
-      if(filter_by_value_set(value_set, address_pair.first))
+      const exprt &address = address_pair.first;
+
+      // exact match
+      if(address == expr)
       {
-        has_entry = true;
+        log.debug() << "exact match: " << from_expr(ns, "", address)
+                     << " == " << from_expr(ns, "", expr) << messaget::eom;
+        rhs = typecast_exprt::conditional_cast(address_pair.second, lhs.type());
+        mux_size = 1;
         break;
       }
-    }
-  */
 
-  const null_pointer_exprt null_pointer(to_pointer_type(expr.type()));
-  if(filter_by_value_set(value_set, null_pointer))
-  {
-    log.debug() << "value set match: " << from_expr(ns, "", null_pointer)
-                << " <-- " << from_expr(ns, "", expr) << messaget::eom;
-    rhs = if_exprt(equal_exprt(expr, null_pointer),
-      from_integer(0, lhs.type()), from_integer(-1, lhs.type()));
-    mux_size = 1;
+      std::vector<exprt> filtered_value_set =
+        get_filtered_value_set(value_set, address);
+      if(filtered_value_set.empty())
+        continue;
+
+      for(const auto &matched_object : filtered_value_set)
+      {
+        value_set_dereferencet::valuet dereference =
+          value_set_dereferencet::build_reference_to(matched_object, expr, ns);
+
+        const exprt &matched_base =
+          address_of_exprt(to_object_descriptor_expr(matched_object).object());
+
+        log.debug() << "value set match: " << messaget::eom;
+        log.debug() << "  " << from_expr(ns, "", address)
+                     << " <-- " << from_expr(ns, "", matched_base)
+                     << messaget::eom;
+        log.debug() << "  " << from_expr(ns, "", dereference.pointer)
+                     << " <-- " << from_expr(ns, "", expr) << messaget::eom;
+        const exprt &field = address_pair.second;
+        exprt cond = and_exprt(
+          equal_exprt(
+            expr,
+            typecast_exprt::conditional_cast(dereference.pointer, expr.type())),
+          equal_exprt(
+            address,
+            typecast_exprt::conditional_cast(matched_base, address.type())));
+        log.debug() << "cond: " << from_expr(ns, "", cond) << messaget::eom;
+        if(!cond.is_false())
+        {
+          mux_size++;
+          if(rhs.is_nil())
+          {
+            rhs = if_exprt(
+              cond, typecast_exprt::conditional_cast(field, lhs.type()),
+              from_integer(-1, lhs.type()));
+          }
+          else
+          {
+            rhs = if_exprt(
+              cond, typecast_exprt::conditional_cast(field, lhs.type()), rhs);
+          }
+        }
+      }
+    }
   }
-
-  for(const auto &address_pair : addresses)
+  else // !shadow_per_object
   {
-    const exprt &address = address_pair.first;
-
-    // exact match
-    if(address == expr)
+    const null_pointer_exprt null_pointer(to_pointer_type(expr.type()));
+    if(filter_by_value_set(value_set, null_pointer))
     {
-      log.debug() << "exact match: " << from_expr(ns, "", address)
-                  << " == " << from_expr(ns, "", expr) << messaget::eom;
-      rhs = typecast_exprt::conditional_cast(address_pair.second, lhs.type());
+      log.debug() << "value set match: " << from_expr(ns, "", null_pointer)
+                   << " <-- " << from_expr(ns, "", expr) << messaget::eom;
+      rhs = if_exprt(equal_exprt(expr, null_pointer),
+                     from_integer(0, lhs.type()), from_integer(-1, lhs.type()));
       mux_size = 1;
-      break;
     }
 
-    if(!filter_by_value_set(value_set, address))
-      continue;
-
-    log.debug() << "value set match: " << from_expr(ns, "", address)
-                << " <-- " << from_expr(ns, "", expr) << messaget::eom;
-
-/*
-    if(has_entry && !filter_by_value_set(value_set, address))
-      continue;
-*/
-/*    const typet &expr_subtype = to_pointer_type(expr_type).subtype();
-    const typet &address_subtype = to_pointer_type(address.type()).subtype();
-    if(expr_subtype == address_subtype ||
-       (can_cast_type<bitvector_typet>(expr_subtype) &&
-        can_cast_type<bitvector_typet>(address_subtype) &&
-        to_bitvector_type(expr_subtype).get_width() ==
-        to_bitvector_type(address_subtype).get_width()))*/
+    for(const auto &address_pair : addresses)
     {
+      const exprt &address = address_pair.first;
+
+      // exact match
+      if(address == expr)
+      {
+        log.debug() << "exact match: " << from_expr(ns, "", address)
+                     << " == " << from_expr(ns, "", expr) << messaget::eom;
+        rhs = typecast_exprt::conditional_cast(address_pair.second, lhs.type());
+        mux_size = 1;
+        break;
+      }
+
+      if(!filter_by_value_set(value_set, address))
+        continue;
+
+      log.debug() << "value set match: " << from_expr(ns, "", address)
+                   << " <-- " << from_expr(ns, "", expr) << messaget::eom;
       const exprt &field = address_pair.second;
       exprt cond = equal_exprt(
         address, typecast_exprt::conditional_cast(expr, address.type()));
       log.debug() << "cond: " << from_expr(ns, "", cond) << messaget::eom;
-      // do_simplify(cond);
       if(!cond.is_false())
       {
         mux_size++;
@@ -469,7 +556,6 @@ void goto_symext::symex_get_field(
           rhs = if_exprt(
             cond, typecast_exprt::conditional_cast(field, lhs.type()),
             from_integer(-1, lhs.type()));
-          // rhs = typecast_exprt::conditional_cast(field, lhs.type());
         }
         else
         {
@@ -479,6 +565,7 @@ void goto_symext::symex_get_field(
       }
     }
   }
+
   if (rhs.is_not_nil()) {
     log.debug() << "mux size get_field: " << mux_size << messaget::eom;
     symex_assign(state, code_assignt(lhs, typecast_exprt::conditional_cast(
