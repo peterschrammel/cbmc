@@ -45,7 +45,7 @@ int test_array()
   short *c = malloc(2*sizeof(short));
   int size;
   __CPROVER_assume(size >= 2);
-  short *b = malloc(size*sizeof(long));
+  short *b = malloc(size*sizeof(short));
 
   assert(__CPROVER_get_field(a, "field1") == 0);
   assert(__CPROVER_get_field(&a[0], "field1") == 0);
