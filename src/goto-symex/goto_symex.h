@@ -890,7 +890,8 @@ protected:
     const namespacet &ns,
     goto_symex_statet &state,
     const exprt &expr,
-    const mp_integer &size);
+    const mp_integer &size,
+    bool per_object);
 
 private:
   static void convert_field_decl(
@@ -904,13 +905,19 @@ private:
     goto_symex_statet &state,
     const exprt &expr,
     const irep_idt &field_name,
+    bool per_object,
     std::map<irep_idt, typet> &fields);
 
   void initialize_rec(
     const namespacet &ns,
     goto_symex_statet &state,
     const exprt &expr,
+    bool per_object,
     std::map<irep_idt, typet> &fields);
+
+  bool can_be_initialized_rec(
+    const namespacet &ns,
+    const exprt &expr);
 
   bool filter_by_value_set(const value_setst::valuest &value_set,
                            const exprt &address);
