@@ -55,7 +55,7 @@ int main()
 
   int A[5];
 
-  z = &(A[10]);
+  z = &(A[4]);
 
   assert(__CPROVER_get_field(z, "field1") == 0);
   assert(__CPROVER_get_field(z, "field2") == 0);
@@ -67,12 +67,6 @@ int main()
 
   assert(__CPROVER_get_field(z + 3, "field1") == 13);
   assert(__CPROVER_get_field(z + 3, "field2") == 14);
-
-  z = malloc(20 * sizeof(int));
-
-  __CPROVER_set_field(&(w[3]), "field1", y);
-  assert(__CPROVER_get_field(z + 3, "field1") == 10);
-  assert(__CPROVER_get_field(z + 3, "field2") == 0);
 
   struct STRUCTNAME m, *p;
 
