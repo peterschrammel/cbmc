@@ -14,7 +14,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr_skeleton.h"
 #include "goto_symex.h"
 #include "goto_symex_state.h"
+#include <util/arith_tools.h>
 #include <util/byte_operators.h>
+#include <util/config.h>
 #include <util/expr_util.h>
 #include <util/format_expr.h>
 
@@ -41,7 +43,31 @@ void symex_assignt::assign_rec(
   if(lhs.id() == ID_symbol && lhs.get_bool(ID_C_SSA_symbol))
   {
     assign_symbol(to_ssa_expr(lhs), full_lhs, rhs, guard);
-    goto_symex.symex_field_static_init(ns, state, to_ssa_expr(lhs));
+
+    bool is_string_constant_init = false;
+    if(rhs.id() == ID_address_of)
+    {
+      const address_of_exprt &address_of = to_address_of_expr(rhs);
+      if(address_of.object().id() == ID_index)
+      {
+        const index_exprt &index = to_index_expr(address_of.object());
+        if(index.array().id() == ID_string_constant &&
+           index.index() ==
+           from_integer(0, signedbv_typet(config.ansi_c.long_int_width)))
+        {
+          is_string_constant_init = true;
+        }
+      }
+    }
+    if(is_string_constant_init)
+    {
+      goto_symex.symex_field_static_init_string_constant(
+        ns, state, to_ssa_expr(lhs), rhs);
+    }
+    else
+    {
+      goto_symex.symex_field_static_init(ns, state, to_ssa_expr(lhs));
+    }
   }
   else if(lhs.id() == ID_index)
     assign_array<use_update()>(to_index_expr(lhs), full_lhs, rhs, guard);
