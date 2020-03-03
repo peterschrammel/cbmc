@@ -866,6 +866,9 @@ public:
 
   void symex_field_static_init(const namespacet &ns, goto_symex_statet &state,
                                const ssa_exprt &expr);
+  void symex_field_static_init_string_constant(
+    const namespacet &ns, goto_symex_statet &state,
+    const ssa_exprt &expr, const exprt &rhs);
 
 protected:
   mp_integer variable_array_size = 0;

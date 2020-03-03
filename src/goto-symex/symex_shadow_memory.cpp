@@ -26,6 +26,7 @@ Author: Peter Schrammel
 #include <util/replace_expr.h>
 #include <util/source_location.h>
 #include <util/std_expr.h>
+#include <util/string_constant.h>
 
 #include <langapi/language_util.h>
 
@@ -675,6 +676,29 @@ void goto_symext::symex_field_static_init(const namespacet &ns,
 
   bool per_object = shadow_per_object ? true : !can_be_initialized_rec(ns, expr);
   initialize_rec(ns, state, expr, per_object, state.global_fields);
+}
+
+void goto_symext::symex_field_static_init_string_constant(
+    const namespacet &ns, goto_symex_statet &state,
+    const ssa_exprt &expr, const exprt &rhs)
+{
+  const irep_idt &identifier =
+      to_symbol_expr(expr.get_original_expr()).get_identifier();
+  if(has_prefix(id2string(identifier), CPROVER_PREFIX))
+    return;
+
+  const index_exprt &index_expr =
+    to_index_expr(to_address_of_expr(rhs).object());
+
+  const typet &type = index_expr.array().type();
+  log.debug() << "global memory "
+              << id2string(to_string_constant(index_expr.array()).get_value())
+              << " of type " << from_type(ns, "", type) << messaget::eom;
+
+  bool per_object =
+    shadow_per_object ? true : !can_be_initialized_rec(ns, expr);
+  initialize_rec(
+    ns, state, index_expr.array(), per_object, state.global_fields);
 }
 
 void goto_symext::symex_field_local_init(
