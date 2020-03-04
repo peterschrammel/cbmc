@@ -159,7 +159,7 @@ void goto_symext::initialize_rec(
     for(const auto &field_pair : fields)
     {
       exprt address_expr = expr;
-      if(type.id() == ID_array)
+      if(type.id() == ID_array && expr.id() == ID_symbol)
       {
         address_expr.type() = remove_array_type_l2(address_expr.type());
         exprt original_expr = to_ssa_expr(expr).get_original_expr();
@@ -223,15 +223,9 @@ static std::vector<exprt> get_filtered_value_set(
   if (expr2.id() == ID_index) {
     expr2 = to_index_expr(expr2).array();
   }
-  INVARIANT(expr2.id() == ID_symbol, "symbol of shadowed object expected");
 
   for(const auto &e : value_set)
   {
-    // log.debug() << "object: " << e.pretty() << messaget::eom;
-    // TODO
-    // if(e.id() == ID_unknown)
-    //   return true;
-
     if(e.id() != ID_object_descriptor)
       continue;
 
@@ -242,7 +236,8 @@ static std::vector<exprt> get_filtered_value_set(
     if(expr1.id() != ID_symbol)
       continue;
 
-    if(to_symbol_expr(expr1).get_identifier() ==
+    if(expr2.id() != ID_symbol ||
+       to_symbol_expr(expr1).get_identifier() ==
        to_symbol_expr(expr2).get_identifier())
     {
       result.push_back(e);
