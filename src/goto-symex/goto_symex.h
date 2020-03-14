@@ -924,6 +924,11 @@ private:
 
   bool filter_by_value_set(const value_setst::valuest &value_set,
                            const exprt &address);
+
+  void symex_types_equal(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const code_function_callt &code_function_call);
 };
 
 /// Transition to the next instruction, which increments the internal program

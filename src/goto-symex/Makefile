@@ -36,6 +36,7 @@ SRC = auto_objects.cpp \
       symex_target.cpp \
       symex_target_equation.cpp \
       symex_throw.cpp \
+      symex_types_match.cpp \
       complexity_limiter.cpp \
       # Empty last line
 

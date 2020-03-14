@@ -230,7 +230,8 @@ void remove_returnst::operator()(goto_functionst &goto_functions)
       return !findit->second.body_available() &&
              function_id != CPROVER_PREFIX "field_decl" &&
              function_id != CPROVER_PREFIX "get_field" &&
-             function_id != CPROVER_PREFIX "set_field";
+             function_id != CPROVER_PREFIX "set_field" &&
+             function_id != CPROVER_PREFIX "types_equal";
     };
 
     replace_returns(it->first, it->second);

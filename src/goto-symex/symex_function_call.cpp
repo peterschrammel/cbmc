@@ -220,6 +220,11 @@ void goto_symext::symex_function_call_symbol(
     symex_set_field(ns, state, code);
     symex_transition(state);
   }
+  else if(identifier == CPROVER_PREFIX "types_equal")
+  {
+    symex_types_equal(ns, state, code);
+    symex_transition(state);
+  }
   else if(has_prefix(id2string(identifier), CPROVER_FKT_PREFIX))
   {
     symex_fkt(state, code);
