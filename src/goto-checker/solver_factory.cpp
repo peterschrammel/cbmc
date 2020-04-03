@@ -178,12 +178,18 @@ static std::unique_ptr<SatcheckT>
 make_satcheck_prop(message_handlert &message_handler, const optionst &options)
 {
   auto satcheck = util_make_unique<SatcheckT>(message_handler);
-  if(options.is_set("write-solver-stats-to"))
+  if(
+    auto hardness_collector =
+      dynamic_cast<hardness_collectort *>(&*satcheck))
   {
-    satcheck->enable_hardness_collection();
-    satcheck->with_solver_hardness([&options](solver_hardnesst &hardness) {
-      hardness.set_outfile(options.get_option("write-solver-stats-to"));
-    });
+    if(options.is_set("write-solver-stats-to"))
+    {
+      hardness_collector->enable_hardness_collection();
+      hardness_collector->with_solver_hardness(
+        [&options](solver_hardnesst &hardness) {
+          hardness.set_outfile(options.get_option("write-solver-stats-to"));
+        });
+    }
   }
   return satcheck;
 }
