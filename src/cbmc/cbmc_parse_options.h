@@ -51,6 +51,7 @@ class optionst;
   "(object-bits):" \
   "(variable-array-size):" \
   "(shadow-per-object)" \
+  "(no-merge-seq-paths)" \
   OPT_GOTO_CHECK \
   "(no-assertions)(no-assumptions)" \
   "(malloc-fail-assert)(malloc-fail-null)" \

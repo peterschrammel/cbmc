@@ -34,6 +34,7 @@ Author: Daniel Kroening, kroening@kroening.com
 symex_configt::symex_configt(const optionst &options)
   : max_depth(options.get_unsigned_int_option("depth")),
     doing_path_exploration(options.is_set("paths")),
+    merge_sequentialization_paths(options.get_bool_option("merge-seq-paths")),
     allow_pointer_unsoundness(
       options.get_bool_option("allow-pointer-unsoundness")),
     constant_propagation(options.get_bool_option("propagation")),
@@ -224,7 +225,7 @@ void goto_symext::symex_assume_l2(statet &state, const exprt &cond)
   if(cond.is_false())
   {
     state.reachable = false;
-    if(symex_config.doing_path_exploration)
+    if(symex_config.doing_path_exploration && !state.paths_require_merge)
     {
       // We have reached the end of a path. Let's continue with the next.
       should_pause_symex = true;
@@ -623,8 +624,8 @@ void goto_symext::execute_next_instruction(
 
   const goto_programt::instructiont &instruction=*state.source.pc;
 
-  if(!symex_config.doing_path_exploration)
-    merge_gotos(state);
+  //if(!symex_config.doing_path_exploration)
+  merge_gotos(state);
 
   // depth exceeded?
   if(symex_config.max_depth != 0 && state.depth > symex_config.max_depth)

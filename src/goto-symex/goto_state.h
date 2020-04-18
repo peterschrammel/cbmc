@@ -30,6 +30,9 @@ public:
   /// Distance from entry
   unsigned depth = 0;
 
+  /// For selective path merging with --paths
+  bool paths_require_merge = false;
+
 protected:
   symex_level2t level2;
 

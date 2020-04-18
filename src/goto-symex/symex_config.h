@@ -22,6 +22,8 @@ struct symex_configt final
 
   bool doing_path_exploration;
 
+  bool merge_sequentialization_paths;
+
   bool allow_pointer_unsoundness;
 
   bool constant_propagation;

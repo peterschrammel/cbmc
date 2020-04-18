@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/exception_utils.h>
 #include <util/expr_util.h>
+#include <util/format_expr.h>
 #include <util/invariant.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
@@ -215,6 +216,32 @@ void goto_symext::symex_goto(statet &state)
 
   const goto_programt::instructiont &instruction=*state.source.pc;
 
+  // heuristics whether we are going to merge paths in single-path mode
+  const std::unordered_set<irep_idt> cond_symbols =
+    find_symbol_identifiers(instruction.get_condition());
+  const bool is_sequentialization_branch = !std::all_of(
+    cond_symbols.begin(),
+    cond_symbols.end(),
+    [](const irep_idt& cond_identifier) {
+      return (id2string(cond_identifier).find("__cs_") == std::string::npos) ||
+      id2string(cond_identifier).find("__cs_nondet_") != std::string::npos;
+    });
+  const bool doing_path_exploration =
+    symex_config.doing_path_exploration &&
+    !state.paths_require_merge &&
+    !(symex_config.merge_sequentialization_paths &&
+      is_sequentialization_branch);
+  log.debug() << instruction.location_number
+               << " is seq branch: "
+               << is_sequentialization_branch
+               << " needs merge "
+               << state.paths_require_merge
+               << messaget::eom;
+  log.debug() << (doing_path_exploration ? "Not merging " : "Merging ")
+               << "GOTO: "
+               << format(instruction.get_condition()) << messaget::eom;
+  state.paths_require_merge = !doing_path_exploration;
+
   exprt new_guard = clean_expr(instruction.get_condition(), state, false);
 
   renamedt<exprt, L2> renamed_guard = state.rename(std::move(new_guard), ns);
@@ -305,7 +332,7 @@ void goto_symext::symex_goto(statet &state)
     (state.guard.is_true() ||
      // or there is another block, but we're doing path exploration so
      // we're going to skip over it for now and return to it later.
-     symex_config.doing_path_exploration))
+     doing_path_exploration))
   {
     DATA_INVARIANT(
       instruction.targets.size() > 0,
@@ -372,7 +399,7 @@ void goto_symext::symex_goto(statet &state)
     log.debug() << "Resuming from next instruction '"
                 << state_pc->source_location << "'" << log.eom;
   }
-  else if(symex_config.doing_path_exploration)
+  else if(doing_path_exploration)
   {
     // We should save both the instruction after this goto, and the target of
     // the goto.
@@ -429,7 +456,7 @@ void goto_symext::symex_goto(statet &state)
 
     symex_transition(state, state_pc, backward);
 
-    if(!symex_config.doing_path_exploration)
+    if(!doing_path_exploration)
     {
       // This doesn't work for --paths (single-path mode) yet, as in multi-path
       // mode we remove the implied constants at a control-flow merge, but in
@@ -660,6 +687,8 @@ void goto_symext::merge_goto(
   // goto_state over it below.
   guardt new_guard = merge_state_guards(goto_state, state);
 
+  const bool paths_require_merge = state.paths_require_merge;
+
   // Merge constant propagator, value-set etc. only if the incoming state is
   // reachable:
   if(goto_state.reachable)
@@ -685,6 +714,10 @@ void goto_symext::merge_goto(
 
   // Save the new state guard
   state.guard = std::move(new_guard);
+
+  // We have to path-merge if any incoming state requires us to merge.
+  state.paths_require_merge =
+    paths_require_merge || goto_state.paths_require_merge;
 }
 
 /// Helper function for \c phi_function which merges the names of an identifier

@@ -120,6 +120,7 @@ void cbmc_parse_optionst::set_default_options(optionst &options)
   options.set_option("simple-slice", true);
   options.set_option("simplify", true);
   options.set_option("simplify-if", true);
+  options.set_option("merge-seq-paths", true);
   options.set_option("show-goto-symex-steps", false);
 
   // Other default
@@ -298,6 +299,10 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("shadow-per-object"))
   {
     options.set_option("shadow-per-object", true);
+  }
+  if(cmdline.isset("no-merge-seq-paths"))
+  {
+    options.set_option("merge-seq-paths", false);
   }
 
   // constant propagation
