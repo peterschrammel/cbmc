@@ -1,0 +1,8 @@
+CORE
+main_success.c
+--paths lifo --no-merge-seq-paths
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
