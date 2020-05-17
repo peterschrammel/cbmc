@@ -64,7 +64,7 @@ static typet remove_array_type_l2(const typet &type) {
 static void remove_pointer_object(exprt &expr) {
   if(expr.id() == ID_pointer_object)
   {
-    expr = expr.op0();
+    expr = to_unary_expr(expr).op();
     return;
   }
   Forall_operands(it, expr)
