@@ -218,22 +218,33 @@ void convert(
     case goto_trace_stept::typet::GOTO:
     case goto_trace_stept::typet::ASSUME:
     case goto_trace_stept::typet::NONE:
-      if(source_location!=previous_source_location)
-      {
-        // just the source location
-        if(!xml_location.name.empty())
-        {
-          xmlt &xml_location_only=dest.new_element("location-only");
+    {
+      // If this is just a source location then we output only the first
+      // location of a sequence of same locations.
+      // However, we don't want to suppress loop head locations because
+      // they might come from different loop iterations. If we suppressed
+      // them it would be impossible to know in which loop iteration
+      // we are in.
+      const bool is_loophead = std::any_of(
+          step.pc->incoming_edges.begin(),
+          step.pc->incoming_edges.end(),
+          [](goto_programt::targett t) { return t->is_backwards_goto(); });
+      if (source_location != previous_source_location || is_loophead) {
+        if (!xml_location.name.empty()) {
+          xmlt &xml_location_only = dest.new_element(
+              is_loophead ? "loop-head" : "location-only");
 
           xml_location_only.set_attribute_bool("hidden", step.hidden);
           xml_location_only.set_attribute(
-            "thread", std::to_string(step.thread_nr));
+              "thread", std::to_string(step.thread_nr));
           xml_location_only.set_attribute(
-            "step_nr", std::to_string(step.step_nr));
+              "step_nr", std::to_string(step.step_nr));
 
           xml_location_only.new_element().swap(xml_location);
         }
       }
+      break;
+    }
     }
 
     if(source_location.is_not_nil() && !source_location.get_file().empty())
