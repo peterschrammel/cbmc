@@ -207,6 +207,10 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("show-vcc"))
     options.set_option("show-vcc", true);
 
+  if(cmdline.isset("show-dimacs-var"))
+    options.set_option(
+      "show-dimacs-var", cmdline.get_values("show-dimacs-var"));
+
   if(cmdline.isset("cover"))
     parse_cover_options(cmdline, options);
 

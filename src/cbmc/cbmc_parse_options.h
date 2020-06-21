@@ -69,7 +69,8 @@ class optionst;
   "(little-endian)(big-endian)" \
   OPT_SHOW_GOTO_FUNCTIONS \
   OPT_SHOW_PROPERTIES \
-  "(show-symbol-table)(show-parse-tree)" \
+  "(show-dimacs-var):" \
+  "(show-symbol-table)(show-parse-tree)"          \
   "(drop-unused-functions)" \
   "(havoc-undefined-functions)" \
   "(property):(stop-on-fail)(trace)" \
