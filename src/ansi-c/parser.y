@@ -192,6 +192,7 @@ extern char *yyansi_ctext;
 %token TOK_ACSL_LET    "\\let"
 %token TOK_ARRAY_OF    "array_of"
 %token TOK_CPROVER_BITVECTOR "__CPROVER_bitvector"
+%token TOK_CPROVER_UNCONST_TYPE "__CPROVER_unconst_type"
 %token TOK_CPROVER_FLOATBV "__CPROVER_floatbv"
 %token TOK_CPROVER_FIXEDBV "__CPROVER_fixedbv"
 %token TOK_CPROVER_ATOMIC "__CPROVER_atomic"
@@ -1092,12 +1093,22 @@ declaration_specifier:
         | atomic_declaration_specifier
         ;
 
-type_specifier:
+type_specifier_:
           basic_type_specifier
         | sue_type_specifier
         | typedef_type_specifier
         | typeof_type_specifier
         | atomic_type_specifier
+        ;
+
+type_specifier:
+        TOK_CPROVER_UNCONST_TYPE '(' type_specifier_ ')'
+        {
+          $$=$3;
+          remove_const($$);
+        }
+        |
+        type_specifier_
         ;
 
 declaration_qualifier_list:

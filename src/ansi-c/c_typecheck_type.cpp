@@ -1533,6 +1533,30 @@ void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
   }
 }
 
+static void remove_const_from_type(typet &type)
+{
+  if(type.find(ID_const).is_not_nil())
+  {
+    type.remove(ID_const);
+  }
+  if(type.id() == ID_pointer)
+  {
+    typet &subtype = to_pointer_type(type).subtype();
+    if(subtype.find(ID_C_constant).is_not_nil())
+    {
+      subtype.remove(ID_C_constant);
+    }
+  }
+  if(type.id() == ID_array)
+  {
+    typet &subtype = to_array_type(type).subtype();
+    if(subtype.find(ID_C_constant).is_not_nil())
+    {
+      subtype.remove(ID_C_constant);
+    }
+  }
+}
+
 void c_typecheck_baset::typecheck_typeof_type(typet &type)
 {
   // save location
@@ -1548,6 +1572,8 @@ void c_typecheck_baset::typecheck_typeof_type(typet &type)
   {
     typet t=static_cast<const typet &>(type.find(ID_type_arg));
     typecheck_type(t);
+    if(type.find(ID_const_cast).is_not_nil())
+      remove_const_from_type(t);
     type.swap(t);
   }
   else
@@ -1561,7 +1587,8 @@ void c_typecheck_baset::typecheck_typeof_type(typet &type)
     {
       expr = to_address_of_expr(expr).object();
     }
-
+    if(type.find(ID_const_cast).is_not_nil())
+      remove_const_from_type(expr.type());
     type.swap(expr.type());
   }
 
