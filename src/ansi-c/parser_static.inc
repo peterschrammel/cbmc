@@ -428,3 +428,14 @@ static void adjust_KnR_parameters(
     }
   }
 }
+
+static void remove_const(const YYSTYPE src)
+{
+  irept &irep = parser_stack(src);
+  typet &type = static_cast<typet &>(irep);
+  if (type.find(ID_const).is_not_nil())
+  {
+    type.remove(ID_const);
+  }
+  type.set(ID_const_cast, 1);
+}

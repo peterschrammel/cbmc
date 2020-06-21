@@ -508,6 +508,8 @@ void ansi_c_scanner_init()
 "void"          { loc(); return TOK_VOID; }
 "volatile"      { loc(); return TOK_VOLATILE; }
 "while"         { loc(); return TOK_WHILE; }
+"__CPROVER_unconst_type" { loc(); return TOK_CPROVER_UNCONST_TYPE; }
+
 
 "__auto_type"   { if((PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                       PARSER.mode==configt::ansi_ct::flavourt::CLANG)
