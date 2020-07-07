@@ -273,15 +273,15 @@ void goto_program_dereferencet::dereference_expression(
 /// may be pointing to.
 void remove_pointers(
   goto_modelt &goto_model,
-  value_setst &value_sets)
+  value_setst &value_sets,
+  message_handlert &message_handler)
 {
   namespacet ns(goto_model.symbol_table);
 
   optionst options;
 
-  goto_program_dereferencet
-    goto_program_dereference(
-      ns, goto_model.symbol_table, options, value_sets);
+  goto_program_dereferencet goto_program_dereference(
+    ns, goto_model.symbol_table, options, value_sets, message_handler);
 
   Forall_goto_functions(it, goto_model.goto_functions)
     goto_program_dereference.dereference_program(it->second.body);
@@ -294,11 +294,12 @@ void dereference(
   goto_programt::const_targett target,
   exprt &expr,
   const namespacet &ns,
-  value_setst &value_sets)
+  value_setst &value_sets,
+  message_handlert &message_handler)
 {
   optionst options;
   symbol_tablet new_symbol_table;
-  goto_program_dereferencet
-    goto_program_dereference(ns, new_symbol_table, options, value_sets);
+  goto_program_dereferencet goto_program_dereference(
+    ns, new_symbol_table, options, value_sets, message_handler);
   goto_program_dereference.dereference_expression(function_id, target, expr);
 }

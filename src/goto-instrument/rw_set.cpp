@@ -13,9 +13,10 @@ Date: February 2006
 
 #include "rw_set.h"
 
-#include <util/std_expr.h>
-#include <util/std_code.h>
+#include <util/message.h>
 #include <util/namespace.h>
+#include <util/std_code.h>
+#include <util/std_expr.h>
 
 #include <langapi/language_util.h>
 
@@ -161,7 +162,8 @@ void _rw_set_loct::read_write_rec(
       read_write_rec(*it, r, w, suffix, guard_conjuncts);
     }
     #else
-    dereference(function_id, target, tmp, ns, value_sets);
+    null_message_handlert message_handler;
+    dereference(function_id, target, tmp, ns, value_sets, message_handler);
 
     read_write_rec(tmp, r, w, suffix, guard_conjuncts);
 #endif

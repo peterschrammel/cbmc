@@ -253,6 +253,8 @@ exprt value_set_dereferencet::dereference(
 
   // now build big case split, but we only do "good" objects
 
+  log.debug() << "mux size dereference: " << values.size() << messaget::eom;
+
   exprt value=nil_exprt();
 
   for(std::list<valuet>::const_iterator
