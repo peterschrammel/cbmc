@@ -122,7 +122,14 @@ void preconditiont::compute_rec(exprt &dest)
       // may alias!
       exprt tmp;
       tmp.swap(deref_expr.pointer());
-      dereference(SSA_step.source.function_id, target, tmp, ns, value_sets);
+      null_message_handlert message_handler;
+      dereference(
+        SSA_step.source.function_id,
+        target,
+        tmp,
+        ns,
+        value_sets,
+        message_handler);
       deref_expr.swap(tmp);
       compute_rec(deref_expr);
     }

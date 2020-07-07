@@ -253,6 +253,8 @@ exprt value_set_dereferencet::handle_dereference_base_case(
 
   // now build big case split, but we only do "good" objects
 
+  log.debug() << "mux size dereference: " << values.size() << messaget::eom;
+
   exprt result_value = nil_exprt{};
 
   for(const auto &value : values)
