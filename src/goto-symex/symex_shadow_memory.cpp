@@ -181,10 +181,14 @@ void goto_symext::initialize_rec(
         field, from_integer(mp_integer(0), field.type()));
       symex_assign(state, code_assign);
 
-      log.debug() << "initialize field " << id2string(field.get_identifier())
+      log.conditional_output(
+        log.debug(),
+        [field, ns, address_expr, per_object](messaget::mstreamt &mstream) {
+          mstream << "initialize field " << id2string(field.get_identifier())
                   << " for " << from_expr(ns, "", address_expr)
                   << (per_object ? " (per object)" : "")
                   << messaget::eom;
+        });
     }
   }
 }
@@ -250,7 +254,7 @@ bool goto_symext::filter_by_value_set(
   const value_setst::valuest &value_set,
   const exprt &address)
 {
-  // log.debug() << "address: " << address.pretty() << messaget::eom;
+  //log.debug() << "address: " << address.pretty() << messaget::eom;
 
   if(address.id() == ID_constant &&
      address.type().id() == ID_pointer &&
@@ -282,7 +286,7 @@ bool goto_symext::filter_by_value_set(
 
   for(const auto &e : value_set)
   {
-    // log.debug() << "object: " << e.pretty() << messaget::eom;
+    //log.debug() << "object: " << e.pretty() << messaget::eom;
     if(e.id() == ID_unknown)
       return true;
 
@@ -331,9 +335,13 @@ void goto_symext::symex_set_field(
 
   exprt value = code_function_call.arguments()[2];
 
-  log.debug() << "set_field: " << id2string(field_name) << " for "
+  log.conditional_output(
+    log.debug(),
+    [field_name, ns, expr, value](messaget::mstreamt &mstream) {
+      mstream << "set_field: " << id2string(field_name) << " for "
               << from_expr(ns, "", expr) << " to " << from_expr(ns, "", value)
               << messaget::eom;
+    });
   INVARIANT(
     state.address_fields.count(field_name) == 1,
     id2string(field_name) + " should exist");
@@ -343,34 +351,50 @@ void goto_symext::symex_set_field(
   size_t mux_size = 0;
   value_setst::valuest value_set;
   state.value_set.get_value_set(expr, value_set, ns);
-  for (const auto &e : value_set)
-  {
-    log.debug() << "value set: " << from_expr(ns, "", e) << messaget::eom;
-  }
+  log.conditional_output(
+    log.debug(),
+    [ns, value_set](messaget::mstreamt &mstream) {
+      for (const auto &e : value_set)
+      {
+        mstream << "value set: " << from_expr(ns, "", e) << messaget::eom;
+      }
+    });
 
   const null_pointer_exprt null_pointer(to_pointer_type(expr.type()));
   if(value_set.size() == 1 && filter_by_value_set(value_set, null_pointer))
   {
-    log.debug() << "value set match: " << from_expr(ns, "", null_pointer)
+    log.conditional_output(
+      log.debug(),
+      [ns, null_pointer, expr](messaget::mstreamt &mstream) {
+        mstream << "value set match: " << from_expr(ns, "", null_pointer)
                 << " <-- " << from_expr(ns, "", expr) << messaget::eom;
-    log.debug() << "ignoring set field on NULL object" << messaget::eom;
+        mstream << "ignoring set field on NULL object" << messaget::eom;
+      });
     return;
   }
 
   for(const auto &shadowed_address : addresses)
   {
-    log.debug()
-      << "trying shadowed address: " << from_expr(ns, "", shadowed_address.address)
-      << (shadowed_address.per_object ? " (per object)" : "")
-      << messaget::eom;
+    log.conditional_output(
+      log.debug(),
+      [ns, shadowed_address](messaget::mstreamt &mstream) {
+        mstream << "trying shadowed address: "
+                << from_expr(ns, "", shadowed_address.address)
+                << (shadowed_address.per_object ? " (per object)" : "")
+                << messaget::eom;
+      });
     if(shadowed_address.per_object)
     {
       // exact match
       if(shadowed_address.address == expr)
       {
-        log.debug()
-          << "exact match: " << from_expr(ns, "", shadowed_address.address)
-          << " == " << from_expr(ns, "", expr) << messaget::eom;
+        log.conditional_output(
+          log.debug(),
+          [ns, shadowed_address, expr](messaget::mstreamt &mstream) {
+            mstream
+              << "exact match: " << from_expr(ns, "", shadowed_address.address)
+              << " == " << from_expr(ns, "", expr) << messaget::eom;
+          });
         lhs = address_of_exprt(shadowed_address.shadow);
         mux_size = 1;
         break;
@@ -389,12 +413,16 @@ void goto_symext::symex_set_field(
         const exprt &matched_base =
           address_of_exprt(to_object_descriptor_expr(matched_object).object());
 
-        log.debug() << "value set match: " << messaget::eom;
-        log.debug() << "  " << from_expr(ns, "", shadowed_address.address)
+        log.conditional_output(
+          log.debug(),
+          [ns, shadowed_address, expr, dereference, matched_base](messaget::mstreamt &mstream) {
+            mstream << "value set match: " << messaget::eom;
+            mstream  << "  " << from_expr(ns, "", shadowed_address.address)
                      << " <-- " << from_expr(ns, "", matched_base)
                      << messaget::eom;
-        log.debug() << "  " << from_expr(ns, "", dereference.pointer)
+            mstream  << "  " << from_expr(ns, "", dereference.pointer)
                      << " <-- " << from_expr(ns, "", expr) << messaget::eom;
+          });
         exprt cond = and_exprt(
           equal_exprt(
             expr,
@@ -403,9 +431,13 @@ void goto_symext::symex_set_field(
             shadowed_address.address,
             typecast_exprt::conditional_cast(
               matched_base, shadowed_address.address.type())));
-        log.debug() << "cond: " << from_expr(ns, "", cond)
+        log.conditional_output(
+          log.debug(),
+          [ns, shadowed_address, cond](messaget::mstreamt &mstream) {
+            mstream << "cond: " << from_expr(ns, "", cond)
                     << (shadowed_address.per_object ? " (per object)" : "")
                     << messaget::eom;
+          });
         if(!cond.is_false())
         {
           mux_size++;
@@ -425,8 +457,12 @@ void goto_symext::symex_set_field(
       // exact match
       if(shadowed_address.address == expr)
       {
-        log.debug() << "exact match: " << from_expr(ns, "", shadowed_address.address)
+        log.conditional_output(
+          log.debug(),
+          [ns, shadowed_address, expr](messaget::mstreamt &mstream) {
+            mstream << "exact match: " << from_expr(ns, "", shadowed_address.address)
                     << " == " << from_expr(ns, "", expr) << messaget::eom;
+          });
         lhs = address_of_exprt(shadowed_address.shadow);
         mux_size = 1;
         break;
@@ -435,15 +471,23 @@ void goto_symext::symex_set_field(
       if(!filter_by_value_set(value_set, shadowed_address.address))
         continue;
 
-      log.debug() << "value set match: " << from_expr(ns, "", shadowed_address.address)
+      log.conditional_output(
+        log.debug(),
+        [ns, shadowed_address, expr](messaget::mstreamt &mstream) {
+          mstream << "value set match: " << from_expr(ns, "", shadowed_address.address)
                   << " <-- " << from_expr(ns, "", expr) << messaget::eom;
+        });
 
       exprt cond = equal_exprt(
         shadowed_address.address,
         typecast_exprt::conditional_cast(expr, shadowed_address.address.type()));
-      log.debug() << "cond: " << from_expr(ns, "", cond)
+      log.conditional_output(
+        log.debug(),
+        [ns, shadowed_address, cond](messaget::mstreamt &mstream) {
+          mstream << "cond: " << from_expr(ns, "", cond)
                   << (shadowed_address.per_object ? " (per object)" : "")
                   << messaget::eom;
+        });
       if(!cond.is_false())
       {
         mux_size++;
@@ -486,8 +530,12 @@ void goto_symext::symex_get_field(
     expr_type.id() == ID_pointer,
     "shadow memory requires a pointer expression");
 
-  log.debug() << "get_field: " << id2string(field_name) << " for "
+  log.conditional_output(
+    log.debug(),
+    [ns, field_name, expr](messaget::mstreamt &mstream) {
+      mstream << "get_field: " << id2string(field_name) << " for "
               << from_expr(ns, "", expr) << messaget::eom;
+    });
 
   INVARIANT(
     state.address_fields.count(field_name) == 1,
@@ -499,16 +547,24 @@ void goto_symext::symex_get_field(
   size_t mux_size = 0;
   value_setst::valuest value_set;
   state.value_set.get_value_set(expr, value_set, ns);
-  for (const auto &e : value_set)
-  {
-    log.debug() << "value set: " << from_expr(ns, "", e) << messaget::eom;
-  }
+  log.conditional_output(
+    log.debug(),
+    [ns, value_set](messaget::mstreamt &mstream) {
+      for (const auto &e : value_set)
+      {
+        mstream << "value set: " << from_expr(ns, "", e) << messaget::eom;
+      }
+    });
 
   const null_pointer_exprt null_pointer(to_pointer_type(expr.type()));
   if(filter_by_value_set(value_set, null_pointer))
   {
-    log.debug() << "value set match: " << from_expr(ns, "", null_pointer)
+    log.conditional_output(
+      log.debug(),
+      [ns, null_pointer, expr](messaget::mstreamt &mstream) {
+        mstream << "value set match: " << from_expr(ns, "", null_pointer)
                 << " <-- " << from_expr(ns, "", expr) << messaget::eom;
+      });
     rhs = if_exprt(equal_exprt(expr, null_pointer),
                    from_integer(0, lhs.type()), from_integer(-1, lhs.type()));
     mux_size = 1;
@@ -516,18 +572,26 @@ void goto_symext::symex_get_field(
 
   for(const auto &shadowed_address : addresses)
   {
-    log.debug()
-      << "trying shadowed address: " << from_expr(ns, "", shadowed_address.address)
-      << (shadowed_address.per_object ? " (per object)" : "")
-      << messaget::eom;
+    log.conditional_output(
+      log.debug(),
+      [ns, shadowed_address](messaget::mstreamt &mstream) {
+        mstream
+          << "trying shadowed address: " << from_expr(ns, "", shadowed_address.address)
+          << (shadowed_address.per_object ? " (per object)" : "")
+          << messaget::eom;
+      });
     if(shadowed_address.per_object)
     {
       // exact match
       if(shadowed_address.address == expr)
       {
-        log.debug()
-          << "exact match: " << from_expr(ns, "", shadowed_address.address)
-          << " == " << from_expr(ns, "", expr) << messaget::eom;
+        log.conditional_output(
+          log.debug(),
+          [ns, shadowed_address, expr](messaget::mstreamt &mstream) {
+            mstream
+              << "exact match: " << from_expr(ns, "", shadowed_address.address)
+              << " == " << from_expr(ns, "", expr) << messaget::eom;
+          });
         rhs = typecast_exprt::conditional_cast(shadowed_address.shadow, lhs.type());
         mux_size = 1;
         break;
@@ -546,12 +610,16 @@ void goto_symext::symex_get_field(
         const exprt &matched_base =
           address_of_exprt(to_object_descriptor_expr(matched_object).object());
 
-        log.debug() << "value set match: " << messaget::eom;
-        log.debug() << "  " << from_expr(ns, "", shadowed_address.address)
-                     << " <-- " << from_expr(ns, "", matched_base)
-                     << messaget::eom;
-        log.debug() << "  " << from_expr(ns, "", dereference.pointer)
-                     << " <-- " << from_expr(ns, "", expr) << messaget::eom;
+        log.conditional_output(
+          log.debug(),
+          [ns, shadowed_address, expr, matched_base, dereference](messaget::mstreamt &mstream) {
+            mstream << "value set match: " << messaget::eom;
+            mstream << "  " << from_expr(ns, "", shadowed_address.address)
+                    << " <-- " << from_expr(ns, "", matched_base)
+                    << messaget::eom;
+            mstream << "  " << from_expr(ns, "", dereference.pointer)
+                    << " <-- " << from_expr(ns, "", expr) << messaget::eom;
+          });
         exprt cond = and_exprt(
           equal_exprt(
             expr,
@@ -560,9 +628,13 @@ void goto_symext::symex_get_field(
             shadowed_address.address,
             typecast_exprt::conditional_cast(
               matched_base, shadowed_address.address.type())));
-        log.debug() << "cond: " << from_expr(ns, "", cond)
+        log.conditional_output(
+          log.debug(),
+          [ns, shadowed_address, cond](messaget::mstreamt &mstream) {
+            mstream << "cond: " << from_expr(ns, "", cond)
                     << (shadowed_address.per_object ? " (per object)" : "")
                     << messaget::eom;
+          });
         if(!cond.is_false())
         {
           mux_size++;
@@ -590,9 +662,12 @@ void goto_symext::symex_get_field(
       // exact match
       if(shadowed_address.address == expr)
       {
-        log.debug()
-          << "exact match: " << from_expr(ns, "", shadowed_address.address)
-          << " == " << from_expr(ns, "", expr) << messaget::eom;
+        log.conditional_output(
+          log.debug(),
+          [ns, shadowed_address, expr](messaget::mstreamt &mstream) {
+            mstream << "exact match: " << from_expr(ns, "", shadowed_address.address)
+                    << " == " << from_expr(ns, "", expr) << messaget::eom;
+          });
         rhs = typecast_exprt::conditional_cast(shadowed_address.shadow, lhs.type());
         mux_size = 1;
         break;
@@ -601,15 +676,22 @@ void goto_symext::symex_get_field(
       if(!filter_by_value_set(value_set, shadowed_address.address))
         continue;
 
-      log.debug()
-        << "value set match: " << from_expr(ns, "", shadowed_address.address)
-        << " <-- " << from_expr(ns, "", expr) << messaget::eom;
+      log.conditional_output(
+        log.debug(),
+        [ns, shadowed_address, expr](messaget::mstreamt &mstream) {
+          mstream << "value set match: " << from_expr(ns, "", shadowed_address.address)
+                  << " <-- " << from_expr(ns, "", expr) << messaget::eom;
+        });
       exprt cond = equal_exprt(
         shadowed_address.address,
         typecast_exprt::conditional_cast(expr, shadowed_address.address.type()));
-      log.debug() << "cond: " << from_expr(ns, "", cond)
+      log.conditional_output(
+        log.debug(),
+        [ns, shadowed_address, cond](messaget::mstreamt &mstream) {
+          mstream << "cond: " << from_expr(ns, "", cond)
                   << (shadowed_address.per_object ? " (per object)" : "")
                   << messaget::eom;
+        });
       if(!cond.is_false())
       {
         mux_size++;
