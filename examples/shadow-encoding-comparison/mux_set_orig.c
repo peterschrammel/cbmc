@@ -1,0 +1,20 @@
+struct data
+{
+  unsigned memory;
+};
+
+void main()
+{
+  struct data *x;
+  for(int i=0; i<300; ++i)
+  {
+    if(nondet())
+    {
+      x = malloc(sizeof(struct data));
+    }
+  }
+
+  x->memory = 42u;
+  
+  assert(x);
+}
