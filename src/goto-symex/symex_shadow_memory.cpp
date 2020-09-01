@@ -348,7 +348,7 @@ void goto_symext::symex_set_field(
   const auto &addresses = state.address_fields.at(field_name);
   const exprt &rhs = value;
   exprt lhs = nil_exprt();
-  size_t mux_size = 0;
+  size_t mux_size = 1;
   value_setst::valuest value_set;
   state.value_set.get_value_set(expr, value_set, ns);
   log.conditional_output(
@@ -544,7 +544,7 @@ void goto_symext::symex_get_field(
   // Should actually be fields.at(field_name)
   symbol_exprt lhs(CPROVER_PREFIX "get_field#return_value", signedbv_typet(32));
   exprt rhs = nil_exprt();
-  size_t mux_size = 0;
+  size_t mux_size = 1;
   value_setst::valuest value_set;
   state.value_set.get_value_set(expr, value_set, ns);
   log.conditional_output(
