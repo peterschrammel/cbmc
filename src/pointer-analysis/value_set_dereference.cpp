@@ -253,20 +253,22 @@ exprt value_set_dereferencet::handle_dereference_base_case(
 
   // now build big case split, but we only do "good" objects
 
-  log.debug() << "mux size dereference: " << values.size() << messaget::eom;
-
   exprt result_value = nil_exprt{};
 
+  size_t mux_size = 0;
   for(const auto &value : values)
   {
     if(value.value.is_not_nil())
     {
+      ++mux_size;
       if(result_value.is_nil()) // first?
         result_value = value.value;
       else
         result_value = if_exprt(value.pointer_guard, value.value, result_value);
     }
   }
+
+  log.debug() << "mux size dereference: " << mux_size << messaget::eom;
 
   if(compare_against_pointer != pointer)
     result_value =
