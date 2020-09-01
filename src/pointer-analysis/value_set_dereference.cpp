@@ -253,10 +253,9 @@ exprt value_set_dereferencet::dereference(
 
   // now build big case split, but we only do "good" objects
 
-  log.debug() << "mux size dereference: " << values.size() << messaget::eom;
-
   exprt value=nil_exprt();
 
+  size_t mux_size = 0;
   for(std::list<valuet>::const_iterator
       it=values.begin();
       it!=values.end();
@@ -264,12 +263,15 @@ exprt value_set_dereferencet::dereference(
   {
     if(it->value.is_not_nil())
     {
+      ++mux_size;
       if(value.is_nil()) // first?
         value=it->value;
       else
         value=if_exprt(it->pointer_guard, it->value, value);
     }
   }
+
+  log.debug() << "mux size dereference: " << mux_size << messaget::eom;
 
   if(compare_against_pointer != pointer)
     value = let_exprt(to_symbol_expr(compare_against_pointer), pointer, value);
