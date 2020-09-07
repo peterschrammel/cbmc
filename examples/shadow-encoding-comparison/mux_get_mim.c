@@ -7,7 +7,7 @@ void main()
 {
   struct data *x;
   _Bool *y;
-  for(int i=0; i<300; ++i)
+  for(int i=0; i<3; ++i)
   {
     if(nondet())
     {

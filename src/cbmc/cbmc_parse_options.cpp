@@ -75,6 +75,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-instrument/full_slicer.h>
 #include <goto-instrument/nondet_static.h>
 #include <goto-instrument/reachability_slicer.h>
+#include <goto-instrument/remove_printf.h>
 
 #include <goto-symex/path_storage.h>
 
@@ -981,6 +982,8 @@ bool cbmc_parse_optionst::process_goto_program(
     log.status() << "String Abstraction" << messaget::eom;
     string_abstraction(goto_model, log.get_message_handler());
   }
+
+  remove_printf(goto_model);
 
   // add failed symbols
   // needs to be done before pointer analysis

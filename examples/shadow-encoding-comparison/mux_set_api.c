@@ -7,7 +7,7 @@ void main()
 {
   __CPROVER_field_decl_global("field", (_Bool)0);
   struct data *x;
-  for(int i=0; i<3; ++i)
+  for(int i=0; i<300; ++i)
   {
     if(nondet())
     {
