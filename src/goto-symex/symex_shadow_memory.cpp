@@ -423,14 +423,15 @@ void goto_symext::symex_set_field(
             mstream  << "  " << from_expr(ns, "", dereference.pointer)
                      << " <-- " << from_expr(ns, "", expr) << messaget::eom;
           });
-        exprt cond = and_exprt(
+        exprt cond = simplify_expr(and_exprt(
           equal_exprt(
             expr,
             typecast_exprt::conditional_cast(dereference.pointer, expr.type())),
           equal_exprt(
             shadowed_address.address,
             typecast_exprt::conditional_cast(
-              matched_base, shadowed_address.address.type())));
+              matched_base, shadowed_address.address.type()))), ns);
+
         log.conditional_output(
           log.debug(),
           [ns, shadowed_address, cond](messaget::mstreamt &mstream) {
@@ -471,6 +472,10 @@ void goto_symext::symex_set_field(
       if(!filter_by_value_set(value_set, shadowed_address.address))
         continue;
 
+      exprt cond = simplify_expr(equal_exprt(
+        shadowed_address.address,
+        typecast_exprt::conditional_cast(expr, shadowed_address.address.type())), ns);
+
       log.conditional_output(
         log.debug(),
         [ns, shadowed_address, expr](messaget::mstreamt &mstream) {
@@ -478,9 +483,6 @@ void goto_symext::symex_set_field(
                   << " <-- " << from_expr(ns, "", expr) << messaget::eom;
         });
 
-      exprt cond = equal_exprt(
-        shadowed_address.address,
-        typecast_exprt::conditional_cast(expr, shadowed_address.address.type()));
       log.conditional_output(
         log.debug(),
         [ns, shadowed_address, cond](messaget::mstreamt &mstream) {
@@ -620,14 +622,14 @@ void goto_symext::symex_get_field(
             mstream << "  " << from_expr(ns, "", dereference.pointer)
                     << " <-- " << from_expr(ns, "", expr) << messaget::eom;
           });
-        exprt cond = and_exprt(
+        exprt cond = simplify_expr(and_exprt(
           equal_exprt(
             expr,
             typecast_exprt::conditional_cast(dereference.pointer, expr.type())),
           equal_exprt(
             shadowed_address.address,
             typecast_exprt::conditional_cast(
-              matched_base, shadowed_address.address.type())));
+              matched_base, shadowed_address.address.type()))), ns);
         log.conditional_output(
           log.debug(),
           [ns, shadowed_address, cond](messaget::mstreamt &mstream) {
@@ -682,9 +684,9 @@ void goto_symext::symex_get_field(
           mstream << "value set match: " << from_expr(ns, "", shadowed_address.address)
                   << " <-- " << from_expr(ns, "", expr) << messaget::eom;
         });
-      exprt cond = equal_exprt(
+      exprt cond = simplify_expr(equal_exprt(
         shadowed_address.address,
-        typecast_exprt::conditional_cast(expr, shadowed_address.address.type()));
+        typecast_exprt::conditional_cast(expr, shadowed_address.address.type())), ns);
       log.conditional_output(
         log.debug(),
         [ns, shadowed_address, cond](messaget::mstreamt &mstream) {
