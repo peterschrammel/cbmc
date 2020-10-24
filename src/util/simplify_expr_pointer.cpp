@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "c_types.h"
 #include "config.h"
+#include "expr_iterator.h"
 #include "expr_util.h"
 #include "namespace.h"
 #include "pointer_offset_size.h"
@@ -412,6 +413,101 @@ simplify_exprt::simplify_pointer_offset(const unary_exprt &expr)
 
       return changed(simplify_node(new_expr));
     }
+  }
+
+  return unchanged(expr);
+}
+
+#include <iostream>
+
+static address_of_exprt *find_address_of_expr(exprt &expr)
+{
+  if(expr.id() == ID_address_of)
+    return &to_address_of_expr(expr);
+  Forall_operands(it, expr)
+  {
+    address_of_exprt *result = find_address_of_expr(*it);
+    if (result != nullptr)
+      return result;
+  }
+  return nullptr;
+}
+
+simplify_exprt::resultt<> simplify_exprt::simplify_inequality_ptr_arith_address_of(
+  const binary_relation_exprt &expr)
+{
+  // the operands of the relation are
+  // typecast_exprt(plus_exprt(typecast_exprt(address_of_exprt(object)), const_exprt))
+
+  //std::cout << "PTR_INEQ: " << expr.pretty() << std::endl;
+
+  PRECONDITION(expr.id() == ID_equal || expr.id() == ID_notequal);
+
+  exprt tmp0 = expr.op0();
+  auto &tmp0_address_of = *find_address_of_expr(tmp0);
+
+  if(
+    tmp0_address_of.object().id() == ID_index &&
+    to_index_expr(tmp0_address_of.object()).index().is_zero())
+  {
+    tmp0_address_of =
+      address_of_exprt(to_index_expr(tmp0_address_of.object()).array());
+  }
+
+  exprt tmp1 = expr.op1();
+  auto &tmp1_address_of = *find_address_of_expr(tmp1);
+
+  if(
+    tmp1_address_of.object().id() == ID_index &&
+    to_index_expr(tmp1_address_of.object()).index().is_zero())
+  {
+    tmp1_address_of =
+      address_of_exprt(to_index_expr(tmp1_address_of.object()).array());
+  }
+
+  const auto tmp0_plus_it =
+    std::find_if(tmp0.depth_cbegin(), tmp0.depth_cend(),
+                 [](const exprt &expr) {
+                   return expr.id() == ID_plus;
+                 });
+  const auto tmp1_plus_it =
+    std::find_if(tmp0.depth_cbegin(), tmp0.depth_cend(),
+                 [](const exprt &expr) {
+                   return expr.id() == ID_plus;
+                 });
+  const bool has_same_offset =
+    (tmp0_plus_it == tmp0.depth_cend() && tmp1_plus_it == tmp1.depth_cend()) ||
+    (tmp0_plus_it != tmp0.depth_cend() && tmp1_plus_it != tmp1.depth_cend() &&
+     to_plus_expr(*tmp0_plus_it).op1().id() == ID_constant &&
+     to_plus_expr(*tmp1_plus_it).op1().id() == ID_constant &&
+     numeric_cast_v<mp_integer>(to_constant_expr(to_plus_expr(*tmp0_plus_it).op1())) ==
+     numeric_cast_v<mp_integer>(to_constant_expr(to_plus_expr(*tmp1_plus_it).op1())));
+
+  const auto &tmp0_object = tmp0_address_of.object();
+  const auto &tmp1_object = tmp1_address_of.object();
+
+  if(tmp0_object.id() == ID_symbol && tmp1_object.id() == ID_symbol)
+  {
+    bool equal = to_symbol_expr(tmp0_object).get_identifier() ==
+                 to_symbol_expr(tmp1_object).get_identifier() && has_same_offset;
+
+    return make_boolean_expr(expr.id() == ID_equal ? equal : !equal);
+  }
+  else if(
+    tmp0_object.id() == ID_dynamic_object &&
+    tmp1_object.id() == ID_dynamic_object)
+  {
+    bool equal = to_dynamic_object_expr(tmp0_object).get_instance() ==
+                 to_dynamic_object_expr(tmp1_object).get_instance() && has_same_offset;
+
+    return make_boolean_expr(expr.id() == ID_equal ? equal : !equal);
+  }
+  else if(
+    (tmp0_object.id() == ID_symbol && tmp1_object.id() == ID_dynamic_object) ||
+    (tmp0_object.id() == ID_dynamic_object && tmp1_object.id() == ID_symbol))
+  {
+    bool equal = has_same_offset;
+    return make_boolean_expr(expr.id() == ID_equal ? equal : !equal);
   }
 
   return unchanged(expr);
