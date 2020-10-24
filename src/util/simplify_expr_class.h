@@ -217,6 +217,8 @@ public:
   NODISCARD resultt<>
   simplify_inequality_address_of(const binary_relation_exprt &);
   NODISCARD resultt<>
+  simplify_inequality_ptr_arith_address_of(const binary_relation_exprt &);
+  NODISCARD resultt<>
   simplify_inequality_pointer_object(const binary_relation_exprt &);
 
   // main recursion

@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "c_types.h"
 #include "config.h"
+#include "expr_iterator.h"
 #include "expr_util.h"
 #include "namespace.h"
 #include "pointer_offset_size.h"
@@ -412,6 +413,184 @@ simplify_exprt::simplify_pointer_offset(const unary_exprt &expr)
 
       return changed(simplify_node(new_expr));
     }
+  }
+
+  return unchanged(expr);
+}
+
+#include <iostream>
+
+static address_of_exprt *find_address_of_expr(exprt &expr)
+{
+  if(expr.id() == ID_address_of)
+    return &to_address_of_expr(expr);
+  Forall_operands(it, expr)
+  {
+    address_of_exprt *result = find_address_of_expr(*it);
+    if (result != nullptr)
+      return result;
+  }
+  return nullptr;
+}
+
+simplify_exprt::resultt<> simplify_exprt::simplify_inequality_ptr_arith_address_of(
+  const binary_relation_exprt &expr)
+{
+  // the operands of the relation are
+  // typecast_exprt(plus_exprt(typecast_exprt(address_of_exprt(object)), const_exprt))
+
+//  std::cout << "PTR_INEQ: " << expr.pretty() << std::endl;
+
+  PRECONDITION(expr.id() == ID_equal || expr.id() == ID_notequal);
+
+  exprt tmp0 = expr.op0();
+  auto &tmp0_address_of = *find_address_of_expr(tmp0);
+  exprt tmp1 = expr.op1();
+  auto &tmp1_address_of = *find_address_of_expr(tmp1);
+  std::cout << "TMP0: " << tmp0.pretty() << std::endl;
+  std::cout << "TMP1: " << tmp1.pretty() << std::endl;
+
+  mp_integer tmp0_offset = 0;
+
+  if(tmp0_address_of.object().id() == ID_member)
+  {
+    std::cout << "MEMBER0" << std::endl;
+    const member_exprt &member_expr = to_member_expr(tmp0_address_of.object());
+    const typet &followed_type = ns.follow(member_expr.struct_op().type());
+    if(followed_type.id() == ID_struct)
+    {
+      const irep_idt &component_name = member_expr.get_component_name();
+      auto offset =
+        member_offset(to_struct_type(followed_type), component_name, ns);
+      if(offset.has_value())
+      {
+        tmp0_address_of = address_of_exprt(member_expr.struct_op());
+        tmp0_offset += *offset;
+      }
+    }
+  }
+
+  if(
+    tmp0_address_of.object().id() == ID_index &&
+    to_index_expr(tmp0_address_of.object()).index().id() == ID_constant &&
+    to_index_expr(tmp0_address_of.object()).index().is_zero())
+  {
+    std::cout << "INDEX0 ZERO" << std::endl;
+    tmp0_address_of =
+      address_of_exprt(to_index_expr(tmp0_address_of.object()).array());
+  }
+  else if(
+    tmp0_address_of.object().id() == ID_index &&
+    to_index_expr(tmp0_address_of.object()).index().id() != ID_constant)
+  {
+    std::cout << "INDEX0 NON-CONST" << std::endl;
+    return unchanged(expr);
+  }
+
+  mp_integer tmp1_offset = 0;
+
+  std::cout << "ADDR_OF1: " << tmp1_address_of.object().pretty() << std::endl;
+  if(tmp1_address_of.object().id() == ID_member)
+  {
+    std::cout << "MEMBER1" << std::endl;
+    const member_exprt &member_expr = to_member_expr(tmp1_address_of.object());
+    const typet &followed_type = ns.follow(member_expr.struct_op().type());
+    if(followed_type.id() == ID_struct)
+    {
+      const irep_idt &component_name = member_expr.get_component_name();
+      auto offset =
+        member_offset(to_struct_type(followed_type), component_name, ns);
+      if(offset.has_value())
+      {
+        tmp1_address_of = address_of_exprt(member_expr.struct_op());
+        tmp1_offset += *offset;
+      }
+    }
+  }
+
+  if(
+    tmp1_address_of.object().id() == ID_index &&
+    to_index_expr(tmp1_address_of.object()).index().id() == ID_constant &&
+    to_index_expr(tmp1_address_of.object()).index().is_zero())
+  {
+    std::cout << "INDEX1 ZERO" << std::endl;
+    tmp1_address_of =
+      address_of_exprt(to_index_expr(tmp1_address_of.object()).array());
+  }
+  else if(
+    tmp1_address_of.object().id() == ID_index &&
+    to_index_expr(tmp1_address_of.object()).index().id() != ID_constant)
+  {
+    std::cout << "INDEX1 NON-CONST" << std::endl;
+    return unchanged(expr);
+  }
+
+  const bool has_mult0 =
+    std::any_of(tmp0.depth_cbegin(), tmp0.depth_cend(),
+                [](const exprt &expr) {
+                  return expr.id() == ID_mult;
+                });
+  const bool has_mult1 =
+    std::any_of(tmp1.depth_cbegin(), tmp1.depth_cend(),
+                [](const exprt &expr) {
+                  return expr.id() == ID_mult;
+                });
+
+  const auto tmp0_plus_it =
+    std::find_if(tmp0.depth_cbegin(), tmp0.depth_cend(),
+                 [](const exprt &expr) {
+                   return expr.id() == ID_plus;
+                 });
+  const auto tmp1_plus_it =
+    std::find_if(tmp1.depth_cbegin(), tmp1.depth_cend(),
+                 [](const exprt &expr) {
+                   return expr.id() == ID_plus;
+                 });
+  if(tmp0_plus_it != tmp0.depth_cend() && !has_mult0)
+  {
+    std::cout << "PLUS0 NON-MULT" << std::endl;
+    tmp0_offset +=
+      numeric_cast_v<mp_integer>(
+        to_constant_expr(to_plus_expr(*tmp0_plus_it).op1()));
+  }
+  if(tmp1_plus_it != tmp1.depth_cend() && !has_mult1)
+  {
+    std::cout << "PLUS1 NON-MULT" << std::endl;
+    tmp1_offset +=
+      numeric_cast_v<mp_integer>(
+        to_constant_expr(to_plus_expr(*tmp1_plus_it).op1()));
+  }
+  bool has_same_offset = false;
+  if(!has_mult0 && !has_mult1)
+  {
+    has_same_offset = tmp0_offset == tmp1_offset;
+  }
+
+  const auto &tmp0_object = tmp0_address_of.object();
+  const auto &tmp1_object = tmp1_address_of.object();
+
+  const bool has_same_object =
+    (tmp0_object.id() == ID_symbol &&
+     tmp1_object.id() == ID_symbol &&
+     to_symbol_expr(tmp0_object).get_identifier() ==
+     to_symbol_expr(tmp1_object).get_identifier()) ||
+    (tmp0_object.id() == ID_dynamic_object &&
+     tmp1_object.id() == ID_dynamic_object &&
+     to_dynamic_object_expr(tmp0_object).get_instance() ==
+     to_dynamic_object_expr(tmp1_object).get_instance());
+
+  if(has_same_object)
+  {
+    if(has_mult0 || has_mult1)
+    {
+      return unchanged(expr);
+    }
+    const bool equal = has_same_offset;
+    return make_boolean_expr(expr.id() == ID_equal ? equal : !equal);
+  }
+  else
+  {
+    return make_boolean_expr(expr.id() != ID_equal);
   }
 
   return unchanged(expr);

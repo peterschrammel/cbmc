@@ -8,9 +8,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "simplify_expr_class.h"
 
+#include <algorithm>
+
 #include "arith_tools.h"
 #include "byte_operators.h"
 #include "config.h"
+#include "expr_iterator.h"
 #include "expr_util.h"
 #include "fixedbv.h"
 #include "ieee_float.h"
@@ -473,7 +476,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_plus(const plus_exprt &expr)
           }
           else
           {
-            if(!sum_expr(to_constant_expr(*const_sum), 
+            if(!sum_expr(to_constant_expr(*const_sum),
                          to_constant_expr(*it)))
             {
               *it=from_integer(0, it->type());
@@ -1240,6 +1243,46 @@ simplify_exprt::simplify_inequality(const binary_relation_exprt &expr)
     (expr.id() == ID_equal || expr.id() == ID_notequal))
   {
     return simplify_inequality_address_of(expr);
+  }
+
+  // see if we are comparing pointers that are address_of,
+  // potentially with casts and pointer arithmetic
+  const bool has_only_address_of_typecast_plus =
+    std::all_of(tmp0.depth_cbegin(), tmp0.depth_cend(),
+                [](const exprt &expr) {
+                  return expr.id() == ID_typecast ||
+                    expr.id() == ID_address_of ||
+                    expr.id() == ID_plus ||
+                    expr.id() == ID_mult ||
+                    expr.id() == ID_constant ||
+                    expr.id() == ID_symbol ||
+                    expr.id() == ID_index ||
+                    expr.id() == ID_member;
+                }) &&
+    std::any_of(tmp0.depth_cbegin(), tmp0.depth_cend(),
+                [](const exprt &expr) {
+                  return expr.id() == ID_address_of;
+                }) &&
+    std::all_of(tmp1.depth_cbegin(), tmp1.depth_cend(),
+                [](const exprt &expr) {
+                  return expr.id() == ID_typecast ||
+                    expr.id() == ID_address_of ||
+                    expr.id() == ID_plus ||
+                    expr.id() == ID_mult ||
+                    expr.id() == ID_constant ||
+                    expr.id() == ID_symbol ||
+                    expr.id() == ID_index ||
+                    expr.id() == ID_member;
+                }) &&
+    std::any_of(tmp1.depth_cbegin(), tmp1.depth_cend(),
+                [](const exprt &expr) {
+                  return expr.id() == ID_address_of;
+                });
+
+  if(has_only_address_of_typecast_plus &&
+    (expr.id() == ID_equal || expr.id() == ID_notequal))
+  {
+    return simplify_inequality_ptr_arith_address_of(expr);
   }
 
   if(tmp0.id()==ID_pointer_object &&
