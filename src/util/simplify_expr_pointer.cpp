@@ -439,16 +439,14 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_ptr_arith_address_
   // the operands of the relation are
   // typecast_exprt(plus_exprt(typecast_exprt(address_of_exprt(object)), const_exprt))
 
-//  std::cout << "PTR_INEQ: " << expr.pretty() << std::endl;
-
   PRECONDITION(expr.id() == ID_equal || expr.id() == ID_notequal);
 
   exprt tmp0 = expr.op0();
   auto &tmp0_address_of = *find_address_of_expr(tmp0);
   exprt tmp1 = expr.op1();
   auto &tmp1_address_of = *find_address_of_expr(tmp1);
-  std::cout << "TMP0: " << tmp0.pretty() << std::endl;
-  std::cout << "TMP1: " << tmp1.pretty() << std::endl;
+  //std::cout << "TMP0: " << tmp0.pretty() << std::endl;
+  //std::cout << "TMP1: " << tmp1.pretty() << std::endl;
 
   mp_integer tmp0_offset = 0;
 
@@ -489,7 +487,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_ptr_arith_address_
 
   mp_integer tmp1_offset = 0;
 
-  std::cout << "ADDR_OF1: " << tmp1_address_of.object().pretty() << std::endl;
+  //std::cout << "ADDR_OF1: " << tmp1_address_of.object().pretty() << std::endl;
   if(tmp1_address_of.object().id() == ID_member)
   {
     std::cout << "MEMBER1" << std::endl;
