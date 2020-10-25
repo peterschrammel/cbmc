@@ -18,11 +18,11 @@ Author: Peter Schrammel
 #include <util/find_symbols.h>
 #include <util/fresh_symbol.h>
 #include <util/invariant.h>
-#include <util/pointer_predicates.h>
-#include <util/prefix.h>
 #include <util/invariant.h>
 #include <util/message.h>
 #include <util/pointer_offset_size.h>
+#include <util/pointer_predicates.h>
+#include <util/prefix.h>
 #include <util/replace_expr.h>
 #include <util/source_location.h>
 #include <util/std_expr.h>
@@ -120,7 +120,7 @@ bool goto_symext::can_be_initialized_rec(
   }
   return true;
 }
-  
+
 void goto_symext::initialize_rec(
   const namespacet &ns,
   goto_symex_statet &state,
@@ -153,7 +153,7 @@ void goto_symext::initialize_rec(
     }
     return;
   }
-  
+
   if(per_object || (type.id() != ID_array && type.id() != ID_struct))
   {
     for(const auto &field_pair : fields)
@@ -317,6 +317,47 @@ bool goto_symext::filter_by_value_set(
   return false;
 }
 
+void goto_symext::resolve_value_set_expr(
+  const namespacet &ns,
+  exprt &target,
+  const exprt &value_set_expr)
+{
+  if(value_set_expr.id() != ID_object_descriptor)
+    return;
+  const object_descriptor_exprt &object_descriptor =
+    to_object_descriptor_expr(value_set_expr);
+  const typet &followed_type = ns.follow(object_descriptor.object().type());
+  if(followed_type.id() == ID_struct)
+  {
+    const struct_typet &struct_type = to_struct_type(followed_type);
+
+    // TODO: This should be implemented inside get_subexpression_at_offset?
+    auto component_offset =
+      numeric_cast<mp_integer>(object_descriptor.offset());
+    if(!component_offset.has_value())
+      return;
+    for(const auto &component : struct_type.components())
+    {
+      auto offset = member_offset(struct_type, component.get_name(), ns);
+      if(!offset.has_value())
+        continue;
+      if(*component_offset == *offset)
+      {
+        target = address_of_exprt(member_exprt(
+          object_descriptor.object(), component.get_name(), component.type()));
+      }
+    }
+  }
+  else if(followed_type.id() == ID_signed_int ||
+          followed_type.id() == ID_unsigned_int)
+  {
+    auto offset = numeric_cast<mp_integer>(object_descriptor.offset());
+    if(!offset.has_value() || !offset->is_zero())
+      return;
+    target = address_of_exprt(object_descriptor.object());
+  }
+}
+
 void goto_symext::symex_set_field(
   const namespacet &ns,
   goto_symex_statet &state,
@@ -371,6 +412,11 @@ void goto_symext::symex_set_field(
         mstream << "ignoring set field on NULL object" << messaget::eom;
       });
     return;
+  }
+
+  if(value_set.size() == 1) {
+    //log.status() << value_set.begin()->pretty() << messaget::eom;
+    resolve_value_set_expr(ns, expr, *value_set.begin());
   }
 
   for(const auto &shadowed_address : addresses)
@@ -570,6 +616,11 @@ void goto_symext::symex_get_field(
     rhs = if_exprt(equal_exprt(expr, null_pointer),
                    from_integer(0, lhs.type()), from_integer(-1, lhs.type()));
     mux_size = 1;
+  }
+
+  if(value_set.size() == 1) {
+    //log.status() << value_set.begin()->pretty() << messaget::eom;
+    resolve_value_set_expr(ns, expr, *value_set.begin());
   }
 
   for(const auto &shadowed_address : addresses)
