@@ -1256,7 +1256,8 @@ simplify_exprt::simplify_inequality(const binary_relation_exprt &expr)
                     expr.id() == ID_mult ||
                     expr.id() == ID_constant ||
                     expr.id() == ID_symbol ||
-                    expr.id() == ID_index;
+                    expr.id() == ID_index ||
+                    expr.id() == ID_member;
                 }) &&
     std::any_of(tmp0.depth_cbegin(), tmp0.depth_cend(),
                 [](const exprt &expr) {
@@ -1270,7 +1271,8 @@ simplify_exprt::simplify_inequality(const binary_relation_exprt &expr)
                     expr.id() == ID_mult ||
                     expr.id() == ID_constant ||
                     expr.id() == ID_symbol ||
-                    expr.id() == ID_index;
+                    expr.id() == ID_index ||
+                    expr.id() == ID_member;
                 }) &&
     std::any_of(tmp1.depth_cbegin(), tmp1.depth_cend(),
                 [](const exprt &expr) {
