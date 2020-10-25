@@ -1253,6 +1253,7 @@ simplify_exprt::simplify_inequality(const binary_relation_exprt &expr)
                   return expr.id() == ID_typecast ||
                     expr.id() == ID_address_of ||
                     expr.id() == ID_plus ||
+                    expr.id() == ID_mult ||
                     expr.id() == ID_constant ||
                     expr.id() == ID_symbol ||
                     expr.id() == ID_index;
@@ -1266,6 +1267,7 @@ simplify_exprt::simplify_inequality(const binary_relation_exprt &expr)
                   return expr.id() == ID_typecast ||
                     expr.id() == ID_address_of ||
                     expr.id() == ID_plus ||
+                    expr.id() == ID_mult ||
                     expr.id() == ID_constant ||
                     expr.id() == ID_symbol ||
                     expr.id() == ID_index;
