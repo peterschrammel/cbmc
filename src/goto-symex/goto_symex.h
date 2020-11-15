@@ -909,7 +909,7 @@ private:
     const exprt &expr,
     const irep_idt &field_name,
     bool per_object,
-    std::map<irep_idt, typet> &fields);
+    const typet &field_type);
 
   void initialize_rec(
     const namespacet &ns,

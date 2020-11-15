@@ -131,18 +131,39 @@ void goto_symext::initialize_rec(
   typet type = ns.follow(expr.type());
   if(type.id() == ID_array && !per_object)
   {
-    exprt size_expr = to_array_type(type).size();
+    const typet &subtype = to_array_type(type).subtype();
+    const exprt &size_expr = to_array_type(type).size();
     CHECK_RETURN(size_expr.is_constant());
     mp_integer array_size;
     to_integer(to_constant_expr(size_expr), array_size);
-    for(mp_integer index = 0; index < array_size; ++index)
+    if(subtype.id() == ID_signedbv || subtype.id() == ID_unsignedbv)
     {
-      initialize_rec(
-        ns,
-        state,
-        index_exprt(expr, from_integer(index, signed_long_int_type())),
-        per_object,
-        fields);
+      for(const auto &field_pair : fields)
+      {
+        exprt address_expr = expr;
+        typet field_type = array_typet(field_pair.second, size_expr);
+        symbol_exprt field = add_field(
+          ns, state, address_expr, field_pair.first, per_object, field_type);
+        for(mp_integer index = 0; index < array_size; ++index)
+        {
+          code_assignt code_assign(
+            index_exprt(field, from_integer(index, signed_long_int_type())),
+            from_integer(mp_integer(0), field_pair.second));
+          symex_assign(state, code_assign);
+        }
+      }
+    }
+    else
+    {
+      for(mp_integer index = 0; index < array_size; ++index)
+      {
+        initialize_rec(
+          ns,
+          state,
+          index_exprt(expr, from_integer(index, signed_long_int_type())),
+          per_object,
+          fields);
+      }
     }
   }
   else if(type.id() == ID_struct && !per_object)
@@ -176,7 +197,7 @@ void goto_symext::initialize_rec(
       }
 
       symbol_exprt field = add_field(
-        ns, state, address_expr, field_pair.first, per_object, fields);
+        ns, state, address_expr, field_pair.first, per_object, field_pair.second);
       code_assignt code_assign(
         field, from_integer(mp_integer(0), field.type()));
       symex_assign(state, code_assign);
@@ -199,11 +220,11 @@ symbol_exprt goto_symext::add_field(
   const exprt &expr,
   const irep_idt &field_name,
   bool per_object,
-  std::map<irep_idt, typet> &fields)
+  const typet &field_type)
 {
   auto &addresses = state.address_fields[field_name];
   symbolt &new_symbol = get_fresh_aux_symbol(
-    fields.at(field_name),
+    field_type,
     id2string(state.source.function_id),
     from_expr(ns, "", expr) + "." + id2string(field_name),
     state.source.pc->source_location,
@@ -334,22 +355,78 @@ void goto_symext::resolve_value_set_expr(
     // TODO: This should be implemented inside get_subexpression_at_offset?
     auto component_offset =
       numeric_cast<mp_integer>(object_descriptor.offset());
+    optionalt<exprt> array_index = {};
     if(!component_offset.has_value())
+    {
+      if(target.id() == ID_typecast)
+      {
+        const typecast_exprt &typecast_expr = to_typecast_expr(target);
+        const typet &subtype = to_pointer_type(typecast_expr.type()).subtype();
+        if (subtype.id() == ID_signedbv || subtype.id() == ID_unsignedbv)
+        {
+          mp_integer subtype_bytes =
+            to_bitvector_type(subtype).get_width() / mp_integer(8);
+          if (typecast_expr.op().id() == ID_plus)
+          {
+            const plus_exprt &plus_expr = to_plus_expr(typecast_expr.op());
+            if(plus_expr.op1().id() == ID_constant)
+            {
+              component_offset = mp_integer(0);
+              array_index = std::move(from_integer(
+                numeric_cast_v<mp_integer>(to_constant_expr(plus_expr.op1()))
+                / subtype_bytes, signed_long_int_type()));
+            }
+            else if (typecast_expr.op().id() == ID_mult)
+            {
+              component_offset = mp_integer(0);
+              const mult_exprt &mult_expr = to_mult_expr(plus_expr.op1());
+              INVARIANT(
+                numeric_cast_v<mp_integer>(to_constant_expr(mult_expr.op0()))
+                == subtype_bytes, "subtype bytes expected to match");
+              array_index = mult_expr.op1();
+              while(array_index->id() == ID_typecast)
+              {
+                array_index = to_typecast_expr(*array_index).op();
+              }
+            }
+          }
+        }
+      }
+    }
+    if(!component_offset.has_value())
+    {
       return;
+    }
     for(const auto &component : struct_type.components())
     {
       auto offset = member_offset(struct_type, component.get_name(), ns);
       if(!offset.has_value())
+      {
         continue;
+      }
       if(*component_offset == *offset)
       {
-        target = address_of_exprt(member_exprt(
-          object_descriptor.object(), component.get_name(), component.type()));
+        if (array_index.has_value())
+        {
+          target = address_of_exprt(
+            index_exprt(
+              member_exprt(
+                object_descriptor.object(),
+                component.get_name(),
+                component.type()),
+              *array_index));
+        }
+        else
+        {
+          target = address_of_exprt(member_exprt(
+            object_descriptor.object(), component.get_name(), component.type()));
+        }
+        break;
       }
     }
   }
-  else if(followed_type.id() == ID_signed_int ||
-          followed_type.id() == ID_unsigned_int)
+  else if(followed_type.id() == ID_signedbv ||
+          followed_type.id() == ID_unsignedbv)
   {
     auto offset = numeric_cast<mp_integer>(object_descriptor.offset());
     if(!offset.has_value() || !offset->is_zero())
@@ -416,6 +493,7 @@ void goto_symext::symex_set_field(
 
   if(value_set.size() == 1) {
     //log.status() << value_set.begin()->pretty() << messaget::eom;
+    // TODO: fix for arrays
     resolve_value_set_expr(ns, expr, *value_set.begin());
   }
 
@@ -431,6 +509,7 @@ void goto_symext::symex_set_field(
       });
     if(shadowed_address.per_object)
     {
+      // TODO: match for arrays and access via index
       // exact match
       if(shadowed_address.address == expr)
       {
