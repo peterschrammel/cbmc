@@ -439,16 +439,22 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_ptr_arith_address_
   // the operands of the relation are
   // typecast_exprt(plus_exprt(typecast_exprt(address_of_exprt(object)), const_exprt))
 
-  //std::cout << "PTR_INEQ: " << expr.pretty() << std::endl;
+//  std::cout << "PTR_INEQ: " << expr.pretty() << std::endl;
 
   PRECONDITION(expr.id() == ID_equal || expr.id() == ID_notequal);
 
   exprt tmp0 = expr.op0();
   auto &tmp0_address_of = *find_address_of_expr(tmp0);
+  exprt tmp1 = expr.op1();
+  auto &tmp1_address_of = *find_address_of_expr(tmp1);
+  std::cout << "TMP0: " << tmp0.pretty() << std::endl;
+  std::cout << "TMP1: " << tmp1.pretty() << std::endl;
+
   mp_integer tmp0_offset = 0;
 
   if(tmp0_address_of.object().id() == ID_member)
   {
+    std::cout << "MEMBER0" << std::endl;
     const member_exprt &member_expr = to_member_expr(tmp0_address_of.object());
     const typet &followed_type = ns.follow(member_expr.struct_op().type());
     if(followed_type.id() == ID_struct)
@@ -466,26 +472,27 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_ptr_arith_address_
 
   if(
     tmp0_address_of.object().id() == ID_index &&
+    to_index_expr(tmp0_address_of.object()).index().id() == ID_constant &&
     to_index_expr(tmp0_address_of.object()).index().is_zero())
   {
+    std::cout << "INDEX0 ZERO" << std::endl;
     tmp0_address_of =
       address_of_exprt(to_index_expr(tmp0_address_of.object()).array());
   }
-
-  exprt tmp1 = expr.op1();
-  auto &tmp1_address_of = *find_address_of_expr(tmp1);
-
-  if(
-    tmp1_address_of.object().id() == ID_index &&
-    to_index_expr(tmp1_address_of.object()).index().is_zero())
+  else if(
+    tmp0_address_of.object().id() == ID_index &&
+    to_index_expr(tmp0_address_of.object()).index().id() != ID_constant)
   {
-    tmp1_address_of =
-      address_of_exprt(to_index_expr(tmp1_address_of.object()).array());
+    std::cout << "INDEX0 NON-CONST" << std::endl;
+    return unchanged(expr);
   }
+
   mp_integer tmp1_offset = 0;
 
+  std::cout << "ADDR_OF1: " << tmp1_address_of.object().pretty() << std::endl;
   if(tmp1_address_of.object().id() == ID_member)
   {
+    std::cout << "MEMBER1" << std::endl;
     const member_exprt &member_expr = to_member_expr(tmp1_address_of.object());
     const typet &followed_type = ns.follow(member_expr.struct_op().type());
     if(followed_type.id() == ID_struct)
@@ -499,6 +506,23 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_ptr_arith_address_
         tmp1_offset += *offset;
       }
     }
+  }
+
+  if(
+    tmp1_address_of.object().id() == ID_index &&
+    to_index_expr(tmp1_address_of.object()).index().id() == ID_constant &&
+    to_index_expr(tmp1_address_of.object()).index().is_zero())
+  {
+    std::cout << "INDEX1 ZERO" << std::endl;
+    tmp1_address_of =
+      address_of_exprt(to_index_expr(tmp1_address_of.object()).array());
+  }
+  else if(
+    tmp1_address_of.object().id() == ID_index &&
+    to_index_expr(tmp1_address_of.object()).index().id() != ID_constant)
+  {
+    std::cout << "INDEX1 NON-CONST" << std::endl;
+    return unchanged(expr);
   }
 
   const bool has_mult0 =
@@ -524,12 +548,14 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_ptr_arith_address_
                  });
   if(tmp0_plus_it != tmp0.depth_cend() && !has_mult0)
   {
+    std::cout << "PLUS0 NON-MULT" << std::endl;
     tmp0_offset +=
       numeric_cast_v<mp_integer>(
         to_constant_expr(to_plus_expr(*tmp0_plus_it).op1()));
   }
   if(tmp1_plus_it != tmp1.depth_cend() && !has_mult1)
   {
+    std::cout << "PLUS1 NON-MULT" << std::endl;
     tmp1_offset +=
       numeric_cast_v<mp_integer>(
         to_constant_expr(to_plus_expr(*tmp1_plus_it).op1()));
