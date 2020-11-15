@@ -618,13 +618,35 @@ void goto_symext::symex_set_field(
         break;
       }
 
+      if(
+        shadowed_address.address.type().id() == ID_array &&
+        expr.id() == ID_address_of &&
+        to_address_of_expr(expr).object().id() == ID_index)
+      {
+        const index_exprt &index =
+          to_index_expr(to_address_of_expr(expr).object());
+        if(shadowed_address.address == index.array())
+        {
+          log.conditional_output(
+            log.debug(),
+            [ns, shadowed_address, expr](messaget::mstreamt &mstream) {
+              mstream << "exact array match: "
+                      << from_expr(ns, "", shadowed_address.address)
+                      << " == " << from_expr(ns, "", expr) << messaget::eom;
+            });
+          lhs = address_of_exprt(
+            index_exprt(shadowed_address.shadow, index.index()));
+          mux_size = 1;
+          break;
+        }
+      }
+
       if(!filter_by_value_set(value_set, shadowed_address.address))
         continue;
 
       exprt cond0 = equal_exprt(
         shadowed_address.address,
         typecast_exprt::conditional_cast(expr, shadowed_address.address.type()));
-      log.debug() << cond0.pretty() << messaget::eom;
       exprt cond = simplify_expr(cond0, ns);
 
       log.conditional_output(
@@ -658,7 +680,14 @@ void goto_symext::symex_set_field(
 
   if (lhs.is_not_nil()) {
     log.debug() << "mux size set_field: " << mux_size << messaget::eom;
-    lhs = dereference_exprt(lhs);
+    if(lhs.id() == ID_address_of)
+    {
+      lhs = to_address_of_expr(lhs).object();
+    }
+    else
+    {
+      lhs = dereference_exprt(lhs);
+    }
     symex_assign(state, code_assignt(lhs, typecast_exprt::conditional_cast(
                                               rhs, lhs.type())));
   } else {
