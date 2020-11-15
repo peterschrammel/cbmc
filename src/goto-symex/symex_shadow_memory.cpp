@@ -338,6 +338,56 @@ bool goto_symext::filter_by_value_set(
   return false;
 }
 
+optionalt<exprt> goto_symext::resolve_array_index(
+  const namespacet &ns,
+  const exprt &expr)
+{
+  if(expr.id() == ID_typecast)
+  {
+    log.debug() << "    TYPECAST" << messaget::eom;
+    const typecast_exprt &typecast_expr = to_typecast_expr(expr);
+    const typet &subtype = to_pointer_type(typecast_expr.type()).subtype();
+    if (subtype.id() == ID_signedbv || subtype.id() == ID_unsignedbv)
+    {
+      log.debug() << "      INTEGER" << messaget::eom;
+      mp_integer subtype_bytes =
+        to_bitvector_type(subtype).get_width() / mp_integer(8);
+      if (typecast_expr.op().id() == ID_plus)
+      {
+        const plus_exprt &plus_expr = to_plus_expr(typecast_expr.op());
+        log.debug() << "        PLUS " //<< plus_expr.op1().pretty()
+                    << messaget::eom;
+        if(plus_expr.op1().id() == ID_constant)
+        {
+          log.debug() << "          CONSTANT" << messaget::eom;
+          return std::move(from_integer(
+            numeric_cast_v<mp_integer>(to_constant_expr(plus_expr.op1()))
+              / subtype_bytes, signed_long_int_type()));
+        }
+        else if (plus_expr.op1().id() == ID_mult)
+        {
+          log.debug() << "          MULT" << messaget::eom;
+          const mult_exprt &mult_expr = to_mult_expr(plus_expr.op1());
+          INVARIANT(
+            numeric_cast_v<mp_integer>(to_constant_expr(mult_expr.op0()))
+              == subtype_bytes, "subtype bytes expected to match");
+          optionalt<exprt> array_index = mult_expr.op1();
+          while(array_index->id() == ID_typecast)
+          {
+            array_index = to_typecast_expr(*array_index).op();
+          }
+          return array_index;
+        }
+        else
+        {
+          log.debug() << "          UNKNOWN" << messaget::eom;
+        }
+      }
+    }
+  }
+  return {};
+}
+
 void goto_symext::resolve_value_set_expr(
   const namespacet &ns,
   exprt &target,
@@ -345,7 +395,7 @@ void goto_symext::resolve_value_set_expr(
 {
   if(value_set_expr.id() != ID_object_descriptor)
     return;
-  log.debug() << target.pretty() << messaget::eom;
+  //log.debug() << target.pretty() << messaget::eom;
   
   const object_descriptor_exprt &object_descriptor =
     to_object_descriptor_expr(value_set_expr);
@@ -362,49 +412,10 @@ void goto_symext::resolve_value_set_expr(
     if(!component_offset.has_value())
     {
       log.debug() << "  COMPONENT" << messaget::eom;
-      if(target.id() == ID_typecast)
+      array_index = resolve_array_index(ns, target);
+      if(array_index.has_value())
       {
-        log.debug() << "    TYPECAST" << messaget::eom;
-        const typecast_exprt &typecast_expr = to_typecast_expr(target);
-        const typet &subtype = to_pointer_type(typecast_expr.type()).subtype();
-        if (subtype.id() == ID_signedbv || subtype.id() == ID_unsignedbv)
-        {
-          log.debug() << "      INTEGER" << messaget::eom;
-          mp_integer subtype_bytes =
-            to_bitvector_type(subtype).get_width() / mp_integer(8);
-          if (typecast_expr.op().id() == ID_plus)
-          {
-            const plus_exprt &plus_expr = to_plus_expr(typecast_expr.op());
-            log.debug() << "        PLUS " //<< plus_expr.op1().pretty()
-                        << messaget::eom;
-            if(plus_expr.op1().id() == ID_constant)
-            {
-              log.debug() << "          CONSTANT" << messaget::eom;
-              component_offset = mp_integer(0);
-              array_index = std::move(from_integer(
-                numeric_cast_v<mp_integer>(to_constant_expr(plus_expr.op1()))
-                / subtype_bytes, signed_long_int_type()));
-            }
-            else if (plus_expr.op1().id() == ID_mult)
-            {
-              log.debug() << "          MULT" << messaget::eom;
-              component_offset = mp_integer(0);
-              const mult_exprt &mult_expr = to_mult_expr(plus_expr.op1());
-              INVARIANT(
-                numeric_cast_v<mp_integer>(to_constant_expr(mult_expr.op0()))
-                == subtype_bytes, "subtype bytes expected to match");
-              array_index = mult_expr.op1();
-              while(array_index->id() == ID_typecast)
-              {
-                array_index = to_typecast_expr(*array_index).op();
-              }
-            }
-            else
-            {
-              log.debug() << "          UNKNOWN" << messaget::eom;
-            }
-          }
-        }
+        component_offset = mp_integer(0);
       }
     }
     if(!component_offset.has_value())
@@ -449,9 +460,29 @@ void goto_symext::resolve_value_set_expr(
   {
     log.debug() << "INTEGER" << messaget::eom;
     auto offset = numeric_cast<mp_integer>(object_descriptor.offset());
-    if(!offset.has_value() || !offset->is_zero())
-      return;
-    target = address_of_exprt(object_descriptor.object());
+    optionalt<exprt> array_index = resolve_array_index(ns, target);
+    if(array_index.has_value())
+    {
+      log.debug() << "    WITH ARRAY INDEX" << messaget::eom;
+      exprt object = object_descriptor.object();
+      if(
+        object.id() == ID_index &&
+        to_index_expr(object).index().is_zero())
+      {
+        object = to_index_expr(object).array();
+      }
+      target = address_of_exprt(
+        index_exprt(object, *array_index));
+    }
+    else
+    {
+      if(offset.has_value() && offset->is_zero())
+      {
+        log.debug() << "    WITH ZERO OFFSET" << messaget::eom;
+        target = address_of_exprt(object_descriptor.object());
+      }
+    }
+    log.debug() << "result: " << from_expr(ns, "", target) << messaget::eom;
   }
   else
   {
@@ -515,10 +546,10 @@ void goto_symext::symex_set_field(
     return;
   }
 
+  exprt resolved_expr = expr;
   if(value_set.size() == 1) {
     //log.status() << value_set.begin()->pretty() << messaget::eom;
-    // TODO: fix for arrays
-    resolve_value_set_expr(ns, expr, *value_set.begin());
+    resolve_value_set_expr(ns, resolved_expr, *value_set.begin());
   }
 
   for(const auto &shadowed_address : addresses)
@@ -533,16 +564,15 @@ void goto_symext::symex_set_field(
       });
     if(shadowed_address.per_object)
     {
-      // TODO: match for arrays and access via index
       // exact match
-      if(shadowed_address.address == expr)
+      if(shadowed_address.address == resolved_expr)
       {
         log.conditional_output(
           log.debug(),
-          [ns, shadowed_address, expr](messaget::mstreamt &mstream) {
+          [ns, shadowed_address, resolved_expr](messaget::mstreamt &mstream) {
             mstream
               << "exact match: " << from_expr(ns, "", shadowed_address.address)
-              << " == " << from_expr(ns, "", expr) << messaget::eom;
+              << " == " << from_expr(ns, "", resolved_expr) << messaget::eom;
           });
         lhs = address_of_exprt(shadowed_address.shadow);
         mux_size = 1;
@@ -605,13 +635,13 @@ void goto_symext::symex_set_field(
     else // !shadowed_address.per_object
     {
       // exact match
-      if(shadowed_address.address == expr)
+      if(shadowed_address.address == resolved_expr)
       {
         log.conditional_output(
           log.debug(),
-          [ns, shadowed_address, expr](messaget::mstreamt &mstream) {
+          [ns, shadowed_address, resolved_expr](messaget::mstreamt &mstream) {
             mstream << "exact match: " << from_expr(ns, "", shadowed_address.address)
-                    << " == " << from_expr(ns, "", expr) << messaget::eom;
+                    << " == " << from_expr(ns, "", resolved_expr) << messaget::eom;
           });
         lhs = address_of_exprt(shadowed_address.shadow);
         mux_size = 1;
@@ -620,19 +650,19 @@ void goto_symext::symex_set_field(
 
       if(
         shadowed_address.address.type().id() == ID_array &&
-        expr.id() == ID_address_of &&
-        to_address_of_expr(expr).object().id() == ID_index)
+        resolved_expr.id() == ID_address_of &&
+        to_address_of_expr(resolved_expr).object().id() == ID_index)
       {
         const index_exprt &index =
-          to_index_expr(to_address_of_expr(expr).object());
+          to_index_expr(to_address_of_expr(resolved_expr).object());
         if(shadowed_address.address == index.array())
         {
           log.conditional_output(
             log.debug(),
-            [ns, shadowed_address, expr](messaget::mstreamt &mstream) {
+            [ns, shadowed_address, resolved_expr](messaget::mstreamt &mstream) {
               mstream << "exact array match: "
                       << from_expr(ns, "", shadowed_address.address)
-                      << " == " << from_expr(ns, "", expr) << messaget::eom;
+                      << " == " << from_expr(ns, "", resolved_expr) << messaget::eom;
             });
           lhs = address_of_exprt(
             index_exprt(shadowed_address.shadow, index.index()));

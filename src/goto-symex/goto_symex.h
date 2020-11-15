@@ -925,6 +925,10 @@ private:
   bool filter_by_value_set(const value_setst::valuest &value_set,
                            const exprt &address);
 
+  optionalt<exprt> resolve_array_index(
+    const namespacet &ns,
+    const exprt &expr);
+  
   void resolve_value_set_expr(
     const namespacet &ns,
     exprt &target,
