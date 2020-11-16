@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 Test
 --function doubleToInt
 ^EXIT=0$

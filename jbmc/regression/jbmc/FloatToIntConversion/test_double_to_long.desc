@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 Test
 --function doubleToLong
 ^EXIT=0$

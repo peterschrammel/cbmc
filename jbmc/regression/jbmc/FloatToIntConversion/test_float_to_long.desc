@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 Test
 --function floatToLong
 ^EXIT=0$

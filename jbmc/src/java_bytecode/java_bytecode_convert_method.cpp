@@ -1669,6 +1669,29 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
 
       c = convert_putstatic(i_it->source_location, arg0, op, symbol_expr);
     }
+    else if(
+      bytecode == BC_f2i || bytecode == BC_f2l ||
+      bytecode == BC_d2i || bytecode == BC_d2l)
+    {
+      PRECONDITION(op.size() == 1 && results.size() == 1);
+      typet src_type = java_type_from_char(statement[0]);
+      typet dest_type = java_type_from_char(statement[2]);
+      exprt smallest = to_integer_bitvector_type(dest_type).smallest_expr();
+      exprt smallest_minus_one = from_integer(
+        to_integer_bitvector_type(dest_type).smallest() - 1, src_type);
+      exprt largest = to_integer_bitvector_type(dest_type).largest_expr();
+      exprt largest_plus_one = from_integer(
+        to_integer_bitvector_type(dest_type).largest() + 1, src_type);
+      // See JLS 5.1.3. Narrowing Primitive Conversion
+      results[0] =
+        if_exprt(
+          binary_relation_exprt(op[0], ID_le, smallest_minus_one),
+          smallest,
+          if_exprt(
+            binary_relation_exprt(op[0], ID_ge, largest_plus_one),
+            largest,
+            typecast_exprt::conditional_cast(op[0], dest_type)));
+    }
     else if(bytecode == patternt("?2?")) // i2c etc.
     {
       PRECONDITION(op.size() == 1 && results.size() == 1);
