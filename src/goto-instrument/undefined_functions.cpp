@@ -81,7 +81,7 @@ void undefined_function_abort_path(
 
       replaced.insert(id2string(function));
 
-      ins.make_assumption(false_exprt());
+      ins = goto_programt::make_assumption(false_exprt(), ins.source_location);
       ins.source_location.set_comment(
         "'" + id2string(function) + "' is undefined");
     }
