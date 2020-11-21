@@ -523,7 +523,7 @@ void goto_symext::symex_set_field(
   exprt lhs = nil_exprt();
   size_t mux_size = 1;
   value_setst::valuest value_set;
-  state.value_set.get_value_set(expr, value_set, ns);
+  state.value_set.get_reference_set(expr, value_set, ns);
   log.conditional_output(
     log.debug(),
     [ns, value_set](messaget::mstreamt &mstream) {
@@ -758,7 +758,7 @@ void goto_symext::symex_get_field(
   exprt rhs = nil_exprt();
   size_t mux_size = 1;
   value_setst::valuest value_set;
-  state.value_set.get_value_set(expr, value_set, ns);
+  state.value_set.get_reference_set(expr, value_set, ns);
   log.conditional_output(
     log.debug(),
     [ns, value_set](messaget::mstreamt &mstream) {
@@ -1086,13 +1086,13 @@ goto_symext::preprocess_field_decl(
       {
         convert_field_decl(
           ns, message_handler, code_function_call, global_fields);
-        target->make_skip();
+        target->turn_into_skip();
       }
       else if(identifier == CPROVER_PREFIX "field_decl_local")
       {
         convert_field_decl(
           ns, message_handler, code_function_call, local_fields);
-        target->make_skip();
+        target->turn_into_skip();
       }
     }
   }
