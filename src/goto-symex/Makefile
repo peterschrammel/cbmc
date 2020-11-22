@@ -32,6 +32,7 @@ SRC = auto_objects.cpp \
       symex_main.cpp \
       symex_other.cpp \
       symex_shadow_memory.cpp \
+      symex_shadow_memory_util.cpp \
       symex_start_thread.cpp \
       symex_target.cpp \
       symex_target_equation.cpp \

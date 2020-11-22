@@ -922,18 +922,6 @@ private:
     const namespacet &ns,
     const exprt &expr);
 
-  bool filter_by_value_set(const value_setst::valuest &value_set,
-                           const exprt &address);
-
-  optionalt<exprt> resolve_array_index(
-    const namespacet &ns,
-    const exprt &expr);
-  
-  void resolve_value_set_expr(
-    const namespacet &ns,
-    exprt &target,
-    const exprt &value_set_expr);
-
   void symex_types_equal(
     const namespacet &ns,
     goto_symex_statet &state,
