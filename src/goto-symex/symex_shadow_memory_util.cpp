@@ -27,7 +27,7 @@ void log_value_set_match(
   log.conditional_output(
     log.debug(),
     [ns, shadowed_address, expr](messaget::mstreamt &mstream) {
-      mstream << "exact match: "
+      mstream << "value set match: "
               << from_expr(ns, "", shadowed_address.address)
               << " == " << from_expr(ns, "", expr) << messaget::eom;
     });
