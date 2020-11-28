@@ -252,7 +252,11 @@ static optionalt<exprt> set_field_per_object(
       ns);
     log_cond(ns, log, shadowed_address, cond);
 
-    if(!cond.is_false())
+    if(cond.is_true())
+    {
+      return address_of_exprt(shadowed_address.shadow);
+    }
+    else if(!cond.is_false())
     {
       mux_size++;
       if(lhs.is_nil())
@@ -299,7 +303,11 @@ static optionalt<exprt> get_field_per_object(
             matched_base, shadowed_address.address.type()))),
       ns);
     log_cond(ns, log, shadowed_address, cond);
-    if(!cond.is_false())
+    if(cond.is_true())
+    {
+      return shadowed_address.shadow;
+    }
+    else if(!cond.is_false())
     {
       mux_size++;
       if(rhs.is_nil())
@@ -371,7 +379,11 @@ static optionalt<exprt> set_field_per_element(
   log_value_set_match(ns, log, shadowed_address, expr);
   log_cond(ns, log, shadowed_address, cond);
 
-  if(!cond.is_false())
+  if(cond.is_true())
+  {
+    return address_of_exprt(shadowed_address.shadow);
+  }
+  else if(!cond.is_false())
   {
     if(lhs.is_nil())
       return address_of_exprt(shadowed_address.shadow);
@@ -401,24 +413,28 @@ static optionalt<exprt> get_field_per_element(
       typecast_exprt::conditional_cast(expr, shadowed_address.address.type())),
     ns);
   log_cond(ns, log, shadowed_address, cond);
-  if(!cond.is_false())
+  if(cond.is_true())
+  {
+    return shadowed_address.shadow;
+  }
+  else if(!cond.is_false())
   {
     if(rhs.is_nil())
     {
-      rhs = if_exprt(
+      return if_exprt(
         cond,
         typecast_exprt::conditional_cast(shadowed_address.shadow, lhs_type),
         from_integer(-1, lhs_type));
     }
     else
     {
-      rhs = if_exprt(
+      return if_exprt(
         cond,
         typecast_exprt::conditional_cast(shadowed_address.shadow, lhs_type),
         rhs);
     }
   }
-  return rhs;
+  return {};
 }
 
 void goto_symext::symex_set_field(
