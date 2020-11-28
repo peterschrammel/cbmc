@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cstdlib>
 #include <iostream>
+#include <langapi/language_util.h>
 
 #include <util/as_const.h>
 #include <util/base_exceptions.h>
@@ -264,6 +265,14 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
       *it = rename<level>(std::move(*it), ns).get();
 
     const exprt &c_expr = as_const(expr);
+#if 1
+    if(expr.id() == ID_if)
+    {
+      std::cout << "EXPR = " << c_expr.type().pretty() << std::endl;
+      std::cout << "TRUE = " << to_if_expr(c_expr).true_case().type().pretty() << std::endl;
+      std::cout << "FALSE = " << to_if_expr(c_expr).false_case().type().pretty() << std::endl;
+    }
+#endif
     INVARIANT(
       (expr.id() != ID_with ||
        c_expr.type() == to_with_expr(c_expr).old().type()) &&
