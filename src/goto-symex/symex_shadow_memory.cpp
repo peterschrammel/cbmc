@@ -281,47 +281,43 @@ static optionalt<exprt> get_field_per_object(
   
   for(const auto &matched_object : filtered_value_set)
   {
+    value_set_dereferencet::valuet dereference =
+      value_set_dereferencet::build_reference_to(matched_object, expr, ns);
 
-      value_set_dereferencet::valuet dereference =
-          value_set_dereferencet::build_reference_to(matched_object, expr, ns);
-
-        const exprt &matched_base =
-          address_of_exprt(to_object_descriptor_expr(matched_object).object());
-        log_value_set_match(
-          ns, log, shadowed_address, matched_base, dereference, expr);
-        exprt cond = simplify_expr(
-          and_exprt(
-            equal_exprt(
-              expr,
-              typecast_exprt::conditional_cast(
-                dereference.pointer, expr.type())),
-            equal_exprt(
-              shadowed_address.address,
-              typecast_exprt::conditional_cast(
-                matched_base, shadowed_address.address.type()))),
-          ns);
-        log_cond(ns, log, shadowed_address, cond);
-        if(!cond.is_false())
-        {
-          mux_size++;
-          if(rhs.is_nil())
-          {
-            rhs = if_exprt(
-              cond,
-              typecast_exprt::conditional_cast(
-                shadowed_address.shadow, lhs_type),
-              from_integer(-1, lhs_type));
-          }
-          else
-          {
-            rhs = if_exprt(
-              cond,
-              typecast_exprt::conditional_cast(
-                shadowed_address.shadow, lhs_type),
-              rhs);
-          }
-        }
+    const exprt &matched_base =
+      address_of_exprt(to_object_descriptor_expr(matched_object).object());
+    log_value_set_match(
+      ns, log, shadowed_address, matched_base, dereference, expr);
+    exprt cond = simplify_expr(
+      and_exprt(
+        equal_exprt(
+          expr,
+          typecast_exprt::conditional_cast(dereference.pointer, expr.type())),
+        equal_exprt(
+          shadowed_address.address,
+          typecast_exprt::conditional_cast(
+            matched_base, shadowed_address.address.type()))),
+      ns);
+    log_cond(ns, log, shadowed_address, cond);
+    if(!cond.is_false())
+    {
+      mux_size++;
+      if(rhs.is_nil())
+      {
+        rhs = if_exprt(
+          cond,
+          typecast_exprt::conditional_cast(shadowed_address.shadow, lhs_type),
+          from_integer(-1, lhs_type));
       }
+      else
+      {
+        rhs = if_exprt(
+          cond,
+          typecast_exprt::conditional_cast(shadowed_address.shadow, lhs_type),
+          rhs);
+      }
+    }
+  }
   return rhs;
 }
 
