@@ -71,10 +71,6 @@ typet remove_array_type_l2(const typet &type);
 
 void remove_pointer_object(exprt &expr);
 
-std::vector<exprt> get_filtered_value_set(
-  const value_setst::valuest &value_set,
-  const exprt &address);
-
 bool filter_by_value_set(
   const value_setst::valuest &value_set,
   const exprt &address);

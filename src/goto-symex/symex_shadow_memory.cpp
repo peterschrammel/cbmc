@@ -225,13 +225,14 @@ static optionalt<exprt> set_field_per_object(
   exprt lhs,
   size_t &mux_size)
 {
-  std::vector<exprt> filtered_value_set =
-    get_filtered_value_set(value_set, shadowed_address.address);
-  if(filtered_value_set.empty())
-    return {};
-
-  for(const auto &matched_object : filtered_value_set)
+  for(const auto &matched_object : value_set)
   {
+    if(matched_object.id() != ID_object_descriptor)
+    {
+      log.debug() << "VALUE SET CONTAINS UNKNOWN" << messaget::eom;
+      continue;
+    }
+
     value_set_dereferencet::valuet dereference =
       value_set_dereferencet::build_reference_to(matched_object, expr, ns);
 
@@ -278,13 +279,14 @@ static optionalt<exprt> get_field_per_object(
   const typet &lhs_type,
   size_t &mux_size)
 {
-  std::vector<exprt> filtered_value_set =
-    get_filtered_value_set(value_set, shadowed_address.address);
-  if(filtered_value_set.empty())
-    return {};
-  
-  for(const auto &matched_object : filtered_value_set)
+  for(const auto &matched_object : value_set)
   {
+    if(matched_object.id() != ID_object_descriptor)
+    {
+      log.debug() << "VALUE SET CONTAINS UNKNOWN" << messaget::eom;
+      continue;
+    }
+
     value_set_dereferencet::valuet dereference =
       value_set_dereferencet::build_reference_to(matched_object, expr, ns);
 

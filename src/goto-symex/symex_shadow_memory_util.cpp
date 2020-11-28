@@ -197,43 +197,6 @@ void remove_pointer_object(exprt &expr)
   }
 }
 
-std::vector<exprt> get_filtered_value_set(
-  const value_setst::valuest &value_set,
-  const exprt &address)
-{
-  std::vector<exprt> result;
-  INVARIANT(
-    address.id() == ID_address_of, "address of shadowed object expected");
-
-  exprt expr2 = to_address_of_expr(address).object();
-  if(expr2.id() == ID_index)
-  {
-    expr2 = to_index_expr(expr2).array();
-  }
-
-  for(const auto &e : value_set)
-  {
-    if(e.id() != ID_object_descriptor)
-      continue;
-
-    exprt expr1 = to_object_descriptor_expr(e).object();
-    if(expr1.id() == ID_index)
-    {
-      expr1 = to_index_expr(expr1).array();
-    }
-    if(expr1.id() != ID_symbol)
-      continue;
-
-    if(
-      expr2.id() != ID_symbol || to_symbol_expr(expr1).get_identifier() ==
-                                   to_symbol_expr(expr2).get_identifier())
-    {
-      result.push_back(e);
-    }
-  }
-  return result;
-}
-
 bool filter_by_value_set(
   const value_setst::valuest &value_set,
   const exprt &address)
