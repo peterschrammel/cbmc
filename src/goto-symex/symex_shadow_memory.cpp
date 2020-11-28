@@ -394,33 +394,30 @@ static optionalt<exprt> get_field_per_element(
   if(!filter_by_value_set(value_set, shadowed_address.address))
     return {};
 
-      log_value_set_match(ns, log, shadowed_address, expr);
-      exprt cond = simplify_expr(
-        equal_exprt(
-          shadowed_address.address,
-          typecast_exprt::conditional_cast(
-            expr, shadowed_address.address.type())),
-        ns);
-      log_cond(ns, log, shadowed_address, cond);
-      if(!cond.is_false())
-      {
-        if(rhs.is_nil())
-        {
-          rhs = if_exprt(
-            cond,
-            typecast_exprt::conditional_cast(
-              shadowed_address.shadow, lhs_type),
-            from_integer(-1, lhs_type));
-        }
-        else
-        {
-          rhs = if_exprt(
-            cond,
-            typecast_exprt::conditional_cast(
-              shadowed_address.shadow, lhs_type),
-            rhs);
-        }
-      }
+  log_value_set_match(ns, log, shadowed_address, expr);
+  exprt cond = simplify_expr(
+    equal_exprt(
+      shadowed_address.address,
+      typecast_exprt::conditional_cast(expr, shadowed_address.address.type())),
+    ns);
+  log_cond(ns, log, shadowed_address, cond);
+  if(!cond.is_false())
+  {
+    if(rhs.is_nil())
+    {
+      rhs = if_exprt(
+        cond,
+        typecast_exprt::conditional_cast(shadowed_address.shadow, lhs_type),
+        from_integer(-1, lhs_type));
+    }
+    else
+    {
+      rhs = if_exprt(
+        cond,
+        typecast_exprt::conditional_cast(shadowed_address.shadow, lhs_type),
+        rhs);
+    }
+  }
   return rhs;
 }
 
