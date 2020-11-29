@@ -12,53 +12,55 @@
 // remove this after debugging
 #include <langapi/language_util.h>
 
-
-static optionalt<exprt> resolve_array_index(
-  const namespacet &ns, messaget &log, const exprt &expr)
+static optionalt<exprt>
+resolve_array_index(const namespacet &ns, messaget &log, exprt expr)
 {
-  if(expr.id() == ID_typecast)
+  while(expr.id() == ID_typecast)
   {
     log.debug() << "    TYPECAST" << messaget::eom;
-    const typecast_exprt &typecast_expr = to_typecast_expr(expr);
-    const typet &subtype = to_pointer_type(typecast_expr.type()).subtype();
-    if(subtype.id() == ID_signedbv || subtype.id() == ID_unsignedbv ||
-      subtype.id() == ID_pointer)
+    expr = to_typecast_expr(expr).op();
+  }
+  if(expr.type().id() != ID_pointer)
+    return {};
+
+  const typet &subtype = to_pointer_type(expr.type()).subtype();
+  if(subtype.id() == ID_signedbv || subtype.id() == ID_unsignedbv ||
+    subtype.id() == ID_pointer)
+  {
+    log.debug() << "      INTEGER" << messaget::eom;
+    mp_integer subtype_bytes =
+      to_bitvector_type(subtype).get_width() / mp_integer(8);
+    if(expr.id() == ID_plus)
     {
-      log.debug() << "      INTEGER" << messaget::eom;
-      mp_integer subtype_bytes =
-        to_bitvector_type(subtype).get_width() / mp_integer(8);
-      if(typecast_expr.op().id() == ID_plus)
+      const plus_exprt &plus_expr = to_plus_expr(expr);
+      log.debug() << "        PLUS " //<< plus_expr.op1().pretty()
+                  << messaget::eom;
+      if(plus_expr.op1().id() == ID_constant)
       {
-        const plus_exprt &plus_expr = to_plus_expr(typecast_expr.op());
-        log.debug() << "        PLUS " //<< plus_expr.op1().pretty()
-                    << messaget::eom;
-        if(plus_expr.op1().id() == ID_constant)
+        log.debug() << "          CONSTANT" << messaget::eom;
+        return std::move(from_integer(
+          numeric_cast_v<mp_integer>(to_constant_expr(plus_expr.op1())) /
+            subtype_bytes,
+          signed_long_int_type()));
+      }
+      else if(plus_expr.op1().id() == ID_mult)
+      {
+        log.debug() << "          MULT" << messaget::eom;
+        const mult_exprt &mult_expr = to_mult_expr(plus_expr.op1());
+        INVARIANT(
+          numeric_cast_v<mp_integer>(to_constant_expr(mult_expr.op0())) ==
+            subtype_bytes,
+          "subtype bytes expected to match");
+        optionalt<exprt> array_index = mult_expr.op1();
+        while(array_index->id() == ID_typecast)
         {
-          log.debug() << "          CONSTANT" << messaget::eom;
-          return std::move(from_integer(
-            numeric_cast_v<mp_integer>(to_constant_expr(plus_expr.op1())) /
-              subtype_bytes,
-            signed_long_int_type()));
+          array_index = to_typecast_expr(*array_index).op();
         }
-        else if(plus_expr.op1().id() == ID_mult)
-        {
-          log.debug() << "          MULT" << messaget::eom;
-          const mult_exprt &mult_expr = to_mult_expr(plus_expr.op1());
-          INVARIANT(
-            numeric_cast_v<mp_integer>(to_constant_expr(mult_expr.op0())) ==
-              subtype_bytes,
-            "subtype bytes expected to match");
-          optionalt<exprt> array_index = mult_expr.op1();
-          while(array_index->id() == ID_typecast)
-          {
-            array_index = to_typecast_expr(*array_index).op();
-          }
-          return array_index;
-        }
-        else
-        {
-          log.debug() << "          UNKNOWN" << messaget::eom;
-        }
+        return array_index;
+      }
+      else
+      {
+        log.debug() << "          UNKNOWN" << messaget::eom;
       }
     }
   }
