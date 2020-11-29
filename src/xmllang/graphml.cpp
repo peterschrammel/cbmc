@@ -390,6 +390,16 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
     key.set_attribute("id", "architecture");
   }
 
+  // <key attr.name="creationTime" attr.type="string" for="graph"
+  //      id="creationtime"/>
+  {
+    xmlt &key=graphml.new_element("key");
+    key.set_attribute("attr.name", "creationTime");
+    key.set_attribute("attr.type", "string");
+    key.set_attribute("for", "graph");
+    key.set_attribute("id", "creationtime");
+  }
+
   // <key attr.name="producer" attr.type="string" for="graph"
   //      id="producer"/>
   {
