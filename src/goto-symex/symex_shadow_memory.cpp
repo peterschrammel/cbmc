@@ -636,6 +636,9 @@ void goto_symext::symex_field_static_init(
   if(state.source.function_id != CPROVER_PREFIX "initialize")
     return;
 
+  if(expr.get_original_expr().id() != ID_symbol)
+    return;
+
   const irep_idt &identifier =
     to_symbol_expr(expr.get_original_expr()).get_identifier();
   if(has_prefix(id2string(identifier), CPROVER_PREFIX))
