@@ -90,7 +90,8 @@ void goto_symext::initialize_rec(
     CHECK_RETURN(size_expr.is_constant());
     mp_integer array_size;
     to_integer(to_constant_expr(size_expr), array_size);
-    if(subtype.id() == ID_signedbv || subtype.id() == ID_unsignedbv)
+    if(subtype.id() == ID_signedbv || subtype.id() == ID_unsignedbv ||
+       subtype.id() == ID_pointer)
     {
       for(const auto &field_pair : fields)
       {
