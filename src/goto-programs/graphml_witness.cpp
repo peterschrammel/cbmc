@@ -464,10 +464,6 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
         xmlt &data_l = edge.new_element("data");
         data_l.set_attribute("key", "startline");
         data_l.data = id2string(graphml[from].line);
-
-        xmlt &data_t = edge.new_element("data");
-        data_t.set_attribute("key", "threadId");
-        data_t.data = std::to_string(it->thread_nr);
       }
 
       const auto lhs_object = it->get_lhs_object();
