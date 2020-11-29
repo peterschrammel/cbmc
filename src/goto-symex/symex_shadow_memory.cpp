@@ -340,8 +340,14 @@ static optionalt<exprt> exact_match(
   const goto_symex_statet::shadowed_addresst &shadowed_address,
   const exprt &resolved_expr)
 {
+  log.debug() << "checking exact match "
+              << from_expr(ns, "", shadowed_address.address)
+              << " =?= "
+              << from_expr(ns, "", resolved_expr)
+              << messaget::eom;
   if(shadowed_address.address == resolved_expr)
   {
+    log.debug() << "syntactic match" << messaget::eom;
     log_exact_match(ns, log, shadowed_address, resolved_expr);
     return address_of_exprt(shadowed_address.shadow);
   }
@@ -351,10 +357,12 @@ static optionalt<exprt> exact_match(
     resolved_expr.id() == ID_address_of &&
     to_address_of_expr(resolved_expr).object().id() == ID_index)
   {
+    log.debug() << "resolved expression is array with index" << messaget::eom;
     const index_exprt &index =
       to_index_expr(to_address_of_expr(resolved_expr).object());
     if(shadowed_address.address == index.array())
     {
+      log.debug() << "syntactic array match" << messaget::eom;
       log_exact_match(ns, log, shadowed_address, resolved_expr);
       return
         address_of_exprt(index_exprt(shadowed_address.shadow, index.index()));
@@ -370,14 +378,51 @@ static optionalt<exprt> set_field_per_element(
   const value_setst::valuest &value_set,
   const goto_symex_statet::shadowed_addresst &shadowed_address,
   const exprt &expr,
+  const exprt &resolved_expr,
   const exprt &lhs)
 {
   if(!filter_by_value_set(value_set, shadowed_address.address))
     return {};
 
+  exprt lhs_eq = shadowed_address.address;
+  if((shadowed_address.address.type().id() == ID_array ||
+      shadowed_address.address.type().id() == ID_pointer) &&
+     to_address_of_expr(resolved_expr).op().id() == ID_index)
+  {
+    const index_exprt &resolved_index = to_index_expr(to_address_of_expr(resolved_expr).op());
+    typet resolved_subtype = empty_typet();
+    if(resolved_index.array().type().id() == ID_pointer)
+    {
+      resolved_subtype = to_pointer_type(resolved_index.array().type()).subtype();
+    }
+    else
+    {
+      resolved_subtype = to_array_type(resolved_index.array().type()).subtype();
+    }
+    typet shadow_subtype = empty_typet();
+    if(shadowed_address.address.type().id() == ID_pointer)
+    {
+      shadow_subtype = to_pointer_type(shadowed_address.address.type()).subtype();
+    }
+    else
+    {
+      shadow_subtype = to_array_type(shadowed_address.address.type()).subtype();
+    }
+
+    if(resolved_subtype != shadow_subtype)
+    {
+      return {};
+    }
+
+    lhs_eq = address_of_exprt(
+      index_exprt(
+        shadowed_address.address,
+        resolved_index.index()));
+  }
+
   exprt cond0 = equal_exprt(
-    shadowed_address.address,
-    typecast_exprt::conditional_cast(expr, shadowed_address.address.type()));
+    lhs_eq,
+    typecast_exprt::conditional_cast(expr, lhs_eq.type()));
   exprt cond = simplify_expr(cond0, ns);
   log_value_set_match(ns, log, shadowed_address, expr);
   log_cond(ns, log, shadowed_address, cond);
@@ -403,22 +448,64 @@ static optionalt<exprt> get_field_per_element(
   const value_setst::valuest &value_set,
   const goto_symex_statet::shadowed_addresst &shadowed_address,
   const exprt &expr,
+  const exprt &resolved_expr,
   exprt rhs,
   const typet &lhs_type)
 {
   if(!filter_by_value_set(value_set, shadowed_address.address))
     return {};
 
+  exprt shadow = shadowed_address.shadow;
+  exprt shadow_addr = shadowed_address.address;
+  if((shadowed_address.address.type().id() == ID_array ||
+      shadowed_address.address.type().id() == ID_pointer) &&
+     to_address_of_expr(resolved_expr).op().id() == ID_index)
+  {
+    const index_exprt &resolved_index = to_index_expr(to_address_of_expr(resolved_expr).op());
+    typet resolved_subtype = empty_typet();
+    if(resolved_index.array().type().id() == ID_pointer)
+    {
+      resolved_subtype = to_pointer_type(resolved_index.array().type()).subtype();
+    }
+    else
+    {
+      resolved_subtype = to_array_type(resolved_index.array().type()).subtype();
+    }
+    typet shadow_subtype = empty_typet();
+    if(shadowed_address.address.type().id() == ID_pointer)
+    {
+      shadow_subtype = to_pointer_type(shadowed_address.address.type()).subtype();
+    }
+    else
+    {
+      shadow_subtype = to_array_type(shadowed_address.address.type()).subtype();
+    }
+
+    if(resolved_subtype != shadow_subtype)
+    {
+      return {};
+    }
+
+    shadow_addr = address_of_exprt(
+      index_exprt(
+        shadowed_address.address,
+        resolved_index.index()));
+    shadow = index_exprt(
+        shadowed_address.shadow,
+        resolved_index.index());
+  }
+
+
   log_value_set_match(ns, log, shadowed_address, expr);
   exprt cond = simplify_expr(
     equal_exprt(
-      shadowed_address.address,
-      typecast_exprt::conditional_cast(expr, shadowed_address.address.type())),
+      shadow_addr,
+      typecast_exprt::conditional_cast(expr, shadow_addr.type())),
     ns);
   log_cond(ns, log, shadowed_address, cond);
   if(cond.is_true())
   {
-    return shadowed_address.shadow;
+    return shadow;
   }
   else if(!cond.is_false())
   {
@@ -426,14 +513,14 @@ static optionalt<exprt> get_field_per_element(
     {
       return if_exprt(
         cond,
-        typecast_exprt::conditional_cast(shadowed_address.shadow, lhs_type),
+        typecast_exprt::conditional_cast(shadow, lhs_type),
         from_integer(-1, lhs_type));
     }
     else
     {
       return if_exprt(
         cond,
-        typecast_exprt::conditional_cast(shadowed_address.shadow, lhs_type),
+        typecast_exprt::conditional_cast(shadow, lhs_type),
         rhs);
     }
   }
@@ -483,7 +570,7 @@ void goto_symext::symex_set_field(
   // build lhs
   const exprt &rhs = value;
   exprt lhs = nil_exprt();
-  size_t mux_size = 1;
+  size_t mux_size = 0;
   for(const auto &shadowed_address : addresses)
   {
     log_try_shadow_address(ns, log, shadowed_address);
@@ -508,7 +595,7 @@ void goto_symext::symex_set_field(
     else // !shadowed_address.per_object
     {
       maybe_lhs = set_field_per_element(
-        ns, log, value_set, shadowed_address, expr, lhs);
+        ns, log, value_set, shadowed_address, expr, resolved_expr, lhs);
       if(maybe_lhs)
       {
         lhs = *maybe_lhs;
@@ -583,7 +670,7 @@ void goto_symext::symex_get_field(
   for(const auto &shadow_address : addresses)
   {
     log_try_shadow_address(ns, log, shadow_address);
-    
+
     auto maybe_rhs = exact_match(
       ns, log, shadow_address, resolved_expr);
     if(maybe_rhs)
@@ -592,7 +679,7 @@ void goto_symext::symex_get_field(
       mux_size = 1;
       break;
     }
-      
+
     if(shadow_address.per_object)
     {
       maybe_rhs = get_field_per_object(
@@ -605,7 +692,7 @@ void goto_symext::symex_get_field(
     else // !shadowed_address.per_object
     {
       maybe_rhs = get_field_per_element(
-        ns, log, value_set, shadow_address, expr, rhs, lhs.type());
+        ns, log, value_set, shadow_address, expr, resolved_expr, rhs, lhs.type());
       if(maybe_rhs)
       {
         rhs = *maybe_rhs;
