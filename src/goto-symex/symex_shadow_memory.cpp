@@ -185,7 +185,7 @@ symbol_exprt goto_symext::add_field(
   symbolt &new_symbol = get_fresh_aux_symbol(
     field_type,
     id2string(state.source.function_id),
-    from_expr(ns, "", expr) + "." + id2string(field_name),
+    "SM__" + from_expr(ns, "", expr) + "__" + id2string(field_name),
     state.source.pc->source_location,
     ID_C,
     state.symbol_table);
