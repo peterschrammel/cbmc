@@ -315,7 +315,7 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
     xmlt &key = graphml.new_element("key");
     key.set_attribute("attr.name", "cyclehead");
     key.set_attribute("attr.type", "boolean");
-    key.set_attribute("for", "edge");
+    key.set_attribute("for", "node");
     key.set_attribute("id", "cyclehead");
 
     key.new_element("default").data = "false";
