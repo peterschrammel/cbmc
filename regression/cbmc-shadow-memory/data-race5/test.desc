@@ -1,0 +1,8 @@
+KNOWNBUG
+main.c
+--unwind 3 --variable-array-size 2
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

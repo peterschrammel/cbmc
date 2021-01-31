@@ -1,0 +1,8 @@
+THOROUGH
+main.c
+--verbosity 10 --variable-array-size 8
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

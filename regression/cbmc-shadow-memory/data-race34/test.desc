@@ -1,0 +1,9 @@
+THOROUGH
+main.c
+--unwind 1 --no-unwinding-assertions --object-bits 16 --stop-on-fail --nondet-static --verbosity 10 --show-vcc
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Takes a while
