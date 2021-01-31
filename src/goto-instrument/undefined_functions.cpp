@@ -45,6 +45,9 @@ void undefined_function_abort_path(
   const std::list<std::string> &ignore_functions,
   std::ostream &out)
 {
+  std::set<std::string> replaced;
+  std::set<std::string> ignored;
+
   Forall_goto_functions(it, goto_model.goto_functions)
   {
     for(auto &ins : it->second.body.instructions)
@@ -57,7 +60,7 @@ void undefined_function_abort_path(
       if(call.function().id()!=ID_symbol)
         continue;
 
-      const irep_idt &function=
+      const irep_idt function =
         to_symbol_expr(call.function()).get_identifier();
 
       goto_functionst::function_mapt::const_iterator entry=
@@ -79,13 +82,27 @@ void undefined_function_abort_path(
           ignore_functions.end(),
           id2string(function)) != ignore_functions.end())
       {
+        ignored.insert(id2string(function));
         continue;
       }
+
+      replaced.insert(id2string(function));
 
       ins = goto_programt::make_assumption(false_exprt(), ins.source_location);
       ins.source_location.set_comment(
         "'" + id2string(function) + "' is undefined");
     }
+  }
+
+  out << "Replaced by assume(false):\n";
+  for(const auto &function : replaced)
+  {
+    out << "  " << function << '\n';
+  }
+  out << "Not replaced:\n";
+  for(const auto &function : ignored)
+  {
+    out << "  " << function << '\n';
   }
 }
 
