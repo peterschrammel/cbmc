@@ -35,6 +35,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../goto-instrument/cover_instrument_other$(OBJEXT) \
       ../goto-instrument/cover_util$(OBJEXT) \
       ../goto-instrument/reachability_slicer$(OBJEXT) \
+      ../goto-instrument/remove_printf$(OBJEXT) \
       ../goto-instrument/nondet_static$(OBJEXT) \
       ../goto-instrument/full_slicer$(OBJEXT) \
       ../goto-instrument/unwindset$(OBJEXT) \
