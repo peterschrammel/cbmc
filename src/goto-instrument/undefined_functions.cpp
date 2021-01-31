@@ -13,6 +13,7 @@ Date: July 2016
 
 #include "undefined_functions.h"
 
+#include <algorithm>
 #include <ostream>
 
 #include <util/cprover_prefix.h>
@@ -39,9 +40,13 @@ void list_undefined_functions(
   }
 }
 
-void undefined_function_abort_path(goto_modelt &goto_model)
+void undefined_function_abort_path(
+  goto_modelt &goto_model,
+  const std::list<std::string> &ignore_functions,
+  std::ostream &out)
 {
   Forall_goto_functions(it, goto_model.goto_functions)
+  {
     for(auto &ins : it->second.body.instructions)
     {
       if(!ins.is_function_call())
@@ -68,8 +73,23 @@ void undefined_function_abort_path(goto_modelt &goto_model)
         continue;
       }
 
+      if(
+        std::find(
+          ignore_functions.begin(),
+          ignore_functions.end(),
+          id2string(function)) != ignore_functions.end())
+      {
+        continue;
+      }
+
       ins = goto_programt::make_assumption(false_exprt(), ins.source_location);
       ins.source_location.set_comment(
         "'" + id2string(function) + "' is undefined");
     }
+  }
+}
+
+void undefined_function_abort_path(goto_modelt &goto_model, std::ostream &out)
+{
+  undefined_function_abort_path(goto_model, {}, out);
 }

@@ -15,6 +15,7 @@ Date: July 2016
 #define CPROVER_UNDEFINED_FUNCTIONS_H
 
 #include <iosfwd>
+#include <list>
 
 class namespacet;
 class goto_modelt;
@@ -23,6 +24,11 @@ void list_undefined_functions(
   const goto_modelt &,
   std::ostream &);
 
-void undefined_function_abort_path(goto_modelt &);
+void undefined_function_abort_path(goto_modelt &, std::ostream &);
+
+void undefined_function_abort_path(
+  goto_modelt &,
+  const std::list<std::string> &ignore_functions,
+  std::ostream &);
 
 #endif
