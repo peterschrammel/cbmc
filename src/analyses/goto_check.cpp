@@ -49,6 +49,7 @@ public:
     enable_bounds_check=_options.get_bool_option("bounds-check");
     enable_pointer_check=_options.get_bool_option("pointer-check");
     enable_memory_leak_check=_options.get_bool_option("memory-leak-check");
+    enable_memory_cleanup_check=_options.get_bool_option("memory-cleanup-check");
     enable_div_by_zero_check=_options.get_bool_option("div-by-zero-check");
     enable_signed_overflow_check=
       _options.get_bool_option("signed-overflow-check");
@@ -135,6 +136,7 @@ protected:
   bool enable_bounds_check;
   bool enable_pointer_check;
   bool enable_memory_leak_check;
+  bool enable_memory_cleanup_check;
   bool enable_div_by_zero_check;
   bool enable_signed_overflow_check;
   bool enable_unsigned_overflow_check;
@@ -1729,7 +1731,7 @@ void goto_checkt::goto_check(
       // These are further 'exit points' of the program
       const exprt simplified_guard = simplify_expr(i.guard, ns);
       if(
-        enable_memory_leak_check && simplified_guard.is_false() &&
+        enable_memory_cleanup_check && simplified_guard.is_false() &&
         (i.function == "abort" || i.function == "exit" ||
          i.function == "_Exit" ||
          (i.labels.size() == 1 && i.labels.front() == "__VERIFIER_abort")))
