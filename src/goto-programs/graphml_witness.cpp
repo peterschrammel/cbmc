@@ -405,9 +405,23 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     {
       // advance
     }
-    const std::size_t to=
-      next==goto_trace.steps.end()?
-      sink:step_to_node[next->step_nr];
+
+    std::size_t to=sink;
+    // nontermination lasso traces end in a backwards goto:
+    if(next==goto_trace.steps.end() &&
+       it->is_goto() && it->pc->is_backwards_goto())
+    {
+      goto_tracet::stepst::const_iterator last=it;
+      for(--last; last->pc==it->pc->get_target(); --last)
+        ;
+      // we'll close the loop
+      to=step_to_node[last->step_nr];
+    }
+    else
+    {
+      // advance to the next step
+      to=step_to_node[next->step_nr];
+    }
 
     switch(it->type)
     {
