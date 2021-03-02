@@ -155,8 +155,11 @@ std::string graphml_witnesst::convert_assign_rec(
     exprt clean_rhs=assign.rhs();
     remove_l0_l1(clean_rhs);
 
-    result=from_expr(ns, identifier, assign.lhs())+" = "+
-           from_expr(ns, identifier, clean_rhs)+";";
+    std::string lhs=from_expr(ns, identifier, assign.lhs());
+    if(lhs.find('$')!=std::string::npos)
+      lhs="\\result";
+
+    result=lhs+" = "+from_expr(ns, identifier, clean_rhs)+";";
   }
 
   cache.insert({{identifier.get_no(), &assign.read()}, result});
@@ -181,7 +184,6 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
 
   const graphmlt::node_indext sink=graphml.add_node();
   graphml[sink].node_name="sink";
-  graphml[sink].thread_nr=0;
   graphml[sink].is_violation=false;
   graphml[sink].has_invariant=false;
 
@@ -234,13 +236,14 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
       std::to_string(it->pc->location_number)+"."+std::to_string(it->step_nr);
     graphml[node].file=source_location.get_file();
     graphml[node].line=source_location.get_line();
-    graphml[node].thread_nr=it->thread_nr;
     graphml[node].is_violation=
       it->type==goto_trace_stept::ASSERT && !it->cond_value;
     graphml[node].has_invariant=false;
 
     step_to_node[it->step_nr]=node;
   }
+
+  std::size_t thread_id=0;
 
   // build edges
   for(goto_tracet::stepst::const_iterator
@@ -288,6 +291,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     case goto_trace_stept::ASSIGNMENT:
     case goto_trace_stept::ASSERT:
     case goto_trace_stept::GOTO:
+    case goto_trace_stept::typet::SPAWN:
       {
         xmlt edge("edge");
         edge.set_attribute("source", graphml[from].node_name);
@@ -301,6 +305,10 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
           xmlt &data_l=edge.new_element("data");
           data_l.set_attribute("key", "startline");
           data_l.data=id2string(graphml[from].line);
+
+          xmlt &data_t=edge.new_element("data");
+          data_t.set_attribute("key", "threadId");
+          data_t.data=std::to_string(it->thread_nr);
         }
 
         if((it->type==goto_trace_stept::ASSIGNMENT ||
@@ -308,16 +316,34 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
            it->lhs_object_value.is_not_nil() &&
            it->full_lhs.is_not_nil())
         {
-          irep_idt identifier=it->lhs_object.get_identifier();
+          if(id2string(it->lhs_object.get_identifier())
+             .find("pthread_create::thread")!=std::string::npos)
+          {
+            xmlt &data_t=edge.new_element("data");
+            data_t.set_attribute("key", "createThread");
+            data_t.data=std::to_string(++thread_id);
+          }
+          else if(id2string(it->lhs_object.get_identifier())
+               .find("#return_value")==std::string::npos &&
+             id2string(it->lhs_object.get_identifier())
+               .find("thread")==std::string::npos &&
+             id2string(it->lhs_object.get_identifier())
+               .find("mutex")==std::string::npos &&
+             (!it->lhs_object_value.is_constant() ||
+              !it->lhs_object_value.has_operands() ||
+              !has_prefix(id2string(it->lhs_object_value.op0().get(ID_value)),
+                          "INVALID-")))
+          {
+            xmlt &val=edge.new_element("data");
+            val.set_attribute("key", "assumption");
+            code_assignt assign(it->lhs_object, it->lhs_object_value);
+            irep_idt identifier=it->lhs_object.get_identifier();
+            val.data=convert_assign_rec(identifier, assign);
 
-          xmlt &val=edge.new_element("data");
-          val.set_attribute("key", "assumption");
-          code_assignt assign(it->lhs_object, it->lhs_object_value);
-          val.data=convert_assign_rec(identifier, assign);
-
-          xmlt &val_s=edge.new_element("data");
-          val_s.set_attribute("key", "assumption.scope");
-          val_s.data=id2string(it->pc->source_location.get_function());
+            xmlt &val_s=edge.new_element("data");
+            val_s.set_attribute("key", "assumption.scope");
+            val_s.data=id2string(it->pc->source_location.get_function());
+          }
         }
         else if(it->type==goto_trace_stept::GOTO &&
                 it->pc->is_goto())
@@ -365,7 +391,6 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     case goto_trace_stept::OUTPUT:
     case goto_trace_stept::SHARED_READ:
     case goto_trace_stept::SHARED_WRITE:
-    case goto_trace_stept::SPAWN:
     case goto_trace_stept::MEMORY_BARRIER:
     case goto_trace_stept::ATOMIC_BEGIN:
     case goto_trace_stept::ATOMIC_END:
@@ -398,7 +423,6 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
 
   const graphmlt::node_indext sink=graphml.add_node();
   graphml[sink].node_name="sink";
-  graphml[sink].thread_nr=0;
   graphml[sink].is_violation=false;
   graphml[sink].has_invariant=false;
 
@@ -444,7 +468,6 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
       std::to_string(step_nr);
     graphml[node].file=source_location.get_file();
     graphml[node].line=source_location.get_line();
-    graphml[node].thread_nr=it->source.thread_nr;
     graphml[node].is_violation=false;
     graphml[node].has_invariant=false;
 
@@ -485,6 +508,7 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
     case goto_trace_stept::ASSIGNMENT:
     case goto_trace_stept::ASSERT:
     case goto_trace_stept::GOTO:
+    case goto_trace_stept::typet::SPAWN:
       {
         xmlt edge("edge");
         edge.set_attribute("source", graphml[from].node_name);
@@ -537,7 +561,6 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
     case goto_trace_stept::OUTPUT:
     case goto_trace_stept::SHARED_READ:
     case goto_trace_stept::SHARED_WRITE:
-    case goto_trace_stept::SPAWN:
     case goto_trace_stept::MEMORY_BARRIER:
     case goto_trace_stept::ATOMIC_BEGIN:
     case goto_trace_stept::ATOMIC_END:
