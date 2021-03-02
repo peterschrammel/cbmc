@@ -90,6 +90,11 @@ void goto_inlinet::parameter_assignments(
         {
           actual = typecast_exprt(actual, f_partype);
         }
+        else if(f_partype.id()==ID_floatbv &&
+                f_acttype.id()==ID_floatbv)
+        {
+          actual = typecast_exprt(actual, f_partype);
+        }
         else if((f_partype.id()==ID_signedbv ||
                  f_partype.id()==ID_unsignedbv ||
                  f_partype.id()==ID_bool) &&
