@@ -6,24 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cassert>
+#include "boolbv.h"
 
 #include <util/prefix.h>
 #include <util/string2int.h>
-
-#include "boolbv.h"
-
-/*******************************************************************\
-
-Function: boolbvt::convert_overflow
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt boolbvt::convert_overflow(const exprt &expr)
 {
@@ -107,6 +93,72 @@ literalt boolbvt::convert_overflow(const exprt &expr)
       literalt all_zero=!prop.lor(bv_overflow);
       return !prop.lor(all_one, all_zero);
     }
+  }
+  else if(expr.id() == ID_overflow_shl)
+  {
+    if(operands.size() != 2)
+      throw "operator " + expr.id_string() + " takes two operands";
+
+    const bvt &bv0=convert_bv(operands[0]);
+    const bvt &bv1=convert_bv(operands[1]);
+
+    std::size_t old_size = bv0.size();
+    std::size_t new_size = old_size * 2;
+
+    bv_utilst::representationt rep=
+      operands[0].type().id()==ID_signedbv?bv_utilst::SIGNED:
+                                           bv_utilst::UNSIGNED;
+
+    bvt bv_ext=bv_utils.extension(bv0, new_size, rep);
+
+    bvt result=bv_utils.shift(bv_ext, bv_utilst::LEFT, bv1);
+
+    // a negative shift is undefined; yet this isn't an overflow
+    literalt neg_shift =
+      operands[1].type().id() == ID_unsignedbv ?
+        const_literal(false) :
+        bv1.back(); // sign bit
+
+    // an undefined shift of a non-zero value always results in overflow; the
+    // use of unsigned comparision is safe here as we cover the signed negative
+    // case via neg_shift
+    literalt undef =
+      bv_utils.rel(
+        bv1,
+        ID_gt,
+        bv_utils.build_constant(old_size, bv1.size()),
+        bv_utilst::UNSIGNED);
+
+    literalt overflow;
+
+    if(rep == bv_utilst::UNSIGNED)
+    {
+      // get top result bits
+      result.erase(result.begin(), result.begin() + old_size);
+
+      // one of the top bits is non-zero
+      overflow=prop.lor(result);
+    }
+    else
+    {
+      // get top result bits plus sign bit
+      assert(old_size != 0);
+      result.erase(result.begin(), result.begin() + old_size - 1);
+
+      // the sign bit has changed
+      literalt sign_change=!prop.lequal(bv0.back(), result.front());
+
+      // these need to be either all 1's or all 0's
+      literalt all_one=prop.land(result);
+      literalt all_zero=!prop.lor(result);
+
+      overflow=prop.lor(sign_change, !prop.lor(all_one, all_zero));
+    }
+
+    // a negative shift isn't an overflow; else check the conditions built
+    // above
+    return
+      prop.land(!neg_shift, prop.lselect(undef, prop.lor(bv0), overflow));
   }
   else if(expr.id()==ID_overflow_unary_minus)
   {
