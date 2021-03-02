@@ -46,8 +46,10 @@ void goto_inline(
     ns,
     message_handler,
     adjust_function);
+  goto_inline();
+}
 
-  typedef goto_functionst::goto_functiont goto_functiont;
+void goto_inlinet::operator()() {
 
     // find entry point
     goto_functionst::function_mapt::iterator it=
@@ -84,7 +86,7 @@ void goto_inline(
       }
     }
 
-  goto_inline.goto_inline(
+  goto_inline(
     goto_functionst::entry_point(), goto_function, inline_map, true);
 
   // clean up
