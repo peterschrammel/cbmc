@@ -56,6 +56,7 @@ public:
     enable_bounds_check = _options.get_bool_option("bounds-check");
     enable_pointer_check = _options.get_bool_option("pointer-check");
     enable_memory_leak_check = _options.get_bool_option("memory-leak-check");
+    enable_memory_cleanup_check=_options.get_bool_option("memory-cleanup-check");
     enable_div_by_zero_check = _options.get_bool_option("div-by-zero-check");
     enable_enum_range_check = _options.get_bool_option("enum-range-check");
     enable_signed_overflow_check =
@@ -258,6 +259,7 @@ protected:
   bool enable_bounds_check;
   bool enable_pointer_check;
   bool enable_memory_leak_check;
+  bool enable_memory_cleanup_check;
   bool enable_div_by_zero_check;
   bool enable_enum_range_check;
   bool enable_signed_overflow_check;
