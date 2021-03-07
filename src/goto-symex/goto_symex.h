@@ -848,31 +848,29 @@ public:
     goto_modelt &goto_model,
     message_handlert &message_handler);
 
+  void symex_field_static_init(
+    goto_symex_statet &state,
+    const ssa_exprt &expr);
 
-  void symex_field_static_init(const namespacet &ns, goto_symex_statet &state,
-                               const ssa_exprt &expr);
   void symex_field_static_init_string_constant(
-    const namespacet &ns, goto_symex_statet &state,
-    const ssa_exprt &expr, const exprt &rhs);
+    goto_symex_statet &state,
+    const ssa_exprt &expr,
+    const exprt &rhs);
 
 protected:
   void symex_get_field(
-    const namespacet &ns,
     goto_symex_statet &state,
     const code_function_callt &code_function_call);
 
   void symex_set_field(
-    const namespacet &ns,
     goto_symex_statet &state,
     const code_function_callt &code_function_call);
 
   void symex_field_local_init(
-    const namespacet &ns,
     goto_symex_statet &state,
     const ssa_exprt &expr);
 
   void symex_field_dynamic_init(
-    const namespacet &ns,
     goto_symex_statet &state,
     const exprt &expr,
     const side_effect_exprt &code);
@@ -885,17 +883,20 @@ private:
     std::map<irep_idt, typet> &fields);
 
   symbol_exprt add_field(
-    const namespacet &ns,
     goto_symex_statet &state,
     const exprt &expr,
     const irep_idt &field_name,
     const typet &field_type);
 
   void initialize_shadow_memory(
-    const namespacet &ns,
     goto_symex_statet &state,
     const exprt &expr,
     std::map<irep_idt, typet> &fields);
+
+  void locality(
+    const irep_idt &function_identifier,
+    goto_symext::statet &state,
+    const goto_functionst::goto_functiont &goto_function);
 };
 
 /// Transition to the next instruction, which increments the internal program

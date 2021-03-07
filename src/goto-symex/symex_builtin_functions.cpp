@@ -210,15 +210,13 @@ void goto_symext::symex_allocate(
     index_exprt index_expr(
       value_symbol.symbol_expr(), from_integer(0, array_type.index_type()));
     rhs = address_of_exprt(index_expr, pointer_type(array_type.element_type()));
-    symex_field_dynamic_init(ns, state, index_expr, code);
   }
   else
   {
     rhs=address_of_exprt(
       value_symbol.symbol_expr(), pointer_type(value_symbol.type));
-    symex_field_dynamic_init(
-      ns, state, value_symbol.symbol_expr(), code);
   }
+  symex_field_dynamic_init(state, value_symbol.symbol_expr(), code);
 
   symex_assign(state, lhs, typecast_exprt::conditional_cast(rhs, lhs.type()));
 }
