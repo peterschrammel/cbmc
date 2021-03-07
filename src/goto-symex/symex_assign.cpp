@@ -63,11 +63,11 @@ void symex_assignt::assign_rec(
     if(is_string_constant_init)
     {
       goto_symex.symex_field_static_init_string_constant(
-        ns, state, to_ssa_expr(lhs), rhs);
+        state, to_ssa_expr(lhs), rhs);
     }
     else
     {
-      goto_symex.symex_field_static_init(ns, state, to_ssa_expr(lhs));
+      goto_symex.symex_field_static_init(state, to_ssa_expr(lhs));
     }
   }
   else if(lhs.id() == ID_index)

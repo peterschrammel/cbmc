@@ -39,17 +39,22 @@ void log_value_set_match(
   const goto_symex_statet::shadowed_addresst &shadowed_address,
   const exprt &matched_base,
   const value_set_dereferencet::valuet &dereference,
-  const exprt &expr)
+  const exprt &expr,
+  const value_set_dereferencet::valuet &shadow_dereference)
 {
   log.conditional_output(
     log.debug(),
-    [ns, shadowed_address, expr, dereference, matched_base](
+    [ns, shadowed_address, expr, dereference, matched_base, shadow_dereference](
       messaget::mstreamt &mstream) {
       mstream << "value set match: " << messaget::eom;
-      mstream << "  " << from_expr(ns, "", shadowed_address.address)
+      mstream << "  base: " << from_expr(ns, "", shadowed_address.address)
               << " <-- " << from_expr(ns, "", matched_base) << messaget::eom;
-      mstream << "  " << from_expr(ns, "", dereference.pointer) << " <-- "
+      mstream << "  cell: " << from_expr(ns, "", dereference.pointer) << " <-- "
               << from_expr(ns, "", expr) << messaget::eom;
+      mstream << "  shadow ptr: "
+              << from_expr(ns, "", shadow_dereference.pointer) << messaget::eom;
+      mstream << "  shadow val: "
+              << from_expr(ns, "", shadow_dereference.value) << messaget::eom;
     });
 }
 
@@ -69,11 +74,10 @@ void log_value_set_match(
 void log_cond(
   const namespacet &ns,
   const messaget &log,
-  const goto_symex_statet::shadowed_addresst &shadowed_address,
   const exprt &cond)
 {
   log.conditional_output(
-    log.debug(), [ns, shadowed_address, cond](messaget::mstreamt &mstream) {
+    log.debug(), [ns, cond](messaget::mstreamt &mstream) {
       mstream << "cond: " << from_expr(ns, "", cond)
               << messaget::eom;
     });
@@ -82,7 +86,7 @@ void log_cond(
 void log_value_set(
   const namespacet &ns,
   const messaget &log,
-  const value_setst::valuest &value_set)
+  const std::vector<exprt> &value_set)
 {
   log.conditional_output(
   log.debug(), [ns, value_set](messaget::mstreamt &mstream) {
@@ -196,7 +200,7 @@ void remove_pointer_object(exprt &expr)
 }
 
 bool filter_by_value_set(
-  const value_setst::valuest &value_set,
+  const std::vector<exprt>  &value_set,
   const exprt &address)
 {
   //log.debug() << "address: " << address.pretty() << messaget::eom;
@@ -260,4 +264,17 @@ bool filter_by_value_set(
     return true;
   }
   return false;
+}
+
+const typet &get_field_type(
+  const irep_idt& field_name,
+  const goto_symex_statet &state)
+{
+  auto field_type_it = state.local_fields.find(field_name);
+  if (field_type_it != state.local_fields.end()) {
+    return field_type_it->second;
+  }
+  field_type_it = state.global_fields.find(field_name);
+  CHECK_RETURN(field_type_it != state.global_fields.end());
+  return field_type_it->second;
 }
