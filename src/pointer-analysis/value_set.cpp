@@ -1228,6 +1228,11 @@ void value_sett::get_reference_set_rec(
     get_reference_set_rec(to_if_expr(expr).false_case(), dest, ns);
     return;
   }
+  else if(expr.id() == ID_address_of)
+  {
+    insert(dest, to_address_of_expr(expr).op(), 0);
+    return;
+  }
 
   insert(dest, exprt(ID_unknown, expr.type()));
 }
