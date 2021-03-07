@@ -309,13 +309,6 @@ void goto_symext::symex_set_field(
     return;
   }
 
-  // simplify to find exact matches
-  exprt resolved_expr = expr;
-  if(value_set.size() == 1)
-  {
-    resolve_value_set_expr(ns, log, resolved_expr, *value_set.begin());
-  }
-
   // build lhs
   const exprt &rhs = value;
   exprt lhs = nil_exprt();
@@ -323,16 +316,8 @@ void goto_symext::symex_set_field(
   for(const auto &shadowed_address : addresses)
   {
     log_try_shadow_address(ns, log, shadowed_address);
-    auto maybe_lhs = exact_match(
-      ns, log, shadowed_address, resolved_expr);
-    if(maybe_lhs)
-    {
-      lhs = *maybe_lhs;
-      mux_size = 1;
-      break;
-    }
 
-    maybe_lhs = set_field(
+    auto maybe_lhs = set_field(
       ns, log, value_set, shadowed_address, expr, lhs, mux_size);
     if(maybe_lhs)
     {
@@ -396,26 +381,11 @@ void goto_symext::symex_get_field(
     mux_size = 1;
   }
 
-  exprt resolved_expr = expr;
-  if(value_set.size() == 1)
-  {
-    resolve_value_set_expr(ns, log, resolved_expr, *value_set.begin());
-  }
-
   for(const auto &shadow_address : addresses)
   {
     log_try_shadow_address(ns, log, shadow_address);
 
-    auto maybe_rhs = exact_match(
-      ns, log, shadow_address, resolved_expr);
-    if(maybe_rhs)
-    {
-      rhs = *maybe_rhs;
-      mux_size = 1;
-      break;
-    }
-
-    maybe_rhs = get_field(
+    auto maybe_rhs = get_field(
       ns, log, value_set, shadow_address, expr, rhs, lhs.type(), mux_size);
     if(maybe_rhs)
     {
