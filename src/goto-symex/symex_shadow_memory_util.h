@@ -26,7 +26,8 @@ void log_value_set_match(
   const goto_symex_statet::shadowed_addresst &shadowed_address,
   const exprt &matched_base,
   const value_set_dereferencet::valuet &dereference,
-  const exprt &expr);
+  const exprt &expr,
+  const value_set_dereferencet::valuet &shadow_dereference);
 
 void log_value_set_match(
   const namespacet &ns,
@@ -37,13 +38,12 @@ void log_value_set_match(
 void log_cond(
   const namespacet &ns,
   const messaget &log,
-  const goto_symex_statet::shadowed_addresst &shadowed_address,
   const exprt &expr);
 
 void log_value_set(
   const namespacet &ns,
   const messaget &log,
-  const value_setst::valuest &value_set);
+  const std::vector<exprt>  &value_set);
 
 void log_try_shadow_address(
   const namespacet &ns,
@@ -72,7 +72,11 @@ typet remove_array_type_l2(const typet &type);
 void remove_pointer_object(exprt &expr);
 
 bool filter_by_value_set(
-  const value_setst::valuest &value_set,
+  const std::vector<exprt>  &value_set,
   const exprt &address);
+
+const typet &get_field_type(
+    const irep_idt& field_name,
+    const goto_symex_statet &state);
 
 #endif // CPROVER_GOTO_SYMEX_SYMEX_SHADOW_MEMORY_UTIL_H
