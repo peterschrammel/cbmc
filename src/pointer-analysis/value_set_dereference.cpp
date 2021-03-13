@@ -657,7 +657,15 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
 
       if(memory_model(result.value, dereference_type, offset, ns))
       {
-        // ok, done
+        // set pointer correctly
+        result.pointer =
+          typecast_exprt::conditional_cast(
+            plus_exprt(
+              typecast_exprt(
+                result.pointer,
+                pointer_typet(char_type(), pointer_type.get_width())),
+              offset),
+            pointer_type);
       }
       else
       {
