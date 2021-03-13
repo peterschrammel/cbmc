@@ -63,38 +63,24 @@ void constant_propagator_domaint::assign_rec(
             << " := " << from_type(ns, "", rhs_type) << '\n';
 #endif
 
-  if(lhs.id()==ID_symbol && rhs.id()==ID_if)
-  {
-	exprt cond=rhs.op0();
-	assert(cond.operands().size()==2);
-	if(values.is_constant(cond.op0())
-			&& values.is_constant(cond.op1()))
-	{
-      if(cond.op0().id()==ID_index)
-      {
-    	exprt index=cond.op0();
-        exprt new_expr=concatenate_array_id(index.op0(), index.op1(), index.type());
-        values.replace_const(new_expr);
-        cond.op0()=new_expr;
-        cond = simplify_expr(cond,ns);
-      }
-      else
-        assert(0);
+  // Try to replace constants in LHS and see if it produces a symbol
+  exprt new_lhs=lhs;
+  values.replace_const(new_lhs);
+  new_lhs=simplify_expr(new_lhs, ns);
+  if(new_lhs.id()!=ID_symbol)
+    new_lhs=lhs;
 
-      assign(values, to_symbol_expr(lhs), cond, ns);
-	}
-  }
-  else if(lhs.id()==ID_symbol && rhs_type.id()!=ID_array
-                         && rhs_type.id()!=ID_struct
-                         && rhs_type.id()!=ID_union)
+  if(new_lhs.id()==ID_symbol && rhs_type.id()!=ID_array
+                             && rhs_type.id()!=ID_struct
+                             && rhs_type.id()!=ID_union)
   {
     if(values.is_constant(rhs))
-      assign(values, to_symbol_expr(lhs), rhs, ns);
+      assign(values, to_symbol_expr(new_lhs), rhs, ns);
     else
-      values.set_to_top(to_symbol_expr(lhs));
+      values.set_to_top(to_symbol_expr(new_lhs));
   }
-  else if(lhs.id()==ID_symbol && lhs_type.id()==ID_array
-		                       && rhs_type.id()==ID_array)
+  if(lhs.id()==ID_symbol && lhs_type.id()==ID_array
+                         && rhs_type.id()==ID_array)
   {
 	exprt new_expr;
 	mp_integer idx=0;
@@ -258,9 +244,14 @@ void constant_propagator_domaint::assign(
   exprt rhs,
   const namespacet &ns) const
 {
+  const exprt rhs_old = rhs;
   values.replace_const(rhs);
   rhs = simplify_expr(rhs, ns);
   dest.set_to(lhs, rhs);
+  // If the produced value is constant again (might happen with *(&o)), call
+  // recursively
+  if (rhs != rhs_old && values.is_constant(rhs))
+    assign(dest, lhs, rhs, ns);
 }
 
 /// Simplify the condition given context-sensitive knowledge from the abstract
@@ -309,6 +300,10 @@ bool constant_propagator_domaint::valuest::is_constant(const exprt &expr) const
 
   if(expr.id()==ID_address_of)
     return is_constant_address_of(to_address_of_expr(expr).object());
+
+  if (expr.id()==ID_member &&
+      to_member_expr(expr).struct_op().id()==ID_dereference)
+    return false;
 
   forall_operands(it, expr)
     if(!is_constant(*it))
@@ -510,6 +505,14 @@ void constant_propagator_ait::replace(
     }
     else if(it->is_assign())
     {
+      // Try to replace LHS and see if it produces a symbol
+      exprt &lhs=to_code_assign(it->code).lhs();
+      exprt lhs_old=lhs;
+      s_it->second.values.replace_const(lhs);
+      lhs=simplify_expr(lhs, ns);
+      if(lhs.id()!=ID_symbol)
+        lhs=lhs_old;
+
       exprt &rhs = to_code_assign(it->code).rhs();
       s_it->second.values.replace_const(rhs);
       rhs = simplify_expr(rhs, ns);
