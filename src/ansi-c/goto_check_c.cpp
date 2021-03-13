@@ -2227,7 +2227,8 @@ void goto_check_ct::goto_check(
       if(
         enable_memory_cleanup_check && simplified_guard.is_false() &&
         (former_function == "abort" || former_function == "exit" ||
-         former_function == "_Exit"))
+         former_function == "_Exit" ||
+         (i.labels.size() == 1 && i.labels.front() == "__VERIFIER_abort")))
       {
         memory_leak_check(former_function);
       }
