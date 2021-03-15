@@ -294,44 +294,6 @@ static optionalt<exprt> get_field(
   return {};
 }
 
-// returns an expr if shadowed_address corresponds to resolved_expr
-static optionalt<exprt> exact_match(
-  const namespacet &ns,
-  const messaget &log,
-  const goto_symex_statet::shadowed_addresst &shadowed_address,
-  const exprt &resolved_expr)
-{
-  log.debug() << "checking exact match "
-              << from_expr(ns, "", shadowed_address.address)
-              << " =?= "
-              << from_expr(ns, "", resolved_expr)
-              << messaget::eom;
-  if(shadowed_address.address == resolved_expr)
-  {
-    log.debug() << "syntactic match" << messaget::eom;
-    log_exact_match(ns, log, shadowed_address, resolved_expr);
-    return address_of_exprt(shadowed_address.shadow);
-  }
-
-  if(
-    shadowed_address.address.type().id() == ID_array &&
-    resolved_expr.id() == ID_address_of &&
-    to_address_of_expr(resolved_expr).object().id() == ID_index)
-  {
-    log.debug() << "resolved expression is array with index" << messaget::eom;
-    const index_exprt &index =
-      to_index_expr(to_address_of_expr(resolved_expr).object());
-    if(shadowed_address.address == index.array())
-    {
-      log.debug() << "syntactic array match" << messaget::eom;
-      log_exact_match(ns, log, shadowed_address, resolved_expr);
-      return
-        address_of_exprt(index_exprt(shadowed_address.shadow, index.index()));
-    }
-  }
-  return {};
-}
-
 void goto_symext::symex_set_field(
   goto_symex_statet &state,
   const code_function_callt &code_function_call)
