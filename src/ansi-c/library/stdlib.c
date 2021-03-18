@@ -151,11 +151,13 @@ inline void free(void *ptr)
     if(__CPROVER_deallocated==ptr)
       __CPROVER_assert(0, "double free");
 
+#if 0
     // catch people who try to use free(...) for stuff
     // allocated with new[]
     __CPROVER_assert(__CPROVER_malloc_object!=ptr ||
                      !__CPROVER_malloc_is_new_array,
                      "free called for new[] object");
+#endif
 
     // non-deterministically record as deallocated
     __CPROVER_bool record;
