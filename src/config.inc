@@ -23,7 +23,7 @@ endif
 #MINISAT = ../../MiniSat-p_v1.14
 #MINISAT2 = ../../minisat-2.2.1
 #IPASIR = ../../ipasir
-#GLUCOSE = ../../glucose-syrup
+GLUCOSE = ../../glucose-syrup
 #CADICAL = ../../cadical
 
 # Extra library for SAT solver. This should link to the archive file to be used
