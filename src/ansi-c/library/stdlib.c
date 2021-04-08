@@ -168,10 +168,12 @@ inline void free(void *ptr)
 
   // catch people who try to use free(...) for stuff
   // allocated with new[]
+#if 0
   __CPROVER_precondition(ptr==0 ||
                          __CPROVER_malloc_object!=ptr ||
                          !__CPROVER_malloc_is_new_array,
                          "free called for new[] object");
+#endif
 
   if(ptr!=0)
   {
