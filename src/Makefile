@@ -121,7 +121,7 @@ $(patsubst %, %_clean, $(DIRS)):
 
 # minisat2 and glucose download, for your convenience
 
-DOWNLOADER = curl -L --remote-name
+DOWNLOADER = wget
 TAR = tar
 
 minisat2-download:
