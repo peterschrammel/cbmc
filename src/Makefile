@@ -86,7 +86,7 @@ $(patsubst %, %_clean, $(DIRS)):
 
 # minisat2 and glucose download, for your convenience
 
-DOWNLOADER = lwp-download
+DOWNLOADER = wget
 TAR = tar
 
 minisat2-download:
