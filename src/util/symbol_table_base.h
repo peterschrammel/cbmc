@@ -8,6 +8,7 @@
 
 #include <map>
 #include <unordered_map>
+#include <stdexcept>
 
 #include "symbol.h"
 
