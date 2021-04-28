@@ -192,7 +192,6 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
 
   const graphmlt::node_indext sink=graphml.add_node();
   graphml[sink].node_name="sink";
-  graphml[sink].thread_nr=0;
   graphml[sink].is_violation=false;
   graphml[sink].has_invariant=false;
 
@@ -234,13 +233,14 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
       std::to_string(it->pc->location_number)+"."+std::to_string(it->step_nr);
     graphml[node].file=source_location.get_file();
     graphml[node].line=source_location.get_line();
-    graphml[node].thread_nr=it->thread_nr;
     graphml[node].is_violation=
       it->type==goto_trace_stept::typet::ASSERT && !it->cond_value;
     graphml[node].has_invariant=false;
 
     step_to_node[it->step_nr]=node;
   }
+
+  std::size_t thread_id=0;
 
   // build edges
   for(goto_tracet::stepst::const_iterator
@@ -288,6 +288,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     case goto_trace_stept::typet::ASSIGNMENT:
     case goto_trace_stept::typet::ASSERT:
     case goto_trace_stept::typet::GOTO:
+    case goto_trace_stept::typet::SPAWN:
       {
         xmlt edge("edge");
         edge.set_attribute("source", graphml[from].node_name);
@@ -301,6 +302,10 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
           xmlt &data_l=edge.new_element("data");
           data_l.set_attribute("key", "startline");
           data_l.data=id2string(graphml[from].line);
+
+          xmlt &data_t=edge.new_element("data");
+          data_t.set_attribute("key", "threadId");
+          data_t.data=std::to_string(it->thread_nr);
         }
 
         if(it->type==goto_trace_stept::typet::ASSIGNMENT &&
@@ -362,7 +367,6 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     case goto_trace_stept::typet::OUTPUT:
     case goto_trace_stept::typet::SHARED_READ:
     case goto_trace_stept::typet::SHARED_WRITE:
-    case goto_trace_stept::typet::SPAWN:
     case goto_trace_stept::typet::MEMORY_BARRIER:
     case goto_trace_stept::typet::ATOMIC_BEGIN:
     case goto_trace_stept::typet::ATOMIC_END:
@@ -384,7 +388,6 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
 
   const graphmlt::node_indext sink=graphml.add_node();
   graphml[sink].node_name="sink";
-  graphml[sink].thread_nr=0;
   graphml[sink].is_violation=false;
   graphml[sink].has_invariant=false;
 
@@ -430,7 +433,6 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
       std::to_string(step_nr);
     graphml[node].file=source_location.get_file();
     graphml[node].line=source_location.get_line();
-    graphml[node].thread_nr=it->source.thread_nr;
     graphml[node].is_violation=false;
     graphml[node].has_invariant=false;
 
@@ -471,6 +473,7 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
     case goto_trace_stept::typet::ASSIGNMENT:
     case goto_trace_stept::typet::ASSERT:
     case goto_trace_stept::typet::GOTO:
+    case goto_trace_stept::typet::SPAWN:
       {
         xmlt edge("edge");
         edge.set_attribute("source", graphml[from].node_name);
@@ -523,7 +526,6 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
     case goto_trace_stept::typet::OUTPUT:
     case goto_trace_stept::typet::SHARED_READ:
     case goto_trace_stept::typet::SHARED_WRITE:
-    case goto_trace_stept::typet::SPAWN:
     case goto_trace_stept::typet::MEMORY_BARRIER:
     case goto_trace_stept::typet::ATOMIC_BEGIN:
     case goto_trace_stept::typet::ATOMIC_END:
