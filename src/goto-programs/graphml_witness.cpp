@@ -139,7 +139,9 @@ std::string graphml_witnesst::convert_assign_rec(
     exprt clean_rhs=assign.rhs();
     remove_l0_l1(clean_rhs);
 
-    std::string lhs=from_expr(ns, identifier, assign.lhs());
+    exprt clean_lhs=assign.lhs();
+    remove_l0_l1(clean_lhs);
+    std::string lhs=from_expr(ns, identifier, clean_lhs);
     if(lhs.find('$')!=std::string::npos)
       lhs="\\result";
 
@@ -326,9 +328,11 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
         {
           xmlt &val=edge.new_element("data");
           val.set_attribute("key", "sourcecode");
-          const std::string cond = from_expr(ns, it->function, it->cond_expr);
-          const std::string neg_cond =
-            from_expr(ns, it->function, not_exprt(it->cond_expr));
+          exprt clean_cond=it->cond_expr;
+          remove_l0_l1(clean_cond);
+          const std::string cond=from_expr(ns, "", clean_cond);
+          const std::string neg_cond=
+            from_expr(ns, "", not_exprt(clean_cond));
           val.data="["+(it->cond_value ? cond : neg_cond)+"]";
 
           #if 0
@@ -507,8 +511,10 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
         {
           xmlt &val=edge.new_element("data");
           val.set_attribute("key", "sourcecode");
-          const std::string cond =
-            from_expr(ns, it->source.function, it->cond_expr);
+          exprt clean_cond=it->cond_expr;
+          remove_l0_l1(clean_cond);
+          const std::string cond=from_expr(ns, "", clean_cond);
+            from_expr(ns, "", not_exprt(clean_cond));
           val.data="["+cond+"]";
         }
 
