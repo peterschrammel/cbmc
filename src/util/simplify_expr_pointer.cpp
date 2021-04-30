@@ -587,9 +587,11 @@ simplify_exprt::simplify_is_dynamic_object(const unary_exprt &expr)
     {
       const irep_idt identifier = to_symbol_expr(op_object).get_identifier();
 
+      address_of_exprt op=to_address_of_expr(op);
       // this is for the benefit of symex
       return make_boolean_expr(
-        has_prefix(id2string(identifier), SYMEX_DYNAMIC_PREFIX));
+        has_prefix(id2string(identifier), SYMEX_DYNAMIC_PREFIX) ||
+          op.object().type().get_bool("#dynamic"));
     }
     else if(op_object.id() == ID_string_constant)
     {
