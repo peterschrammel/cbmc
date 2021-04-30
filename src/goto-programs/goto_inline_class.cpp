@@ -339,6 +339,7 @@ void goto_inlinet::expand_function_call(
     log.warning().source_location = function.find_source_location();
     log.warning() << "recursion is ignored on call to '" << identifier << "'"
                   << messaget::eom;
+    is_recursion_detected=true;
 
     if(force_full)
       target->turn_into_skip();
