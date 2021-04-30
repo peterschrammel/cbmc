@@ -30,7 +30,8 @@ public:
     goto_functions(goto_functions),
     ns(ns),
     adjust_function(adjust_function),
-    caching(caching)
+    caching(caching),
+    is_recursion_detected(false)
   {
   }
 
@@ -46,6 +47,9 @@ public:
 
   // list of calls per function that should be inlined
   typedef std::map<irep_idt, call_listt> inline_mapt;
+
+  void operator()();
+  bool recursion_detected() { return is_recursion_detected; }
 
   // handle given goto function
   // force_full:
@@ -127,6 +131,7 @@ protected:
 
   const bool adjust_function;
   const bool caching;
+  bool is_recursion_detected;
 
   goto_inline_logt inline_log;
 
