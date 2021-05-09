@@ -2,6 +2,7 @@
 
 #include <langapi/language_util.h>
 
+#include <util/pointer_expr.h>
 
 void log_exact_match(
   const namespacet &ns,
