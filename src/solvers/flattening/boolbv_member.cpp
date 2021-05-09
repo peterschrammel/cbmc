@@ -92,7 +92,7 @@ bvt boolbvt::convert_member(const member_exprt &expr)
 {
   const bvt &compound_bv = convert_bv(expr.compound());
 
-  if(expr.compound().type().id() == ID_struct_tag)
+  if(expr.compound().type().id() == ID_struct_tag || expr.compound().type().id() == ID_struct)
     return convert_member_struct(
       expr,
       compound_bv,
