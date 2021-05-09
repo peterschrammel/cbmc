@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/byte_operators.h>
 #include <util/config.h>
 #include <util/expr_util.h>
+#include <util/pointer_expr.h>
 #include <util/range.h>
 
 #include "symex_config.h"
