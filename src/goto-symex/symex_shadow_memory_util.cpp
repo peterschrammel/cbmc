@@ -2,6 +2,8 @@
 
 #include <langapi/language_util.h>
 
+#include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/pointer_expr.h>
 
 void log_exact_match(
@@ -278,4 +280,83 @@ const typet &get_field_type(
   field_type_it = state.global_fields.find(field_name);
   CHECK_RETURN(field_type_it != state.global_fields.end());
   return field_type_it->second;
+}
+
+exprt compute_max_over_cells(
+  const exprt &expr,
+  const typet &lhs_type,
+  const namespacet &ns,
+  const messaget &log)
+{
+  const typet type = ns.follow(expr.type());
+
+  if(type.id() == ID_struct)
+  {
+    exprt max = nil_exprt();
+    for(const auto &component : to_struct_type(type).components())
+    {
+      exprt value;
+      if(component.type().id() == ID_unsignedbv || component.type().id() == ID_signedbv)
+      {
+        value = typecast_exprt::conditional_cast(member_exprt(expr, component), lhs_type);
+      }
+      else
+      {
+        value = compute_max_over_cells(member_exprt(expr, component),
+          lhs_type,
+          ns,
+          log);
+      }
+
+      if (max.is_nil())
+      {
+        max = value;
+      }
+      else
+      {
+        max = if_exprt(binary_predicate_exprt(value, ID_gt, max), value, max);
+      }
+    }
+    return max;
+  }
+  else if(type.id() == ID_array)
+  {
+    const array_typet &array_type = to_array_type(type);
+    if(array_type.size().is_constant())
+    {
+      exprt max = nil_exprt();
+      const mp_integer size = numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
+      for(mp_integer index = 0; index < size; ++index)
+      {
+        exprt value;
+        if(array_type.subtype().id() == ID_unsignedbv || array_type.subtype().id() == ID_signedbv)
+        {
+          value = typecast_exprt::conditional_cast(index_exprt(expr, from_integer(index, index_type())), lhs_type);
+        }
+        else
+        {
+          value = compute_max_over_cells(
+              index_exprt(expr, from_integer(index, index_type())),
+              lhs_type,
+              ns,
+              log);
+        }
+
+        if (max.is_nil())
+        {
+          max = value;
+        }
+        else
+        {
+          max = if_exprt(binary_predicate_exprt(value, ID_gt, max), value, max);
+        }
+      }
+      return max;
+    }
+    else
+    {
+      log.warning() << "CANNOT COMPUTE MAX OVER SHADOW MEMORY FOR VARIABLE SIZE ARRAY" << messaget::eom;
+    }
+  }
+  return typecast_exprt::conditional_cast(expr, lhs_type);
 }

@@ -239,7 +239,7 @@ static optionalt<exprt> get_field(
   {
     if(matched_object.id() != ID_object_descriptor)
     {
-      log.debug() << "VALUE SET CONTAINS UNKNOWN" << messaget::eom;
+      log.warning() << "CANNOT ACCESS SHADOW MEMORY: VALUE SET CONTAINS UNKNOWN" << messaget::eom;
       continue;
     }
     const object_descriptor_exprt &matched_base_descriptor =
@@ -261,11 +261,18 @@ static optionalt<exprt> get_field(
     log_value_set_match(
       ns, log, shadowed_address, matched_base, dereference, expr, shadow_dereference);
 
+    if(is_void_pointer(dereference.pointer.type()))
+    {
+      log.warning() << "CANNOT ACCESS SHADOW MEMORY FOR void*" << messaget::eom;
+    }
+
+    // const exprt value = typecast_exprt::conditional_cast(shadow_dereference.value, lhs_type);
+    const exprt value = compute_max_over_cells(shadow_dereference.value, lhs_type, ns, log);
     const exprt cond = get_cond(
         shadowed_address.address, dereference.pointer, matched_base, expr, ns, log);
     if(cond.is_true())
     {
-      return shadow_dereference.value;
+      return value;
     }
     else if(!cond.is_false())
     {
@@ -273,17 +280,11 @@ static optionalt<exprt> get_field(
       found = true;
       if(rhs.is_nil())
       {
-        rhs = if_exprt(
-          cond,
-          typecast_exprt::conditional_cast(shadow_dereference.value, lhs_type),
-          from_integer(-1, lhs_type));
+        rhs = if_exprt(cond, value, from_integer(-1, lhs_type));
       }
       else
       {
-        rhs = if_exprt(
-          cond,
-          typecast_exprt::conditional_cast(shadow_dereference.value, lhs_type),
-          rhs);
+        rhs = if_exprt(cond, value, rhs);
       }
     }
   }

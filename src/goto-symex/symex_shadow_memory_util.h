@@ -79,4 +79,10 @@ const typet &get_field_type(
     const irep_idt& field_name,
     const goto_symex_statet &state);
 
+exprt compute_max_over_cells(
+  const exprt &expr,
+  const typet &lhs_type,
+  const namespacet &ns,
+  const messaget &log);
+
 #endif // CPROVER_GOTO_SYMEX_SYMEX_SHADOW_MEMORY_UTIL_H
