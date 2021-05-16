@@ -267,7 +267,8 @@ static optionalt<exprt> get_field(
     }
 
     // const exprt value = typecast_exprt::conditional_cast(shadow_dereference.value, lhs_type);
-    const exprt value = compute_max_over_cells(shadow_dereference.value, lhs_type, ns, log);
+    // const exprt value = compute_max_over_cells(shadow_dereference.value, lhs_type, ns, log);
+    const exprt value = compute_or_over_cells(shadow_dereference.value, lhs_type, ns, log);
     const exprt cond = get_cond(
         shadowed_address.address, dereference.pointer, matched_base, expr, ns, log);
     if(cond.is_true())
