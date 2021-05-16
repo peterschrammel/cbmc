@@ -85,4 +85,10 @@ exprt compute_max_over_cells(
   const namespacet &ns,
   const messaget &log);
 
+exprt compute_or_over_cells(
+    const exprt &expr,
+    const typet &lhs_type,
+    const namespacet &ns,
+    const messaget &log);
+
 #endif // CPROVER_GOTO_SYMEX_SYMEX_SHADOW_MEMORY_UTIL_H

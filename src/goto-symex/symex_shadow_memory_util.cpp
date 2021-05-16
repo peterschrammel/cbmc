@@ -360,3 +360,68 @@ exprt compute_max_over_cells(
   }
   return typecast_exprt::conditional_cast(expr, lhs_type);
 }
+
+exprt compute_or_over_cells(
+    const exprt &expr,
+    const typet &lhs_type,
+    const namespacet &ns,
+    const messaget &log)
+{
+  const typet type = ns.follow(expr.type());
+
+  if(type.id() == ID_struct)
+  {
+    exprt::operandst values;
+    for(const auto &component : to_struct_type(type).components())
+    {
+      exprt value;
+      if(component.type().id() == ID_unsignedbv || component.type().id() == ID_signedbv)
+      {
+        value = member_exprt(expr, component);
+      }
+      else
+      {
+        value = compute_or_over_cells(member_exprt(expr, component),
+                                       lhs_type,
+                                       ns,
+                                       log);
+      }
+
+      values.push_back(typecast_exprt::conditional_cast(value, lhs_type));
+    }
+    return multi_ary_exprt(ID_bitor, values, lhs_type);
+  }
+  else if(type.id() == ID_array)
+  {
+    const array_typet &array_type = to_array_type(type);
+    if(array_type.size().is_constant())
+    {
+      exprt::operandst values;
+      const mp_integer size = numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
+      for(mp_integer index = 0; index < size; ++index)
+      {
+        exprt value;
+        if(array_type.subtype().id() == ID_unsignedbv || array_type.subtype().id() == ID_signedbv)
+        {
+          value = index_exprt(expr, from_integer(index, index_type()));
+        }
+        else
+        {
+          value = compute_or_over_cells(
+              index_exprt(expr, from_integer(index, index_type())),
+              lhs_type,
+              ns,
+              log);
+        }
+
+        values.push_back(typecast_exprt::conditional_cast(value, lhs_type));
+      }
+      return multi_ary_exprt(ID_bitor, values, lhs_type);
+    }
+    else
+    {
+      log.warning() << "CANNOT COMPUTE OR OVER SHADOW MEMORY FOR VARIABLE SIZE ARRAY" << messaget::eom;
+    }
+  }
+  return typecast_exprt::conditional_cast(expr, lhs_type);
+}
