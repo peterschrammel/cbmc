@@ -266,9 +266,12 @@ static optionalt<exprt> get_field(
       log.warning() << "CANNOT ACCESS SHADOW MEMORY FOR void*" << messaget::eom;
     }
 
+    const bool is_union = matched_base_descriptor.type().id() == ID_union ||
+        matched_base_descriptor.type().id() == ID_union_tag;
     // const exprt value = typecast_exprt::conditional_cast(shadow_dereference.value, lhs_type);
     // const exprt value = compute_max_over_cells(shadow_dereference.value, lhs_type, ns, log);
-    const exprt value = compute_or_over_cells(shadow_dereference.value, lhs_type, ns, log);
+    const exprt value =
+        compute_or_over_cells(shadow_dereference.value, lhs_type, ns, log, is_union);
     const exprt cond = get_cond(
         shadowed_address.address, dereference.pointer, matched_base, expr, ns, log);
     if(cond.is_true())
