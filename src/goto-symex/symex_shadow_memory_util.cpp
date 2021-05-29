@@ -290,10 +290,10 @@ exprt compute_max_over_cells(
 {
   const typet type = ns.follow(expr.type());
 
-  if(type.id() == ID_struct)
+  if(type.id() == ID_struct || type.id() == ID_union)
   {
     exprt max = nil_exprt();
-    for(const auto &component : to_struct_type(type).components())
+    for(const auto &component : to_struct_union_type(type).components())
     {
       exprt value;
       if(component.type().id() == ID_unsignedbv || component.type().id() == ID_signedbv)
@@ -369,10 +369,10 @@ exprt compute_or_over_cells(
 {
   const typet type = ns.follow(expr.type());
 
-  if(type.id() == ID_struct)
+  if(type.id() == ID_struct || type.id() == ID_union)
   {
     exprt::operandst values;
-    for(const auto &component : to_struct_type(type).components())
+    for(const auto &component : to_struct_union_type(type).components())
     {
       exprt value;
       if(component.type().id() == ID_unsignedbv || component.type().id() == ID_signedbv)
