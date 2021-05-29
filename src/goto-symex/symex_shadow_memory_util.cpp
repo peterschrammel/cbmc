@@ -366,7 +366,8 @@ exprt compute_or_over_cells(
     const exprt &expr,
     const typet &lhs_type,
     const namespacet &ns,
-    const messaget &log)
+    const messaget &log,
+    const bool is_union)
 {
   const typet type = ns.follow(expr.type());
 
@@ -375,20 +376,31 @@ exprt compute_or_over_cells(
     exprt::operandst values;
     for(const auto &component : to_struct_union_type(type).components())
     {
-      exprt value;
       if(component.type().id() == ID_unsignedbv || component.type().id() == ID_signedbv)
       {
-        value = member_exprt(expr, component);
+        exprt value = member_exprt(expr, component);
+        if(is_union)
+        {
+          const size_t size = to_bitvector_type(component.type()).get_width();
+          values.push_back(value);
+          for(size_t i = 1; i < size; ++i) {
+            values.push_back(lshr_exprt(value, from_integer(8*i, size_type())));
+          }
+        }
+        else
+        {
+          values.push_back(typecast_exprt::conditional_cast(value, lhs_type));
+        }
       }
       else
       {
-        value = compute_or_over_cells(member_exprt(expr, component),
+        exprt value = compute_or_over_cells(member_exprt(expr, component),
                                        lhs_type,
                                        ns,
-                                       log);
+                                       log,
+                                       is_union);
+        values.push_back(typecast_exprt::conditional_cast(value, lhs_type));
       }
-
-      values.push_back(typecast_exprt::conditional_cast(value, lhs_type));
     }
     return multi_ary_exprt(ID_bitor, values, lhs_type);
   }
@@ -401,21 +413,32 @@ exprt compute_or_over_cells(
       const mp_integer size = numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
       for(mp_integer index = 0; index < size; ++index)
       {
-        exprt value;
         if(array_type.subtype().id() == ID_unsignedbv || array_type.subtype().id() == ID_signedbv)
         {
-          value = index_exprt(expr, from_integer(index, index_type()));
+          exprt value = index_exprt(expr, from_integer(index, index_type()));
+          if(is_union)
+          {
+            const size_t subtype_size = to_bitvector_type(array_type.subtype()).get_width();
+            values.push_back(value);
+            for(size_t i = 1; i < subtype_size; ++i) {
+              values.push_back(lshr_exprt(value, from_integer(8*i, size_type())));
+            }
+          }
+          else
+          {
+            values.push_back(typecast_exprt::conditional_cast(value, lhs_type));
+          }
         }
         else
         {
-          value = compute_or_over_cells(
+          exprt value = compute_or_over_cells(
               index_exprt(expr, from_integer(index, index_type())),
               lhs_type,
               ns,
-              log);
+              log,
+              is_union);
+          values.push_back(typecast_exprt::conditional_cast(value, lhs_type));
         }
-
-        values.push_back(typecast_exprt::conditional_cast(value, lhs_type));
       }
       return multi_ary_exprt(ID_bitor, values, lhs_type);
     }
@@ -448,7 +471,7 @@ exprt duplicate_per_byte(
     exprt::operandst values;
     values.push_back(expr);
     for(size_t i = 1; i < size; ++i) {
-      values.push_back(shl_exprt(expr, from_integer(8*i, lhs_type)));
+      values.push_back(shl_exprt(expr, from_integer(8*i, size_type())));
     }
     return multi_ary_exprt(ID_bitor, values, lhs_type);
   }
