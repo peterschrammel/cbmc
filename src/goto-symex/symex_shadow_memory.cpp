@@ -273,7 +273,7 @@ static optionalt<exprt> get_field(
         shadowed_address.address, dereference.pointer, matched_base, expr, ns, log);
     if(cond.is_true())
     {
-      return value;
+      return typecast_exprt::conditional_cast(value, field_type);
     }
     else if(!cond.is_false())
     {
@@ -291,7 +291,7 @@ static optionalt<exprt> get_field(
   }
   if (found)
   {
-    return rhs;
+    return typecast_exprt::conditional_cast(rhs, field_type);
   }
   return {};
 }
@@ -352,8 +352,12 @@ void goto_symext::symex_set_field(
     log.debug() << "mux size set_field: " << mux_size << messaget::eom;
     lhs = deref_expr(lhs);
     log.debug() << "LHS: " << from_expr(ns, "", lhs) << messaget::eom;
-    symex_assign(
-      state, lhs, typecast_exprt::conditional_cast(rhs, lhs.type()));
+    // We replicate the rhs value on each byte of the value that we set.
+    // This allows the get_field or/max semantics to operate correctly
+    // on unions.
+    exprt per_byte_rhs = duplicate_per_byte(rhs, lhs.type(), ns, log);
+    log.debug() << "RHS: " << from_expr(ns, "", per_byte_rhs) << messaget::eom;
+    symex_assign(state, lhs, per_byte_rhs);
   }
   else
   {
