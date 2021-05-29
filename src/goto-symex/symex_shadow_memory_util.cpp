@@ -3,6 +3,7 @@
 #include <langapi/language_util.h>
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/c_types.h>
 #include <util/pointer_expr.h>
 
@@ -422,6 +423,38 @@ exprt compute_or_over_cells(
     {
       log.warning() << "CANNOT COMPUTE OR OVER SHADOW MEMORY FOR VARIABLE SIZE ARRAY" << messaget::eom;
     }
+  }
+  return typecast_exprt::conditional_cast(expr, lhs_type);
+}
+
+exprt duplicate_per_byte(
+    const exprt &expr,
+    const typet &lhs_type,
+    const namespacet &ns,
+    const messaget &log)
+{
+  if(lhs_type.id() == ID_unsignedbv || lhs_type.id() == ID_signedbv)
+  {
+    const size_t size = to_bitvector_type(lhs_type).get_width();
+    if(expr.is_constant())
+    {
+      const mp_integer value = numeric_cast_v<mp_integer>(to_constant_expr(expr));
+      mp_integer duplicated_value = value;
+      for(size_t i = 1; i < size; ++i) {
+        duplicated_value = bitwise_or(duplicated_value << 8,  value);
+      }
+      return from_integer(duplicated_value, lhs_type);
+    }
+    exprt::operandst values;
+    values.push_back(expr);
+    for(size_t i = 1; i < size; ++i) {
+      values.push_back(shl_exprt(expr, from_integer(8*i, lhs_type)));
+    }
+    return multi_ary_exprt(ID_bitor, values, lhs_type);
+  }
+  else
+  {
+    log.warning() << "CANNOT HANDLE NON-PRIMITIVE UNION UPDATES CORRECTLY" << messaget::eom;
   }
   return typecast_exprt::conditional_cast(expr, lhs_type);
 }
