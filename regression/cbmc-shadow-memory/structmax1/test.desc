@@ -1,4 +1,4 @@
-CORE
+FUTURE
 main.c
 --verbosity 10
 ^EXIT=0$
@@ -6,3 +6,6 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+Disabled because we don't have an option for max semantics yet
+(but it is implemented).
