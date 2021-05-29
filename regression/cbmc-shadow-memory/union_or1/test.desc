@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.c
 --verbosity 10
 ^EXIT=0$
@@ -7,4 +7,4 @@ main.c
 --
 ^warning: ignoring
 --
-Not implemented yet.
+
