@@ -296,6 +296,11 @@ exprt compute_max_over_cells(
     exprt max = nil_exprt();
     for(const auto &component : to_struct_union_type(type).components())
     {
+      if(component.get_is_padding())
+      {
+        continue;
+      }
+
       exprt value;
       if(component.type().id() == ID_unsignedbv || component.type().id() == ID_signedbv)
       {
@@ -362,9 +367,35 @@ exprt compute_max_over_cells(
   return typecast_exprt::conditional_cast(expr, lhs_type);
 }
 
+static void or_over_bytes(
+  const exprt &value,
+  const typet &type,
+  const typet &field_type,
+  exprt::operandst &values)
+{
+  const size_t size = to_bitvector_type(type).get_width() / 8;
+  values.push_back(typecast_exprt::conditional_cast(value, field_type));
+  for(size_t i = 1; i < size; ++i)
+  {
+    values.push_back(
+        typecast_exprt::conditional_cast(
+            lshr_exprt(value, from_integer(8 * i, size_type())),
+            field_type));
+  }
+}
+
+static exprt or_values(const exprt::operandst values, const typet &field_type)
+{
+  if(values.size() == 1)
+  {
+    return values[0];
+  }
+  return multi_ary_exprt(ID_bitor, values, field_type);
+}
+
 exprt compute_or_over_cells(
     const exprt &expr,
-    const typet &lhs_type,
+    const typet &field_type,
     const namespacet &ns,
     const messaget &log,
     const bool is_union)
@@ -376,33 +407,33 @@ exprt compute_or_over_cells(
     exprt::operandst values;
     for(const auto &component : to_struct_union_type(type).components())
     {
+      if(component.get_is_padding())
+      {
+        continue;
+      }
       if(component.type().id() == ID_unsignedbv || component.type().id() == ID_signedbv)
       {
         exprt value = member_exprt(expr, component);
         if(is_union)
         {
-          const size_t size = to_bitvector_type(component.type()).get_width();
-          values.push_back(value);
-          for(size_t i = 1; i < size; ++i) {
-            values.push_back(lshr_exprt(value, from_integer(8*i, size_type())));
-          }
+          or_over_bytes(value, component.type(), field_type, values);
         }
         else
         {
-          values.push_back(typecast_exprt::conditional_cast(value, lhs_type));
+          values.push_back(typecast_exprt::conditional_cast(value, field_type));
         }
       }
       else
       {
         exprt value = compute_or_over_cells(member_exprt(expr, component),
-                                       lhs_type,
-                                       ns,
-                                       log,
-                                       is_union);
-        values.push_back(typecast_exprt::conditional_cast(value, lhs_type));
+                                            field_type,
+                                            ns,
+                                            log,
+                                            is_union);
+        values.push_back(typecast_exprt::conditional_cast(value, field_type));
       }
     }
-    return multi_ary_exprt(ID_bitor, values, lhs_type);
+    return or_values(values, field_type);
   }
   else if(type.id() == ID_array)
   {
@@ -418,36 +449,41 @@ exprt compute_or_over_cells(
           exprt value = index_exprt(expr, from_integer(index, index_type()));
           if(is_union)
           {
-            const size_t subtype_size = to_bitvector_type(array_type.subtype()).get_width();
-            values.push_back(value);
-            for(size_t i = 1; i < subtype_size; ++i) {
-              values.push_back(lshr_exprt(value, from_integer(8*i, size_type())));
-            }
+            or_over_bytes(value, array_type.subtype(), field_type, values);
           }
           else
           {
-            values.push_back(typecast_exprt::conditional_cast(value, lhs_type));
+            values.push_back(typecast_exprt::conditional_cast(value, field_type));
           }
         }
         else
         {
           exprt value = compute_or_over_cells(
               index_exprt(expr, from_integer(index, index_type())),
-              lhs_type,
+              field_type,
               ns,
               log,
               is_union);
-          values.push_back(typecast_exprt::conditional_cast(value, lhs_type));
+          values.push_back(typecast_exprt::conditional_cast(value, field_type));
         }
       }
-      return multi_ary_exprt(ID_bitor, values, lhs_type);
+      return or_values(values, field_type);
     }
     else
     {
       log.warning() << "CANNOT COMPUTE OR OVER SHADOW MEMORY FOR VARIABLE SIZE ARRAY" << messaget::eom;
     }
   }
-  return typecast_exprt::conditional_cast(expr, lhs_type);
+  exprt::operandst values;
+  if(is_union)
+  {
+    or_over_bytes(expr, type, field_type, values);
+  }
+  else
+  {
+    values.push_back(typecast_exprt::conditional_cast(expr, field_type));
+  }
+  return or_values(values, field_type);
 }
 
 exprt duplicate_per_byte(
@@ -458,7 +494,7 @@ exprt duplicate_per_byte(
 {
   if(lhs_type.id() == ID_unsignedbv || lhs_type.id() == ID_signedbv)
   {
-    const size_t size = to_bitvector_type(lhs_type).get_width();
+    const size_t size = to_bitvector_type(lhs_type).get_width() / 8;
     if(expr.is_constant())
     {
       const mp_integer value = numeric_cast_v<mp_integer>(to_constant_expr(expr));
@@ -473,7 +509,7 @@ exprt duplicate_per_byte(
     for(size_t i = 1; i < size; ++i) {
       values.push_back(shl_exprt(expr, from_integer(8*i, size_type())));
     }
-    return multi_ary_exprt(ID_bitor, values, lhs_type);
+    return or_values(values, lhs_type);
   }
   else
   {
