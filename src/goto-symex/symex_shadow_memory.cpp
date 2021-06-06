@@ -270,13 +270,14 @@ static optionalt<exprt> get_field(
         matched_base_descriptor.type().id() == ID_union_tag;
     // const exprt value = typecast_exprt::conditional_cast(shadow_dereference.value, lhs_type);
     // const exprt value = compute_max_over_cells(shadow_dereference.value, lhs_type, ns, log);
-    const exprt value =
-        compute_or_over_cells(shadow_dereference.value, field_type, ns, log, is_union);
+    const exprt value = typecast_exprt::conditional_cast(
+        compute_or_over_cells(shadow_dereference.value, field_type, ns, log, is_union),
+        lhs_type);
     const exprt cond = get_cond(
         shadowed_address.address, dereference.pointer, matched_base, expr, ns, log);
     if(cond.is_true())
     {
-      return typecast_exprt::conditional_cast(value, field_type);
+      return value;
     }
     else if(!cond.is_false())
     {
@@ -294,7 +295,7 @@ static optionalt<exprt> get_field(
   }
   if (found)
   {
-    return typecast_exprt::conditional_cast(rhs, field_type);
+    return typecast_exprt::conditional_cast(rhs, lhs_type);
   }
   return {};
 }
@@ -360,7 +361,7 @@ void goto_symext::symex_set_field(
     // on unions.
     exprt per_byte_rhs = duplicate_per_byte(rhs, lhs.type(), ns, log);
     log.debug() << "RHS: " << from_expr(ns, "", per_byte_rhs) << messaget::eom;
-    symex_assign(state, lhs, per_byte_rhs);
+    symex_assign(state, lhs, typecast_exprt::conditional_cast(per_byte_rhs, lhs.type()));
   }
   else
   {
