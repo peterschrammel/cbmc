@@ -3619,8 +3619,8 @@ tmain_7:
                                         }
                                         int main(void)
                                         {
-                                        __CPROVER_field_decl_global("ts_read", (unsigned int) 0);
-                                        __CPROVER_field_decl_global("ts_write", (unsigned int) 0);
+                                        __CPROVER_field_decl_global("ts_read", (unsigned char) 0);
+                                        __CPROVER_field_decl_global("ts_write", (unsigned char) 0);
 /* round  0 */
 /* main */
                                         unsigned __CPROVER_bitvector[3] __cs_tmp_t0_r0;

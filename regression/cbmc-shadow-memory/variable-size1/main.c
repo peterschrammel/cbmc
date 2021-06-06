@@ -3,9 +3,9 @@
 int main()
 {
   // field declarations
-  __CPROVER_field_decl_local("field1", (int)0);
+  __CPROVER_field_decl_local("field1", (char)0);
   __CPROVER_field_decl_local("field2", (__CPROVER_bitvector[6])0);
-  __CPROVER_field_decl_global("field1", (int)0);
+  __CPROVER_field_decl_global("field1", (char)0);
   __CPROVER_field_decl_global("field2", (__CPROVER_bitvector[6])0);
 
   /***********************
