@@ -31,10 +31,10 @@ int foo()
 int main ()
 {
     // field declarations
-  __CPROVER_field_decl_local( "field1", (int)0 );
-  __CPROVER_field_decl_local( "field2", (int)0 );
+  __CPROVER_field_decl_local( "field1", (char)0 );
+  __CPROVER_field_decl_local( "field2", (char)0 );
   __CPROVER_field_decl_local( "field3", (__CPROVER_bitvector[6])0 );
-  __CPROVER_field_decl_global( "one", (int)0 );
+  __CPROVER_field_decl_global( "one", (char)0 );
   __CPROVER_field_decl_global( "two", (__CPROVER_bitvector[6])0 );
   foo();
 }

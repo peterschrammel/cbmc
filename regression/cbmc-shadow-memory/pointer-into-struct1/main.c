@@ -9,7 +9,7 @@ struct STRUCTNAME
 int main()
 {
   // field declarations
-  __CPROVER_field_decl_local("field1", (int)0);
+  __CPROVER_field_decl_local("field1", (char)0);
 
   struct STRUCTNAME n, m;
   int *p, *q;
