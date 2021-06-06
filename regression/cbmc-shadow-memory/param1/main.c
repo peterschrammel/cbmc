@@ -91,7 +91,7 @@ void f_int_local(int rec, int value)
 
 int main()
 {
-  __CPROVER_field_decl_local("field1", (int)0);
+  __CPROVER_field_decl_local("field1", (char)0);
   int x;
   f_int_val(x);
   f_int_val(x);
