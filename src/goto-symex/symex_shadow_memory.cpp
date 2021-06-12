@@ -163,17 +163,15 @@ static exprt get_cond(
   return cond;
 }
 
-static optionalt<exprt> set_field(
-  const namespacet &ns,
-  const messaget &log,
-  const std::vector<exprt>  &value_set,
-  const goto_symex_statet::shadowed_addresst &shadowed_address,
-  const typet &field_type,
-  const exprt &expr,
-  exprt lhs,
-  size_t &mux_size)
+static optionalt<exprt> get_shadow_memory_for_shadow_address(
+    const exprt &expr,
+    const std::vector<exprt> &value_set,
+    const goto_symex_statet::shadowed_addresst &shadowed_address,
+    const namespacet &ns,
+    const messaget &log,
+    exprt result,
+    size_t &mux_size)
 {
-  bool found = false;
   for(const auto &matched_object : value_set)
   {
     if(matched_object.id() != ID_object_descriptor)
@@ -209,16 +207,44 @@ static optionalt<exprt> set_field(
     else if(!cond.is_false())
     {
       mux_size++;
-      found = true;
-      if(lhs.is_nil())
-        lhs = shadow_dereference.pointer;
+      if(result.is_nil())
+        result = shadow_dereference.pointer;
       else
-        lhs = if_exprt(cond, shadow_dereference.pointer, lhs);
+        result = if_exprt(cond, shadow_dereference.pointer, result);
     }
   }
-  if(found)
+  if(result.is_not_nil())
   {
-    return lhs;
+    return result;
+  }
+  return {};
+}
+
+static optionalt<exprt> get_shadow_memory(
+    const exprt &expr,
+    const std::vector<exprt> &value_set,
+    const std::vector<goto_symex_statet::shadowed_addresst> &addresses,
+    const namespacet &ns,
+    const messaget &log,
+    size_t &mux_size)
+{
+  exprt result = nil_exprt();
+  for (const auto &shadowed_address : addresses)
+  {
+    log_try_shadow_address(ns, log, shadowed_address);
+
+    auto maybe_result = get_shadow_memory_for_shadow_address(
+        expr, value_set, shadowed_address, ns, log, result, mux_size);
+    if (maybe_result)
+    {
+      result = *maybe_result;
+      if (result.id() == ID_symbol)
+        break;
+    }
+  }
+  if(result.is_not_nil())
+  {
+    return result;
   }
   return {};
 }
@@ -226,7 +252,7 @@ static optionalt<exprt> set_field(
 static optionalt<exprt> get_field(
   const namespacet &ns,
   const messaget &log,
-  const std::vector<exprt>  &value_set,
+  const std::vector<exprt> &value_set,
   const goto_symex_statet::shadowed_addresst &shadowed_address,
   const typet &field_type,
   const exprt &expr,
@@ -331,7 +357,7 @@ void goto_symext::symex_set_field(
     state.address_fields.count(field_name) == 1,
     id2string(field_name) + " should exist");
   const auto &addresses = state.address_fields.at(field_name);
-  const typet &field_type = get_field_type(field_name, state);
+  // const typet &field_type = get_field_type(field_name, state);
 
   // get value set
   std::vector<exprt> value_set = state.value_set.get_value_set(expr, ns);
@@ -343,27 +369,15 @@ void goto_symext::symex_set_field(
 
   // build lhs
   const exprt &rhs = value;
-  exprt lhs = nil_exprt();
   size_t mux_size = 0;
-  for(const auto &shadowed_address : addresses)
-  {
-    log_try_shadow_address(ns, log, shadowed_address);
-
-    auto maybe_lhs = set_field(
-      ns, log, value_set, shadowed_address, field_type, expr, lhs, mux_size);
-    if(maybe_lhs)
-    {
-      lhs = *maybe_lhs;
-      if(lhs.id() == ID_symbol)
-        break;
-    }
-  }
+  optionalt<exprt> maybe_lhs = get_shadow_memory(
+      expr, value_set, addresses, ns, log, mux_size);
 
   // add to equation
-  if(lhs.is_not_nil())
+  if(maybe_lhs.has_value())
   {
     log.debug() << "mux size set_field: " << mux_size << messaget::eom;
-    lhs = deref_expr(lhs);
+    const exprt lhs = deref_expr(*maybe_lhs);
     log.debug() << "LHS: " << from_expr(ns, "", lhs) << messaget::eom;
     // We replicate the rhs value on each byte of the value that we set.
     // This allows the get_field or/max semantics to operate correctly
