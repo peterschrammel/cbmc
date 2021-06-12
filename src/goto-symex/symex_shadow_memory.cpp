@@ -269,10 +269,19 @@ static optionalt<exprt> get_field(
     const bool is_union = matched_base_descriptor.type().id() == ID_union ||
         matched_base_descriptor.type().id() == ID_union_tag;
     // const exprt value = typecast_exprt::conditional_cast(shadow_dereference.value, lhs_type);
-    // const exprt value = compute_max_over_cells(shadow_dereference.value, lhs_type, ns, log);
-    const exprt value = typecast_exprt::conditional_cast(
-        compute_or_over_cells(shadow_dereference.value, field_type, ns, log, is_union),
-        lhs_type);
+    exprt value;
+    if(field_type.id() == ID_c_bool || field_type.id() == ID_bool)
+    {
+      value = typecast_exprt::conditional_cast(
+          compute_or_over_cells(shadow_dereference.value, field_type, ns, log, is_union),
+          lhs_type);
+    }
+    else
+    {
+      value = typecast_exprt::conditional_cast(
+          compute_max_over_cells(shadow_dereference.value, field_type, ns, log, is_union),
+          lhs_type);
+    }
     const exprt cond = get_cond(
         shadowed_address.address, dereference.pointer, matched_base, expr, ns, log);
     if(cond.is_true())
