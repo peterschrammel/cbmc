@@ -83,7 +83,8 @@ exprt compute_max_over_cells(
   const exprt &expr,
   const typet &lhs_type,
   const namespacet &ns,
-  const messaget &log);
+  const messaget &log,
+  const bool is_union);
 
 exprt compute_or_over_cells(
     const exprt &expr,
