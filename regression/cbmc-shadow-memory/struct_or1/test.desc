@@ -1,0 +1,10 @@
+FUTURE
+main.c
+--verbosity 10
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Disabled because we don't need this semantics atm.
