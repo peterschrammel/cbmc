@@ -283,11 +283,74 @@ const typet &get_field_type(
   return field_type_it->second;
 }
 
+static void max_element(
+    const exprt &element,
+    const typet &field_type,
+    exprt &max)
+{
+  exprt value = typecast_exprt::conditional_cast(element, field_type);
+  if (max.is_nil())
+  {
+    max = value;
+  }
+  else {
+    max = if_exprt(binary_predicate_exprt(value, ID_gt, max), value, max);
+  }
+}
+
+static void max_over_bytes(
+    const exprt &value,
+    const typet &type,
+    const typet &field_type,
+    exprt &max)
+{
+  const size_t size = to_bitvector_type(type).get_width() / 8;
+  max_element(value, field_type, max);
+  for(size_t i = 1; i < size; ++i)
+  {
+    max_element(
+        lshr_exprt(value, from_integer(8 * i, size_type())),
+        field_type,
+        max);
+  }
+}
+
+static void max_elements(
+    const exprt &element,
+    const typet &field_type,
+    const namespacet &ns,
+    const messaget &log,
+    const bool is_union,
+    exprt &max)
+{
+  if(element.type().id() == ID_unsignedbv || element.type().id() == ID_signedbv)
+  {
+    if(is_union)
+    {
+      max_over_bytes(element, element.type(), field_type, max);
+    }
+    else
+    {
+      max_element(element, field_type, max);
+    }
+  }
+  else
+  {
+    exprt value = compute_max_over_cells(element,
+                                        field_type,
+                                        ns,
+                                        log,
+                                        is_union);
+    max_element(value, field_type, max);
+  }
+}
+
 exprt compute_max_over_cells(
   const exprt &expr,
-  const typet &lhs_type,
+  const typet &field_type,
   const namespacet &ns,
-  const messaget &log)
+  const messaget &log,
+  const bool is_union)
 {
   const typet type = ns.follow(expr.type());
 
@@ -300,28 +363,13 @@ exprt compute_max_over_cells(
       {
         continue;
       }
-
-      exprt value;
-      if(component.type().id() == ID_unsignedbv || component.type().id() == ID_signedbv)
-      {
-        value = typecast_exprt::conditional_cast(member_exprt(expr, component), lhs_type);
-      }
-      else
-      {
-        value = compute_max_over_cells(member_exprt(expr, component),
-          lhs_type,
+      max_elements(
+          member_exprt(expr, component),
+          field_type,
           ns,
-          log);
-      }
-
-      if (max.is_nil())
-      {
-        max = value;
-      }
-      else
-      {
-        max = if_exprt(binary_predicate_exprt(value, ID_gt, max), value, max);
-      }
+          log,
+          is_union,
+          max);
     }
     return max;
   }
@@ -334,28 +382,13 @@ exprt compute_max_over_cells(
       const mp_integer size = numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
       for(mp_integer index = 0; index < size; ++index)
       {
-        exprt value;
-        if(array_type.subtype().id() == ID_unsignedbv || array_type.subtype().id() == ID_signedbv)
-        {
-          value = typecast_exprt::conditional_cast(index_exprt(expr, from_integer(index, index_type())), lhs_type);
-        }
-        else
-        {
-          value = compute_max_over_cells(
-              index_exprt(expr, from_integer(index, index_type())),
-              lhs_type,
-              ns,
-              log);
-        }
-
-        if (max.is_nil())
-        {
-          max = value;
-        }
-        else
-        {
-          max = if_exprt(binary_predicate_exprt(value, ID_gt, max), value, max);
-        }
+        max_elements(
+            index_exprt(expr, from_integer(index, index_type())),
+            field_type,
+            ns,
+            log,
+            is_union,
+            max);
       }
       return max;
     }
@@ -364,7 +397,7 @@ exprt compute_max_over_cells(
       log.warning() << "CANNOT COMPUTE MAX OVER SHADOW MEMORY FOR VARIABLE SIZE ARRAY" << messaget::eom;
     }
   }
-  return typecast_exprt::conditional_cast(expr, lhs_type);
+  return typecast_exprt::conditional_cast(expr, field_type);
 }
 
 static void or_over_bytes(
@@ -384,13 +417,44 @@ static void or_over_bytes(
   }
 }
 
-static exprt or_values(const exprt::operandst values, const typet &field_type)
+static exprt or_values(const exprt::operandst &values, const typet &field_type)
 {
   if(values.size() == 1)
   {
     return values[0];
   }
   return multi_ary_exprt(ID_bitor, values, field_type);
+}
+
+static void or_elements(
+    const exprt &element,
+    const typet &field_type,
+    const namespacet &ns,
+    const messaget &log,
+    const bool is_union,
+    exprt::operandst &values)
+{
+  if(element.type().id() == ID_unsignedbv || element.type().id() == ID_signedbv)
+  {
+    exprt value = element;
+    if(is_union)
+    {
+      or_over_bytes(value, element.type(), field_type, values);
+    }
+    else
+    {
+      values.push_back(typecast_exprt::conditional_cast(value, field_type));
+    }
+  }
+  else
+  {
+    exprt value = compute_or_over_cells(element,
+                                        field_type,
+                                        ns,
+                                        log,
+                                        is_union);
+    values.push_back(typecast_exprt::conditional_cast(value, field_type));
+  }
 }
 
 exprt compute_or_over_cells(
@@ -411,27 +475,13 @@ exprt compute_or_over_cells(
       {
         continue;
       }
-      if(component.type().id() == ID_unsignedbv || component.type().id() == ID_signedbv)
-      {
-        exprt value = member_exprt(expr, component);
-        if(is_union)
-        {
-          or_over_bytes(value, component.type(), field_type, values);
-        }
-        else
-        {
-          values.push_back(typecast_exprt::conditional_cast(value, field_type));
-        }
-      }
-      else
-      {
-        exprt value = compute_or_over_cells(member_exprt(expr, component),
-                                            field_type,
-                                            ns,
-                                            log,
-                                            is_union);
-        values.push_back(typecast_exprt::conditional_cast(value, field_type));
-      }
+      or_elements(
+          member_exprt(expr, component),
+          field_type,
+          ns,
+          log,
+          is_union,
+          values);
     }
     return or_values(values, field_type);
   }
@@ -444,28 +494,13 @@ exprt compute_or_over_cells(
       const mp_integer size = numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
       for(mp_integer index = 0; index < size; ++index)
       {
-        if(array_type.subtype().id() == ID_unsignedbv || array_type.subtype().id() == ID_signedbv)
-        {
-          exprt value = index_exprt(expr, from_integer(index, index_type()));
-          if(is_union)
-          {
-            or_over_bytes(value, array_type.subtype(), field_type, values);
-          }
-          else
-          {
-            values.push_back(typecast_exprt::conditional_cast(value, field_type));
-          }
-        }
-        else
-        {
-          exprt value = compute_or_over_cells(
-              index_exprt(expr, from_integer(index, index_type())),
-              field_type,
-              ns,
-              log,
-              is_union);
-          values.push_back(typecast_exprt::conditional_cast(value, field_type));
-        }
+        or_elements(
+            index_exprt(expr, from_integer(index, index_type())),
+            field_type,
+            ns,
+            log,
+            is_union,
+            values);
       }
       return or_values(values, field_type);
     }
