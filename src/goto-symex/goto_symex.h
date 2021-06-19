@@ -857,6 +857,11 @@ public:
     const ssa_exprt &expr,
     const exprt &rhs);
 
+  void symex_shadow_memory_copy(
+    goto_symex_statet &state,
+    const address_of_exprt &dest,
+    const address_of_exprt &src);
+
 protected:
   void symex_get_field(
     goto_symex_statet &state,
