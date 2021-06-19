@@ -172,6 +172,10 @@ void symex_assignt::assign_from_struct(
       "member of symbol should be susceptible to field-sensitivity");
 
     assign_symbol(to_ssa_expr(lhs_field), full_lhs, comp_rhs.second, guard);
+    goto_symex.symex_shadow_memory_copy(
+        state,
+        address_of_exprt(member_exprt{lhs, comp.get_name(), comp.type()}),
+        address_of_exprt(comp_rhs.second));
   }
 }
 
