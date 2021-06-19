@@ -26,6 +26,7 @@ Author: Peter Schrammel
 #include <util/pointer_predicates.h>
 #include <util/pointer_resolve.h>
 #include <util/prefix.h>
+#include <util/range.h>
 #include <util/replace_expr.h>
 #include <util/source_location.h>
 #include <util/std_expr.h>
@@ -163,6 +164,50 @@ static exprt get_cond(
   return cond;
 }
 
+static object_descriptor_exprt normalize(
+    const object_descriptor_exprt &expr, const namespacet &ns)
+{
+  if(expr.object().id() == ID_symbol) {
+    return expr;
+  }
+  if(expr.offset().id() == ID_unknown) {
+    return expr;
+  }
+
+  object_descriptor_exprt result = expr;
+  mp_integer offset = numeric_cast_v<mp_integer>(to_constant_expr(expr.offset()));
+  exprt object = expr.object();
+
+  while(true)
+  {
+    if(object.id() == ID_index)
+    {
+      const index_exprt &index_expr = to_index_expr(object);
+      mp_integer index =
+          numeric_cast_v<mp_integer>(to_constant_expr(index_expr.index()));
+
+      offset += *pointer_offset_size(index_expr.type(), ns) * index;
+      object = index_expr.array();
+    }
+    else if(object.id() == ID_member)
+    {
+      const member_exprt &member_expr = to_member_expr(object);
+      const struct_typet &struct_type =
+          to_struct_type(ns.follow(member_expr.struct_op().type()));
+      offset +=
+          *member_offset(struct_type, member_expr.get_component_name(), ns);
+      object = member_expr.struct_op();
+    }
+    else
+    {
+      break;
+    }
+  }
+  result.object() = object;
+  result.offset() = from_integer(offset, expr.offset().type());
+  return result;
+}
+
 static optionalt<exprt> get_shadow_memory_for_shadow_address(
     const exprt &expr,
     const std::vector<exprt> &value_set,
@@ -172,6 +217,7 @@ static optionalt<exprt> get_shadow_memory_for_shadow_address(
     exprt result,
     size_t &mux_size)
 {
+  log_value_set(ns, log, value_set);
   for(const auto &matched_object : value_set)
   {
     if(matched_object.id() != ID_object_descriptor)
@@ -180,12 +226,14 @@ static optionalt<exprt> get_shadow_memory_for_shadow_address(
       continue;
     }
 
-    value_set_dereferencet::valuet dereference =
-        value_set_dereferencet::build_reference_to(matched_object, expr, ns);
+    object_descriptor_exprt matched_base_descriptor =
+        normalize(to_object_descriptor_expr(matched_object), ns);
+    log.debug() << "normalized: " << from_expr(ns, "", matched_base_descriptor) << messaget::eom;
 
-    const object_descriptor_exprt &matched_base_descriptor =
-        to_object_descriptor_expr(matched_object);
-    const exprt &matched_base = address_of_exprt(matched_base_descriptor.object());
+    value_set_dereferencet::valuet dereference =
+        value_set_dereferencet::build_reference_to(matched_base_descriptor, expr, ns);
+
+    const exprt matched_base = address_of_exprt(matched_base_descriptor.object());
 
     // NULL has already been handled in the caller; skip.
     if(matched_base.id() == ID_address_of &&
@@ -248,6 +296,159 @@ static optionalt<exprt> get_shadow_memory(
   }
   return {};
 }
+
+static exprt get_original_ssa_expr(const exprt &expr)
+{
+  exprt full_expr = expr;
+  exprt ssa_object = nil_exprt();
+  exprt *maybe_object = &full_expr;
+  while(true)
+  {
+    if(maybe_object->get_bool(ID_C_SSA_symbol))
+    {
+      exprt original_expr = to_ssa_expr(*maybe_object).get_original_expr();
+      ssa_object = to_ssa_expr(*maybe_object).get_l1_object();
+      *maybe_object = original_expr;
+    }
+    if(maybe_object->id() == ID_index)
+    {
+      maybe_object = &to_index_expr(*maybe_object).array();
+    }
+    else if(maybe_object->id() == ID_member)
+    {
+      maybe_object = &to_member_expr(*maybe_object).struct_op();
+    }
+    else
+    {
+      break;
+    }
+  }
+  *maybe_object = ssa_object;
+  return full_expr;
+}
+
+void goto_symext::symex_shadow_memory_copy(
+    goto_symex_statet &state,
+    const address_of_exprt &dest,
+    const address_of_exprt &src)
+{
+  log.debug() << "COPY SHADOW MEMORY" << messaget::eom;
+  log.debug() << "DEST: " << from_expr(ns, "", dest) << messaget::eom;
+  log.debug() << "SRC : " << from_expr(ns, "", src) << messaget::eom;
+  const std::unordered_set<irep_idt> dest_identifiers = find_symbol_identifiers(dest);
+  if(std::find_if(
+      dest_identifiers.begin(),
+      dest_identifiers.end(),
+      [](irep_idt identifier) {
+        return id2string(identifier).find("SM__") != std::string::npos;
+      }) != dest_identifiers.end())
+  {
+    log.debug() << "IGNORED" << messaget::eom;
+    return;
+  }
+  if(src.object().id() == ID_struct)
+  {
+    const auto &components = to_struct_type(ns.follow(src.object().type())).components();
+    const auto &src_struct = to_struct_expr(src.object());
+
+    for(const auto &comp_src : make_range(components).zip(src_struct.operands()))
+    {
+      const auto &comp = comp_src.first;
+      symex_shadow_memory_copy(
+          state,
+          address_of_exprt(member_exprt{dest.object(), comp.get_name(), comp.type()}),
+          address_of_exprt(comp_src.second));
+    }
+    return;
+  }
+  if(src.object().id() == ID_array)
+  {
+    const auto &src_array = to_array_expr(src.object());
+
+    mp_integer index = 0;
+    for(const auto &src_element : src_array.operands())
+    {
+      symex_shadow_memory_copy(
+          state,
+          address_of_exprt(index_exprt{dest.object(), from_integer(index, index_type()), src_element.type()}),
+          address_of_exprt(src_element));
+      ++index;
+    }
+    return;
+  }
+  const address_of_exprt dest_expr =
+      address_of_exprt(get_original_ssa_expr(dest.object()));
+  log.debug() << "DEST_EXPR: " << from_expr(ns, "", dest_expr) << messaget::eom;
+  const address_of_exprt src_expr =
+      address_of_exprt(get_original_ssa_expr(src.object()));
+  log.debug() << "SRC_EXPR : " << from_expr(ns, "", src_expr) << messaget::eom;
+  log.conditional_output(
+      log.debug(), [this, dest_expr, src_expr](messaget::mstreamt &mstream) {
+        mstream << "Shadow memory: copy from "
+                << from_expr(ns, "", src_expr.object())
+                << " to " << from_expr(ns, "", dest_expr.object())
+                << messaget::eom;
+      });
+  for(const auto &entry : state.address_fields)
+  {
+    size_t mux_size = 0;
+    log.debug() << "FINDING SHADOW MEMORY FOR DEST" << messaget::eom;
+    std::vector<exprt> lhs_value_set = state.value_set.get_value_set(dest_expr, ns);
+    if(lhs_value_set.empty())
+    {
+      log.warning() << "CANNOT COPY SHADOW MEMORY" << messaget::eom;
+      continue;
+    }
+    optionalt<exprt> maybe_lhs = get_shadow_memory(
+        dest_expr,
+        lhs_value_set,
+        entry.second,
+        ns,
+        log,
+        mux_size);
+    if(!maybe_lhs.has_value())
+    {
+      log.warning() << "CANNOT COPY SHADOW MEMORY" << messaget::eom;
+      continue;
+    }
+    log.debug() << "FINDING SHADOW MEMORY FOR SRC" << messaget::eom;
+    std::vector<exprt> rhs_value_set = state.value_set.get_value_set(src_expr, ns);
+    if(rhs_value_set.empty())
+    {
+      log.warning() << "CANNOT COPY SHADOW MEMORY" << messaget::eom;
+      continue;
+    }
+    optionalt<exprt> maybe_rhs = get_shadow_memory(
+        src_expr,
+        rhs_value_set,
+        entry.second,
+        ns,
+        log,
+        mux_size);
+    if(!maybe_rhs.has_value())
+    {
+      log.warning() << "CANNOT COPY SHADOW MEMORY" << messaget::eom;
+      continue;
+    }
+    log.debug() << "copying shadow memory: "
+      << from_expr(ns, "", *maybe_lhs)
+      << " = "
+      << from_expr(ns, "", *maybe_rhs)
+      << messaget::eom;
+    if(maybe_lhs->id() == ID_address_of && maybe_rhs->id() == ID_address_of)
+    {
+      symex_assign(
+          state,
+          state.field_sensitivity.apply(ns, state, to_address_of_expr(*maybe_lhs).object(), true),
+          state.field_sensitivity.apply(ns, state, to_address_of_expr(*maybe_rhs).object(), false));
+    }
+    else
+    {
+      log.warning() << "CANNOT COPY SHADOW MEMORY" << messaget::eom;
+    }
+  }
+}
+
 
 static optionalt<exprt> get_field(
   const namespacet &ns,
