@@ -13,13 +13,15 @@ void log_exact_match(
   const goto_symex_statet::shadowed_addresst &shadowed_address,
   const exprt &resolved_expr)
 {
+#ifdef DEBUG_SM
   log.conditional_output(
     log.debug(),
     [ns, shadowed_address, resolved_expr](messaget::mstreamt &mstream) {
-      mstream << "exact match: "
+      mstream << "Shadow memory: exact match: "
               << from_expr(ns, "", shadowed_address.address)
               << " == " << from_expr(ns, "", resolved_expr) << messaget::eom;
     });
+#endif
 }
 
 void log_value_set_match(
@@ -28,13 +30,15 @@ void log_value_set_match(
   const goto_symex_statet::shadowed_addresst &shadowed_address,
   const exprt &expr)
 {
+#ifdef DEBUG_SM
   log.conditional_output(
     log.debug(),
     [ns, shadowed_address, expr](messaget::mstreamt &mstream) {
-      mstream << "value set match: "
+      mstream << "Shadow memory: value set match: "
               << from_expr(ns, "", shadowed_address.address)
               << " == " << from_expr(ns, "", expr) << messaget::eom;
     });
+#endif
 }
 
 void log_value_set_match(
@@ -46,20 +50,22 @@ void log_value_set_match(
   const exprt &expr,
   const value_set_dereferencet::valuet &shadow_dereference)
 {
+#ifdef DEBUG_SM
   log.conditional_output(
     log.debug(),
     [ns, shadowed_address, expr, dereference, matched_base, shadow_dereference](
       messaget::mstreamt &mstream) {
-      mstream << "value set match: " << messaget::eom;
-      mstream << "  base: " << from_expr(ns, "", shadowed_address.address)
+      mstream << "Shadow memory: value set match: " << messaget::eom;
+      mstream << "Shadow memory:   base: " << from_expr(ns, "", shadowed_address.address)
               << " <-- " << from_expr(ns, "", matched_base) << messaget::eom;
-      mstream << "  cell: " << from_expr(ns, "", dereference.pointer) << " <-- "
+      mstream << "Shadow memory:   cell: " << from_expr(ns, "", dereference.pointer) << " <-- "
               << from_expr(ns, "", expr) << messaget::eom;
-      mstream << "  shadow ptr: "
+      mstream << "Shadow memory:   shadow ptr: "
               << from_expr(ns, "", shadow_dereference.pointer) << messaget::eom;
-      mstream << "  shadow val: "
+      mstream << "Shadow memory:   shadow val: "
               << from_expr(ns, "", shadow_dereference.value) << messaget::eom;
     });
+#endif
 }
 
 void log_value_set_match(
@@ -68,11 +74,13 @@ void log_value_set_match(
   const exprt &address,
   const exprt &expr)
 {
+#ifdef DEBUG_SM
   log.conditional_output(
     log.debug(), [ns, address, expr](messaget::mstreamt &mstream) {
-      mstream << "value set match: " << from_expr(ns, "", address)
+      mstream << "Shadow memory: value set match: " << from_expr(ns, "", address)
               << " <-- " << from_expr(ns, "", expr) << messaget::eom;
     });
+#endif
 }
 
 void log_cond(
@@ -80,11 +88,13 @@ void log_cond(
   const messaget &log,
   const exprt &cond)
 {
+#ifdef DEBUG_SM
   log.conditional_output(
     log.debug(), [ns, cond](messaget::mstreamt &mstream) {
-      mstream << "cond: " << from_expr(ns, "", cond)
+      mstream << "Shadow memory: cond: " << from_expr(ns, "", cond)
               << messaget::eom;
     });
+#endif
 }
 
 void log_value_set(
@@ -92,13 +102,15 @@ void log_value_set(
   const messaget &log,
   const std::vector<exprt> &value_set)
 {
+#ifdef DEBUG_SM
   log.conditional_output(
   log.debug(), [ns, value_set](messaget::mstreamt &mstream) {
     for(const auto &e : value_set)
     {
-      mstream << "value set: " << from_expr(ns, "", e) << messaget::eom;
+      mstream << "Shadow memory: value set: " << from_expr(ns, "", e) << messaget::eom;
     }
   });
+#endif
 }
 
 void log_try_shadow_address(
@@ -106,12 +118,14 @@ void log_try_shadow_address(
   const messaget &log,
   const goto_symex_statet::shadowed_addresst &shadowed_address)
 {
+#ifdef DEBUG_SM
   log.conditional_output(
     log.debug(), [ns, shadowed_address](messaget::mstreamt &mstream) {
-      mstream << "trying shadowed address: "
+      mstream << "Shadow memory: trying shadowed address: "
               << from_expr(ns, "", shadowed_address.address)
               << messaget::eom;
     });
+#endif
 }
 
 void log_set_field(
@@ -123,7 +137,7 @@ void log_set_field(
 {
   log.conditional_output(
     log.debug(), [field_name, ns, expr, value](messaget::mstreamt &mstream) {
-      mstream << "set_field: " << id2string(field_name) << " for "
+      mstream << "Shadow memory: set_field: " << id2string(field_name) << " for "
               << from_expr(ns, "", expr) << " to " << from_expr(ns, "", value)
               << messaget::eom;
     });
@@ -137,7 +151,7 @@ void log_get_field(
 {
   log.conditional_output(
     log.debug(), [ns, field_name, expr](messaget::mstreamt &mstream) {
-      mstream << "get_field: " << id2string(field_name) << " for "
+      mstream << "Shadow memory: get_field: " << id2string(field_name) << " for "
               << from_expr(ns, "", expr) << messaget::eom;
     });
 }
@@ -394,7 +408,10 @@ exprt compute_max_over_cells(
     }
     else
     {
-      log.warning() << "CANNOT COMPUTE MAX OVER SHADOW MEMORY FOR VARIABLE SIZE ARRAY" << messaget::eom;
+      log.warning()
+        << "Shadow memory: cannot compute max over variable-size array "
+        << from_expr(ns, "", expr)
+        << messaget::eom;
     }
   }
   return typecast_exprt::conditional_cast(expr, field_type);
@@ -506,7 +523,10 @@ exprt compute_or_over_cells(
     }
     else
     {
-      log.warning() << "CANNOT COMPUTE OR OVER SHADOW MEMORY FOR VARIABLE SIZE ARRAY" << messaget::eom;
+      log.warning()
+          << "Shadow memory: cannot compute or over variable-size array "
+          << from_expr(ns, "", expr)
+          << messaget::eom;
     }
   }
   exprt::operandst values;
@@ -548,7 +568,10 @@ exprt duplicate_per_byte(
   }
   else
   {
-    log.warning() << "CANNOT HANDLE NON-PRIMITIVE UNION UPDATES CORRECTLY" << messaget::eom;
+    log.warning()
+        << "Shadow memory: cannot handle non-primitive union updates correctly for "
+        << from_expr(ns, "", expr)
+        << messaget::eom;
   }
   return typecast_exprt::conditional_cast(expr, lhs_type);
 }

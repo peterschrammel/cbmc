@@ -8,6 +8,8 @@
 
 #include <pointer-analysis/value_set_dereference.h>
 
+// #define DEBUG_SM
+
 void log_exact_match(
   const namespacet &ns,
   const messaget &log,
