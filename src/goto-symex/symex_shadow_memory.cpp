@@ -14,7 +14,6 @@ Author: Peter Schrammel
 #include "symex_shadow_memory_util.h"
 
 #include <util/arith_tools.h>
-#include <util/base_type.h>
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
 #include <util/expr_initializer.h>
@@ -23,12 +22,9 @@ Author: Peter Schrammel
 #include <util/invariant.h>
 #include <util/message.h>
 #include <util/pointer_offset_size.h>
-#include <util/pointer_predicates.h>
 #include <util/pointer_resolve.h>
 #include <util/prefix.h>
 #include <util/range.h>
-#include <util/replace_expr.h>
-#include <util/source_location.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
 
@@ -78,7 +74,7 @@ void goto_symext::initialize_shadow_memory(
     log.conditional_output(
       log.debug(),
       [field, this, address_expr](messaget::mstreamt &mstream) {
-        mstream << "initialize field " << id2string(field.get_identifier())
+        mstream << "Shadow memory: initialize field " << id2string(field.get_identifier())
                 << " for " << from_expr(ns, "", address_expr)
                 << messaget::eom;
       });
@@ -115,12 +111,14 @@ static bool set_field_check_null(
   const null_pointer_exprt null_pointer(to_pointer_type(expr.type()));
   if(value_set.size() == 1 && filter_by_value_set(value_set, null_pointer))
   {
+#ifdef DEBUG_SM
     log.conditional_output(
       log.debug(), [ns, null_pointer, expr](messaget::mstreamt &mstream) {
-        mstream << "value set match: " << from_expr(ns, "", null_pointer)
+        mstream << "Shadow memory: value set match: " << from_expr(ns, "", null_pointer)
                 << " <-- " << from_expr(ns, "", expr) << messaget::eom;
-        mstream << "ignoring set field on NULL object" << messaget::eom;
+        mstream << "Shadow memory: ignoring set field on NULL object" << messaget::eom;
       });
+#endif
     return true;
   }
   return false;
@@ -137,7 +135,9 @@ static value_set_dereferencet::valuet get_shadow(
   shadowed_object.object() = shadow;
   value_set_dereferencet::valuet shadow_dereference =
       value_set_dereferencet::build_reference_to(shadowed_object, expr, ns);
-  //log.debug() << "  shadow-deref: " << from_expr(ns, "", shadow_dereference.value) << messaget::eom;
+#ifdef DEBUG_SM
+  log.debug() << "Shadow memory: shadow-deref: " << from_expr(ns, "", shadow_dereference.value) << messaget::eom;
+#endif
   return shadow_dereference;
 }
 
@@ -222,13 +222,15 @@ static optionalt<exprt> get_shadow_memory_for_shadow_address(
   {
     if(matched_object.id() != ID_object_descriptor)
     {
-      log.debug() << "VALUE SET CONTAINS UNKNOWN" << messaget::eom;
+      log.warning()
+          << "Shadow memory: value set contains unknown for "
+          << from_expr(ns, "", expr)
+          << messaget::eom;
       continue;
     }
 
     object_descriptor_exprt matched_base_descriptor =
         normalize(to_object_descriptor_expr(matched_object), ns);
-    log.debug() << "normalized: " << from_expr(ns, "", matched_base_descriptor) << messaget::eom;
 
     value_set_dereferencet::valuet dereference =
         value_set_dereferencet::build_reference_to(matched_base_descriptor, expr, ns);
@@ -332,9 +334,6 @@ void goto_symext::symex_shadow_memory_copy(
     const address_of_exprt &dest,
     const address_of_exprt &src)
 {
-  log.debug() << "COPY SHADOW MEMORY" << messaget::eom;
-  log.debug() << "DEST: " << from_expr(ns, "", dest) << messaget::eom;
-  log.debug() << "SRC : " << from_expr(ns, "", src) << messaget::eom;
   const std::unordered_set<irep_idt> dest_identifiers = find_symbol_identifiers(dest);
   if(std::find_if(
       dest_identifiers.begin(),
@@ -343,7 +342,6 @@ void goto_symext::symex_shadow_memory_copy(
         return id2string(identifier).find("SM__") != std::string::npos;
       }) != dest_identifiers.end())
   {
-    log.debug() << "IGNORED" << messaget::eom;
     return;
   }
   if(src.object().id() == ID_struct)
@@ -378,10 +376,8 @@ void goto_symext::symex_shadow_memory_copy(
   }
   const address_of_exprt dest_expr =
       address_of_exprt(get_original_ssa_expr(dest.object()));
-  log.debug() << "DEST_EXPR: " << from_expr(ns, "", dest_expr) << messaget::eom;
   const address_of_exprt src_expr =
       address_of_exprt(get_original_ssa_expr(src.object()));
-  log.debug() << "SRC_EXPR : " << from_expr(ns, "", src_expr) << messaget::eom;
   log.conditional_output(
       log.debug(), [this, dest_expr, src_expr](messaget::mstreamt &mstream) {
         mstream << "Shadow memory: copy from "
@@ -392,13 +388,7 @@ void goto_symext::symex_shadow_memory_copy(
   for(const auto &entry : state.address_fields)
   {
     size_t mux_size = 0;
-    log.debug() << "FINDING SHADOW MEMORY FOR DEST" << messaget::eom;
     std::vector<exprt> lhs_value_set = state.value_set.get_value_set(dest_expr, ns);
-    if(lhs_value_set.empty())
-    {
-      log.warning() << "CANNOT COPY SHADOW MEMORY" << messaget::eom;
-      continue;
-    }
     optionalt<exprt> maybe_lhs = get_shadow_memory(
         dest_expr,
         lhs_value_set,
@@ -408,16 +398,13 @@ void goto_symext::symex_shadow_memory_copy(
         mux_size);
     if(!maybe_lhs.has_value())
     {
-      log.warning() << "CANNOT COPY SHADOW MEMORY" << messaget::eom;
+      log.warning()
+          << "Shadow memory: cannot copy shadow memory to "
+          << from_expr(ns, "", dest_expr)
+          << messaget::eom;
       continue;
     }
-    log.debug() << "FINDING SHADOW MEMORY FOR SRC" << messaget::eom;
     std::vector<exprt> rhs_value_set = state.value_set.get_value_set(src_expr, ns);
-    if(rhs_value_set.empty())
-    {
-      log.warning() << "CANNOT COPY SHADOW MEMORY" << messaget::eom;
-      continue;
-    }
     optionalt<exprt> maybe_rhs = get_shadow_memory(
         src_expr,
         rhs_value_set,
@@ -427,14 +414,12 @@ void goto_symext::symex_shadow_memory_copy(
         mux_size);
     if(!maybe_rhs.has_value())
     {
-      log.warning() << "CANNOT COPY SHADOW MEMORY" << messaget::eom;
+      log.warning()
+          << "Shadow memory: cannot copy shadow memory from "
+          << from_expr(ns, "", src_expr)
+          << messaget::eom;
       continue;
     }
-    log.debug() << "copying shadow memory: "
-      << from_expr(ns, "", *maybe_lhs)
-      << " = "
-      << from_expr(ns, "", *maybe_rhs)
-      << messaget::eom;
     if(maybe_lhs->id() == ID_address_of && maybe_rhs->id() == ID_address_of)
     {
       symex_assign(
@@ -444,7 +429,12 @@ void goto_symext::symex_shadow_memory_copy(
     }
     else
     {
-      log.warning() << "CANNOT COPY SHADOW MEMORY" << messaget::eom;
+      log.warning()
+          << "Shadow memory: failed to copy shadow memory from "
+          << from_expr(ns, "", src_expr)
+          << " to "
+          << from_expr(ns, "", dest_expr)
+          << messaget::eom;
     }
   }
 }
@@ -466,7 +456,10 @@ static optionalt<exprt> get_field(
   {
     if(matched_object.id() != ID_object_descriptor)
     {
-      log.warning() << "CANNOT ACCESS SHADOW MEMORY: VALUE SET CONTAINS UNKNOWN" << messaget::eom;
+      log.warning()
+          << "Shadow memory: value set contains unknown for "
+          << from_expr(ns, "", expr)
+          << messaget::eom;
       continue;
     }
     const object_descriptor_exprt &matched_base_descriptor =
@@ -490,7 +483,10 @@ static optionalt<exprt> get_field(
 
     if(is_void_pointer(dereference.pointer.type()))
     {
-      log.warning() << "CANNOT ACCESS SHADOW MEMORY FOR void*" << messaget::eom;
+      log.warning()
+          << "Shadow memory: cannot access void* for "
+          << from_expr(ns, "", expr)
+          << messaget::eom;
     }
 
     const bool is_union = matched_base_descriptor.type().id() == ID_union ||
@@ -577,20 +573,26 @@ void goto_symext::symex_set_field(
   // add to equation
   if(maybe_lhs.has_value())
   {
-    log.debug() << "mux size set_field: " << mux_size << messaget::eom;
+    log.debug() << "Shadow memory: mux size set_field: " << mux_size << messaget::eom;
     const exprt lhs = deref_expr(*maybe_lhs);
-    log.debug() << "LHS: " << from_expr(ns, "", lhs) << messaget::eom;
+#ifdef DEBUG_SM
+    log.debug() << "Shadow memory: LHS: " << from_expr(ns, "", lhs) << messaget::eom;
+#endif
     // We replicate the rhs value on each byte of the value that we set.
     // This allows the get_field or/max semantics to operate correctly
     // on unions.
     exprt per_byte_rhs = duplicate_per_byte(rhs, lhs.type(), ns, log);
-    log.debug() << "RHS: " << from_expr(ns, "", per_byte_rhs) << messaget::eom;
+#ifdef DEBUG_SM
+    log.debug() << "Shadow memory: RHS: " << from_expr(ns, "", per_byte_rhs) << messaget::eom;
+#endif
     symex_assign(state, lhs, typecast_exprt::conditional_cast(per_byte_rhs, lhs.type()));
   }
   else
   {
-    log.warning() << "cannot set_field for " << from_expr(ns, "", expr)
-                  << messaget::eom;
+    log.warning()
+      << "Shadow memory: cannot set_field for "
+      << from_expr(ns, "", expr)
+      << messaget::eom;
   }
 }
 
@@ -650,15 +652,19 @@ void goto_symext::symex_get_field(
 
   if(rhs.is_not_nil())
   {
-    log.debug() << "mux size get_field: " << mux_size << messaget::eom;
-    log.debug() << "RHS: " << from_expr(ns, "", rhs) << messaget::eom;
+    log.debug() << "Shadow memory: mux size get_field: " << mux_size << messaget::eom;
+#ifdef DEBUG_SM
+    log.debug() << "Shadow memory: RHS: " << from_expr(ns, "", rhs) << messaget::eom;
+#endif
     symex_assign(
       state, lhs, typecast_exprt::conditional_cast(rhs, lhs.type()));
   }
   else
   {
-    log.warning() << "cannot get_field for " << from_expr(ns, "", expr)
-                  << messaget::eom;
+    log.warning()
+      << "Shadow memory: cannot get_field for "
+      << from_expr(ns, "", expr)
+      << messaget::eom;
     symex_assign(state, lhs, from_integer(0, lhs.type()));
   }
 }
@@ -686,8 +692,9 @@ void goto_symext::symex_field_static_init(
     return;
 
   const typet &type = symbol.type;
-  log.debug() << "global memory " << id2string(identifier) << " of type "
-              << from_type(ns, "", type) << messaget::eom;
+  log.debug()
+    << "Shadow memory: global memory " << id2string(identifier) << " of type "
+    << from_type(ns, "", type) << messaget::eom;
 
   initialize_shadow_memory(state, expr, state.global_fields);
 }
@@ -706,9 +713,10 @@ void goto_symext::symex_field_static_init_string_constant(
     to_index_expr(to_address_of_expr(rhs).object());
 
   const typet &type = index_expr.array().type();
-  log.debug() << "global memory "
-              << id2string(to_string_constant(index_expr.array()).get_value())
-              << " of type " << from_type(ns, "", type) << messaget::eom;
+  log.debug()
+    << "Shadow memory: global memory "
+    << id2string(to_string_constant(index_expr.array()).get_value())
+    << " of type " << from_type(ns, "", type) << messaget::eom;
 
   initialize_shadow_memory(
     state, index_expr.array(), state.global_fields);
@@ -747,8 +755,9 @@ void goto_symext::symex_field_local_init(
 
   const typet &type = expr.type();
   ssa_exprt expr_l1 = remove_level_2(expr);
-  log.debug() << "local memory " << id2string(expr_l1.get_identifier())
-              << " of type " << from_type(ns, "", type) << messaget::eom;
+  log.debug()
+    << "Shadow memory: local memory " << id2string(expr_l1.get_identifier())
+    << " of type " << from_type(ns, "", type) << messaget::eom;
 
   initialize_shadow_memory(state, expr_l1, state.local_fields);
 }
@@ -758,8 +767,9 @@ void goto_symext::symex_field_dynamic_init(
   const exprt &expr,
   const side_effect_exprt &code)
 {
-  log.debug() << "dynamic memory of type " << from_type(ns, "", expr.type())
-              << messaget::eom;
+  log.debug()
+    << "Shadow memory: dynamic memory of type " << from_type(ns, "", expr.type())
+    << messaget::eom;
 
   initialize_shadow_memory(state, expr, state.global_fields);
 }
@@ -822,8 +832,9 @@ void goto_symext::convert_field_decl(
   exprt expr = code_function_call.arguments()[1];
 
   messaget log(message_handler);
-  log.debug() << "declare " << id2string(field_name) << " of type "
-              << from_type(ns, "", expr.type()) << messaget::eom;
+  log.debug()
+    << "Shadow memory: declare " << id2string(field_name) << " of type "
+    << from_type(ns, "", expr.type()) << messaget::eom;
 
   // record field type
   fields[field_name] = expr.type();
