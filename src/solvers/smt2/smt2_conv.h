@@ -87,6 +87,9 @@ public:
   void pop() override;
 
   std::size_t get_number_of_solver_calls() const override;
+  void convert_expr(const exprt &);
+  void convert_type(const typet &);
+  void convert_literal(const literalt);
 
   static std::string convert_identifier(const irep_idt &identifier);
 
@@ -155,9 +158,6 @@ protected:
   void convert_update_bit(const update_bit_exprt &);
   void convert_update_bits(const update_bits_exprt &);
 
-  void convert_expr(const exprt &);
-  void convert_type(const typet &);
-  void convert_literal(const literalt);
   void convert_string_literal(const std::string &);
 
   literalt convert(const exprt &expr);
