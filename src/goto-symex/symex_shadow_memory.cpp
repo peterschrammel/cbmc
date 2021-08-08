@@ -378,6 +378,14 @@ void goto_symext::symex_shadow_memory_copy(
       address_of_exprt(get_original_ssa_expr(dest.object()));
   const address_of_exprt src_expr =
       address_of_exprt(get_original_ssa_expr(src.object()));
+  // we ignore assignments to NULL
+  const exprt src_without_casts = remove_casts(src.object());
+  if(src_without_casts.is_constant() &&
+      (to_constant_expr(src_without_casts).get_value() == ID_NULL ||
+       to_constant_expr(src_without_casts).is_zero()))
+  {
+    return;
+  }
   log.conditional_output(
       log.debug(), [this, dest_expr, src_expr](messaget::mstreamt &mstream) {
         mstream << "Shadow memory: copy from "
