@@ -570,6 +570,10 @@ exprt duplicate_per_byte(
   {
     // We don't support union semantics for pointers.
   }
+  else if(lhs_type.id() == ID_c_bool)
+  {
+    // nothing to do
+  }
   else
   {
     log.warning()
