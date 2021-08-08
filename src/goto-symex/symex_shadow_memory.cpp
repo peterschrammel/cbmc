@@ -835,6 +835,16 @@ void goto_symext::convert_field_decl(
   log.debug()
     << "Shadow memory: declare " << id2string(field_name) << " of type "
     << from_type(ns, "", expr.type()) << messaget::eom;
+  if(!can_cast_type<bitvector_typet>(expr.type()))
+  {
+    throw unsupported_operation_exceptiont(
+        "A shadow memory field must be of a bitvector type.");
+  }
+  if(to_bitvector_type(expr.type()).get_width() > 8)
+  {
+    throw unsupported_operation_exceptiont(
+      "A shadow memory field must not be larger than 8 bits.");
+  }
 
   // record field type
   fields[field_name] = expr.type();
