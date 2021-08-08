@@ -228,6 +228,14 @@ static optionalt<exprt> get_shadow_memory_for_shadow_address(
           << messaget::eom;
       continue;
     }
+    if(to_object_descriptor_expr(matched_object).root_object().id() == ID_integer_address)
+    {
+      log.warning()
+          << "Shadow memory: value set contains integer_address for "
+          << from_expr(ns, "", expr)
+          << messaget::eom;
+      continue;
+    }
 
     object_descriptor_exprt matched_base_descriptor =
         normalize(to_object_descriptor_expr(matched_object), ns);
@@ -466,6 +474,14 @@ static optionalt<exprt> get_field(
     {
       log.warning()
           << "Shadow memory: value set contains unknown for "
+          << from_expr(ns, "", expr)
+          << messaget::eom;
+      continue;
+    }
+    if(to_object_descriptor_expr(matched_object).root_object().id() == ID_integer_address)
+    {
+      log.warning()
+          << "Shadow memory: value set contains integer_address for "
           << from_expr(ns, "", expr)
           << messaget::eom;
       continue;
