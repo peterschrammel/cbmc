@@ -696,7 +696,7 @@ void goto_symext::symex_field_static_init(
 
   if(symbol.is_auxiliary || !symbol.is_static_lifetime)
     return;
-  if(id2string(symbol.name).find("__cs_") != std::string::npos)
+  if(id2string(symbol.name).find("__cs_") == 0)
     return;
 
   const typet &type = symbol.type;
