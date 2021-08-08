@@ -566,11 +566,15 @@ exprt duplicate_per_byte(
     }
     return or_values(values, lhs_type);
   }
+  else if(lhs_type.id() == ID_pointer)
+  {
+    // We don't support union semantics for pointers.
+  }
   else
   {
     log.warning()
         << "Shadow memory: cannot handle non-primitive union updates correctly for "
-        << from_expr(ns, "", expr)
+        << from_type(ns, "", lhs_type)
         << messaget::eom;
   }
   return typecast_exprt::conditional_cast(expr, lhs_type);
