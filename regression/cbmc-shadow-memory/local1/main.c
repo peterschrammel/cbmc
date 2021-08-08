@@ -96,6 +96,10 @@ int main()
   struct STRUCTNAME m;
   struct STRUCTNAME *p;
 
+  assert(__CPROVER_get_field(&p, "field1") == 0);
+  __CPROVER_set_field(&p, "field1", 1);
+  assert(__CPROVER_get_field(&p, "field1") == 1);
+
   p = &m;
 
   assert(__CPROVER_get_field(&(p->x1), "field1") == 0);
