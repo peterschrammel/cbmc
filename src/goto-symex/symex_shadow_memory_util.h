@@ -101,4 +101,6 @@ exprt duplicate_per_byte(
     const namespacet &ns,
     const messaget &log);
 
+exprt remove_casts(exprt expr);
+
 #endif // CPROVER_GOTO_SYMEX_SYMEX_SHADOW_MEMORY_UTIL_H

@@ -575,3 +575,12 @@ exprt duplicate_per_byte(
   }
   return typecast_exprt::conditional_cast(expr, lhs_type);
 }
+
+exprt remove_casts(exprt expr)
+{
+  while(expr.id() == ID_typecast)
+  {
+    expr = to_typecast_expr(expr).op();
+  }
+  return expr;
+}
