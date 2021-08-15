@@ -103,4 +103,6 @@ exprt duplicate_per_byte(
 
 exprt remove_casts(exprt expr);
 
+void replace_invalid_object_by_null(exprt &expr);
+
 #endif // CPROVER_GOTO_SYMEX_SYMEX_SHADOW_MEMORY_UTIL_H

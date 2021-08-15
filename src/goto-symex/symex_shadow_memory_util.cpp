@@ -6,6 +6,7 @@
 #include <util/bitvector_expr.h>
 #include <util/c_types.h>
 #include <util/pointer_expr.h>
+#include <util/pointer_predicates.h>
 
 void log_exact_match(
   const namespacet &ns,
@@ -591,4 +592,19 @@ exprt remove_casts(exprt expr)
     expr = to_typecast_expr(expr).op();
   }
   return expr;
+}
+
+void replace_invalid_object_by_null(exprt &expr)
+{
+  if(expr.id() == ID_symbol && expr.type().id() == ID_pointer &&
+      (id2string(to_symbol_expr(expr).get_identifier()).rfind("invalid_object") != std::string::npos ||
+      id2string(to_symbol_expr(expr).get_identifier()).rfind("$object") != std::string::npos))
+  {
+    expr = null_pointer_exprt(to_pointer_type(expr.type()));
+    return;
+  }
+  Forall_operands(it, expr)
+  {
+    replace_invalid_object_by_null(*it);
+  }
 }
