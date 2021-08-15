@@ -1,4 +1,4 @@
-CORE
+FUTURE
 main.c
 --unwind 1 --no-unwinding-assertions --object-bits 16 --stop-on-fail --nondet-static --verbosity 10 --show-vcc
 ^EXIT=0$
