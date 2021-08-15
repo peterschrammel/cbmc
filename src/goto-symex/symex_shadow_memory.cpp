@@ -591,6 +591,8 @@ void goto_symext::symex_set_field(
     irep_pretty_diagnosticst{expr_subtype});
 
   // get value set
+  replace_invalid_object_by_null(expr);
+  // log_set_field(ns, log, field_name, expr, value);
   std::vector<exprt> value_set = state.value_set.get_value_set(expr, ns);
   log_value_set(ns, log, value_set);
   if(set_field_check_null(ns, log, value_set, expr))
@@ -655,6 +657,8 @@ void goto_symext::symex_get_field(
   symbol_exprt lhs(CPROVER_PREFIX "get_field#return_value", signedbv_typet(32));
   const typet &field_type = get_field_type(field_name, state);
 
+  replace_invalid_object_by_null(expr);
+  // log_get_field(ns, log, field_name, expr);
   std::vector<exprt> value_set = state.value_set.get_value_set(expr, ns);
   log_value_set(ns, log, value_set);
 
