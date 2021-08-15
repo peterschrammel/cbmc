@@ -568,9 +568,10 @@ void goto_symext::symex_set_field(
 
   exprt expr = code_function_call.arguments()[0];
   typet expr_type = expr.type();
-  DATA_INVARIANT(
-    expr.type().id() == ID_pointer,
-    "shadow memory requires a pointer expression");
+  DATA_INVARIANT_WITH_DIAGNOSTICS(
+    expr_type.id() == ID_pointer,
+    "shadow memory requires a pointer expression",
+    irep_pretty_diagnosticst{expr_type});
 
   exprt value = code_function_call.arguments()[2];
   log_set_field(ns, log, field_name, expr, value);
@@ -579,6 +580,15 @@ void goto_symext::symex_set_field(
     id2string(field_name) + " should exist");
   const auto &addresses = state.address_fields.at(field_name);
   // const typet &field_type = get_field_type(field_name, state);
+
+  const typet &expr_subtype = to_pointer_type(expr_type).subtype();
+  DATA_INVARIANT_WITH_DIAGNOSTICS(expr_subtype.id() != ID_struct &&
+      expr_subtype.id() != ID_struct_tag &&
+      expr_subtype.id() != ID_union &&
+      expr_subtype.id() != ID_union_tag &&
+      expr_subtype.id() != ID_array,
+    "set_field requires pointer expression to primitive type",
+    irep_pretty_diagnosticst{expr_subtype});
 
   // get value set
   std::vector<exprt> value_set = state.value_set.get_value_set(expr, ns);
