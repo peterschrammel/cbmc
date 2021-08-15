@@ -595,6 +595,7 @@ void goto_symext::symex_set_field(
   log_value_set(ns, log, value_set);
   if(set_field_check_null(ns, log, value_set, expr))
   {
+    log.warning() << "Shadow memory: cannot set shadow memory of NULL" << messaget::eom;
     return;
   }
 
