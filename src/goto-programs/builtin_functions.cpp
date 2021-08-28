@@ -706,6 +706,7 @@ void goto_convertt::do_function_call_symbol(
     // are being checked
     goto_programt::targett a = dest.add(goto_programt::make_assumption(
       false_exprt(), function.source_location()));
+    a->labels.push_back("__VERIFIER_abort");
     a->source_location.set("user-provided", true);
   }
   else if(

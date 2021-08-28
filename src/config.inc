@@ -5,7 +5,7 @@ BUILD_ENV = AUTO
 ifeq ($(BUILD_ENV),MSVC)
   #CXXFLAGS += /Wall /WX
 else
-  CXXFLAGS += -Wall -pedantic -Werror -Wno-deprecated-declarations -Wswitch-enum
+  CXXFLAGS += -Wall -pedantic -Wno-deprecated-declarations -Wswitch-enum
 endif
 
 ifeq ($(CPROVER_WITH_PROFILING),1)
@@ -31,7 +31,7 @@ endif
 #MINISAT = ../../MiniSat-p_v1.14
 #MINISAT2 = ../../minisat-2.2.1
 #IPASIR = ../../ipasir
-#GLUCOSE = ../../glucose-syrup
+GLUCOSE = ../../glucose-syrup
 #CADICAL = ../../cadical
 
 # select default solver to be minisat2 if no other is specified

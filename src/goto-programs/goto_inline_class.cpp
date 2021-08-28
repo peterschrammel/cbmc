@@ -96,6 +96,11 @@ void goto_inlinet::parameter_assignments(
         {
           actual = typecast_exprt(actual, f_partype);
         }
+        else if(f_partype.id()==ID_floatbv &&
+                f_acttype.id()==ID_floatbv)
+        {
+          actual = typecast_exprt(actual, f_partype);
+        }
         else if((f_partype.id()==ID_signedbv ||
                  f_partype.id()==ID_unsignedbv ||
                  f_partype.id()==ID_bool) &&
@@ -358,6 +363,7 @@ void goto_inlinet::expand_function_call(
     warning().source_location=function.find_source_location();
     warning() << "recursion is ignored on call to '" << identifier << "'"
               << eom;
+    is_recursion_detected=true;
 
     if(force_full)
       target->turn_into_skip();

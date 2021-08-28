@@ -935,6 +935,7 @@ inline int vsscanf(const char *restrict s, const char *restrict format, va_list 
 
 int __VERIFIER_nondet_int();
 
+#if 0
 inline int printf(const char *format, ...)
 {
 __CPROVER_HIDE:;
@@ -945,6 +946,7 @@ __CPROVER_HIDE:;
   va_end(list);
   return result;
 }
+#endif
 
 /* FUNCTION: fprintf */
 
