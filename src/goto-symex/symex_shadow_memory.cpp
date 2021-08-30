@@ -43,7 +43,8 @@ void goto_symext::initialize_shadow_memory(
   for(const auto &field_pair : fields)
   {
     exprt address_expr = expr;
-    if(type.id() == ID_array && expr.id() == ID_symbol && !type.get_bool(ID_C_dynamic))
+    if(type.id() == ID_array && expr.id() == ID_symbol
+      && to_array_type(type).size().get_bool(ID_C_SSA_symbol))
     {
       address_expr.type() = remove_array_type_l2(address_expr.type());
       exprt original_expr = to_ssa_expr(expr).get_original_expr();
