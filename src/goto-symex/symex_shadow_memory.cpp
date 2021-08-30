@@ -541,7 +541,7 @@ static optionalt<exprt> get_field(
       found = true;
       if(rhs.is_nil())
       {
-        rhs = if_exprt(cond, value, from_integer(-1, lhs_type));
+        rhs = if_exprt(cond, value, from_integer(0, lhs_type));
       }
       else
       {
@@ -668,11 +668,7 @@ void goto_symext::symex_get_field(
   if(filter_by_value_set(value_set, null_pointer))
   {
     log_value_set_match(ns, log, null_pointer, expr);
-    rhs = if_exprt(
-      equal_exprt(expr, null_pointer),
-      from_integer(0, lhs.type()),
-      from_integer(-1, lhs.type()));
-    mux_size = 1;
+    rhs = from_integer(0, lhs.type());
   }
 
   for(const auto &shadow_address : addresses)
