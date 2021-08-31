@@ -183,6 +183,21 @@ irep_idt get_field_name(const exprt &string_expr)
     UNREACHABLE;
 }
 
+void fix_array_with_expr_size_in_type(exprt &expr)
+{
+  if(expr.id() == ID_with)
+  {
+    with_exprt &with_expr = to_with_expr(expr);
+    if(with_expr.type() != with_expr.old().type())
+    {
+      with_expr.type() = with_expr.old().type();
+    }
+    return;
+  }
+  Forall_operands(it, expr)
+      fix_array_with_expr_size_in_type(*it);
+}
+
 typet remove_array_type_l2(const typet &type)
 {
   if(to_array_type(type).size().id() != ID_symbol)

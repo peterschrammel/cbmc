@@ -69,6 +69,8 @@ exprt deref_expr(const exprt &expr);
 
 irep_idt get_field_name(const exprt &string_expr);
 
+void fix_array_with_expr_size_in_type(exprt &expr);
+
 typet remove_array_type_l2(const typet &type);
 
 void remove_pointer_object(exprt &expr);
