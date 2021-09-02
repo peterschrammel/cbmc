@@ -50,6 +50,7 @@ static bool build_graph_rec(
     node.node_name=node_name;
     node.is_violation=false;
     node.has_invariant=false;
+    node.is_cyclehead=false;
 
     for(xmlt::elementst::const_iterator
         e_it=xml.elements.begin();
@@ -389,6 +390,16 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
     key.set_attribute("id", "architecture");
   }
 
+  // <key attr.name="creationTime" attr.type="string" for="graph"
+  //      id="creationtime"/>
+  {
+    xmlt &key=graphml.new_element("key");
+    key.set_attribute("attr.name", "creationTime");
+    key.set_attribute("attr.type", "string");
+    key.set_attribute("for", "graph");
+    key.set_attribute("id", "creationtime");
+  }
+
   // <key attr.name="producer" attr.type="string" for="graph"
   //      id="producer"/>
   {
@@ -536,6 +547,16 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
       xmlt &val_s=node.new_element("data");
       val_s.set_attribute("key", "invariant.scope");
       val_s.data=n.invariant_scope;
+    }
+
+    // <node id="A14">
+    //     <data key="cyclehead">true</data>
+    // </node>
+    if(n.is_cyclehead)
+    {
+      xmlt &entry=node.new_element("data");
+      entry.set_attribute("key", "cyclehead");
+      entry.data="true";
     }
 
     for(graphmlt::edgest::const_iterator

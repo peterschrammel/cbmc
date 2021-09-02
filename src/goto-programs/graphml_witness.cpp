@@ -383,6 +383,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     graphml[node].is_violation=
       it->type==goto_trace_stept::typet::ASSERT && !it->cond_value;
     graphml[node].has_invariant=false;
+    graphml[node].is_cyclehead=false;
 
     step_to_node[it->step_nr]=node;
   }
@@ -412,9 +413,42 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     {
       // advance
     }
-    const std::size_t to=
-      next==goto_trace.steps.end()?
-      sink:step_to_node[next->step_nr];
+
+    std::size_t to=sink;
+    if(next!=goto_trace.steps.end())
+    {
+      goto_tracet::stepst::const_iterator after_next=next;
+      ++after_next;
+      // nontermination lasso traces do not end in assertions
+      if(after_next==goto_trace.steps.end() &&
+         !next->is_assert())
+      {
+        goto_tracet::stepst::const_iterator last=
+          goto_trace.steps.begin();
+        for(goto_tracet::stepst::const_iterator last_it=
+              goto_trace.steps.begin();
+            last_it!=goto_trace.steps.end() &&
+            last_it!=next;
+            ++last_it)
+        {
+          if(last_it->pc==next->pc)
+            last=last_it;
+        }
+        // we'll close the loop
+        to=step_to_node[last->step_nr];
+        graphml[to].is_cyclehead=true;
+      }
+      else
+      {
+        // advance to the next step
+        to=step_to_node[next->step_nr];
+      }
+    }
+    else if(!it->is_assert())
+    {
+      // do not output recurrent step in nontermination trace
+      break;
+    }
 
     switch(it->type)
     {
@@ -437,10 +471,6 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
         xmlt &data_l = edge.new_element("data");
         data_l.set_attribute("key", "startline");
         data_l.data = id2string(graphml[from].line);
-
-        xmlt &data_t = edge.new_element("data");
-        data_t.set_attribute("key", "threadId");
-        data_t.data = std::to_string(it->thread_nr);
       }
 
       const auto lhs_object = it->get_lhs_object();
