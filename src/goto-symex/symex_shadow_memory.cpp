@@ -209,6 +209,23 @@ static object_descriptor_exprt normalize(
   return result;
 }
 
+static bool are_types_compatible(const typet &expr_type, const typet &shadow_type)
+{
+  if(expr_type.id() != ID_pointer || shadow_type.id() != ID_pointer)
+    return true;
+
+  // We filter out the particularly annoying case of char ** being definitely
+  // incompatible with char[].
+  const typet &expr_subtype = to_pointer_type(expr_type).subtype();
+  const typet &shadow_subtype = to_pointer_type(shadow_type).subtype();
+  if (expr_subtype.id() == ID_pointer && to_pointer_type(expr_subtype).subtype().id() != ID_pointer
+      && shadow_subtype.id() == ID_array && to_array_type(shadow_subtype).subtype().id() != ID_pointer)
+  {
+    return false;
+  }
+  return true;
+}
+
 static optionalt<exprt> get_shadow_memory_for_shadow_address(
     const exprt &expr,
     const std::vector<exprt> &value_set,
@@ -291,6 +308,13 @@ static optionalt<exprt> get_shadow_memory(
   for (const auto &shadowed_address : addresses)
   {
     log_try_shadow_address(ns, log, shadowed_address);
+    if(!are_types_compatible(expr.type(), shadowed_address.address.type()))
+    {
+#ifdef DEBUG_SM
+      log.debug() << "Shadow memory: incompatible types" << messaget::eom;
+#endif
+      continue;
+    }
 
     auto maybe_result = get_shadow_memory_for_shadow_address(
         expr, value_set, shadowed_address, ns, log, result, mux_size);
@@ -455,7 +479,6 @@ void goto_symext::symex_shadow_memory_copy(
     }
   }
 }
-
 
 static optionalt<exprt> get_field(
   const namespacet &ns,
@@ -675,6 +698,13 @@ void goto_symext::symex_get_field(
   for(const auto &shadow_address : addresses)
   {
     log_try_shadow_address(ns, log, shadow_address);
+    if(!are_types_compatible(expr.type(), shadow_address.address.type()))
+    {
+#ifdef DEBUG_SM
+      log.debug() << "Shadow memory: incompatible types" << messaget::eom;
+#endif
+      continue;
+    }
 
     auto maybe_rhs = get_field(
       ns, log, value_set, shadow_address, field_type, expr, rhs, lhs.type(), mux_size);
