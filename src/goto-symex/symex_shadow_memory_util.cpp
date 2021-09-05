@@ -46,7 +46,7 @@ void log_value_set_match(
   const namespacet &ns,
   const messaget &log,
   const goto_symex_statet::shadowed_addresst &shadowed_address,
-  const exprt &matched_base,
+  const exprt &matched_base_address,
   const value_set_dereferencet::valuet &dereference,
   const exprt &expr,
   const value_set_dereferencet::valuet &shadow_dereference)
@@ -54,11 +54,11 @@ void log_value_set_match(
 #ifdef DEBUG_SM
   log.conditional_output(
     log.debug(),
-    [ns, shadowed_address, expr, dereference, matched_base, shadow_dereference](
+    [ns, shadowed_address, expr, dereference, matched_base_address, shadow_dereference](
       messaget::mstreamt &mstream) {
       mstream << "Shadow memory: value set match: " << messaget::eom;
       mstream << "Shadow memory:   base: " << from_expr(ns, "", shadowed_address.address)
-              << " <-- " << from_expr(ns, "", matched_base) << messaget::eom;
+              << " <-- " << from_expr(ns, "", matched_base_address) << messaget::eom;
       mstream << "Shadow memory:   cell: " << from_expr(ns, "", dereference.pointer) << " <-- "
               << from_expr(ns, "", expr) << messaget::eom;
       mstream << "Shadow memory:   shadow ptr: "
@@ -87,12 +87,13 @@ void log_value_set_match(
 void log_cond(
   const namespacet &ns,
   const messaget &log,
+  const char *cond_text,
   const exprt &cond)
 {
 #ifdef DEBUG_SM
   log.conditional_output(
-    log.debug(), [ns, cond](messaget::mstreamt &mstream) {
-      mstream << "Shadow memory: cond: " << from_expr(ns, "", cond)
+    log.debug(), [ns, cond_text, cond](messaget::mstreamt &mstream) {
+      mstream << "Shadow memory: " << cond_text << ": " << from_expr(ns, "", cond)
               << messaget::eom;
     });
 #endif

@@ -9,7 +9,7 @@ void test(const char *str) {
   for(int i=0; i<7; ++i) {
     buffer[i] = str[i];
     __CPROVER_set_field(&buffer[i], "field1",
-    __CPROVER_get_field(&str[i], "field1"));
+      __CPROVER_get_field(&str[i], "field1"));
   }
 
   assert(__CPROVER_get_field(&buffer[0], "field1") == 0);
