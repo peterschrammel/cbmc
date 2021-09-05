@@ -26,7 +26,7 @@ void log_value_set_match(
   const namespacet &ns,
   const messaget &log,
   const goto_symex_statet::shadowed_addresst &shadowed_address,
-  const exprt &matched_base,
+  const exprt &matched_base_address,
   const value_set_dereferencet::valuet &dereference,
   const exprt &expr,
   const value_set_dereferencet::valuet &shadow_dereference);
@@ -40,6 +40,7 @@ void log_value_set_match(
 void log_cond(
   const namespacet &ns,
   const messaget &log,
+  const char *cond_text,
   const exprt &expr);
 
 void log_value_set(
