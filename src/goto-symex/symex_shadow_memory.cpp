@@ -315,7 +315,10 @@ static std::vector<exprt::operandst> get_shadow_memory_for_matched_object(
     if(!are_types_compatible(expr.type(), shadowed_address.address.type()))
     {
 #ifdef DEBUG_SM
-      log.debug() << "Shadow memory: incompatible types" << messaget::eom;
+      log.debug() << "Shadow memory: incompatible types "
+        << from_type(ns, "", expr.type()) << ", "
+        << from_type(ns, "", shadowed_address.address.type())
+        << messaget::eom;
 #endif
       continue;
     }
@@ -635,7 +638,10 @@ static std::vector<exprt::operandst> get_field(
     if(!are_types_compatible(expr.type(), shadowed_address.address.type()))
     {
 #ifdef DEBUG_SM
-      log.debug() << "Shadow memory: incompatible types" << messaget::eom;
+      log.debug() << "Shadow memory: incompatible types "
+          << from_type(ns, "", expr.type()) << ", "
+          << from_type(ns, "", shadowed_address.address.type())
+          << messaget::eom;
 #endif
       continue;
     }
