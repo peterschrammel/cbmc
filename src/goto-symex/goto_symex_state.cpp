@@ -263,13 +263,20 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
 
     const exprt &c_expr = as_const(expr);
     INVARIANT_WITH_DIAGNOSTICS(
-      (expr.id() != ID_with ||
-       c_expr.type() == to_with_expr(c_expr).old().type()) &&
-        (expr.id() != ID_if ||
-         (c_expr.type() == to_if_expr(c_expr).true_case().type() &&
-          c_expr.type() == to_if_expr(c_expr).false_case().type())),
-      "Type of renamed expr should be the same as operands for with_exprt and "
-      "if_exprt", old_expr.pretty(), expr.pretty());
+      expr.id() != ID_with ||
+       c_expr.type() == to_with_expr(c_expr).old().type(),
+      "Type of renamed expr should be the same as operands for with_exprt",
+      c_expr.type().pretty(), to_with_expr(c_expr).old().type().pretty());
+    INVARIANT_WITH_DIAGNOSTICS(
+      expr.id() != ID_if ||
+         c_expr.type() == to_if_expr(c_expr).true_case().type(),
+      "Type of renamed expr should be the same as operands for if_exprt",
+      c_expr.type().pretty(), to_if_expr(c_expr).true_case().type().pretty());
+    INVARIANT_WITH_DIAGNOSTICS(
+        expr.id() != ID_if ||
+          c_expr.type() == to_if_expr(c_expr).false_case().type(),
+        "Type of renamed expr should be the same as operands for if_exprt",
+        c_expr.type().pretty(), to_if_expr(c_expr).false_case().type().pretty());
 
     if(level == L2)
       expr = field_sensitivity.apply(ns, *this, std::move(expr), false);
