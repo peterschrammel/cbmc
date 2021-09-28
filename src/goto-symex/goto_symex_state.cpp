@@ -262,6 +262,12 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
       *it = rename<level>(std::move(*it), ns).get();
 
     const exprt &c_expr = as_const(expr);
+    // Big hack: Rename uses array_of values from propagation without having updated
+    // the array size variable to the latest L2.
+    if(expr.id() == ID_with && c_expr.type() != to_with_expr(c_expr).old().type())
+    {
+      expr.type() = to_with_expr(expr).old().type();
+    }
     INVARIANT_WITH_DIAGNOSTICS(
       expr.id() != ID_with ||
        c_expr.type() == to_with_expr(c_expr).old().type(),
