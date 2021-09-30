@@ -29,6 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-checker/all_properties_verifier.h>
 #include <goto-checker/all_properties_verifier_with_fault_localization.h>
 #include <goto-checker/all_properties_verifier_with_trace_storage.h>
+#include <goto-checker/cover_goals_verifier_with_trace_storage.h>
 #include <goto-checker/stop_on_fail_verifier.h>
 #include <goto-checker/stop_on_fail_verifier_with_fault_localization.h>
 
@@ -45,6 +46,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_properties.h>
 #include <goto-programs/show_symbol_table.h>
 
+#include <goto-instrument/cover.h>
 #include <goto-instrument/full_slicer.h>
 #include <goto-instrument/nondet_static.h>
 #include <goto-instrument/reachability_slicer.h>
@@ -129,6 +131,14 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("function"))
     options.set_option("function", cmdline.get_value("function"));
 
+  if(cmdline.isset("cover") && cmdline.isset("unwinding-assertions"))
+  {
+    log.error()
+      << "--cover and --unwinding-assertions must not be given together"
+      << messaget::eom;
+    exit(CPROVER_EXIT_USAGE_ERROR);
+  }
+
   parse_java_language_options(cmdline, options);
   parse_java_object_factory_options(cmdline, options);
 
@@ -164,6 +174,9 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("show-vcc"))
     options.set_option("show-vcc", true);
+
+  if(cmdline.isset("cover"))
+    parse_cover_options(cmdline, options);
 
   if(cmdline.isset("nondet-static"))
     options.set_option("nondet-static", true);
@@ -616,6 +629,16 @@ int jbmc_parse_optionst::doit()
     return CPROVER_EXIT_SUCCESS;
   }
 
+  if(options.is_set("cover"))
+  {
+    cover_goals_verifier_with_trace_storaget<multi_path_symex_checkert>
+      verifier(options, ui_message_handler, *goto_model_ptr);
+    (void)verifier();
+    verifier.report();
+
+    return CPROVER_EXIT_SUCCESS;
+  }
+
   std::unique_ptr<goto_verifiert> verifier = nullptr;
 
   if(
@@ -942,6 +965,16 @@ bool jbmc_parse_optionst::process_goto_functions(
   // remove skips such that trivial GOTOs are deleted
   remove_skip(goto_model);
 
+  // instrument cover goals
+  if(options.is_set("cover"))
+  {
+    const auto cover_config = get_cover_config(
+      options, goto_model.symbol_table, log.get_message_handler());
+    if(instrument_cover_goals(
+         cover_config, goto_model, log.get_message_handler()))
+      return true;
+  }
+
   // label the assertions
   // This must be done after adding assertions and
   // before using the argument of the "property" option.
@@ -1084,6 +1117,7 @@ void jbmc_parse_optionst::help()
     " --no-assumptions             ignore user assumptions\n"
     " --error-label label          check that label is unreachable\n"
     " --mm MM                      memory consistency model for concurrent programs\n" // NOLINT(*)
+    HELP_COVER
     HELP_REACHABILITY_SLICER
     " --full-slice                 run full slicer (experimental)\n" // NOLINT(*)
     "\n"
