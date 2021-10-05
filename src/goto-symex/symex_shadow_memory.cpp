@@ -946,11 +946,14 @@ void goto_symext::symex_field_static_init_string_constant(
   const ssa_exprt &expr,
   const exprt &rhs)
 {
-  const irep_idt &identifier =
-    to_symbol_expr(expr.get_original_expr()).get_identifier();
-  if(has_prefix(id2string(identifier), CPROVER_PREFIX))
+  if(
+    expr.get_original_expr().id() == ID_symbol &&
+      has_prefix(
+        id2string(to_symbol_expr(expr.get_original_expr()).get_identifier()),
+        CPROVER_PREFIX))
+  {
     return;
-
+  }
   const index_exprt &index_expr =
     to_index_expr(to_address_of_expr(rhs).object());
 
