@@ -2142,13 +2142,17 @@ void goto_checkt::goto_check(
     {
       // These are further 'exit points' of the program
       const exprt simplified_guard = simplify_expr(i.guard, ns);
+      // The function may be inlined to only __CPROVER_start, use the
+      // original location (if it is still valid thanks to setting
+      // adjust_false=false in goto_inlinet).
+      const irep_idt &former_function = i.source_location.get_function();
       if(
         enable_memory_cleanup_check && simplified_guard.is_false() &&
-        (function_identifier == "abort" || function_identifier == "exit" ||
-         function_identifier == "_Exit" ||
+        (former_function == "abort" || former_function == "exit" ||
+         former_function == "_Exit" ||
          (i.labels.size() == 1 && i.labels.front() == "__VERIFIER_abort")))
       {
-        memory_leak_check(function_identifier);
+        memory_leak_check(former_function);
       }
       if(!enable_assumptions)
       {
