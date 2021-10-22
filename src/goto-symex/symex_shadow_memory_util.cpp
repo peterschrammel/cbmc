@@ -307,11 +307,11 @@ const typet &get_field_type(
 {
   auto field_type_it = state.local_fields.find(field_name);
   if (field_type_it != state.local_fields.end()) {
-    return field_type_it->second;
+    return field_type_it->second.type();
   }
   field_type_it = state.global_fields.find(field_name);
   CHECK_RETURN(field_type_it != state.global_fields.end());
-  return field_type_it->second;
+  return field_type_it->second.type();
 }
 
 static void max_element(
