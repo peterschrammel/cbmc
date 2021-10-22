@@ -469,7 +469,7 @@ std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
 void goto_symext::symex_from_entry_point_of(
   const get_goto_functiont &get_goto_function,
   symbol_tablet &new_symbol_table,
-  const std::pair<std::map<irep_idt, typet>, std::map<irep_idt, typet>> &fields)
+  const std::pair<std::map<irep_idt, exprt>, std::map<irep_idt, exprt>> &fields)
 {
   auto state = initialize_entry_point_state(get_goto_function);
 
@@ -483,7 +483,7 @@ void goto_symext::symex_from_entry_point_of(
 void goto_symext::initialize_path_storage_from_entry_point_of(
   const get_goto_functiont &get_goto_function,
   symbol_tablet &new_symbol_table,
-  const std::pair<std::map<irep_idt, typet>, std::map<irep_idt, typet>> &fields)
+  const std::pair<std::map<irep_idt, exprt>, std::map<irep_idt, exprt>> &fields)
 {
   auto state = initialize_entry_point_state(get_goto_function);
 

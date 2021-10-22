@@ -316,3 +316,21 @@ optionalt<exprt> nondet_initializer(
 {
   return expr_initializert<true>(ns)(type, source_location);
 }
+
+/// Create a value for type `type`, with all subtype bytes
+/// initialized to the given value.
+/// \param type: Type of the target expression.
+/// \param source_location: Location to record in all created sub-expressions.
+/// \param ns: Namespace to perform type symbol/tag lookups.
+/// \param init_expr: Value to be used for initialization.
+/// \return An expression if a byte-initialized expression of the input type
+///   can be built.
+optionalt<exprt> expr_initializer(
+    const typet &type,
+    const source_locationt &source_location,
+    const namespacet &ns,
+    const exprt &init_expr)
+{
+  // TODO
+  return expr_initializert<true>(ns)(type, source_location);
+}

@@ -27,4 +27,10 @@ optionalt<exprt> nondet_initializer(
   const source_locationt &source_location,
   const namespacet &ns);
 
+optionalt<exprt> expr_initializer(
+    const typet &type,
+    const source_locationt &source_location,
+    const namespacet &ns,
+    const exprt &expr);
+
 #endif // CPROVER_UTIL_EXPR_INITIALIZER_H
