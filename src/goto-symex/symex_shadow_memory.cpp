@@ -98,7 +98,7 @@ symbol_exprt goto_symext::add_field(
     field_type,
     id2string(state.source.function_id),
     "SM__" + from_expr(ns, "", expr) + "__" + id2string(field_name),
-    state.source.pc->source_location,
+    state.source.pc->source_location(),
     ID_C,
     state.symbol_table);
 
