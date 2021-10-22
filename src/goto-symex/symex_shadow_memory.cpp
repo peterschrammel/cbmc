@@ -738,22 +738,22 @@ static std::vector<exprt::operandst> get_field(
 
 void goto_symext::symex_set_field(
   goto_symex_statet &state,
-  const code_function_callt &code_function_call)
+  const exprt::operandst &arguments)
 {
   // parse set_field call
   INVARIANT(
-    code_function_call.arguments().size() == 3,
+      arguments.size() == 3,
     CPROVER_PREFIX "set_field requires 3 arguments");
-  irep_idt field_name = get_field_name(code_function_call.arguments()[1]);
+  irep_idt field_name = get_field_name(arguments[1]);
 
-  exprt expr = code_function_call.arguments()[0];
+  exprt expr = arguments[0];
   typet expr_type = expr.type();
   DATA_INVARIANT_WITH_DIAGNOSTICS(
     expr_type.id() == ID_pointer,
     "shadow memory requires a pointer expression",
     irep_pretty_diagnosticst{expr_type});
 
-  exprt value = code_function_call.arguments()[2];
+  exprt value = arguments[2];
   log_set_field(ns, log, field_name, expr, value);
   INVARIANT(
     state.address_fields.count(field_name) == 1,
@@ -815,14 +815,14 @@ void goto_symext::symex_set_field(
 
 void goto_symext::symex_get_field(
   goto_symex_statet &state,
-  const code_function_callt &code_function_call)
+  const exprt::operandst &arguments)
 {
   INVARIANT(
-    code_function_call.arguments().size() == 2,
+      arguments.size() == 2,
     CPROVER_PREFIX "get_field requires 2 arguments");
-  irep_idt field_name = get_field_name(code_function_call.arguments()[1]);
+  irep_idt field_name = get_field_name(arguments[1]);
 
-  exprt expr = code_function_call.arguments()[0];
+  exprt expr = arguments[0];
   typet expr_type = expr.type();
   DATA_INVARIANT(
     expr_type.id() == ID_pointer,

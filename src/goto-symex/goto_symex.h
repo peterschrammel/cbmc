@@ -865,11 +865,11 @@ public:
 protected:
   void symex_get_field(
     goto_symex_statet &state,
-    const code_function_callt &code_function_call);
+    const exprt::operandst &arguments);
 
   void symex_set_field(
     goto_symex_statet &state,
-    const code_function_callt &code_function_call);
+    const exprt::operandst &arguments);
 
   void symex_field_local_init(
     goto_symex_statet &state,
