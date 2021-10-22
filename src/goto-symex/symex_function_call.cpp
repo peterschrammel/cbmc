@@ -207,18 +207,18 @@ void goto_symext::symex_function_call_symbol(
 
   target.location(state.guard.as_expr(), state.source);
 
-  PRECONDITION(code.function().id() == ID_symbol);
+  PRECONDITION(function.id() == ID_symbol);
   const irep_idt &identifier=
-    to_symbol_expr(code.function()).get_identifier();
+    to_symbol_expr(function).get_identifier();
 
   if(identifier == CPROVER_PREFIX "get_field")
   {
-    symex_get_field(state, code);
+    symex_get_field(state, cleaned_arguments);
     symex_transition(state);
   }
   else if(identifier == CPROVER_PREFIX "set_field")
   {
-    symex_set_field(state, code);
+    symex_set_field(state, cleaned_arguments);
     symex_transition(state);
   }
   else
