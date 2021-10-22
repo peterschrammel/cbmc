@@ -119,8 +119,8 @@ public:
 
   field_sensitivityt field_sensitivity;
 
-  std::map<irep_idt, typet> global_fields;
-  std::map<irep_idt, typet> local_fields;
+  std::map<irep_idt, exprt> global_fields;
+  std::map<irep_idt, exprt> local_fields;
 
   struct shadowed_addresst
   {    
