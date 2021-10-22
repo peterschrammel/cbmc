@@ -103,15 +103,15 @@ public:
   virtual void symex_from_entry_point_of(
     const get_goto_functiont &get_goto_function,
     symbol_tablet &new_symbol_table,
-    const std::pair<std::map<irep_idt, typet>,
-      std::map<irep_idt, typet>> &fields);
+    const std::pair<std::map<irep_idt, exprt>,
+      std::map<irep_idt, exprt>> &fields);
 
   /// Puts the initial state of the entry point function into the path storage
   virtual void initialize_path_storage_from_entry_point_of(
     const get_goto_functiont &get_goto_function,
     symbol_table_baset &new_symbol_table,
-    const std::pair<std::map<irep_idt, typet>,
-      std::map<irep_idt, typet>> &fields);
+    const std::pair<std::map<irep_idt, exprt>,
+      std::map<irep_idt, exprt>> &fields);
 
   /// Performs symbolic execution using a state and equation that have
   /// already been used to symbolically execute part of the program. The state
@@ -840,7 +840,7 @@ public:
 
   // Shadow memory
 public:
-  static std::pair<std::map<irep_idt, typet>, std::map<irep_idt, typet>>
+  static std::pair<std::map<irep_idt, exprt>, std::map<irep_idt, exprt>>
   preprocess_field_decl(
     goto_modelt &goto_model,
     message_handlert &message_handler);
@@ -882,7 +882,7 @@ private:
     const namespacet &ns,
     message_handlert &message_handler,
     const code_function_callt &code_function_call,
-    std::map<irep_idt, typet> &fields);
+    std::map<irep_idt, exprt> &fields);
 
   symbol_exprt add_field(
     goto_symex_statet &state,
@@ -893,7 +893,7 @@ private:
   void initialize_shadow_memory(
     goto_symex_statet &state,
     const exprt &expr,
-    std::map<irep_idt, typet> &fields);
+    std::map<irep_idt, exprt> &fields);
 
   void locality(
     const irep_idt &function_identifier,

@@ -37,7 +37,7 @@ Author: Peter Schrammel
 void goto_symext::initialize_shadow_memory(
   goto_symex_statet &state,
   const exprt &expr,
-  std::map<irep_idt, typet> &fields)
+  std::map<irep_idt, exprt> &fields)
 {
   typet type = ns.follow(expr.type());
   for(const auto &field_pair : fields)
@@ -71,17 +71,33 @@ void goto_symext::initialize_shadow_memory(
       field_pair.first,
       type);
 
-    const auto zero_value =
-        zero_initializer(type, expr.source_location(), ns);
-    CHECK_RETURN(zero_value.has_value());
+    if(field_pair.second.id() == ID_typecast &&
+       to_typecast_expr(field_pair.second).op().is_zero())
+    {
+      const auto zero_value =
+          zero_initializer(type, expr.source_location(), ns);
+      CHECK_RETURN(zero_value.has_value());
 
-    symex_assign(state, field, *zero_value);
+      symex_assign(state, field, *zero_value);
+    }
+    else
+    {
+      exprt init_expr = field_pair.second;
+      if(init_expr.id() == ID_typecast)
+        init_expr = to_typecast_expr(field_pair.second).op();
+      const auto init_value =
+        expr_initializer(type, expr.source_location(), ns, init_expr);
+      CHECK_RETURN(init_value.has_value());
+
+      symex_assign(state, field, *init_value);
+    }
 
     log.conditional_output(
       log.debug(),
-      [field, this, address_expr](messaget::mstreamt &mstream) {
+      [field, field_pair, this, address_expr](messaget::mstreamt &mstream) {
         mstream << "Shadow memory: initialize field " << id2string(field.get_identifier())
                 << " for " << from_expr(ns, "", address_expr)
+                << " with initial value " << from_expr(ns, "", field_pair.second)
                 << messaget::eom;
       });
   }
@@ -1019,13 +1035,13 @@ void goto_symext::symex_field_dynamic_init(
   initialize_shadow_memory(state, expr, state.global_fields);
 }
 
-std::pair<std::map<irep_idt, typet>, std::map<irep_idt, typet>>
+std::pair<std::map<irep_idt, exprt>, std::map<irep_idt, exprt>>
 goto_symext::preprocess_field_decl(
   goto_modelt &goto_model,
   message_handlert &message_handler)
 {
-  std::map<irep_idt, typet> global_fields;
-  std::map<irep_idt, typet> local_fields;
+  std::map<irep_idt, exprt> global_fields;
+  std::map<irep_idt, exprt> local_fields;
   namespacet ns(goto_model.symbol_table);
 
   // get declarations
@@ -1067,7 +1083,7 @@ void goto_symext::convert_field_decl(
   const namespacet &ns,
   message_handlert &message_handler,
   const code_function_callt &code_function_call,
-  std::map<irep_idt, typet> &fields)
+  std::map<irep_idt, exprt> &fields)
 {
   INVARIANT(
     code_function_call.arguments().size() == 2,
@@ -1092,6 +1108,6 @@ void goto_symext::convert_field_decl(
   }
 
   // record field type
-  fields[field_name] = expr.type();
+  fields[field_name] = expr;
 }
 
