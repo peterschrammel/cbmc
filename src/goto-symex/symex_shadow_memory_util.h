@@ -80,7 +80,7 @@ bool filter_by_value_set(
   const std::vector<exprt>  &value_set,
   const exprt &address);
 
-const typet &get_field_type(
+const exprt &get_field_init_expr(
     const irep_idt& field_name,
     const goto_symex_statet &state);
 
