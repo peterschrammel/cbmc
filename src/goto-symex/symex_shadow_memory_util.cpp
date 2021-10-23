@@ -6,7 +6,7 @@
 #include <util/bitvector_expr.h>
 #include <util/c_types.h>
 #include <util/pointer_expr.h>
-#include <util/pointer_predicates.h>
+#include <util/expr_initializer.h>
 
 void log_exact_match(
   const namespacet &ns,
@@ -566,22 +566,7 @@ exprt duplicate_per_byte(
 {
   if(lhs_type.id() == ID_unsignedbv || lhs_type.id() == ID_signedbv)
   {
-    const size_t size = to_bitvector_type(lhs_type).get_width() / 8;
-    if(expr.is_constant())
-    {
-      const mp_integer value = numeric_cast_v<mp_integer>(to_constant_expr(expr));
-      mp_integer duplicated_value = value;
-      for(size_t i = 1; i < size; ++i) {
-        duplicated_value = bitwise_or(duplicated_value << 8,  value);
-      }
-      return from_integer(duplicated_value, lhs_type);
-    }
-    exprt::operandst values;
-    values.push_back(expr);
-    for(size_t i = 1; i < size; ++i) {
-      values.push_back(shl_exprt(expr, from_integer(8*i, size_type())));
-    }
-    return or_values(values, lhs_type);
+    return duplicate_per_byte(expr, lhs_type, ns);
   }
   else if(lhs_type.id() == ID_pointer)
   {
