@@ -2,7 +2,7 @@
 
 void main()
 {
-  __CPROVER_field_decl_local("field1", (_Bool)0);
+  __CPROVER_field_decl_local("field1", (_Bool)1);
   int x;
   int *y = NULL;
   int c;
@@ -12,7 +12,9 @@ void main()
     z = &x;
   else
     z = y;
-  assert(!__CPROVER_get_field(z, "field1"));
-  __CPROVER_set_field(z, "field1", 1);
   assert(__CPROVER_get_field(z, "field1"));
+  __CPROVER_set_field(z, "field1", 0);
+  assert(!__CPROVER_get_field(z, "field1"));
+
+  assert(__CPROVER_get_field(y, "field1"));
 }
