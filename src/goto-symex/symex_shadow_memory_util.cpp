@@ -579,7 +579,7 @@ exprt duplicate_per_byte(
   else
   {
     log.warning()
-        << "Shadow memory: cannot handle non-primitive union updates correctly for "
+        << "Shadow memory: cannot handle primitive union updates correctly for "
         << from_type(ns, "", lhs_type)
         << messaget::eom;
   }
