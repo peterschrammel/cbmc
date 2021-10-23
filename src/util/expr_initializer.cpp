@@ -12,12 +12,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr_initializer.h"
 
 #include "arith_tools.h"
+#include "bitvector_expr.h"
 #include "c_types.h"
 #include "magic.h"
 #include "namespace.h" // IWYU pragma: keep
 #include "std_code.h"
 
-template <bool nondet>
 class expr_initializert
 {
 public:
@@ -26,9 +26,9 @@ public:
   }
 
   optionalt<exprt>
-  operator()(const typet &type, const source_locationt &source_location)
+  operator()(const typet &type, const source_locationt &source_location, const exprt &init_expr)
   {
-    return expr_initializer_rec(type, source_location);
+    return expr_initializer_rec(type, source_location, init_expr);
   }
 
 protected:
@@ -36,13 +36,14 @@ protected:
 
   optionalt<exprt> expr_initializer_rec(
     const typet &type,
-    const source_locationt &source_location);
+    const source_locationt &source_location,
+    const exprt &init_expr);
 };
 
-template <bool nondet>
-optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
+optionalt<exprt> expr_initializert::expr_initializer_rec(
   const typet &type,
-  const source_locationt &source_location)
+  const source_locationt &source_location,
+  const exprt &init_expr)
 {
   const irep_idt &type_id=type.id();
 
@@ -57,10 +58,12 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
      type_id==ID_fixedbv)
   {
     exprt result;
-    if(nondet)
+    if(init_expr.id() == ID_nondet)
       result = side_effect_expr_nondett(type, source_location);
-    else
+    else if(init_expr.is_zero())
       result = from_integer(0, type);
+    else
+      result = duplicate_per_byte(init_expr, type, ns);
 
     result.add_source_location()=source_location;
     return result;
@@ -69,10 +72,12 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
           type_id==ID_real)
   {
     exprt result;
-    if(nondet)
+    if(init_expr.id() == ID_nondet)
       result = side_effect_expr_nondett(type, source_location);
-    else
+    else if(init_expr.is_zero())
       result = constant_exprt(ID_0, type);
+    else
+      result = duplicate_per_byte(init_expr, type, ns);
 
     result.add_source_location()=source_location;
     return result;
@@ -81,15 +86,17 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
           type_id==ID_verilog_unsignedbv)
   {
     exprt result;
-    if(nondet)
+    if(init_expr.id() == ID_nondet)
       result = side_effect_expr_nondett(type, source_location);
-    else
+    else if(init_expr.is_zero())
     {
       const std::size_t width = to_bitvector_type(type).get_width();
       std::string value(width, '0');
 
       result = constant_exprt(value, type);
     }
+    else
+      result = duplicate_per_byte(init_expr, type, ns);
 
     result.add_source_location()=source_location;
     return result;
@@ -97,17 +104,19 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
   else if(type_id==ID_complex)
   {
     exprt result;
-    if(nondet)
+    if(init_expr.id() == ID_nondet)
       result = side_effect_expr_nondett(type, source_location);
-    else
+    else if(init_expr.is_zero())
     {
       auto sub_zero =
-        expr_initializer_rec(to_complex_type(type).subtype(), source_location);
+        expr_initializer_rec(to_complex_type(type).subtype(), source_location, init_expr);
       if(!sub_zero.has_value())
         return {};
 
       result = complex_exprt(*sub_zero, *sub_zero, to_complex_type(type));
     }
+    else
+      result = duplicate_per_byte(init_expr, type, ns);
 
     result.add_source_location()=source_location;
     return result;
@@ -127,8 +136,7 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
     }
     else
     {
-      auto tmpval =
-        expr_initializer_rec(array_type.element_type(), source_location);
+      auto tmpval = expr_initializer_rec(array_type.element_type(), source_location, init_expr);
       if(!tmpval.has_value())
         return {};
 
@@ -137,7 +145,7 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
         array_type.size().id() == ID_infinity || !array_size.has_value() ||
         *array_size > MAX_FLATTENED_ARRAY_SIZE)
       {
-        if(nondet)
+        if(init_expr.id() == ID_nondet)
           return side_effect_expr_nondett(type, source_location);
 
         array_of_exprt value(*tmpval, array_type);
@@ -159,8 +167,7 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
   {
     const vector_typet &vector_type=to_vector_type(type);
 
-    auto tmpval =
-      expr_initializer_rec(vector_type.element_type(), source_location);
+    auto tmpval = expr_initializer_rec(vector_type.element_type(), source_location, init_expr);
     if(!tmpval.has_value())
       return {};
 
@@ -190,7 +197,7 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
       DATA_INVARIANT(
         c.type().id() != ID_code, "struct member must not be of code type");
 
-      const auto member = expr_initializer_rec(c.type(), source_location);
+      const auto member = expr_initializer_rec(c.type(), source_location, init_expr);
       if(!member.has_value())
         return {};
 
@@ -217,7 +224,7 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
       return {};
 
     auto component_value =
-      expr_initializer_rec(widest_member->first.type(), source_location);
+      expr_initializer_rec(widest_member->first.type(), source_location, init_expr);
 
     if(!component_value.has_value())
       return {};
@@ -230,7 +237,7 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
   else if(type_id==ID_c_enum_tag)
   {
     auto result = expr_initializer_rec(
-      ns.follow_tag(to_c_enum_tag_type(type)), source_location);
+      ns.follow_tag(to_c_enum_tag_type(type)), source_location, init_expr);
 
     if(!result.has_value())
       return {};
@@ -243,7 +250,7 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
   else if(type_id==ID_struct_tag)
   {
     auto result = expr_initializer_rec(
-      ns.follow_tag(to_struct_tag_type(type)), source_location);
+      ns.follow_tag(to_struct_tag_type(type)), source_location, init_expr);
 
     if(!result.has_value())
       return {};
@@ -256,7 +263,7 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
   else if(type_id==ID_union_tag)
   {
     auto result = expr_initializer_rec(
-      ns.follow_tag(to_union_tag_type(type)), source_location);
+      ns.follow_tag(to_union_tag_type(type)), source_location, init_expr);
 
     if(!result.has_value())
       return {};
@@ -269,10 +276,12 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
   else if(type_id==ID_string)
   {
     exprt result;
-    if(nondet)
+    if(init_expr.id() == ID_nondet)
       result = side_effect_expr_nondett(type, source_location);
-    else
+    else if(init_expr.is_zero())
       result = constant_exprt(irep_idt(), type);
+    else
+      result = duplicate_per_byte(init_expr, type, ns);
 
     result.add_source_location()=source_location;
     return result;
@@ -292,7 +301,7 @@ optionalt<exprt> zero_initializer(
   const source_locationt &source_location,
   const namespacet &ns)
 {
-  return expr_initializert<false>(ns)(type, source_location);
+  return expr_initializert(ns)(type, source_location, constant_exprt(ID_0, char_type()));
 }
 
 /// Create a non-deterministic value for type `type`, with all subtypes
@@ -307,7 +316,7 @@ optionalt<exprt> nondet_initializer(
   const source_locationt &source_location,
   const namespacet &ns)
 {
-  return expr_initializert<true>(ns)(type, source_location);
+  return expr_initializert(ns)(type, source_location, side_effect_expr_nondett(empty_typet(), source_location));
 }
 
 /// Create a value for type `type`, with all subtype bytes
@@ -324,6 +333,41 @@ optionalt<exprt> expr_initializer(
     const namespacet &ns,
     const exprt &init_expr)
 {
-  // TODO
-  return expr_initializert<true>(ns)(type, source_location);
+  return expr_initializert(ns)(type, source_location, init_expr);
+}
+
+static exprt or_values(const exprt::operandst &values, const typet &field_type)
+{
+  if(values.size() == 1)
+  {
+    return values[0];
+  }
+  return multi_ary_exprt(ID_bitor, values, field_type);
+}
+
+exprt duplicate_per_byte(
+    const exprt &init_byte_expr,
+    const typet &output_type,
+    const namespacet &ns)
+{
+  if(output_type.id() == ID_unsignedbv || output_type.id() == ID_signedbv)
+  {
+    const size_t size = to_bitvector_type(output_type).get_width() / 8;
+    if(init_byte_expr.is_constant())
+    {
+      const mp_integer value = numeric_cast_v<mp_integer>(to_constant_expr(init_byte_expr));
+      mp_integer duplicated_value = value;
+      for(size_t i = 1; i < size; ++i) {
+        duplicated_value = bitwise_or(duplicated_value << 8,  value);
+      }
+      return from_integer(duplicated_value, output_type);
+    }
+    exprt::operandst values;
+    values.push_back(init_byte_expr);
+    for(size_t i = 1; i < size; ++i) {
+      values.push_back(shl_exprt(init_byte_expr, from_integer(8*i, size_type())));
+    }
+    return or_values(values, output_type);
+  }
+  return typecast_exprt::conditional_cast(init_byte_expr, output_type);
 }
