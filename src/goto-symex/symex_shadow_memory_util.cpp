@@ -301,17 +301,17 @@ bool filter_by_value_set(
   return false;
 }
 
-const typet &get_field_type(
-  const irep_idt& field_name,
-  const goto_symex_statet &state)
+const exprt &get_field_init_expr(
+    const irep_idt& field_name,
+    const goto_symex_statet &state)
 {
   auto field_type_it = state.local_fields.find(field_name);
   if (field_type_it != state.local_fields.end()) {
-    return field_type_it->second.type();
+    return field_type_it->second;
   }
   field_type_it = state.global_fields.find(field_name);
   CHECK_RETURN(field_type_it != state.global_fields.end());
-  return field_type_it->second.type();
+  return field_type_it->second;
 }
 
 static void max_element(
