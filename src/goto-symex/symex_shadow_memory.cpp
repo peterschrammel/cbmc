@@ -851,7 +851,7 @@ void goto_symext::symex_get_field(
   const auto &addresses = state.address_fields.at(field_name);
   // Should actually be fields.at(field_name)
   symbol_exprt lhs(CPROVER_PREFIX "get_field#return_value", signedbv_typet(32));
-  const typet &field_type = get_field_type(field_name, state);
+  const exprt &field_init_expr = get_field_init_expr(field_name, state);
 
   replace_invalid_object_by_null(expr);
   // log_get_field(ns, log, field_name, expr);
@@ -863,7 +863,8 @@ void goto_symext::symex_get_field(
   if(filter_by_value_set(value_set, null_pointer))
   {
     log_value_set_match(ns, log, null_pointer, expr);
-    rhs_conds_values.push_back({true_exprt(), from_integer(0, lhs.type())});
+    rhs_conds_values.push_back(
+        {true_exprt(), typecast_exprt::conditional_cast(field_init_expr, lhs.type())});
   }
 
   for(const auto &matched_object : value_set)
@@ -895,7 +896,7 @@ void goto_symext::symex_get_field(
 
     bool exact_match = false;
     auto per_matched_object_conds_values = get_field(
-      ns, log, matched_object, addresses, field_type, expr, lhs.type(), exact_match);
+      ns, log, matched_object, addresses, field_init_expr.type(), expr, lhs.type(), exact_match);
     if(exact_match) {
       rhs_conds_values.clear();
     }
@@ -923,7 +924,8 @@ void goto_symext::symex_get_field(
       << "Shadow memory: cannot get_field for "
       << from_expr(ns, "", expr)
       << messaget::eom;
-    symex_assign(state, lhs, from_integer(0, lhs.type()));
+    symex_assign(
+        state, lhs, typecast_exprt::conditional_cast(field_init_expr, lhs.type()));
   }
 }
 
