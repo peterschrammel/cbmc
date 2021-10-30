@@ -34,7 +34,8 @@ void java_bytecode_instrument(
 void java_bytecode_instrument_uncaught_exceptions(
   code_blockt &init_code,
   const symbolt &exc_symbol,
-  const source_locationt &source_location);
+  const source_locationt &source_location,
+  bool assertions_only);
 
 extern const std::vector<std::string> exception_needed_classes;
 
