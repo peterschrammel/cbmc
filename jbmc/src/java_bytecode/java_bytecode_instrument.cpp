@@ -566,8 +566,21 @@ void java_bytecode_instrument_symbol(
 void java_bytecode_instrument_uncaught_exceptions(
   code_blockt &init_code,
   const symbolt &exc_symbol,
-  const source_locationt &source_location)
+  const source_locationt &source_location,
+  bool assertions_only)
 {
+  if(assertions_only)
+  {
+    code_assertt assert_no_exception(not_exprt(java_instanceof_exprt(
+      exc_symbol.symbol_expr(), java_classname("java.lang.AssertionError"))));
+    source_locationt assert_location = source_location;
+    assert_location.set_comment("no uncaught exception");
+    assert_no_exception.add_source_location() = assert_location;
+
+    init_code.add(std::move(assert_no_exception));
+    return;
+  }
+
   // check that there is no uncaught exception
   code_assertt assert_no_exception(equal_exprt(
     exc_symbol.symbol_expr(),
