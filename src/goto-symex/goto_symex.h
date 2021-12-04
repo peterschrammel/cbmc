@@ -865,6 +865,7 @@ public:
 protected:
   void symex_get_field(
     goto_symex_statet &state,
+    const exprt &lhs,
     const exprt::operandst &arguments);
 
   void symex_set_field(
