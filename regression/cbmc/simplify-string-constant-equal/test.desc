@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^Generated 6 VCC\(s\), 0 remaining after simplification$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Equalities on pointers into string constants should be simplified.
