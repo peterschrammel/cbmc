@@ -213,7 +213,7 @@ void goto_symext::symex_function_call_symbol(
 
   if(identifier == CPROVER_PREFIX "get_field")
   {
-    symex_get_field(state, cleaned_arguments);
+    symex_get_field(state, cleaned_lhs, cleaned_arguments);
     symex_transition(state);
   }
   else if(identifier == CPROVER_PREFIX "set_field")
