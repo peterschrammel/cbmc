@@ -831,6 +831,7 @@ void goto_symext::symex_set_field(
 
 void goto_symext::symex_get_field(
   goto_symex_statet &state,
+  const exprt &lhs,
   const exprt::operandst &arguments)
 {
   INVARIANT(
@@ -850,7 +851,6 @@ void goto_symext::symex_get_field(
     id2string(field_name) + " should exist");
   const auto &addresses = state.address_fields.at(field_name);
   // Should actually be fields.at(field_name)
-  symbol_exprt lhs(CPROVER_PREFIX "get_field#return_value", signedbv_typet(32));
   const exprt &field_init_expr = get_field_init_expr(field_name, state);
 
   replace_invalid_object_by_null(expr);
