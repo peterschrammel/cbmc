@@ -22,7 +22,7 @@ public:
   java_single_path_symex_checkert(
     const optionst &options,
     ui_message_handlert &ui_message_handler,
-    abstract_goto_modelt &goto_model)
+    goto_modelt &goto_model)
     : single_path_symex_checkert(options, ui_message_handler, goto_model)
   {
   }
