@@ -783,7 +783,9 @@ bool cbmc_parse_optionst::process_goto_program(
   link_to_library(
     goto_model, log.get_message_handler(), cprover_c_library_factory);
 
+  add_malloc_may_fail_variable_initializations(goto_model);
   add_library_static_variable_initializations(goto_model, log.get_message_handler());
+(??)
   // Common removal of types and complex constructs
   if(::process_goto_program(goto_model, options, log))
     return true;
