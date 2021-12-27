@@ -979,16 +979,20 @@ void goto_symext::symex_field_static_init(
   goto_symex_statet &state,
   const ssa_exprt &expr)
 {
-  if(state.source.function_id != INITIALIZE_FUNCTION)
-    return;
-
   if(expr.get_original_expr().id() != ID_symbol)
     return;
 
   const irep_idt &identifier =
     to_symbol_expr(expr.get_original_expr()).get_identifier();
-  if(has_prefix(id2string(identifier), CPROVER_PREFIX))
+
+  if(state.source.function_id != INITIALIZE_FUNCTION)
     return;
+
+  if(has_prefix(id2string(identifier), CPROVER_PREFIX) &&
+      !has_prefix(id2string(identifier), CPROVER_PREFIX "errno"))
+  {
+    return;
+  }
 
   const symbolt &symbol = ns.lookup(identifier);
 
