@@ -323,7 +323,7 @@ optionalt<exprt> nondet_initializer(
   const source_locationt &source_location,
   const namespacet &ns)
 {
-  return expr_initializert(ns)(type, source_location, side_effect_expr_nondett(empty_typet(), source_location));
+  return expr_initializert(ns)(type, source_location, exprt(ID_nondet));
 }
 
 /// Create a value for type `type`, with all subtype bytes
