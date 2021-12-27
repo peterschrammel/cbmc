@@ -50,6 +50,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-checker/stop_on_fail_verifier.h>
 #include <goto-checker/stop_on_fail_verifier_with_fault_localization.h>
 
+#include <goto-programs/add_library_static_variable_initializations.h>
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/loop_ids.h>
@@ -769,6 +770,7 @@ bool cbmc_parse_optionst::process_goto_program(
   link_to_library(
     goto_model, log.get_message_handler(), cprover_c_library_factory);
 
+  add_library_static_variable_initializations(goto_model, log.get_message_handler());
   // Common removal of types and complex constructs
   if(::process_goto_program(goto_model, options, log))
     return true;
