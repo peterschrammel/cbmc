@@ -443,7 +443,7 @@ int jbmc_parse_optionst::doit()
   stub_objects_are_not_null =
     options.get_bool_option("java-assume-inputs-non-null");
 
-  std::unique_ptr<abstract_goto_modelt> goto_model_ptr;
+  std::unique_ptr<goto_modelt> goto_model_ptr;
   int get_goto_program_ret = get_goto_program(goto_model_ptr, options);
   if(get_goto_program_ret != -1)
     return get_goto_program_ret;
@@ -563,7 +563,7 @@ int jbmc_parse_optionst::doit()
 }
 
 int jbmc_parse_optionst::get_goto_program(
-  std::unique_ptr<abstract_goto_modelt> &goto_model_ptr,
+  std::unique_ptr<goto_modelt> &goto_model_ptr,
   const optionst &options)
 {
   if(options.is_set("context-include") || options.is_set("context-exclude"))
