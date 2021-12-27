@@ -31,8 +31,8 @@ Author: Peter Schrammel
 #include <langapi/language_util.h>
 
 #include <goto-programs/goto_model.h>
+#include <linking/static_lifetime_init.h>
 #include <pointer-analysis/value_set_dereference.h>
-
 
 void goto_symext::initialize_shadow_memory(
   goto_symex_statet &state,
@@ -979,7 +979,7 @@ void goto_symext::symex_field_static_init(
   goto_symex_statet &state,
   const ssa_exprt &expr)
 {
-  if(state.source.function_id != CPROVER_PREFIX "initialize")
+  if(state.source.function_id != INITIALIZE_FUNCTION)
     return;
 
   if(expr.get_original_expr().id() != ID_symbol)
