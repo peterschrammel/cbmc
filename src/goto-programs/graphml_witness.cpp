@@ -246,8 +246,10 @@ static bool filter_out(
      prev_it->pc->source_location==it->pc->source_location)
     return true;
 
+#if 0
   if(it->is_goto() && it->pc->get_condition().is_true())
     return true;
+#endif
 
   const source_locationt &source_location=it->pc->source_location;
 
