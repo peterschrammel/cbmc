@@ -26,6 +26,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/ansi_c_language.h>
 
+#include <cbmc/c_test_input_generator.h>
+
 #include <goto-checker/all_properties_verifier.h>
 #include <goto-checker/all_properties_verifier_with_fault_localization.h>
 #include <goto-checker/all_properties_verifier_with_trace_storage.h>
@@ -635,6 +637,13 @@ int jbmc_parse_optionst::doit()
       verifier(options, ui_message_handler, *goto_model_ptr);
     (void)verifier();
     verifier.report();
+
+
+    if(options.get_bool_option("show-test-suite"))
+    {
+      c_test_input_generatort test_generator(ui_message_handler, options);
+      test_generator(verifier.get_traces());
+    }
 
     return CPROVER_EXIT_SUCCESS;
   }

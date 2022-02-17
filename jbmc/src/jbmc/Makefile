@@ -9,6 +9,7 @@ OBJ += ../$(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) \
       ../$(CPROVER_DIR)/src/goto-checker/goto-checker$(LIBEXT) \
       ../$(CPROVER_DIR)/src/goto-programs/goto-programs$(LIBEXT) \
       ../$(CPROVER_DIR)/src/goto-symex/goto-symex$(LIBEXT) \
+      ../$(CPROVER_DIR)/src/cbmc/c_test_input_generator$(OBJEXT) \
       ../$(CPROVER_DIR)/src/pointer-analysis/value_set$(OBJEXT) \
       ../$(CPROVER_DIR)/src/pointer-analysis/value_set_analysis_fi$(OBJEXT) \
       ../$(CPROVER_DIR)/src/pointer-analysis/value_set_domain_fi$(OBJEXT) \
