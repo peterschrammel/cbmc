@@ -1,4 +1,5 @@
 SRC = allocate_objects.cpp \
+      add_library_static_variable_initializations.cpp \
       adjust_float_expressions.cpp \
       builtin_functions.cpp \
       class_hierarchy.cpp \
