@@ -39,4 +39,6 @@ void nondet_static(goto_modelt &);
 
 void nondet_static(goto_modelt &, const optionst::value_listt &);
 
+void nondet_static_matching(goto_modelt &, const std::string &);
+
 #endif // CPROVER_GOTO_INSTRUMENT_NONDET_STATIC_H
