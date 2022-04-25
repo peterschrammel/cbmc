@@ -222,6 +222,10 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("nondet-static"))
     options.set_option("nondet-static", true);
 
+  if(cmdline.isset("nondet-static-matching"))
+    options.set_option(
+      "nondet-static-matching", cmdline.get_value("nondet-static-matching"));
+
   if(cmdline.isset("no-simplify"))
     options.set_option("simplify", false);
 
@@ -773,6 +777,16 @@ bool cbmc_parse_optionst::process_goto_program(
                  << messaget::eom;
     nondet_static(goto_model);
   }
+  // ignore default/user-specified initialization
+  // of matching variables with static lifetime
+  if(options.is_set("nondet-static-matching"))
+  {
+    log.status() << "Adding nondeterministic initialization "
+                    "of matching static/global variables"
+                 << messaget::eom;
+    nondet_static_matching(
+      goto_model, options.get_option("nondet-static-matching"));
+  }
 
   // add failed symbols
   // needs to be done before pointer analysis
@@ -912,6 +926,8 @@ void cbmc_parse_optionst::help()
     "Semantic transformations:\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"
+    " --nondet-static-matching r   add nondeterministic initialization of variables\n"
+    "                               with static lifetime matching regex r\n"
     "\n"
     "BMC options:\n"
     HELP_BMC
