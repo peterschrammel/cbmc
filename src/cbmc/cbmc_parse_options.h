@@ -57,7 +57,7 @@ class optionst;
   "(havoc-undefined-functions)" \
   "(property):(stop-on-fail)(trace)" \
   "(verbosity):(no-library)" \
-  "(nondet-static)" \
+  "(nondet-static)(nondet-static-matching):" \
   "(version)" \
   OPT_COVER \
   "(symex-coverage-report):" \
