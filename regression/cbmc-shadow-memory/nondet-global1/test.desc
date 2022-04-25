@@ -1,6 +1,6 @@
 CORE
 main.c
---verbosity 10 --nondet-static
+--verbosity 10 --nondet-static-matching '.*_nondet_.*'
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
