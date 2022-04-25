@@ -68,15 +68,8 @@ bool is_nondet_initializable_static(
     return false;
 
   // constant?
-  if(
-    is_constant_or_has_constant_components(symbol_expr.type(), ns) ||
-    is_constant_or_has_constant_components(symbol.type, ns))
-  {
-    return false;
-  }
-
-  // contains _nondet_
-  return id2string(id).find("_nondet_") != std::string::npos;
+  return !is_constant_or_has_constant_components(symbol_expr.type(), ns) &&
+         !is_constant_or_has_constant_components(symbol.type, ns);
 }
 
 /// Nondeterministically initializes global scope variables in a goto-function.
