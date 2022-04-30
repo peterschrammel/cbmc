@@ -1,0 +1,8 @@
+CORE
+main.c
+--nondet-static-matching '.*\.c:__cseq_distinguished_global' --dimacs --outfile dimacs.out --show-dimacs-var __cseq_distinguished_global
+^EXIT=0$
+^SIGNAL=0$
+^__cseq_distinguished_global#1 5 6 7$
+--
+^warning: ignoring
