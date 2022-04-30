@@ -249,9 +249,10 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_dimacs()
   auto prop = util_make_unique<dimacs_cnft>(message_handler);
 
   std::string filename = options.get_option("outfile");
+  const auto &vars_to_show = options.get_list_option("show-dimacs-var");
 
-  auto bv_dimacs =
-    util_make_unique<bv_dimacst>(ns, *prop, message_handler, filename);
+  auto bv_dimacs = util_make_unique<bv_dimacst>(
+    ns, *prop, message_handler, filename, vars_to_show);
 
   return util_make_unique<solvert>(std::move(bv_dimacs), std::move(prop));
 }

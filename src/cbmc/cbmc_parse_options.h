@@ -52,7 +52,8 @@ class optionst;
   OPT_STRING_REFINEMENT_CBMC \
   OPT_SHOW_GOTO_FUNCTIONS \
   OPT_SHOW_PROPERTIES \
-  "(show-symbol-table)(show-parse-tree)" \
+  "(show-dimacs-var):" \
+  "(show-symbol-table)(show-parse-tree)"          \
   "(drop-unused-functions)" \
   "(havoc-undefined-functions)" \
   "(property):(stop-on-fail)(trace)" \
