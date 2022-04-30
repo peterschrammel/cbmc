@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 
 #include <solvers/sat/dimacs_cnf.h>
+#include <util/suffix.h>
 
 bool bv_dimacst::write_dimacs()
 {
@@ -70,4 +71,68 @@ bool bv_dimacst::write_dimacs(std::ostream &out)
   }
 
   return false;
+}
+
+static bool
+contains_one_of(const std::string &s, const std::list<std::string> &vars)
+{
+  for(const std::string &v : vars)
+  {
+    if(s.find(v) != std::string::npos)
+      return true;
+  }
+  return false;
+}
+
+void bv_dimacst::show_prop_vars()
+{
+  // we print the mapping variable<->literals for given vars
+  for(const auto &s : get_symbols())
+  {
+    if(!contains_one_of(id2string(s.first), vars_to_show))
+      continue;
+
+    if(s.second.is_constant())
+    {
+      if(has_suffix(id2string(s.first), "#1"))
+      {
+        log.result() << s.first << " "
+                     << (s.second.is_true() ? "TRUE" : "FALSE")
+                     << messaget::eom;
+      }
+    }
+    else
+    {
+      if(has_suffix(id2string(s.first), "#1"))
+      {
+        log.result() << s.first << " " << s.second.dimacs() << messaget::eom;
+      }
+    }
+  }
+
+  // dump mapping for selected bit-vectors
+  for(const auto &m : get_map().get_mapping())
+  {
+    if(!contains_one_of(id2string(m.first), vars_to_show))
+      continue;
+
+    const bvt &literal_map = m.second.literal_map;
+
+    if(literal_map.empty())
+      continue;
+
+    if(has_suffix(id2string(m.first), "#1"))
+    {
+      log.result() << m.first;
+
+      for(const auto &lit : literal_map)
+      {
+        if(lit.is_constant())
+          log.result() << " " << (lit.is_true() ? "TRUE" : "FALSE");
+        else
+          log.result() << " " << lit.dimacs();
+      }
+      log.result() << messaget::eom;
+    }
+  }
 }
