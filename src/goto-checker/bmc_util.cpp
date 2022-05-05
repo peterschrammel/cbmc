@@ -400,15 +400,55 @@ void run_property_decider(
       return is_property_to_check(properties.at(property_id).status);
     });
 
-  auto const sat_solver_start = std::chrono::steady_clock::now();
+  // Find selector variable
+  const irep_idt selector_variable_name{"__cseq_selector_variable"};
+  exprt selector_variable;
+  const boolbv_mapt::mappingt &symbol_map =
+    property_decider.get_stack_decision_procedure().get_map().get_mapping();
+  for(const auto &s : symbol_map)
+  {
+    if(
+      has_prefix(id2string(s.first), selector_variable_name) &&
+      has_suffix(id2string(s.first), "#1"))
+    {
+      selector_variable = symbol_exprt(s.first, s.second.type);
+    }
+  }
 
-  decision_proceduret::resultt dec_result = property_decider.solve();
+  while(true)
+  {
+    // Request next selector value from master
+    // ...
+    // mp_integer selector_value = ...
 
-  auto const sat_solver_stop = std::chrono::steady_clock::now();
-  std::chrono::duration<double> sat_solver_runtime =
-    std::chrono::duration<double>(sat_solver_stop - sat_solver_start);
-  log.status() << "Runtime Solver: " << sat_solver_runtime.count() << "s"
-               << messaget::eom;
+    // Create assumption literal for selector_variable == selector_value
+    literal_exprt assumption =
+      property_decider.get_stack_decision_procedure().handle(equal_exprt(
+        selector_variable,
+        from_integer(selector_value, selector_variable.type())));
+    // Add assumption
+    property_decider.get_stack_decision_procedure().push(
+      exprt::operandst{assumption});
+
+    auto const sat_solver_start = std::chrono::steady_clock::now();
+
+    decision_proceduret::resultt dec_result = property_decider.solve();
+
+    auto const sat_solver_stop = std::chrono::steady_clock::now();
+    std::chrono::duration<double> sat_solver_runtime =
+      std::chrono::duration<double>(sat_solver_stop - sat_solver_start);
+    log.status() << "Runtime Solver: " << sat_solver_runtime.count() << "s"
+                 << messaget::eom;
+
+    // We found a counterexample, return it.
+    if(dec_result == decision_proceduret::resultt::D_SATISFIABLE)
+    {
+      break;
+    }
+
+    // Remove assumption
+    property_decider.get_stack_decision_procedure().pop();
+  }
 
   property_decider.update_properties_status_from_goals(
     properties, result.updated_properties, dec_result, set_pass);
