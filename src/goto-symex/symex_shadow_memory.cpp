@@ -823,15 +823,6 @@ void goto_symext::symex_set_field(
   const auto &addresses = state.address_fields.at(field_name);
   // const typet &field_type = get_field_type(field_name, state);
 
-  const typet &expr_subtype = to_pointer_type(expr_type).subtype();
-  DATA_INVARIANT_WITH_DIAGNOSTICS(expr_subtype.id() != ID_struct &&
-      expr_subtype.id() != ID_struct_tag &&
-      expr_subtype.id() != ID_union &&
-      expr_subtype.id() != ID_union_tag &&
-      expr_subtype.id() != ID_array,
-    "set_field requires pointer expression to primitive type",
-    irep_pretty_diagnosticst{expr_subtype});
-
   // get value set
   replace_invalid_object_by_null(expr);
   // log_set_field(ns, log, field_name, expr, value);
@@ -868,11 +859,14 @@ void goto_symext::symex_set_field(
     // We replicate the rhs value on each byte of the value that we set.
     // This allows the get_field or/max semantics to operate correctly
     // on unions.
-    exprt per_byte_rhs = duplicate_per_byte(rhs, lhs.type(), ns, log);
+    const auto per_byte_rhs =
+      expr_initializer(lhs.type(), expr.source_location(), ns, rhs);
+    CHECK_RETURN(per_byte_rhs.has_value());
+
 #ifdef DEBUG_SM
     log.debug() << "Shadow memory: RHS: " << from_expr(ns, "", per_byte_rhs) << messaget::eom;
 #endif
-    symex_assign(state, lhs, typecast_exprt::conditional_cast(per_byte_rhs, lhs.type()));
+    symex_assign(state, lhs, typecast_exprt::conditional_cast(per_byte_rhs.value(), lhs.type()));
   }
   else
   {
