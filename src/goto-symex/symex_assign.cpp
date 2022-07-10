@@ -257,6 +257,16 @@ void symex_assignt::assign_non_struct_symbol(
       state.value_set.erase_symbol(l1_lhs, ns);
     }
   }
+  else
+  {
+    if (id2string(l2_lhs.get_object_name()).find("__CPROVER_") == std::string::npos &&
+        id2string(l2_lhs.get_object_name()).find("__SM") == std::string::npos &&
+        id2string(l2_lhs.get_object_name()).find("::$tmp::") == std::string::npos)
+    {
+      goto_symex.symex_shadow_memory_copy(
+        state, address_of_exprt(l2_lhs), address_of_exprt(assignment.rhs));
+    }
+  }
 }
 
 void symex_assignt::assign_symbol(

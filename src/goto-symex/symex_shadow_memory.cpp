@@ -598,6 +598,11 @@ void goto_symext::symex_shadow_memory_copy(
   {
     return;
   }
+  if(src_expr.object().is_nil() ||
+     (src_expr.object().id() == ID_index && to_index_expr(src_expr.object()).array().is_nil()))
+  {
+    return;
+  }
   log.conditional_output(
       log.debug(), [this, dest_expr, src_expr](messaget::mstreamt &mstream) {
         mstream << "Shadow memory: copy from "
