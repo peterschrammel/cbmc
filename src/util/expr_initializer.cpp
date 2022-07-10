@@ -363,9 +363,12 @@ exprt duplicate_per_byte(
       return from_integer(duplicated_value, output_type);
     }
     exprt::operandst values;
-    values.push_back(init_byte_expr);
+    values.push_back(
+      typecast_exprt::conditional_cast(init_byte_expr, output_type));
     for(size_t i = 1; i < size; ++i) {
-      values.push_back(shl_exprt(init_byte_expr, from_integer(8*i, size_type())));
+      values.push_back(shl_exprt(
+        typecast_exprt::conditional_cast(init_byte_expr, output_type),
+        from_integer(8 * i, size_type())));
     }
     return or_values(values, output_type);
   }
