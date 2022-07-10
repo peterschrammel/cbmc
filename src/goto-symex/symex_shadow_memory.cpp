@@ -723,11 +723,11 @@ static std::vector<exprt::operandst> get_field(
 
     if(is_void_pointer(dereference.pointer.type()))
     {
-      log.warning()
-          << "Shadow memory: cannot access void* for "
-          << from_expr(ns, "", expr)
-          << messaget::eom;
-      continue;
+      std::stringstream s;
+      s << "Shadow memory: cannot get shadow memory via type void* for "
+        << from_expr(ns, "", expr)
+        << ". Insert a cast to the type that you want to access.";
+      throw invalid_input_exceptiont(s.str());
     }
 
     const value_set_dereferencet::valuet shadow_dereference =
@@ -857,6 +857,14 @@ void goto_symext::symex_set_field(
 #ifdef DEBUG_SM
     log.debug() << "Shadow memory: LHS: " << from_expr(ns, "", lhs) << messaget::eom;
 #endif
+    if(lhs.type().id() == ID_empty)
+    {
+      std::stringstream s;
+      s << "Shadow memory: cannot set shadow memory via type void* for "
+        << from_expr(ns, "", expr)
+        << ". Insert a cast to the type that you want to access.";
+      throw invalid_input_exceptiont(s.str());
+    }
     // We replicate the rhs value on each byte of the value that we set.
     // This allows the get_field or/max semantics to operate correctly
     // on unions.
