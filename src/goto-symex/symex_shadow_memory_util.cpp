@@ -558,34 +558,6 @@ exprt compute_or_over_cells(
   return or_values(values, field_type);
 }
 
-exprt duplicate_per_byte(
-    const exprt &expr,
-    const typet &lhs_type,
-    const namespacet &ns,
-    const messaget &log)
-{
-  if(lhs_type.id() == ID_unsignedbv || lhs_type.id() == ID_signedbv)
-  {
-    return duplicate_per_byte(expr, lhs_type, ns);
-  }
-  else if(lhs_type.id() == ID_pointer)
-  {
-    // We don't support union semantics for pointers.
-  }
-  else if(lhs_type.id() == ID_c_bool)
-  {
-    // nothing to do
-  }
-  else
-  {
-    log.warning()
-        << "Shadow memory: cannot handle primitive union updates correctly for "
-        << from_type(ns, "", lhs_type)
-        << messaget::eom;
-  }
-  return typecast_exprt::conditional_cast(expr, lhs_type);
-}
-
 exprt remove_casts(exprt expr)
 {
   while(expr.id() == ID_typecast)
