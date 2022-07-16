@@ -18,6 +18,7 @@ Author: Peter Schrammel
 #include <util/cprover_prefix.h>
 #include <util/expr_initializer.h>
 #include <util/find_symbols.h>
+#include <util/format_expr.h>
 #include <util/fresh_symbol.h>
 #include <util/invariant.h>
 #include <util/message.h>
@@ -94,10 +95,10 @@ void goto_symext::initialize_shadow_memory(
 
     log.conditional_output(
       log.debug(),
-      [field, field_pair, this, address_expr](messaget::mstreamt &mstream) {
+      [field, field_pair, address_expr](messaget::mstreamt &mstream) {
         mstream << "Shadow memory: initialize field " << id2string(field.get_identifier())
-                << " for " << from_expr(ns, "", address_expr)
-                << " with initial value " << from_expr(ns, "", field_pair.second)
+                << " for " << format(address_expr)
+                << " with initial value " << format(field_pair.second)
                 << messaget::eom;
       });
   }
@@ -113,7 +114,7 @@ symbol_exprt goto_symext::add_field(
   symbolt &new_symbol = get_fresh_aux_symbol(
     field_type,
     id2string(state.source.function_id),
-    "SM__" + from_expr(ns, "", expr) + "__" + id2string(field_name),
+    "SM__" + from_expr(expr) + "__" + id2string(field_name),
     state.source.pc->source_location(),
     ID_C,
     state.symbol_table);
@@ -136,8 +137,8 @@ static bool set_field_check_null(
 #ifdef DEBUG_SM
     log.conditional_output(
       log.debug(), [ns, null_pointer, expr](messaget::mstreamt &mstream) {
-        mstream << "Shadow memory: value set match: " << from_expr(ns, "", null_pointer)
-                << " <-- " << from_expr(ns, "", expr) << messaget::eom;
+        mstream << "Shadow memory: value set match: " << format(null_pointer)
+                << " <-- " << format(expr) << messaget::eom;
         mstream << "Shadow memory: ignoring set field on NULL object" << messaget::eom;
       });
 #endif
@@ -158,7 +159,7 @@ static value_set_dereferencet::valuet get_shadow(
   value_set_dereferencet::valuet shadow_dereference =
       value_set_dereferencet::build_reference_to(shadowed_object, expr, ns);
 #ifdef DEBUG_SM
-  log.debug() << "Shadow memory: shadow-deref: " << from_expr(ns, "", shadow_dereference.value) << messaget::eom;
+  log.debug() << "Shadow memory: shadow-deref: " << format(shadow_dereference.value) << messaget::eom;
 #endif
   return shadow_dereference;
 }
@@ -466,7 +467,7 @@ static optionalt<exprt> get_shadow_memory(
     {
       log.warning()
           << "Shadow memory: value set contains unknown for "
-          << from_expr(ns, "", expr)
+          << format(expr)
           << messaget::eom;
       continue;
     }
@@ -474,7 +475,7 @@ static optionalt<exprt> get_shadow_memory(
     {
       log.warning()
           << "Shadow memory: value set contains integer_address for "
-          << from_expr(ns, "", expr)
+          << format(expr)
           << messaget::eom;
       continue;
     }
@@ -482,7 +483,7 @@ static optionalt<exprt> get_shadow_memory(
     {
       log.warning()
           << "Shadow memory: value set contains failed symbol for "
-          << from_expr(ns, "", expr)
+          << format(expr)
           << messaget::eom;
       continue;
     }
@@ -604,10 +605,10 @@ void goto_symext::symex_shadow_memory_copy(
     return;
   }
   log.conditional_output(
-      log.debug(), [this, dest_expr, src_expr](messaget::mstreamt &mstream) {
+      log.debug(), [dest_expr, src_expr](messaget::mstreamt &mstream) {
         mstream << "Shadow memory: copy from "
-                << from_expr(ns, "", src_expr.object())
-                << " to " << from_expr(ns, "", dest_expr.object())
+                << format(src_expr.object())
+                << " to " << format(dest_expr.object())
                 << messaget::eom;
       });
   for(const auto &entry : state.address_fields)
@@ -625,7 +626,7 @@ void goto_symext::symex_shadow_memory_copy(
     {
       log.warning()
           << "Shadow memory: cannot copy shadow memory to "
-          << from_expr(ns, "", dest_expr)
+          << format(dest_expr)
           << messaget::eom;
       continue;
     }
@@ -641,7 +642,7 @@ void goto_symext::symex_shadow_memory_copy(
     {
       log.warning()
           << "Shadow memory: cannot copy shadow memory from "
-          << from_expr(ns, "", src_expr)
+          << format(src_expr)
           << messaget::eom;
       continue;
     }
@@ -649,9 +650,9 @@ void goto_symext::symex_shadow_memory_copy(
     {
       log.warning()
         << "Shadow memory: copied shadow memory from "
-        << from_expr(src_expr)
+        << format(src_expr)
         << " to "
-        << from_expr(dest_expr)
+        << format(dest_expr)
         << messaget::eom;
       symex_assign(
           state,
@@ -662,9 +663,9 @@ void goto_symext::symex_shadow_memory_copy(
     {
       log.warning()
           << "Shadow memory: failed to copy shadow memory from "
-          << from_expr(ns, "", src_expr)
+          << format(src_expr)
           << " to "
-          << from_expr(ns, "", dest_expr)
+          << format(dest_expr)
           << messaget::eom;
     }
   }
@@ -736,7 +737,7 @@ static std::vector<exprt::operandst> get_field(
     {
       std::stringstream s;
       s << "Shadow memory: cannot get shadow memory via type void* for "
-        << from_expr(ns, "", expr)
+        << format(expr)
         << ". Insert a cast to the type that you want to access.";
       throw invalid_input_exceptiont(s.str());
     }
@@ -857,13 +858,13 @@ void goto_symext::symex_set_field(
     log.debug() << "Shadow memory: mux size set_field: " << mux_size << messaget::eom;
     const exprt lhs = deref_expr(*maybe_lhs);
 #ifdef DEBUG_SM
-    log.debug() << "Shadow memory: LHS: " << from_expr(ns, "", lhs) << messaget::eom;
+    log.debug() << "Shadow memory: LHS: " << format(lhs) << messaget::eom;
 #endif
     if(lhs.type().id() == ID_empty)
     {
       std::stringstream s;
       s << "Shadow memory: cannot set shadow memory via type void* for "
-        << from_expr(ns, "", expr)
+        << format(expr)
         << ". Insert a cast to the type that you want to access.";
       throw invalid_input_exceptiont(s.str());
     }
@@ -875,7 +876,7 @@ void goto_symext::symex_set_field(
     CHECK_RETURN(per_byte_rhs.has_value());
 
 #ifdef DEBUG_SM
-    log.debug() << "Shadow memory: RHS: " << from_expr(ns, "", per_byte_rhs) << messaget::eom;
+    log.debug() << "Shadow memory: RHS: " << format(per_byte_rhs.value()) << messaget::eom;
 #endif
     symex_assign(state, lhs, typecast_exprt::conditional_cast(per_byte_rhs.value(), lhs.type()));
   }
@@ -883,7 +884,7 @@ void goto_symext::symex_set_field(
   {
     log.warning()
       << "Shadow memory: cannot set_field for "
-      << from_expr(ns, "", expr)
+      << format(expr)
       << messaget::eom;
   }
 }
@@ -932,7 +933,7 @@ void goto_symext::symex_get_field(
     {
       log.warning()
           << "Shadow memory: value set contains unknown for "
-          << from_expr(ns, "", expr)
+          << format(expr)
           << messaget::eom;
       continue;
     }
@@ -940,7 +941,7 @@ void goto_symext::symex_get_field(
     {
       log.warning()
           << "Shadow memory: value set contains integer_address for "
-          << from_expr(ns, "", expr)
+          << format(expr)
           << messaget::eom;
       continue;
     }
@@ -948,7 +949,7 @@ void goto_symext::symex_get_field(
     {
       log.warning()
           << "Shadow memory: value set contains failed symbol for "
-          << from_expr(ns, "", expr)
+          << format(expr)
           << messaget::eom;
       continue;
     }
@@ -972,7 +973,7 @@ void goto_symext::symex_get_field(
     const size_t mux_size = rhs_conds_values.size() - 1;
     log.debug() << "Shadow memory: mux size get_field: " << mux_size << messaget::eom;
 #ifdef DEBUG_SM
-    log.debug() << "Shadow memory: RHS: " << from_expr(ns, "", rhs) << messaget::eom;
+    log.debug() << "Shadow memory: RHS: " << format(rhs) << messaget::eom;
 #endif
     symex_assign(
       state, lhs, typecast_exprt::conditional_cast(rhs, lhs.type()));
@@ -981,7 +982,7 @@ void goto_symext::symex_get_field(
   {
     log.warning()
       << "Shadow memory: cannot get_field for "
-      << from_expr(ns, "", expr)
+      << format(expr)
       << messaget::eom;
     symex_assign(
         state, lhs, typecast_exprt::conditional_cast(field_init_expr, lhs.type()));

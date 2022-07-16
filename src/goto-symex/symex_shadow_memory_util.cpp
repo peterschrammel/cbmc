@@ -5,6 +5,7 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/c_types.h>
+#include <util/format_expr.h>
 #include <util/pointer_expr.h>
 #include <util/expr_initializer.h>
 
@@ -19,8 +20,8 @@ void log_exact_match(
     log.debug(),
     [ns, shadowed_address, resolved_expr](messaget::mstreamt &mstream) {
       mstream << "Shadow memory: exact match: "
-              << from_expr(ns, "", shadowed_address.address)
-              << " == " << from_expr(ns, "", resolved_expr) << messaget::eom;
+              << format(shadowed_address.address)
+              << " == " << format(resolved_expr) << messaget::eom;
     });
 #endif
 }
@@ -36,8 +37,8 @@ void log_value_set_match(
     log.debug(),
     [ns, shadowed_address, expr](messaget::mstreamt &mstream) {
       mstream << "Shadow memory: value set match: "
-              << from_expr(ns, "", shadowed_address.address)
-              << " == " << from_expr(ns, "", expr) << messaget::eom;
+              << format(shadowed_address.address)
+              << " == " << format(expr) << messaget::eom;
     });
 #endif
 }
@@ -57,14 +58,14 @@ void log_value_set_match(
     [ns, shadowed_address, expr, dereference, matched_base_address, shadow_dereference](
       messaget::mstreamt &mstream) {
       mstream << "Shadow memory: value set match: " << messaget::eom;
-      mstream << "Shadow memory:   base: " << from_expr(ns, "", shadowed_address.address)
-              << " <-- " << from_expr(ns, "", matched_base_address) << messaget::eom;
-      mstream << "Shadow memory:   cell: " << from_expr(ns, "", dereference.pointer) << " <-- "
-              << from_expr(ns, "", expr) << messaget::eom;
+      mstream << "Shadow memory:   base: " << format(shadowed_address.address)
+              << " <-- " << format(matched_base_address) << messaget::eom;
+      mstream << "Shadow memory:   cell: " << format(dereference.pointer) << " <-- "
+              << format(expr) << messaget::eom;
       mstream << "Shadow memory:   shadow ptr: "
-              << from_expr(ns, "", shadow_dereference.pointer) << messaget::eom;
+              << format(shadow_dereference.pointer) << messaget::eom;
       mstream << "Shadow memory:   shadow val: "
-              << from_expr(ns, "", shadow_dereference.value) << messaget::eom;
+              << format(shadow_dereference.value) << messaget::eom;
     });
 #endif
 }
@@ -78,8 +79,8 @@ void log_value_set_match(
 #ifdef DEBUG_SM
   log.conditional_output(
     log.debug(), [ns, address, expr](messaget::mstreamt &mstream) {
-      mstream << "Shadow memory: value set match: " << from_expr(ns, "", address)
-              << " <-- " << from_expr(ns, "", expr) << messaget::eom;
+      mstream << "Shadow memory: value set match: " << format(address)
+              << " <-- " << format(expr) << messaget::eom;
     });
 #endif
 }
@@ -93,7 +94,7 @@ void log_cond(
 #ifdef DEBUG_SM
   log.conditional_output(
     log.debug(), [ns, cond_text, cond](messaget::mstreamt &mstream) {
-      mstream << "Shadow memory: " << cond_text << ": " << from_expr(ns, "", cond)
+      mstream << "Shadow memory: " << cond_text << ": " << format(cond)
               << messaget::eom;
     });
 #endif
@@ -109,7 +110,7 @@ void log_value_set(
   log.debug(), [ns, value_set](messaget::mstreamt &mstream) {
     for(const auto &e : value_set)
     {
-      mstream << "Shadow memory: value set: " << from_expr(ns, "", e) << messaget::eom;
+      mstream << "Shadow memory: value set: " << format(e) << messaget::eom;
     }
   });
 #endif
@@ -124,7 +125,7 @@ void log_try_shadow_address(
   log.conditional_output(
     log.debug(), [ns, shadowed_address](messaget::mstreamt &mstream) {
       mstream << "Shadow memory: trying shadowed address: "
-              << from_expr(ns, "", shadowed_address.address)
+              << format(shadowed_address.address)
               << messaget::eom;
     });
 #endif
@@ -140,7 +141,7 @@ void log_set_field(
   log.conditional_output(
     log.debug(), [field_name, ns, expr, value](messaget::mstreamt &mstream) {
       mstream << "Shadow memory: set_field: " << id2string(field_name) << " for "
-              << from_expr(ns, "", expr) << " to " << from_expr(ns, "", value)
+              << format(expr) << " to " << format(value)
               << messaget::eom;
     });
 }
@@ -154,7 +155,7 @@ void log_get_field(
   log.conditional_output(
     log.debug(), [ns, field_name, expr](messaget::mstreamt &mstream) {
       mstream << "Shadow memory: get_field: " << id2string(field_name) << " for "
-              << from_expr(ns, "", expr) << messaget::eom;
+              << format(expr) << messaget::eom;
     });
 }
 
@@ -427,7 +428,7 @@ exprt compute_max_over_cells(
     {
       log.warning()
         << "Shadow memory: cannot compute max over variable-size array "
-        << from_expr(ns, "", expr)
+        << format(expr)
         << messaget::eom;
     }
   }
@@ -542,7 +543,7 @@ exprt compute_or_over_cells(
     {
       log.warning()
           << "Shadow memory: cannot compute or over variable-size array "
-          << from_expr(ns, "", expr)
+          << format(expr)
           << messaget::eom;
     }
   }

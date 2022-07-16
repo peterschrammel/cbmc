@@ -3,6 +3,6 @@ main.c
 --verbosity 10
 ^EXIT=6$
 ^SIGNAL=0$
-Shadow memory: cannot set shadow memory via type void\* for s
+Shadow memory: cannot set shadow memory via type void\* for f_void_ptr::s
 --
 ^warning: ignoring
