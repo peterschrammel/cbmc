@@ -1,13 +1,15 @@
 #include "symex_shadow_memory_util.h"
 
-#include <langapi/language_util.h>
-
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
+#include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/config.h>
+#include <util/expr_initializer.h>
 #include <util/format_expr.h>
 #include <util/pointer_expr.h>
-#include <util/expr_initializer.h>
+
+#include <langapi/language_util.h>
 
 void log_exact_match(
   const namespacet &ns,
@@ -315,6 +317,18 @@ const exprt &get_field_init_expr(
   return field_type_it->second;
 }
 
+static exprt conditional_cast_floatbv_to_unsignedbv(const exprt &value)
+{
+  if(value.type().id() != ID_floatbv)
+  {
+    return value;
+  }
+  return make_byte_extract(
+    value,
+    from_integer(0, unsigned_int_type()),
+    unsignedbv_typet(to_bitvector_type(value.type()).get_width()));
+}
+
 static void max_element(
     const exprt &element,
     const typet &field_type,
@@ -348,13 +362,14 @@ static void max_over_bytes(
 }
 
 static void max_elements(
-    const exprt &element,
+    exprt element,
     const typet &field_type,
     const namespacet &ns,
     const messaget &log,
     const bool is_union,
     exprt &max)
 {
+  element = conditional_cast_floatbv_to_unsignedbv(element);
   if(element.type().id() == ID_unsignedbv || element.type().id() == ID_signedbv)
   {
     if(is_union)
@@ -432,7 +447,9 @@ exprt compute_max_over_cells(
         << messaget::eom;
     }
   }
-  return typecast_exprt::conditional_cast(expr, field_type);
+  // TODO: This is incorrect when accessing non-0 offsets of scalars.
+  return typecast_exprt::conditional_cast(
+    conditional_cast_floatbv_to_unsignedbv(expr), field_type);
 }
 
 static void or_over_bytes(
@@ -462,13 +479,14 @@ static exprt or_values(const exprt::operandst &values, const typet &field_type)
 }
 
 static void or_elements(
-    const exprt &element,
+    exprt element,
     const typet &field_type,
     const namespacet &ns,
     const messaget &log,
     const bool is_union,
     exprt::operandst &values)
 {
+  element = conditional_cast_floatbv_to_unsignedbv(element);
   if(element.type().id() == ID_unsignedbv || element.type().id() == ID_signedbv)
   {
     exprt value = element;
@@ -511,7 +529,7 @@ exprt compute_or_over_cells(
         continue;
       }
       or_elements(
-          member_exprt(expr, component),
+        member_exprt(expr, component),
           field_type,
           ns,
           log,
@@ -550,11 +568,13 @@ exprt compute_or_over_cells(
   exprt::operandst values;
   if(is_union)
   {
-    or_over_bytes(expr, type, field_type, values);
+    or_over_bytes(
+      conditional_cast_floatbv_to_unsignedbv(expr), type, field_type, values);
   }
   else
   {
-    values.push_back(typecast_exprt::conditional_cast(expr, field_type));
+    values.push_back(typecast_exprt::conditional_cast(
+      conditional_cast_floatbv_to_unsignedbv(expr), field_type));
   }
   return or_values(values, field_type);
 }
