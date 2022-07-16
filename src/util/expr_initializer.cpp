@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arith_tools.h"
 #include "bitvector_expr.h"
+#include "byte_operators.h"
 #include "c_types.h"
 #include "magic.h"
 #include "namespace.h"
@@ -357,8 +358,12 @@ exprt duplicate_per_byte(
     const typet &output_type,
     const namespacet &ns)
 {
-  if(output_type.id() == ID_unsignedbv || output_type.id() == ID_signedbv)
+  if(
+    output_type.id() == ID_unsignedbv || output_type.id() == ID_signedbv ||
+    output_type.id() == ID_floatbv)
   {
+    const typet unsigned_output_type =
+      unsignedbv_typet(to_bitvector_type(output_type).get_width());
     const size_t size = to_bitvector_type(output_type).get_width() / 8;
     if(init_byte_expr.is_constant())
     {
@@ -367,17 +372,23 @@ exprt duplicate_per_byte(
       for(size_t i = 1; i < size; ++i) {
         duplicated_value = bitwise_or(duplicated_value << 8,  value);
       }
-      return from_integer(duplicated_value, output_type);
+      exprt constant_expr =
+        from_integer(duplicated_value, unsigned_output_type);
+      return make_byte_extract(
+        constant_expr, from_integer(0, size_type()), output_type);
     }
     exprt::operandst values;
     values.push_back(
-      typecast_exprt::conditional_cast(init_byte_expr, output_type));
+      typecast_exprt::conditional_cast(init_byte_expr, unsigned_output_type));
     for(size_t i = 1; i < size; ++i) {
       values.push_back(shl_exprt(
-        typecast_exprt::conditional_cast(init_byte_expr, output_type),
+        typecast_exprt::conditional_cast(init_byte_expr, unsigned_output_type),
         from_integer(8 * i, size_type())));
     }
-    return or_values(values, output_type);
+    return make_byte_extract(
+      or_values(values, unsigned_output_type),
+      from_integer(0, size_type()),
+      output_type);
   }
   return typecast_exprt::conditional_cast(init_byte_expr, output_type);
 }
