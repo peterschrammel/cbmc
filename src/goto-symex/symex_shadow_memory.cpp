@@ -647,6 +647,12 @@ void goto_symext::symex_shadow_memory_copy(
     }
     if(maybe_lhs->id() == ID_address_of && maybe_rhs->id() == ID_address_of)
     {
+      log.warning()
+        << "Shadow memory: copied shadow memory from "
+        << from_expr(src_expr)
+        << " to "
+        << from_expr(dest_expr)
+        << messaget::eom;
       symex_assign(
           state,
           state.field_sensitivity.apply(ns, state, to_address_of_expr(*maybe_lhs).object(), true),
