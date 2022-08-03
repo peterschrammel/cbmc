@@ -506,6 +506,7 @@ void value_sett::get_value_set_rec(
     else
       insert(dest, exprt(ID_unknown, original_type));
   }
+#if 0
   else if(expr.id() == ID_nondet_symbol)
   {
     if(expr.type().id() == ID_pointer)
@@ -525,6 +526,7 @@ void value_sett::get_value_set_rec(
     else
       insert(dest, exprt(ID_unknown, original_type));
   }
+#endif
   else if(expr.id()==ID_if)
   {
     get_value_set_rec(
