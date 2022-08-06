@@ -1,6 +1,6 @@
 CORE
 main.c
---verbosity 10
+--verbosity 10 --copy-shadow-memory
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

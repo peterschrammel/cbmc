@@ -65,7 +65,8 @@ public:
       path_segment_vccs(0),
       _total_vccs(std::numeric_limits<unsigned>::max()),
       _remaining_vccs(std::numeric_limits<unsigned>::max()),
-      complexity_module(mh, options)
+      complexity_module(mh, options),
+      enable_copy_shadow_memory(options.get_bool_option("copy-shadow-memory"))
   {
   }
 
@@ -879,6 +880,8 @@ protected:
     const side_effect_exprt &code);
 
 private:
+  bool enable_copy_shadow_memory;
+
   static void convert_field_decl(
     const namespacet &ns,
     message_handlert &message_handler,

@@ -547,6 +547,11 @@ void goto_symext::symex_shadow_memory_copy(
     const address_of_exprt &dest,
     const address_of_exprt &src)
 {
+  if (!enable_copy_shadow_memory)
+  {
+    return;
+  }
+
   const std::unordered_set<irep_idt> dest_identifiers = find_symbol_identifiers(dest);
   if(std::find_if(
       dest_identifiers.begin(),

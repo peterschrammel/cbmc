@@ -59,6 +59,7 @@ class optionst;
   "(property):(stop-on-fail)(trace)" \
   "(verbosity):(no-library)" \
   "(nondet-static)(nondet-static-matching):" \
+  "(copy-shadow-memory)" \
   "(version)" \
   OPT_COVER \
   "(symex-coverage-report):" \

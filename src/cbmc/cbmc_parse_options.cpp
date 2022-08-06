@@ -169,6 +169,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
+  if(cmdline.isset("copy-shadow-memory"))
+    options.set_option("copy-shadow-memory", true);
+
   if(cmdline.isset("full-slice"))
     options.set_option("full-slice", true);
 
@@ -942,6 +945,7 @@ void cbmc_parse_optionst::help()
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"
     " --nondet-static-matching r   add nondeterministic initialization of variables\n"
     "                              with static lifetime matching regex r\n"
+    " --copy-shadow-memory         copy shadow memory in simple assignments\n"
     "\n"
     "BMC options:\n"
     HELP_BMC
