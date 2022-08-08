@@ -6,3 +6,4 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+^Shadow memory: cannot get_field for
