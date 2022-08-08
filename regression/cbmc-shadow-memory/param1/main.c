@@ -88,6 +88,13 @@ void f_int_local(int rec, int value)
   }
 }
 
+// Variables starting with __cs won't have shadow memory
+void f_charptr_val(char *cs_param_producer_routine_arg)
+{
+  assert(__CPROVER_get_field(&cs_param_producer_routine_arg, "field1") == 0);
+  __CPROVER_set_field(&cs_param_producer_routine_arg, "field1", 3);
+  assert(__CPROVER_get_field(&cs_param_producer_routine_arg, "field1") == 3);
+}
 
 int main()
 {
@@ -110,4 +117,8 @@ int main()
   f_structptr_val(&z);
   f_structptr_val(&z);
   f_int_local(1, 1);
+  char *__cs_threadargs[2];
+  struct STRUCTNAME __cs_local_main_prod0;
+  __cs_threadargs[1] = (char *) (&__cs_local_main_prod0);
+  f_charptr_val(__cs_threadargs[1]);
 }
