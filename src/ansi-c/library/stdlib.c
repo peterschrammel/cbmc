@@ -671,6 +671,7 @@ __CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
 
 void __CPROVER_deallocate(void *ptr)
 {
-  if(__VERIFIER_nondet___CPROVER_bool())
+  __CPROVER_bool record=__VERIFIER_nondet___CPROVER_bool();
+  if(record)
     __CPROVER_deallocated = ptr;
 }
