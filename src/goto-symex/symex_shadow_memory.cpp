@@ -860,7 +860,16 @@ void goto_symext::symex_set_field(
   // add to equation
   if(maybe_lhs.has_value())
   {
-    log.debug() << "Shadow memory: mux size set_field: " << mux_size << messaget::eom;
+    if (mux_size >= 10)
+    {
+      log.warning() << "Shadow memory: mux size set_field: " << mux_size
+                    << messaget::eom;
+    }
+    else
+    {
+      log.debug() << "Shadow memory: mux size set_field: " << mux_size
+                  << messaget::eom;
+    }
     const exprt lhs = deref_expr(*maybe_lhs);
 #ifdef DEBUG_SM
     log.debug() << "Shadow memory: LHS: " << format(lhs) << messaget::eom;
@@ -976,7 +985,16 @@ void goto_symext::symex_get_field(
   {
     exprt rhs = typecast_exprt::conditional_cast(build_if_else_expr(rhs_conds_values), lhs.type());
     const size_t mux_size = rhs_conds_values.size() - 1;
-    log.debug() << "Shadow memory: mux size get_field: " << mux_size << messaget::eom;
+    if (mux_size >= 10)
+    {
+      log.warning() << "Shadow memory: mux size get_field: " << mux_size
+                    << messaget::eom;
+    }
+    else
+    {
+      log.debug() << "Shadow memory: mux size get_field: " << mux_size
+                  << messaget::eom;
+    }
 #ifdef DEBUG_SM
     log.debug() << "Shadow memory: RHS: " << format(rhs) << messaget::eom;
 #endif
