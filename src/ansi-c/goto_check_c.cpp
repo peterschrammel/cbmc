@@ -56,6 +56,7 @@ public:
     enable_bounds_check = _options.get_bool_option("bounds-check");
     enable_pointer_check = _options.get_bool_option("pointer-check");
     enable_memory_leak_check = _options.get_bool_option("memory-leak-check");
+    enable_memory_cleanup_check=_options.get_bool_option("memory-cleanup-check");
     enable_div_by_zero_check = _options.get_bool_option("div-by-zero-check");
     enable_enum_range_check = _options.get_bool_option("enum-range-check");
     enable_signed_overflow_check =
@@ -225,6 +226,7 @@ protected:
   void float_overflow_check(const exprt &, const guardt &);
   void nan_check(const exprt &, const guardt &);
   optionalt<exprt> rw_ok_check(exprt);
+  void memory_leak_check(const irep_idt &function_id);
 
   std::string array_name(const exprt &);
 
@@ -257,6 +259,7 @@ protected:
   bool enable_bounds_check;
   bool enable_pointer_check;
   bool enable_memory_leak_check;
+  bool enable_memory_cleanup_check;
   bool enable_div_by_zero_check;
   bool enable_enum_range_check;
   bool enable_signed_overflow_check;
@@ -2032,6 +2035,44 @@ optionalt<exprt> goto_check_ct::rw_ok_check(exprt expr)
     return {};
 }
 
+/*******************************************************************\
+Function: goto_check_ct::memory_leak_check
+  Inputs:
+ Outputs:
+ Purpose:
+\*******************************************************************/
+
+void goto_check_ct::memory_leak_check(const irep_idt &function_id)
+{
+  const symbolt &leak=ns.lookup(CPROVER_PREFIX "memory_leak");
+  const symbol_exprt leak_expr=leak.symbol_expr();
+
+  // add self-assignment to get helpful counterexample output
+  code_assignt code(leak_expr, leak_expr);
+  goto_programt::instructiont t=goto_programt::make_assignment(code);
+
+  source_locationt source_location;
+  source_location.set_function(function_id);
+
+  equal_exprt eq(
+    leak_expr,
+    null_pointer_exprt(to_pointer_type(leak.type)));
+  add_guarded_property(
+    eq,
+    "dynamically allocated memory never freed",
+    "memory-leak",
+    source_location,
+    eq,
+    identity);
+}
+
+/*******************************************************************\
+Function: goto_checkt::goto_check
+  Inputs:
+ Outputs:
+ Purpose:[B
+\*******************************************************************/
+
 void goto_check_ct::goto_check(
   const irep_idt &function_identifier,
   goto_functiont &goto_function)
@@ -2177,6 +2218,23 @@ void goto_check_ct::goto_check(
       // this has no successor
       assertions.clear();
     }
+    else if(i.is_assume())
+    {
+      // These are further 'exit points' of the program
+      const exprt simplified_guard = simplify_expr(i.condition(), ns);
+      // The function may be inlined to only __CPROVER_start, use the
+      // original location (if it is still valid thanks to setting
+      // adjust_false=false in goto_inlinet).
+      const irep_idt &former_function = i.source_location().get_function();
+      if(
+        enable_memory_cleanup_check && simplified_guard.is_false() &&
+        (former_function == "abort" || former_function == "exit" ||
+         former_function == "_Exit" ||
+         (i.labels.size() == 1 && i.labels.front() == "__VERIFIER_abort")))
+      {
+        memory_leak_check(former_function);
+      }
+    }
     else if(i.is_dead())
     {
       if(enable_pointer_check || enable_pointer_primitive_check)
@@ -2207,24 +2265,7 @@ void goto_check_ct::goto_check(
         function_identifier == goto_functionst::entry_point() &&
         enable_memory_leak_check)
       {
-        const symbolt &leak = ns.lookup(CPROVER_PREFIX "memory_leak");
-        const symbol_exprt leak_expr = leak.symbol_expr();
-
-        // add self-assignment to get helpful counterexample output
-        new_code.add(goto_programt::make_assignment(leak_expr, leak_expr));
-
-        source_locationt source_location;
-        source_location.set_function(function_identifier);
-
-        equal_exprt eq(
-          leak_expr, null_pointer_exprt(to_pointer_type(leak.type)));
-        add_guarded_property(
-          eq,
-          "dynamically allocated memory never freed",
-          "memory-leak",
-          source_location,
-          eq,
-          identity);
+        memory_leak_check(function_identifier);
       }
     }
 

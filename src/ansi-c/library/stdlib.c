@@ -280,9 +280,11 @@ void free(void *ptr)
 
   // catch people who try to use free(...) for stuff
   // allocated with new[]
+#if 0
   __CPROVER_precondition(
     ptr == 0 || __CPROVER_new_object != ptr || !__CPROVER_malloc_is_new_array,
     "free called for new[] object");
+#endif
 
   // catch people who try to use free(...) with alloca
   __CPROVER_precondition(
@@ -617,6 +619,7 @@ __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 
 void __CPROVER_deallocate(void *ptr)
 {
-  if(__VERIFIER_nondet___CPROVER_bool())
+  __CPROVER_bool record=__VERIFIER_nondet___CPROVER_bool();
+  if(record)
     __CPROVER_deallocated = ptr;
 }
