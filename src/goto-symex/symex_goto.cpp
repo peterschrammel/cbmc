@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/exception_utils.h>
 #include <util/expr_util.h>
+#include <util/find_symbols.h>
+#include <util/format_expr.h>
 #include <util/invariant.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
@@ -26,6 +28,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "path_storage.h"
 
 #include <algorithm>
+#include <chrono>
 
 void goto_symext::apply_goto_condition(
   goto_symex_statet &current_state,
@@ -620,6 +623,8 @@ bool goto_symext::check_break(const irep_idt &loop_id, unsigned unwind)
   return false;
 }
 
+static std::chrono::duration<double> phi_duration{0};
+
 void goto_symext::merge_gotos(statet &state)
 {
   framet &frame = state.call_stack().top();
@@ -633,11 +638,27 @@ void goto_symext::merge_gotos(statet &state)
   // we need to merge
   framet::goto_state_listt &state_list = state_map_it->second;
 
+  phi_duration = std::chrono::duration<double>(0);
+  auto merge_begin = std::chrono::steady_clock::now();
+
   for(auto list_it = state_list.rbegin(); list_it != state_list.rend();
       ++list_it)
   {
     merge_goto(list_it->first, std::move(list_it->second), state);
   }
+
+  //auto guard_expr = state.guard.as_expr();
+  //find_symbols_sett guard_symbols;
+  //find_symbols(guard_expr, guard_symbols);
+  //log.debug() << "merge guard symbols size: " << guard_symbols.size() << messaget::eom;
+
+  auto merge_end = std::chrono::steady_clock::now();
+  log.debug() << "merge phi duration: " << ((long)(phi_duration.count() * 1000))
+              << "ms" << messaget::eom;
+  log.debug()
+    << "merge all duration: "
+    << ((long)(std::chrono::duration<double>(merge_end - merge_begin).count() * 1000))
+    << "ms" << messaget::eom;
 
   // clean up to save some memory
   frame.goto_state_map.erase(state_map_it);
@@ -748,6 +769,9 @@ static void merge_names(
   const irep_idt l1_identifier = ssa.get_identifier();
   const irep_idt &obj_identifier = ssa.get_object_name();
 
+  if(id2string(l1_identifier).find("::$tmp::") != std::string::npos)
+    return;
+
   if(obj_identifier == goto_symext::statet::guard_identifier())
     return; // just a guard, don't bother
 
@@ -830,14 +854,18 @@ static void merge_names(
   else
   {
     rhs = if_exprt(diff_guard.as_expr(), goto_state_rhs, dest_state_rhs);
-    if(do_simplify)
-      simplify(rhs, ns);
+    /*    if(do_simplify)
+      simplify(rhs, ns); */
   }
+
+  auto phi_begin = std::chrono::steady_clock::now();
 
   dest_state.record_events.push(false);
   const ssa_exprt new_lhs =
     dest_state.assignment(ssa, rhs, ns, true, true).get();
   dest_state.record_events.pop();
+
+  auto phi_end = std::chrono::steady_clock::now();
 
   log.conditional_output(
     log.debug(), [ns, &new_lhs](messaget::mstreamt &mstream) {
@@ -854,6 +882,8 @@ static void merge_names(
     rhs,
     dest_state.source,
     symex_targett::assignment_typet::PHI);
+
+  phi_duration += phi_end - phi_begin;
 }
 
 void goto_symext::phi_function(
@@ -872,6 +902,8 @@ void goto_symext::phi_function(
   symex_renaming_levelt::delta_viewt delta_view;
   goto_state.get_level2().current_names.get_delta_view(
     dest_state.get_level2().current_names, delta_view, false);
+  //  log.debug() << "merge current size: " << goto_state.get_level2().current_names.size() << messaget::eom;
+  //  log.debug() << "merge delta view size: " << delta_view.size() << messaget::eom;
 
   for(const auto &delta_item : delta_view)
   {
@@ -898,6 +930,8 @@ void goto_symext::phi_function(
   delta_view.clear();
   dest_state.get_level2().current_names.get_delta_view(
     goto_state.get_level2().current_names, delta_view, false);
+  //  log.debug() << "merge current size: " << goto_state.get_level2().current_names.size() << messaget::eom;
+  //  log.debug() << "merge delta view size: " << delta_view.size() << messaget::eom;
 
   for(const auto &delta_item : delta_view)
   {
