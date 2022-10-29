@@ -169,14 +169,14 @@ static void adjust_array_types(typet &type)
   if(type.id() != ID_pointer) {
     return;
   }
-  const typet &subtype = to_pointer_type(type).subtype();
+  const typet &subtype = to_pointer_type(type).base_type();
   if(subtype.id() == ID_array)
   {
-    to_pointer_type(type).subtype() = to_array_type(subtype).subtype();
+    to_pointer_type(type).base_type() = to_array_type(subtype).element_type();
   }
   if(subtype.id() == ID_string_constant)
   {
-    to_pointer_type(type).subtype() = char_type();
+    to_pointer_type(type).base_type() = char_type();
   }
 }
 
@@ -321,14 +321,14 @@ static bool are_types_compatible(const typet &expr_type, const typet &shadow_typ
 
   // We filter out the particularly annoying case of char ** being definitely
   // incompatible with char[].
-  const typet &expr_subtype = to_pointer_type(expr_type).subtype();
-  const typet &shadow_subtype = to_pointer_type(shadow_type).subtype();
-  if (expr_subtype.id() == ID_pointer && to_pointer_type(expr_subtype).subtype().id() != ID_pointer
-      && shadow_subtype.id() == ID_array && to_array_type(shadow_subtype).subtype().id() != ID_pointer)
+  const typet &expr_subtype = to_pointer_type(expr_type).base_type();
+  const typet &shadow_subtype = to_pointer_type(shadow_type).base_type();
+  if (expr_subtype.id() == ID_pointer && to_pointer_type(expr_subtype).base_type().id() != ID_pointer
+      && shadow_subtype.id() == ID_array && to_array_type(shadow_subtype).element_type().id() != ID_pointer)
   {
     return false;
   }
-  if (shadow_subtype.id() == ID_pointer && to_pointer_type(shadow_subtype).subtype().id() != ID_pointer
+  if (shadow_subtype.id() == ID_pointer && to_pointer_type(shadow_subtype).base_type().id() != ID_pointer
       && expr_subtype.id() != ID_pointer)
   {
     return false;

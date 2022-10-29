@@ -21,7 +21,7 @@ static optionalt<exprt> resolve_array_index(
   {
     log.debug() << "    TYPECAST" << messaget::eom;
     const typecast_exprt &typecast_expr = to_typecast_expr(expr);
-    const typet &subtype = to_pointer_type(typecast_expr.type()).subtype();
+    const typet &subtype = to_pointer_type(typecast_expr.type()).base_type();
     if(subtype.id() == ID_signedbv || subtype.id() == ID_unsignedbv)
     {
       log.debug() << "      INTEGER" << messaget::eom;

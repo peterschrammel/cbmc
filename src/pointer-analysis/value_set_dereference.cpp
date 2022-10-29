@@ -662,26 +662,25 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     result.pointer = typecast_exprt::conditional_cast(
       address_of_exprt{skip_typecast(o.root_object())}, pointer_type);
 
-      if(memory_model(result.value, dereference_type, offset, ns))
-      {
-        // set pointer correctly
-        result.pointer =
-          typecast_exprt::conditional_cast(
-            plus_exprt(
-              typecast_exprt(
-                result.pointer,
-                pointer_typet(char_type(), pointer_type.get_width())),
-              offset),
-            pointer_type);
-      }
-      else
-      {
-        return {}; // give up, no way that this is ok
-      }
+    if(memory_model(result.value, dereference_type, offset, ns))
+    {
+      // set pointer correctly
+      result.pointer =
+        typecast_exprt::conditional_cast(
+          plus_exprt(
+            typecast_exprt(
+              result.pointer,
+              pointer_typet(char_type(), pointer_type.get_width())),
+            offset),
+          pointer_type);
     }
-  }
+    else
+    {
+      return {}; // give up, no way that this is ok
+    }
 
-  return result;
+    return result;
+  }
 }
 
 static bool is_a_bv_type(const typet &type)
