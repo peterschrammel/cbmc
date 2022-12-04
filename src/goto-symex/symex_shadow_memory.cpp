@@ -180,31 +180,6 @@ static void adjust_array_types(typet &type)
   }
 }
 
-static void simplify(exprt &expr)
-{
-  if(expr.id() != ID_equal)
-    return;
-
-  const equal_exprt &equal_expr = to_equal_expr(expr);
-
-  if(equal_expr.lhs().id() != ID_address_of || equal_expr.rhs().id() != ID_address_of)
-    return;
-
-  if(to_address_of_expr(equal_expr.lhs()).object().id() != ID_string_constant ||
-      to_address_of_expr(equal_expr.rhs()).object().id() != ID_index)
-    return;
-
-  if(!to_index_expr(to_address_of_expr(equal_expr.rhs()).object()).index().is_zero() ||
-      to_index_expr(to_address_of_expr(equal_expr.rhs()).object()).array().id() != ID_string_constant)
-    return;
-
-  if(to_string_constant(to_address_of_expr(equal_expr.lhs()).object()).get_value() ==
-      to_string_constant(to_index_expr(to_address_of_expr(equal_expr.rhs()).object()).array()).get_value())
-  {
-    expr = true_exprt();
-  }
-}
-
 static exprt get_matched_base_cond(
   const exprt &shadowed_address,
   const exprt &matched_base_address,
@@ -216,7 +191,6 @@ static exprt get_matched_base_cond(
   exprt lhs = typecast_exprt::conditional_cast(shadowed_address, shadowed_address_type);
   exprt rhs = typecast_exprt::conditional_cast(matched_base_address, shadowed_address_type);
   exprt base_cond = simplify_expr(equal_exprt(lhs, rhs), ns);
-  simplify(base_cond);
   if(base_cond.id() == ID_equal &&
     to_equal_expr(base_cond).lhs() == to_equal_expr(base_cond).rhs())
   {
