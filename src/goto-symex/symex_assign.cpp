@@ -11,8 +11,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symex_assign.h"
 
+#include <util/arith_tools.h>
 #include <util/byte_operators.h>
+#include <util/c_types.h>
 #include <util/expr_util.h>
+#include <util/pointer_expr.h>
 #include <util/range.h>
 
 #include "expr_skeleton.h"
@@ -33,6 +36,29 @@ constexpr bool use_update()
 #endif
 }
 
+/// Determine whether the RHS expression is a string constant initialization
+/// \param rhs The RHS expression
+/// \return True if the expression points to the first character of a string
+///    constant
+static bool is_string_constant_initialization(const exprt &rhs)
+{
+  if(rhs.id() == ID_address_of)
+  {
+    const address_of_exprt &address_of = to_address_of_expr(rhs);
+    if(address_of.object().id() == ID_index)
+    {
+      const index_exprt &index = to_index_expr(address_of.object());
+      if(
+        index.array().id() == ID_string_constant &&
+        index.index() == from_integer(0, c_index_type()))
+      {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 void symex_assignt::assign_rec(
   const exprt &lhs,
   const expr_skeletont &full_lhs,
@@ -42,6 +68,21 @@ void symex_assignt::assign_rec(
   if(is_ssa_expr(lhs))
   {
     assign_symbol(to_ssa_expr(lhs), full_lhs, rhs, guard);
+
+    // Allocate shadow memory
+    if(shadow_memory.has_value())
+    {
+      bool is_string_constant_init = is_string_constant_initialization(rhs);
+      if(is_string_constant_init)
+      {
+        shadow_memory->symex_field_static_init_string_constant(
+          state, to_ssa_expr(lhs), rhs);
+      }
+      else
+      {
+        shadow_memory->symex_field_static_init(state, to_ssa_expr(lhs));
+      }
+    }
   }
   else if(lhs.id() == ID_index)
     assign_array<use_update()>(to_index_expr(lhs), full_lhs, rhs, guard);
