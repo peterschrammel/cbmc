@@ -1,0 +1,18 @@
+<map id="cover_decision_instrumentert" name="cover_decision_instrumentert">
+<area shape="rect" id="node1" title="Decision coverage instrumenter." alt="" coords="1644,171,1859,197"/>
+<area shape="rect" id="node2" href="$classcover__instrumenter__baset.html" title="Base class for goto program coverage instrumenters." alt="" coords="1445,163,1595,205"/>
+<area shape="rect" id="node3" href="$classgoal__filterst.html" title="A collection of goal filters to be applied in conjunction." alt="" coords="1219,103,1318,129"/>
+<area shape="rect" id="node4" title=" " alt="" coords="868,70,1068,111"/>
+<area shape="rect" id="node5" title=" " alt="" coords="516,70,679,111"/>
+<area shape="rect" id="node6" title=" " alt="" coords="163,73,320,100"/>
+<area shape="rect" id="node7" title=" " alt="" coords="5,88,44,115"/>
+<area shape="rect" id="node8" title=" " alt="" coords="356,12,485,39"/>
+<area shape="rect" id="node14" title=" " alt="" coords="157,193,325,220"/>
+<area shape="rect" id="node16" title=" " alt="" coords="165,127,317,169"/>
+<area shape="rect" id="node9" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="1217,171,1320,197"/>
+<area shape="rect" id="node10" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="898,141,1038,168"/>
+<area shape="rect" id="node11" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="891,192,1045,219"/>
+<area shape="rect" id="node12" title=" " alt="" coords="521,199,674,241"/>
+<area shape="rect" id="node13" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="205,259,277,285"/>
+<area shape="rect" id="node15" title=" " alt="" coords="5,224,44,251"/>
+</map>

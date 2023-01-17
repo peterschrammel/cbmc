@@ -1,0 +1,13 @@
+<map id="symbolt" name="symbolt">
+<area shape="rect" id="node1" title="Symbol table entry." alt="" coords="213,620,287,647"/>
+<area shape="rect" id="node2" href="$classtypet.html" title="The type of an expression, extends irept." alt="" coords="85,531,141,557"/>
+<area shape="rect" id="node3" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="168,455,220,481"/>
+<area shape="rect" id="node10" href="$classexprt.html" title="Base class for all expressions." alt="" coords="165,531,221,557"/>
+<area shape="rect" id="node11" href="$classsource__locationt.html" title=" " alt="" coords="245,531,375,557"/>
+<area shape="rect" id="node4" href="$classsharing__treet.html" title=" " alt="" coords="112,341,279,397"/>
+<area shape="rect" id="node5" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="142,213,323,255"/>
+<area shape="rect" id="node6" href="$classtree__nodet.html" title="A node with data in a tree, it contains:" alt="" coords="155,95,366,136"/>
+<area shape="rect" id="node7" href="$structref__count__ift_3_01true_01_4.html" title=" " alt="" coords="5,5,164,32"/>
+<area shape="rect" id="node8" title=" " alt="" coords="189,5,341,32"/>
+<area shape="rect" id="node9" href="$classdstringt.html" title="dstringt has one field, an unsigned integer no which is an index into a static table of strings." alt="" coords="373,5,445,32"/>
+</map>
