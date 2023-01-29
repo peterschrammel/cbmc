@@ -190,6 +190,8 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve()
 {
   PRECONDITION(status != statust::ERROR);
 
+  solver->toDimacs("solver.dimacs");
+
   log.statistics() << (no_variables() - 1) << " variables, "
                    << solver->nClauses() << " clauses" << messaget::eom;
 
