@@ -661,6 +661,8 @@ __CPROVER_HIDE:;
 
 /* FUNCTION: __builtin___memcpy_chk */
 
+void *malloc(__CPROVER_size_t malloc_size);
+
 void *__builtin___memcpy_chk(void *dst, const void *src, __CPROVER_size_t n, __CPROVER_size_t size)
 {
 __CPROVER_HIDE:
