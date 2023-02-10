@@ -83,6 +83,7 @@ add_subdirectory(validate-trace-xml-schema)
 add_subdirectory(cbmc-primitives)
 add_subdirectory(goto-interpreter)
 add_subdirectory(cbmc-sequentialization)
+add_subdirectory(cbmc-shadow-memory)
 add_subdirectory(cpp-linter)
 add_subdirectory(catch-framework)
 
