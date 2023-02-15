@@ -79,7 +79,7 @@ void goto_symext::initialize_shadow_memory(
           zero_initializer(type, expr.source_location(), ns);
       CHECK_RETURN(zero_value.has_value());
 
-      symex_assign(state, field, *zero_value);
+      symex_assign(state, field, *zero_value, false);
     }
     else
     {
@@ -90,7 +90,7 @@ void goto_symext::initialize_shadow_memory(
         expr_initializer(type, expr.source_location(), ns, init_expr);
       CHECK_RETURN(init_value.has_value());
 
-      symex_assign(state, field, *init_value);
+      symex_assign(state, field, *init_value, false);
     }
 
     log.conditional_output(
@@ -636,7 +636,8 @@ void goto_symext::symex_shadow_memory_copy(
       symex_assign(
           state,
           state.field_sensitivity.apply(ns, state, to_address_of_expr(*maybe_lhs).object(), true),
-          state.field_sensitivity.apply(ns, state, to_address_of_expr(*maybe_rhs).object(), false));
+          state.field_sensitivity.apply(ns, state, to_address_of_expr(*maybe_rhs).object(), false),
+          false);
     }
     else
     {
@@ -866,7 +867,7 @@ void goto_symext::symex_set_field(
 #ifdef DEBUG_SM
     log.debug() << "Shadow memory: RHS: " << format(per_byte_rhs.value()) << messaget::eom;
 #endif
-    symex_assign(state, lhs, typecast_exprt::conditional_cast(per_byte_rhs.value(), lhs.type()));
+    symex_assign(state, lhs, typecast_exprt::conditional_cast(per_byte_rhs.value(), lhs.type()), false);
   }
   else
   {
@@ -973,7 +974,7 @@ void goto_symext::symex_get_field(
     log.debug() << "Shadow memory: RHS: " << format(rhs) << messaget::eom;
 #endif
     symex_assign(
-      state, lhs, typecast_exprt::conditional_cast(rhs, lhs.type()));
+      state, lhs, typecast_exprt::conditional_cast(rhs, lhs.type()), false);
   }
   else
   {
@@ -982,7 +983,7 @@ void goto_symext::symex_get_field(
       << format(expr)
       << messaget::eom;
     symex_assign(
-        state, lhs, typecast_exprt::conditional_cast(field_init_expr, lhs.type()));
+        state, lhs, typecast_exprt::conditional_cast(field_init_expr, lhs.type()), false);
   }
 }
 
@@ -1007,7 +1008,7 @@ void goto_symext::symex_field_static_init(
 
   const symbolt &symbol = ns.lookup(identifier);
 
-  if(symbol.is_auxiliary || !symbol.is_static_lifetime)
+  if((id2string(symbol.name).find("::return_value") == std::string::npos && symbol.is_auxiliary) || !symbol.is_static_lifetime)
     return;
   if(id2string(symbol.name).find("__cs_") != std::string::npos)
     return;
@@ -1053,9 +1054,9 @@ void goto_symext::symex_field_local_init(
   const symbolt &symbol =
     ns.lookup(to_symbol_expr(expr.get_original_expr()).get_identifier());
 
-  if(symbol.is_auxiliary)
-    return;
   const std::string symbol_name = id2string(symbol.name);
+  if(symbol.is_auxiliary && symbol_name.find("::return_value") == std::string::npos)
+    return;
   if(
     symbol_name.find("malloc::") != std::string::npos &&
       (symbol_name.find("malloc_size") != std::string::npos ||

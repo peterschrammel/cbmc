@@ -130,7 +130,8 @@ void goto_symext::parameter_assignments(
       rhs = clean_expr(std::move(rhs), state, false);
 
       exprt::operandst lhs_conditions;
-      symex_assignt{*this, state, assignment_type, ns, symex_config, target}
+      symex_assignt{*this, state, assignment_type, ns, symex_config, target,
+          true}
           .assign_rec(lhs, expr_skeletont{}, rhs, lhs_conditions);
     }
 
@@ -154,7 +155,7 @@ void goto_symext::parameter_assignments(
 
       state.call_stack().top().parameter_names.push_back(va_arg.name);
 
-      symex_assign(state, va_arg.symbol_expr(), *it1);
+      symex_assign(state, va_arg.symbol_expr(), *it1, true);
     }
   }
   else if(it1!=arguments.end())
@@ -292,7 +293,7 @@ void goto_symext::symex_function_call_post_clean(
     {
       const auto rhs = side_effect_expr_nondett(
         cleaned_lhs.type(), state.source.pc->source_location());
-      symex_assign(state, cleaned_lhs, rhs);
+      symex_assign(state, cleaned_lhs, rhs, false);
     }
 
     if(symex_config.havoc_undefined_functions)
@@ -457,7 +458,7 @@ void goto_symext::symex_end_of_function(statet &state)
     // the type of the call lhs and the return type might not match
     auto casted_return_value = typecast_exprt::conditional_cast(
       return_value_symbol.value(), call_lhs.type());
-    symex_assign(state, call_lhs, casted_return_value);
+    symex_assign(state, call_lhs, casted_return_value, true);
   }
 }
 

@@ -150,7 +150,7 @@ void goto_symext::symex_allocate(
       auto array_size_rhs = array_size;
       array_size = size_symbol.symbol_expr();
 
-      symex_assign(state, size_symbol.symbol_expr(), array_size_rhs);
+      symex_assign(state, size_symbol.symbol_expr(), array_size_rhs, false);
     }
   }
 
@@ -188,14 +188,14 @@ void goto_symext::symex_allocate(
       throw 0;
     }
 
-    symex_assign(state, value_symbol.symbol_expr(), *zero_value);
+    symex_assign(state, value_symbol.symbol_expr(), *zero_value, false);
   }
   else
   {
     auto lhs = value_symbol.symbol_expr();
     auto rhs =
       path_storage.build_symex_nondet(*object_type, code.source_location());
-    symex_assign(state, lhs, rhs);
+    symex_assign(state, lhs, rhs, false);
   }
 
   exprt rhs;
@@ -214,7 +214,8 @@ void goto_symext::symex_allocate(
   }
   symex_field_dynamic_init(state, value_symbol.symbol_expr(), code);
 
-  symex_assign(state, lhs, typecast_exprt::conditional_cast(rhs, lhs.type()));
+  symex_assign(state, lhs, typecast_exprt::conditional_cast(rhs, lhs.type()),
+               false);
 }
 
 /// Construct an entry for the var args array. Visual Studio complicates this as
@@ -303,12 +304,13 @@ void goto_symext::symex_va_start(
   array = clean_expr(std::move(array), state, false);
   array = state.rename(std::move(array), ns).get();
   do_simplify(array);
-  symex_assign(state, va_array.symbol_expr(), std::move(array));
+  symex_assign(state, va_array.symbol_expr(), std::move(array), false);
 
   exprt rhs = address_of_exprt{index_exprt{
     va_array.symbol_expr(), from_integer(0, array_type.index_type())}};
   rhs = state.rename(std::move(rhs), ns).get();
-  symex_assign(state, lhs, typecast_exprt::conditional_cast(rhs, lhs.type()));
+  symex_assign(state, lhs, typecast_exprt::conditional_cast(rhs, lhs.type()),
+               false);
 }
 
 static irep_idt get_string_argument_rec(const exprt &src)
@@ -532,7 +534,7 @@ void goto_symext::symex_cpp_new(
   else
     rhs.copy_to_operands(symbol.symbol_expr());
 
-  symex_assign(state, lhs, rhs);
+  symex_assign(state, lhs, rhs, false);
 }
 
 void goto_symext::symex_cpp_delete(

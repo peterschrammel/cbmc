@@ -29,9 +29,9 @@ public:
   symex_assignt(goto_symext &goto_symex, goto_symex_statet &state,
                 symex_targett::assignment_typet assignment_type,
                 const namespacet &ns, const symex_configt &symex_config,
-                symex_targett &target)
+                symex_targett &target, const bool copy_sm_nonstruct)
       : goto_symex(goto_symex), state(state), assignment_type(assignment_type),
-        ns(ns), symex_config(symex_config), target(target) {}
+        ns(ns), symex_config(symex_config), target(target), copy_sm_nonstruct(copy_sm_nonstruct) {}
 
   /// Record the assignment of value \p rhs to variable \p lhs in \p state and
   /// add the equation to target: `lhs#{n+1} == guard ? rhs#{m} : lhs#{n}`
@@ -56,6 +56,7 @@ private:
   const namespacet &ns;
   const symex_configt &symex_config;
   symex_targett &target;
+  const bool copy_sm_nonstruct;
 
   void assign_from_struct(
     const ssa_exprt &lhs, // L1

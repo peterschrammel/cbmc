@@ -35,7 +35,7 @@ void goto_symext::havoc_rec(
     auto rhs =
       side_effect_expr_nondett(dest.type(), state.source.pc->source_location());
 
-    symex_assign(state, lhs, rhs);
+    symex_assign(state, lhs, rhs, false);
   }
   else if(dest.id()==ID_byte_extract_little_endian ||
           dest.id()==ID_byte_extract_big_endian)
@@ -158,7 +158,7 @@ void goto_symext::symex_other(
       }
     }
 
-    symex_assign(state, dest_array, src_array);
+    symex_assign(state, dest_array, src_array, false);
   }
   else if(statement==ID_array_set)
   {
@@ -200,7 +200,7 @@ void goto_symext::symex_other(
     if(array_type.element_type() != value.type())
       value = typecast_exprt(value, array_type.element_type());
 
-    symex_assign(state, array_expr, array_of_exprt(value, array_type));
+    symex_assign(state, array_expr, array_of_exprt(value, array_type), false);
   }
   else if(statement==ID_array_equal)
   {
@@ -232,7 +232,7 @@ void goto_symext::symex_other(
     else
       rhs = equal_exprt(array1, array2);
 
-    symex_assign(state, code.op2(), rhs);
+    symex_assign(state, code.op2(), rhs, false);
   }
   else if(statement==ID_user_specified_predicate ||
           statement==ID_user_specified_parameter_predicates ||

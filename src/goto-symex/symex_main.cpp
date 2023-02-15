@@ -678,7 +678,11 @@ void goto_symext::execute_next_instruction(
 
   case ASSIGN:
     if(state.reachable)
-      symex_assign(state, instruction.assign_lhs(), instruction.assign_rhs());
+      // copy sm if storing a return value
+      symex_assign(state, instruction.assign_lhs(), instruction.assign_rhs(),
+        instruction.assign_lhs().id()==ID_symbol &&
+        (id2string(to_symbol_expr(instruction.assign_lhs()).get_identifier())
+        .find("::return_value") != std::string::npos));
 
     symex_transition(state);
     break;

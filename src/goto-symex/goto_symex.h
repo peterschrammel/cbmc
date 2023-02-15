@@ -515,7 +515,13 @@ protected:
   /// \param state: Symbolic execution state for current instruction
   /// \param lhs: The lhs of the assignment to execute
   /// \param rhs: The rhs of the assignment to execute
-  void symex_assign(statet &state, const exprt &lhs, const exprt &rhs);
+  /// \param copy_sm_nonstruct: Whether shadow memory must be copied even for
+  ///    non-struct/union lhs
+  void symex_assign(
+    statet &state,
+    const exprt &lhs,
+    const exprt &rhs,
+    const bool copy_sm_nonstruct);
 
   /// Attempt to constant propagate side effects of the assignment (if any)
   ///
