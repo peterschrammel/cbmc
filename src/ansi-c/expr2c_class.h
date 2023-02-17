@@ -141,6 +141,10 @@ protected:
   std::string convert_overflow(
     const exprt &src, unsigned &precedence);
 
+  std::string convert_plus_with_overflow(
+    const plus_with_overflow_exprt &src,
+    unsigned &precedence);
+
   std::string convert_binding(
     const binding_exprt &,
     const std::string &symbol,

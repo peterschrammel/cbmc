@@ -140,6 +140,30 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
   return bv;
 }
 
+bvt boolbvt::convert_add_with_overflow(const exprt &expr){
+  PRECONDITION(
+    expr.id() == ID_plus_with_overflow);
+
+  const typet &type = expr.type();
+
+  if(type.id()!=ID_unsignedbv &&
+     type.id()!=ID_signedbv)
+    return conversion_failed(expr);
+
+  std::size_t width=boolbv_width(type)-1;
+
+  const exprt &op0 = to_multi_ary_expr(expr).op0();
+  const exprt &op1 = to_multi_ary_expr(expr).op1();
+  /*DATA_INVARIANT(
+    op0.type() == type, "add/sub with mixed types:\n" + expr.pretty());
+  DATA_INVARIANT(
+    op1.type() == type, "add/sub with mixed types:\n" + expr.pretty());*/
+
+  return bv_utils.add_with_overflow(convert_bv(op0, width),
+                                                convert_bv(op1, width),
+                                          type.id()==ID_signedbv? bv_utilst::representationt::SIGNED : bv_utilst::representationt::UNSIGNED);
+}
+
 bvt boolbvt::convert_saturating_add_sub(const binary_exprt &expr)
 {
   PRECONDITION(

@@ -941,6 +941,45 @@ inline multi_ary_exprt &to_multi_ary_expr(exprt &expr)
 }
 
 
+/// \brief The plus expression with the overflow bit returned
+/// Associativity is not specified.
+class plus_with_overflow_exprt:public binary_exprt
+{
+public:
+  plus_with_overflow_exprt(exprt _lhs, exprt _rhs, typet type)
+    : binary_exprt(std::move(_lhs), ID_plus_with_overflow,  std::move(_rhs), std::move(type))
+  {
+  }
+};
+
+template <>
+inline bool can_cast_expr<plus_with_overflow_exprt>(const exprt &base)
+{
+  return base.id() == ID_plus_with_overflow;
+}
+
+inline void validate_expr(const plus_with_overflow_exprt &value)
+{
+  validate_operands(value, 2, "Plus with overflow must have two operands", false);
+}
+
+/// \brief Cast an exprt to a \ref plus_with_overflow_exprt
+///
+/// \a expr must be known to be \ref plus_with_overflow_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref plus_with_overflow_exprt
+inline const plus_with_overflow_exprt &to_plus_with_overflow_exprt(const exprt &expr)
+{
+  return static_cast<const plus_with_overflow_exprt &>(expr);
+}
+
+/// \copydoc to_plus_with_overflow_exprt(const exprt &)
+inline plus_with_overflow_exprt &to_plus_with_overflow_exprt(exprt &expr)
+{
+  return static_cast<plus_with_overflow_exprt &>(expr);
+}
+
 /// \brief The plus expression
 /// Associativity is not specified.
 class plus_exprt:public multi_ary_exprt

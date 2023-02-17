@@ -2510,6 +2510,23 @@ std::string expr2ct::convert_side_effect_expr_function_call(
   return dest;
 }
 
+std::string expr2ct::convert_plus_with_overflow(
+  const plus_with_overflow_exprt &src,
+  unsigned &precedence)
+{
+  precedence = 16;
+
+  std::string dest="with-overflow(";
+  dest += convert(src.type());
+  dest+=", ";
+  dest += convert(src.op0());
+  dest+=" + ";
+  dest += convert(src.op1());
+  dest+=')';
+
+  return dest;
+}
+
 std::string expr2ct::convert_overflow(
   const exprt &src,
   unsigned &precedence)
@@ -3916,6 +3933,12 @@ std::string expr2ct::convert_with_precedence(
     can_cast_expr<binary_overflow_exprt>(src))
   {
     return convert_overflow(src, precedence);
+  }
+
+  else if(
+    can_cast_expr<plus_with_overflow_exprt>(src))
+  {
+    return convert_plus_with_overflow(to_plus_with_overflow_exprt(src), precedence);
   }
 
   else if(src.id()==ID_unknown)

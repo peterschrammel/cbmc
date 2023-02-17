@@ -876,6 +876,10 @@ protected:
     goto_symex_statet &state,
     const exprt::operandst &arguments);
 
+  void symex_add_bits(
+    goto_symex_statet &state,
+    const exprt::operandst &arguments);
+
   void symex_field_local_init(
     goto_symex_statet &state,
     const ssa_exprt &expr);

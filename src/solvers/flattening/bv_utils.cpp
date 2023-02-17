@@ -343,6 +343,32 @@ bvt bv_utilst::add_sub(const bvt &op0, const bvt &op1, bool subtract)
   return adder(op0, tmp_op1, carry_in).first;
 }
 
+bvt bv_utilst::add_with_overflow(const bvt &op0, const bvt &op1, representationt rep)
+{
+  PRECONDITION(op0.size() == op1.size());
+
+  if(rep==representationt::SIGNED)
+  {
+    // An overflow occurs if the signs of the two operands are the same
+    // and the sign of the sum is the opposite.
+
+    literalt old_sign=op0[op0.size()-1];
+    literalt sign_the_same=prop.lequal(op0[op0.size()-1], op1[op1.size()-1]);
+
+    bvt result= adder(op0, op1, const_literal(false)).first;
+    result.push_back(prop.land(sign_the_same, prop.lxor(result[result.size()-1], old_sign)));
+    return result;
+  } else if(rep==representationt::UNSIGNED)
+  {
+    // overflow is simply carry-out
+    bvt result=adder(op0, op1, const_literal(false)).first;
+    result.push_back(carry_out(op0, op1, const_literal(false)));
+    return result;
+  }
+  else
+    UNREACHABLE;
+}
+
 bvt bv_utilst::add_sub(const bvt &op0, const bvt &op1, literalt subtract)
 {
   const bvt op1_sign_applied=

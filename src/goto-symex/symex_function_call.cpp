@@ -221,6 +221,11 @@ void goto_symext::symex_function_call_symbol(
     symex_set_field(state, cleaned_arguments);
     symex_transition(state);
   }
+  else if(identifier == CPROVER_PREFIX "add_bits")
+  {
+    symex_add_bits(state, cleaned_arguments);
+    symex_transition(state);
+  }
   else
   {
     symex_function_call_post_clean(

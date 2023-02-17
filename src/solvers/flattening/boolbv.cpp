@@ -124,6 +124,8 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
           expr.id()=="no-overflow-plus" ||
           expr.id()=="no-overflow-minus")
     return convert_add_sub(expr);
+  else if(expr.id()==ID_plus_with_overflow)
+    return convert_add_with_overflow(expr);
   else if(expr.id() == ID_mult)
     return convert_mult(to_mult_expr(expr));
   else if(expr.id()==ID_div)

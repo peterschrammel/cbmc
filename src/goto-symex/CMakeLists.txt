@@ -1,5 +1,5 @@
 file(GLOB_RECURSE sources "*.cpp" "*.h")
-add_library(goto-symex ${sources})
+add_library(goto-symex ${sources} symex_overflow_operations.cpp)
 
 generic_includes(goto-symex)
 

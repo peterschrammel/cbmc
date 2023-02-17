@@ -168,6 +168,7 @@ protected:
   virtual bvt convert_empty_union(const empty_union_exprt &expr);
   virtual bvt convert_bv_typecast(const typecast_exprt &expr);
   virtual bvt convert_add_sub(const exprt &expr);
+  virtual bvt convert_add_with_overflow(const exprt &expr);
   virtual bvt convert_mult(const mult_exprt &expr);
   virtual bvt convert_div(const div_exprt &expr);
   virtual bvt convert_mod(const mod_exprt &expr);
