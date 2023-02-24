@@ -21,7 +21,8 @@ void goto_symext::symex_set_return_value(
   framet &frame = state.call_stack().top();
   if(frame.return_value_symbol.has_value())
   {
-    symex_field_local_init(state, to_ssa_expr(state.rename(frame.return_value_symbol.value(), ns).get()));
-    symex_assign(state, frame.return_value_symbol.value(), return_value, true);
+    const auto lhs = state.l2_rename_rvalues(clean_expr(frame.return_value_symbol.value(), state, true), ns);
+    symex_field_local_init(state, to_ssa_expr(lhs));
+    symex_assign(state, lhs, return_value, true);
   }
 }
