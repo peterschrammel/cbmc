@@ -219,9 +219,6 @@
 <dt><strong>--string-abstraction</strong></dt>
 <dd><p>track C string lengths and zero-termination</p>
 </dd>
-<dt><strong>--fp-reachability-slice</strong> f</dt>
-<dd><p>remove instructions that cannot appear on a trace that visits all given functions. The list of functions has to be given as a comma separated list f.</p>
-</dd>
 <dt><strong>--reachability-slice</strong></dt>
 <dd><p>remove instructions that cannot appear on a trace from entry point to a property</p>
 </dd>
@@ -327,6 +324,9 @@
 <dt><strong>--object-bits</strong> n</dt>
 <dd><p>number of bits used for object addresses</p>
 </dd>
+<dt><strong>--sat-solver</strong> solver</dt>
+<dd><p>use specified SAT solver</p>
+</dd>
 <dt><strong>--external-sat-solver</strong> cmd</dt>
 <dd><p>command to invoke SAT solver process</p>
 </dd>
@@ -345,6 +345,9 @@
 <dt><strong>--smt2</strong></dt>
 <dd><p>use default SMT2 solver (Z3)</p>
 </dd>
+<dt><strong>--bitwuzla</strong></dt>
+<dd><p>use Bitwuzla</p>
+</dd>
 <dt><strong>--boolector</strong></dt>
 <dd><p>use Boolector</p>
 </dd>
@@ -356,6 +359,9 @@
 </dd>
 <dt><strong>--cvc4</strong></dt>
 <dd><p>use CVC4</p>
+</dd>
+<dt><strong>--cvc5</strong></dt>
+<dd><p>use CVC5</p>
 </dd>
 <dt><strong>--mathsat</strong></dt>
 <dd><p>use MathSAT</p>
@@ -453,6 +459,9 @@ The SMT solver should support the QF_AUFBV logic.</p>
 <dt><strong>--flush</strong></dt>
 <dd><p>flush every line of output</p>
 </dd>
+<dt><strong>--export-symex-ready-goto</strong> filename</dt>
+<dd><p>export the symex ready version of the goto-model into the given filename</p>
+</dd>
 <dt><strong>--verbosity</strong> #</dt>
 <dd><p>verbosity level</p>
 </dd>
@@ -461,7 +470,7 @@ The SMT solver should support the QF_AUFBV logic.</p>
 </dd>
 </dl>
 <h1>ENVIRONMENT</h1>
-<p>All tools honor the TMPDIR environment variable when generating temporary files and directories. Furthermore note that the preprocessor used by <strong>cbmc will use environment variables to locate</strong> header files.</p>
+<p>All tools honor the TMPDIR environment variable when generating temporary files and directories. Furthermore note that the preprocessor used by <strong>cbmc</strong> will use environment variables to locate header files.</p>
 <h1>BUGS</h1>
 <p>If you encounter a problem please create an issue at <strong>https://github.com/diffblue/cbmc/issues</strong></p>
 <h1>SEE ALSO</h1>

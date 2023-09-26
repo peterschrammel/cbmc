@@ -28,8 +28,8 @@ var dir_99e24f80c4828e49b24e2d05c93d325b =
     ] ],
     [ "goto_symex.cpp", "goto__symex_8cpp.html", "goto__symex_8cpp" ],
     [ "goto_symex.h", "goto__symex_8h.html", "goto__symex_8h" ],
-    [ "goto_symex_is_constant.h", "goto__symex__is__constant_8h.html", [
-      [ "goto_symex_is_constantt", "classgoto__symex__is__constantt.html", "classgoto__symex__is__constantt" ]
+    [ "goto_symex_can_forward_propagate.h", "goto__symex__can__forward__propagate_8h.html", [
+      [ "goto_symex_can_forward_propagatet", "classgoto__symex__can__forward__propagatet.html", "classgoto__symex__can__forward__propagatet" ]
     ] ],
     [ "goto_symex_state.cpp", "goto__symex__state_8cpp.html", "goto__symex__state_8cpp" ],
     [ "goto_symex_state.h", "goto__symex__state_8h.html", [
@@ -66,6 +66,17 @@ var dir_99e24f80c4828e49b24e2d05c93d325b =
     [ "renamed.h", "renamed_8h.html", "renamed_8h" ],
     [ "renaming_level.cpp", "renaming__level_8cpp.html", "renaming__level_8cpp" ],
     [ "renaming_level.h", "renaming__level_8h.html", "renaming__level_8h" ],
+    [ "shadow_memory.cpp", "shadow__memory_8cpp.html", null ],
+    [ "shadow_memory.h", "shadow__memory_8h.html", "shadow__memory_8h" ],
+    [ "shadow_memory_field_definitions.h", "shadow__memory__field__definitions_8h.html", [
+      [ "shadow_memory_field_definitionst", "classshadow__memory__field__definitionst.html", "classshadow__memory__field__definitionst" ]
+    ] ],
+    [ "shadow_memory_state.h", "shadow__memory__state_8h.html", [
+      [ "shadow_memory_statet", "classshadow__memory__statet.html", "classshadow__memory__statet" ],
+      [ "shadowed_addresst", "structshadow__memory__statet_1_1shadowed__addresst.html", "structshadow__memory__statet_1_1shadowed__addresst" ]
+    ] ],
+    [ "shadow_memory_util.cpp", "shadow__memory__util_8cpp.html", "shadow__memory__util_8cpp" ],
+    [ "shadow_memory_util.h", "shadow__memory__util_8h.html", "shadow__memory__util_8h" ],
     [ "show_program.cpp", "show__program_8cpp.html", "show__program_8cpp" ],
     [ "show_program.h", "show__program_8h.html", "show__program_8h" ],
     [ "show_vcc.cpp", "show__vcc_8cpp.html", "show__vcc_8cpp" ],

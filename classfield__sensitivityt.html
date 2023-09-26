@@ -110,10 +110,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:acb85cf6b9db2203521e695cc227d1435"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfield__sensitivityt.html#acb85cf6b9db2203521e695cc227d1435">field_assignments</a> (const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, <a class="el" href="classgoto__symex__statet.html">goto_symex_statet</a> &amp;state, const <a class="el" href="classssa__exprt.html">ssa_exprt</a> &amp;lhs, const <a class="el" href="classexprt.html">exprt</a> &amp;rhs, <a class="el" href="classsymex__targett.html">symex_targett</a> &amp;target, bool allow_pointer_unsoundness) const</td></tr>
 <tr class="memdesc:acb85cf6b9db2203521e695cc227d1435"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assign to the individual fields of a non-expanded symbol <code>lhs</code>.  <a href="classfield__sensitivityt.html#acb85cf6b9db2203521e695cc227d1435">More...</a><br /></td></tr>
 <tr class="separator:acb85cf6b9db2203521e695cc227d1435"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab8283bec88669c814dcc228231a2fbc6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">apply</a> (const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, <a class="el" href="classgoto__symex__statet.html">goto_symex_statet</a> &amp;state, <a class="el" href="classexprt.html">exprt</a> expr, bool write) const</td></tr>
+<tr class="memitem:ab8283bec88669c814dcc228231a2fbc6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">apply</a> (const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, <a class="el" href="classgoto__symex__statet.html">goto_symex_statet</a> &amp;state, <a class="el" href="classexprt.html">exprt</a> expr, bool <a class="el" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>) const</td></tr>
 <tr class="memdesc:ab8283bec88669c814dcc228231a2fbc6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Turn an expression <code>expr</code> into a field-sensitive SSA expression.  <a href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">More...</a><br /></td></tr>
 <tr class="separator:ab8283bec88669c814dcc228231a2fbc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a61055079220b911b55857e2e6f373941"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfield__sensitivityt.html#a61055079220b911b55857e2e6f373941">apply</a> (const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, <a class="el" href="classgoto__symex__statet.html">goto_symex_statet</a> &amp;state, <a class="el" href="classssa__exprt.html">ssa_exprt</a> expr, bool write) const</td></tr>
+<tr class="memitem:a61055079220b911b55857e2e6f373941"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfield__sensitivityt.html#a61055079220b911b55857e2e6f373941">apply</a> (const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, <a class="el" href="classgoto__symex__statet.html">goto_symex_statet</a> &amp;state, <a class="el" href="classssa__exprt.html">ssa_exprt</a> expr, bool <a class="el" href="unistd_8c.html#a9e58c2a6f572a2d2cdad1306d7d2b802">write</a>) const</td></tr>
 <tr class="memdesc:a61055079220b911b55857e2e6f373941"><td class="mdescLeft">&#160;</td><td class="mdescRight">Turn an expression <code>expr</code> into a field-sensitive SSA expression.  <a href="classfield__sensitivityt.html#a61055079220b911b55857e2e6f373941">More...</a><br /></td></tr>
 <tr class="separator:a61055079220b911b55857e2e6f373941"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab0336ba44961097ebccc95cc4bdbd086"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfield__sensitivityt.html#ab0336ba44961097ebccc95cc4bdbd086">get_fields</a> (const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, <a class="el" href="classgoto__symex__statet.html">goto_symex_statet</a> &amp;state, const <a class="el" href="classssa__exprt.html">ssa_exprt</a> &amp;ssa_expr, bool disjoined_fields_only) const</td></tr>
@@ -142,22 +142,22 @@ Private Attributes</h2></td></tr>
 <div class="textblock"><p>Control granularity of object accesses. </p>
 <p><a class="el" href="classfield__sensitivityt.html">Field sensitivity</a> is a transformation of the instructions goto-program which mainly replaces some expressions by symbols but can also add assignments to the target equations produced by symbolic execution. The main goal of this transformation is to allow more constants to be propagated during symbolic execution. Note that field sensitivity is not applied as a single pass over the whole goto program but instead applied as the symbolic execution unfolds.</p>
 <p>On a high level, field sensitivity replaces member operators, and array accesses with atomic symbols representing a field when possible. In cases where this is not immediately possible, like struct assignments, some things need to be added. The possible cases are described below.</p>
-<h3><a class="anchor" id="autotoc_md130"></a>
+<h3><a class="anchor" id="autotoc_md131"></a>
 Member access</h3>
 <p>A member expression <code>struct_expr.field_name</code> is replaced by the symbol <code>struct_expr..field_name</code>; note the use of <code>..</code> to visually distinguish the symbol from the member expression. This is valid for both lvalues and rvalues. See <a class="el" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">field_sensitivityt::apply</a>.</p>
-<h3><a class="anchor" id="autotoc_md131"></a>
+<h3><a class="anchor" id="autotoc_md132"></a>
 Symbols representing structs</h3>
 <p>In an rvalue, a symbol struct_expr which has a struct type with fields field1, field2, etc, will be replaced by <code>{struct_expr..field_name1; struct_expr..field_name2; …}</code>. See <a class="el" href="classfield__sensitivityt.html#ab0336ba44961097ebccc95cc4bdbd086">field_sensitivityt::get_fields</a>.</p>
-<h3><a class="anchor" id="autotoc_md132"></a>
+<h3><a class="anchor" id="autotoc_md133"></a>
 Assignment to a struct</h3>
 <p>When the symbol is on the left-hand-side, for instance for an assignment <code>struct_expr = other_struct</code>, the assignment is replaced by a sequence of assignments: <code>struct_expr..field_name1 = other_struct..field_name1;</code> <code>struct_expr..field_name2 = other_struct..field_name2;</code> etc. See <a class="el" href="classfield__sensitivityt.html#acb85cf6b9db2203521e695cc227d1435">field_sensitivityt::field_assignments</a>.</p>
-<h3><a class="anchor" id="autotoc_md133"></a>
+<h3><a class="anchor" id="autotoc_md134"></a>
 Array access</h3>
 <p>An index expression <code>array[index]</code> when index is constant and array has constant size is replaced by the symbol <code>array[[index]]</code>; note the use of <code>[[</code> and <code>]]</code> to visually distinguish the symbol from the index expression. When <code>index</code> is not a constant, <code>array[index]</code> is replaced by <code>{array[[0]]; array[[1]]; …index]</code>. Note that this process does not apply to arrays whose size is not constant, and arrays whose size exceed the bound <code>max_field_sensitivity_array_size</code>. See <a class="el" href="classfield__sensitivityt.html#ab8283bec88669c814dcc228231a2fbc6">field_sensitivityt::apply</a>.</p>
-<h3><a class="anchor" id="autotoc_md134"></a>
+<h3><a class="anchor" id="autotoc_md135"></a>
 Symbols representing arrays</h3>
 <p>In an rvalue, a symbol <code>array</code> which has array type will be replaced by <code>{array[[0]]; array[[1]]; …}[index]</code>. See <a class="el" href="classfield__sensitivityt.html#ab0336ba44961097ebccc95cc4bdbd086">field_sensitivityt::get_fields</a>.</p>
-<h3><a class="anchor" id="autotoc_md135"></a>
+<h3><a class="anchor" id="autotoc_md136"></a>
 Assignment to an array</h3>
 <p>When the array symbol is on the left-hand-side, for instance for an assignment <code>array = other_array</code>, the assignment is replaced by a sequence of assignments: <code>array[[0]] = other_array[[0]]</code>; <code>array[[1]] = other_array[[1]]</code>; etc. See <a class="el" href="classfield__sensitivityt.html#acb85cf6b9db2203521e695cc227d1435">field_sensitivityt::field_assignments</a>. </p>
 
@@ -380,7 +380,7 @@ Assignment to an array</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="field__sensitivity_8cpp_source.html#l00288">288</a> of file <a class="el" href="field__sensitivity_8cpp_source.html">field_sensitivity.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="field__sensitivity_8cpp_source.html#l00302">302</a> of file <a class="el" href="field__sensitivity_8cpp_source.html">field_sensitivity.cpp</a>.</p>
 
 </div>
 </div>
@@ -455,7 +455,7 @@ Assignment to an array</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="field__sensitivity_8cpp_source.html#l00323">323</a> of file <a class="el" href="field__sensitivity_8cpp_source.html">field_sensitivity.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="field__sensitivity_8cpp_source.html#l00337">337</a> of file <a class="el" href="field__sensitivity_8cpp_source.html">field_sensitivity.cpp</a>.</p>
 
 </div>
 </div>
@@ -509,7 +509,7 @@ Assignment to an array</h3>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Expanded expression; for example, for a <code>ssa_expr</code> of some struct type, a <code><a class="el" href="classstruct__exprt.html" title="Struct constructor from list of elements.">struct_exprt</a></code> with each component now being an SSA expression is built. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="field__sensitivity_8cpp_source.html#l00198">198</a> of file <a class="el" href="field__sensitivity_8cpp_source.html">field_sensitivity.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="field__sensitivity_8cpp_source.html#l00212">212</a> of file <a class="el" href="field__sensitivity_8cpp_source.html">field_sensitivity.cpp</a>.</p>
 
 </div>
 </div>
@@ -549,7 +549,7 @@ Assignment to an array</h3>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>False, if and only if, <code>expr</code> would be a single field-sensitive SSA expression. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="field__sensitivity_8cpp_source.html#l00507">507</a> of file <a class="el" href="field__sensitivity_8cpp_source.html">field_sensitivity.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="field__sensitivity_8cpp_source.html#l00521">521</a> of file <a class="el" href="field__sensitivity_8cpp_source.html">field_sensitivity.cpp</a>.</p>
 
 </div>
 </div>
@@ -587,7 +587,7 @@ Assignment to an array</h3>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="field__sensitivity_8cpp_source.html#l00535">535</a> of file <a class="el" href="field__sensitivity_8cpp_source.html">field_sensitivity.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="field__sensitivity_8cpp_source.html#l00549">549</a> of file <a class="el" href="field__sensitivity_8cpp_source.html">field_sensitivity.cpp</a>.</p>
 
 </div>
 </div>

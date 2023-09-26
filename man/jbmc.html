@@ -117,9 +117,6 @@
 <dt><strong>--mm</strong> MM</dt>
 <dd><p>memory consistency model for concurrent programs</p>
 </dd>
-<dt><strong>--fp-reachability-slice</strong> f</dt>
-<dd><p>remove instructions that cannot appear on a trace that visits all given functions. The list of functions has to be given as a comma separated list f.</p>
-</dd>
 <dt><strong>--reachability-slice</strong></dt>
 <dd><p>remove instructions that cannot appear on a trace from entry point to a property</p>
 </dd>
@@ -288,6 +285,9 @@
 <dt><strong>--object-bits</strong> n</dt>
 <dd><p>number of bits used for object addresses</p>
 </dd>
+<dt><strong>--sat-solver</strong> solver</dt>
+<dd><p>use specified SAT solver</p>
+</dd>
 <dt><strong>--external-sat-solver</strong> <em>cmd</em></dt>
 <dd><p>command to invoke SAT solver process</p>
 </dd>
@@ -306,6 +306,9 @@
 <dt><strong>--smt2</strong></dt>
 <dd><p>use default SMT2 solver (Z3)</p>
 </dd>
+<dt><strong>--bitwuzla</strong></dt>
+<dd><p>use Boolector</p>
+</dd>
 <dt><strong>--boolector</strong></dt>
 <dd><p>use Boolector</p>
 </dd>
@@ -317,6 +320,9 @@
 </dd>
 <dt><strong>--cvc4</strong></dt>
 <dd><p>use CVC4</p>
+</dd>
+<dt><strong>--cvc5</strong></dt>
+<dd><p>use CVC5</p>
 </dd>
 <dt><strong>--mathsat</strong></dt>
 <dd><p>use MathSAT</p>

@@ -9,10 +9,12 @@ var classsmt2__convt =
     [ "smt2_identifierst", "classsmt2__convt.html#a9bc0eee3d659f8f9e4954aff5272fbda", null ],
     [ "solvert", "classsmt2__convt.html#aebe67bd484621bca28e896863885f4ac", [
       [ "GENERIC", "classsmt2__convt.html#aebe67bd484621bca28e896863885f4acac942dc2a9f958acddc67e11472d3ca0b", null ],
+      [ "BITWUZLA", "classsmt2__convt.html#aebe67bd484621bca28e896863885f4acaa7d4a85e1e1d40539dd4598022d2d0d4", null ],
       [ "BOOLECTOR", "classsmt2__convt.html#aebe67bd484621bca28e896863885f4acab508351658eb933812a5b0d7760916e8", null ],
       [ "CPROVER_SMT2", "classsmt2__convt.html#aebe67bd484621bca28e896863885f4aca4c6fb071498deedc83273632fd01ae42", null ],
       [ "CVC3", "classsmt2__convt.html#aebe67bd484621bca28e896863885f4aca6d6329b4ed700b0ed38b9afa614ed643", null ],
       [ "CVC4", "classsmt2__convt.html#aebe67bd484621bca28e896863885f4aca47ae492d48da9ce651ca184ed21af487", null ],
+      [ "CVC5", "classsmt2__convt.html#aebe67bd484621bca28e896863885f4acaa9c4d193630bd67750672aa5e6ca3e20", null ],
       [ "MATHSAT", "classsmt2__convt.html#aebe67bd484621bca28e896863885f4aca19f4a5ce20d7fa4d18d536f7202118ec", null ],
       [ "YICES", "classsmt2__convt.html#aebe67bd484621bca28e896863885f4aca0732ee304ffdaed74339e8a2c918c563", null ],
       [ "Z3", "classsmt2__convt.html#aebe67bd484621bca28e896863885f4aca70e31ac6776e733109977f8afdd234ed", null ]
@@ -93,6 +95,7 @@ var classsmt2__convt =
     [ "boolean_assignment", "classsmt2__convt.html#aae080112e6bb440bf0626f755bbdbb83", null ],
     [ "bvfp_set", "classsmt2__convt.html#a2996591922da21109eee3ae29c799c24", null ],
     [ "converters", "classsmt2__convt.html#a93b8e95a267e94c90d512e8a1dc0b05a", null ],
+    [ "current_bindings", "classsmt2__convt.html#a1a925b8f022496ff0ffa7bac8df76c09", null ],
     [ "datatype_map", "classsmt2__convt.html#a845856b9790c4d32f9c13bdbaa82909d", null ],
     [ "defined_expressions", "classsmt2__convt.html#ad0f4056fe92d554f5befd737c90ab257", null ],
     [ "emit_set_logic", "classsmt2__convt.html#a661853ecd46bbd8db828c16b916520d4", null ],

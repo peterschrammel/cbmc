@@ -1,7 +1,7 @@
 var classrd__range__domaint =
 [
     [ "export_cachet", "classrd__range__domaint.html#a04c5a60edc5c7be17f24ae244d6f344f", null ],
-    [ "ranges_at_loct", "classrd__range__domaint.html#abdc51105a2280a3309f39c5b17fd32ea", null ],
+    [ "ranges_at_loct", "classrd__range__domaint.html#ae92a8500ae2d673562ac4aa7b6ea389f", null ],
     [ "rangest", "classrd__range__domaint.html#addc7f05775e71c373d3fbb44a3e655d4", null ],
     [ "values_innert", "classrd__range__domaint.html#afc0c4f3a498527fc4760b26db2d23dc2", null ],
     [ "valuest", "classrd__range__domaint.html#af141a4b2fbf34065eac1cad38bc4dfed", null ],
@@ -14,7 +14,6 @@ var classrd__range__domaint =
     [ "kill", "classrd__range__domaint.html#ae7a7c5402ef8f88bcecdfbfd92190002", null ],
     [ "kill_inf", "classrd__range__domaint.html#a28b45b643e5873c08d33fc455666dd96", null ],
     [ "make_bottom", "classrd__range__domaint.html#acf0b78f258ad82672daac59afdd272d5", null ],
-    [ "make_entry", "classrd__range__domaint.html#a345325edc0ca453ee00bd9c7a949fefb", null ],
     [ "make_top", "classrd__range__domaint.html#a20bec846c323fc6e66ee3259d7deae13", null ],
     [ "merge", "classrd__range__domaint.html#ab556a22d2c58abc550ac6752ede692a0", null ],
     [ "merge_inner", "classrd__range__domaint.html#ad4ba2d479b90c28ddfd9b0f5399eb68a", null ],

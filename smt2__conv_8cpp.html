@@ -127,12 +127,13 @@ $(document).ready(function(){initNavTree('smt2__conv_8cpp.html',''); initResizab
 <code>#include &lt;<a class="el" href="float__bv_8h_source.html">solvers/floatbv/float_bv.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="literal__expr_8h_source.html">solvers/prop/literal_expr.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="smt2__tokenizer_8h_source.html">smt2_tokenizer.h</a>&quot;</code><br />
+<code>#include &lt;cstdint&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for smt2_conv.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="smt2__conv_8cpp__incl.svg" width="3350" height="648"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="smt2__conv_8cpp__incl.svg" width="3519" height="648"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -147,13 +148,13 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a6af4d86ad4258557a6685319c9828d84"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="smt2__conv_8cpp.html#a6af4d86ad4258557a6685319c9828d84">is_zero_width</a> (const <a class="el" href="classtypet.html">typet</a> &amp;type, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
+<tr class="memdesc:a6af4d86ad4258557a6685319c9828d84"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true iff <code>type</code> has effective width of zero bits.  <a href="smt2__conv_8cpp.html#a6af4d86ad4258557a6685319c9828d84">More...</a><br /></td></tr>
+<tr class="separator:a6af4d86ad4258557a6685319c9828d84"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1054e95a428229873fdf23f8a95e39a4"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="smt2__conv_8cpp.html#a1054e95a428229873fdf23f8a95e39a4">has_quantifier</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
 <tr class="separator:a1054e95a428229873fdf23f8a95e39a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a977c410f6d61ffbd84b56050702b8270"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="smt2__conv_8cpp.html#a977c410f6d61ffbd84b56050702b8270">is_smt2_simple_identifier</a> (const std::string &amp;identifier)</td></tr>
 <tr class="separator:a977c410f6d61ffbd84b56050702b8270"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6af4d86ad4258557a6685319c9828d84"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="smt2__conv_8cpp.html#a6af4d86ad4258557a6685319c9828d84">is_zero_width</a> (const <a class="el" href="classtypet.html">typet</a> &amp;type, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
-<tr class="memdesc:a6af4d86ad4258557a6685319c9828d84"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true iff <code>type</code> has effective width of zero bits.  <a href="smt2__conv_8cpp.html#a6af4d86ad4258557a6685319c9828d84">More...</a><br /></td></tr>
-<tr class="separator:a6af4d86ad4258557a6685319c9828d84"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SMT Backend. </p>
@@ -176,7 +177,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt2__conv_8cpp_source.html#l00052">52</a> of file <a class="el" href="smt2__conv_8cpp_source.html">smt2_conv.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__conv_8cpp_source.html#l00054">54</a> of file <a class="el" href="smt2__conv_8cpp_source.html">smt2_conv.cpp</a>.</p>
 
 </div>
 </div>
@@ -196,7 +197,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt2__conv_8cpp_source.html#l00049">49</a> of file <a class="el" href="smt2__conv_8cpp_source.html">smt2_conv.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__conv_8cpp_source.html#l00051">51</a> of file <a class="el" href="smt2__conv_8cpp_source.html">smt2_conv.cpp</a>.</p>
 
 </div>
 </div>
@@ -225,7 +226,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt2__conv_8cpp_source.html#l00789">789</a> of file <a class="el" href="smt2__conv_8cpp_source.html">smt2_conv.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__conv_8cpp_source.html#l00875">875</a> of file <a class="el" href="smt2__conv_8cpp_source.html">smt2_conv.cpp</a>.</p>
 
 </div>
 </div>
@@ -253,7 +254,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt2__conv_8cpp_source.html#l00904">904</a> of file <a class="el" href="smt2__conv_8cpp_source.html">smt2_conv.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__conv_8cpp_source.html#l00990">990</a> of file <a class="el" href="smt2__conv_8cpp_source.html">smt2_conv.cpp</a>.</p>
 
 </div>
 </div>
@@ -293,7 +294,7 @@ Functions</h2></td></tr>
 
 <p>Returns true iff <code>type</code> has effective width of zero bits. </p>
 
-<p class="definition">Definition at line <a class="el" href="smt2__conv_8cpp_source.html#l00957">957</a> of file <a class="el" href="smt2__conv_8cpp_source.html">smt2_conv.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__conv_8cpp_source.html#l00257">257</a> of file <a class="el" href="smt2__conv_8cpp_source.html">smt2_conv.cpp</a>.</p>
 
 </div>
 </div>

@@ -1,9 +1,9 @@
 var classvariable__sensitivity__dependence__domaint =
 [
     [ "dependency_ordert", "classvariable__sensitivity__dependence__domaint_1_1dependency__ordert.html", "classvariable__sensitivity__dependence__domaint_1_1dependency__ordert" ],
-    [ "control_dep_callst", "classvariable__sensitivity__dependence__domaint.html#a056fc41d7eef93be20ae3c667cb6adb4", null ],
-    [ "control_dep_candidatest", "classvariable__sensitivity__dependence__domaint.html#a8474074fef0ea3177edb142cdf039403", null ],
-    [ "control_depst", "classvariable__sensitivity__dependence__domaint.html#a1a76c1eed62c2e85acec3e5f6e064d7f", null ],
+    [ "control_dep_callst", "classvariable__sensitivity__dependence__domaint.html#a4a3aba21d63ff82723799d6858a35d7a", null ],
+    [ "control_dep_candidatest", "classvariable__sensitivity__dependence__domaint.html#a49c05fce81493b326ac7cf052d87a8cf", null ],
+    [ "control_depst", "classvariable__sensitivity__dependence__domaint.html#a3965ec6ecd7c0f6067861f91a7c2cfba", null ],
     [ "data_depst", "classvariable__sensitivity__dependence__domaint.html#a43bd4d7ec29fca80b26d326165ab7177", null ],
     [ "node_indext", "classvariable__sensitivity__dependence__domaint.html#aeb79eed3eb992c292ecccaa67ec9728a", null ],
     [ "variable_sensitivity_dependence_domaint", "classvariable__sensitivity__dependence__domaint.html#aab77ae03f48bff01cc71cc0e39a4d677", null ],
@@ -14,7 +14,6 @@ var classvariable__sensitivity__dependence__domaint =
     [ "is_bottom", "classvariable__sensitivity__dependence__domaint.html#a1c648da1d109fe8f56bff468c2e59a94", null ],
     [ "is_top", "classvariable__sensitivity__dependence__domaint.html#a22ba8a18ad111f45510ff44433e9171c", null ],
     [ "make_bottom", "classvariable__sensitivity__dependence__domaint.html#adc80a619cca100bec40d44ca77e29b9b", null ],
-    [ "make_entry", "classvariable__sensitivity__dependence__domaint.html#a2e58cabf4e30fd76507cd0d28c0e1c17", null ],
     [ "make_top", "classvariable__sensitivity__dependence__domaint.html#a72e564d130c52dd7d5da7a3cc5b5e3a2", null ],
     [ "merge", "classvariable__sensitivity__dependence__domaint.html#a9efd5db641058a004f24e1992a902699", null ],
     [ "merge_control_dependencies", "classvariable__sensitivity__dependence__domaint.html#a88679bbcc74face2648a6d6d8515f712", null ],

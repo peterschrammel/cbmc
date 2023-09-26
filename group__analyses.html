@@ -97,13 +97,10 @@ Folder analyses</h1>
 <p>This contains the abstract interpretation frameworks and several static analyses that instantiate them.</p>
 <h1><a class="anchor" id="analyses-frameworks"></a>
 Frameworks:</h1>
-<p>There are currently three abstract interpretation frameworks provided in this directory. <a class="el" href="group__analyses.html#analyses-ait">Abstract interpreter framework (ait)</a>, <a class="el" href="group__analyses.html#analyses-flow-insensitive-analysis">Flow-insensitive analysis (flow_insensitive_analysist)</a>, and the deprecated and obsolete <a class="el" href="group__analyses.html#analyses-static-analysist">Old Abstract interpreter framework (static_analysist)</a>.</p>
+<p>There are currently two abstract interpretation frameworks provided in this directory. <a class="el" href="group__analyses.html#analyses-ait">Abstract interpreter framework (ait)</a> and <a class="el" href="group__analyses.html#analyses-flow-insensitive-analysis">Flow-insensitive analysis (flow_insensitive_analysist)</a>.</p>
 <h2><a class="anchor" id="analyses-ait"></a>
 Abstract interpreter framework (ait)</h2>
 <p>This abstract interpretation framework is the focus of current active development, and is where most scalability improvements will happen. It should be used as the basis for any new development work. This framework is provided by <a class="el" href="classait.html">ait</a>. This analysis framework is currently location sensitive (meaning there is one abstract domain per code location) and is designed to be run after the function pointer removal and return removal passes. There is ongoing work to make this framework also support context sensitivity.</p>
-<h2><a class="anchor" id="analyses-static-analysist"></a>
-Old Abstract interpreter framework (static_analysist)</h2>
-<p>The obsolete static analysis framework <a class="el" href="classstatic__analysist.html">static_analysist</a> is only used by <a class="el" href="value__set__analysis_8h.html#a39b39e38c9c3e60e3a1fb667659bce56">value_set_analysist</a>. This abstract interpretation framework is deprecated in favour of <a class="el" href="group__analyses.html#analyses-ait">Abstract interpreter framework (ait)</a>, and should not be used as the basis for new code. This framework is location sensitive (one domain per code location), but is able to be run before function pointer removal and return removal phases.</p>
 <h2><a class="anchor" id="analyses-flow-insensitive-analysis"></a>
 Flow-insensitive analysis (flow_insensitive_analysist)</h2>
 <p>Framework for flow-insensitive analyses. Maintains a single global abstract value which instructions are invited to transform in turn. Unsound (terminates too early) if (a) there are two or more instructions that incrementally reach a fixed point, for example by walking a chain of pointers and updating a points-to set, but (b) those instructions are separated by instructions that don't update the abstract value (for example, SKIP instructions). Therefore, not recommended for new code.</p>
@@ -120,7 +117,7 @@ Dominator analysis (cfg_dominators_templatet)</h2>
 <p>This analysis defines <code>cfg_dominatorst</code> (dominator analysis) and <code>cfg_post_dominatorst</code> (post-dominator analysis). Run these analyses using <code>operator()(const goto_programt &amp;)</code>. Alternatively, the template can be instantiated with a different type that can be used with <code><a class="el" href="classprocedure__local__cfg__baset.html">procedure_local_cfg_baset</a></code> &ndash; this is done by <code>natural_loops_mutablet</code> using (non-const) <code><a class="el" href="classgoto__programt.html" title="A generic container class for the GOTO intermediate representation of one function.">goto_programt</a></code>, and by <code><a class="el" href="classjava__bytecode__convert__methodt.html">java_bytecode_convert_methodt</a></code> to apply the dominator algorithm to its Java bytecode representation.</p>
 <p><code><a class="el" href="classcfg__dominators__templatet.html#a7adb5843236067a4153a2786bbf505e6" title="Print the result of the dominator computation.">cfg_dominators_templatet::output</a></code> is a good place to check how to query the dominators it has found.</p>
 <h2><a class="anchor" id="analyses-constant-propagation"></a>
-Constant propagation (\ref constant_propagator_ait)</h2>
+Constant propagation (constant_propagator_ait)</h2>
 <p>A simple, unsound constant propagator. Replaces RHS symbol expressions (variable reads) with their values when they appear to have a unique value at a particular program point. Unsound with respect to pointer operations on the left-hand side of assignments.</p>
 <h2><a class="anchor" id="analyses-taint"></a>
 Taint analysis (custom_bitvector_analysist)</h2>
@@ -154,7 +151,7 @@ const_cast removal analysis (does_remove_constt)</h2>
 <p>To be documented.</p>
 <h2><a class="anchor" id="analyses-escape"></a>
 Escape analysis (escape_analysist)</h2>
-<p>This is a simple [<a href="https://en.wikipedia.org/wiki/Escape_analysis">https://en.wikipedia.org/wiki/Escape_analysis</a>](escape analysis). It is intended to implement <code>__CPROVER_cleanup</code> instructions, which say that a given cleanup function should be run when a particular object goes out of scope. Examples of its usage can be seen in <code>ansi-c/library/stdio.c</code> and <code>ansi-c/library/pthread_lib.c</code>, where it is used to introduce assertions that a <code>FILE*</code> going out of scope has been <code>fclose</code>'d or similarly that a <code>pthread_mutex*</code> has been properly destroyed.</p>
+<p>This is a simple [<a href="https://en.wikipedia.org/wiki/Escape_analysis">https://en.wikipedia.org/wiki/Escape_analysis</a>](escape analysis). It is intended to implement <code>__CPROVER_cleanup</code> instructions, which say that a given cleanup function should be run when a particular object goes out of scope. Examples of its usage can be seen in <code><a class="el" href="stdio_8c.html">ansi-c/library/stdio.c</a></code> and <code><a class="el" href="pthread__lib_8c.html">ansi-c/library/pthread_lib.c</a></code>, where it is used to introduce assertions that a <code>FILE*</code> going out of scope has been <code>fclose</code>'d or similarly that a <code>pthread_mutex*</code> has been properly destroyed.</p>
 <p>For example <code>f = fopen("/tmp/hello", "wb"); __CPROVER_cleanup(f, check_closed);</code> should result in a call to <code>check_closed(f)</code> or <code>check_closed()</code> (depending on whether it has an argument) when <code>f</code> and all its aliases go out of scope.</p>
 <p>The alias analysis is a simple union-find algorithm, and can introduce cleanup calls too soon (i.e. before all aliases are really gone), so this overestimates the possible problems caused by escaping pointers.</p>
 <p>Note this differs from a typical escape analysis, which would conservatively (over-)estimate the objects that may be reachable when (e.g.) a function exits; this <em>underestimates</em> the reachable objects in order to favour false positives over false negatives when testing for missing close operations.</p>
@@ -201,9 +198,6 @@ Uninitialized locals analysis (uninitialized_analysist)</h2>
 <p>To be documented.</p>
 <h1><a class="anchor" id="analyses-transformations"></a>
 Transformations (arguably in the wrong directory):</h1>
-<h2><a class="anchor" id="analyses-goto-checkt"></a>
-Pointer / overflow / other check insertion (goto_checkt)</h2>
-<p>To be documented.</p>
 <h2><a class="anchor" id="analyses-interval-analysis"></a>
 Integer interval analysis – both an analysis and a transformation</h2>
 <p><a class="el" href="interval__analysis_8h.html#ac596f29ee60594342a0c09a6ad4a1e1c">interval_analysis</a> interprets instructions of the input <a class="el" href="classgoto__modelt.html">goto_modelt</a> over the <a class="el" href="classinterval__domaint.html">interval_domaint</a>, evaluates variables for each program location (as intervals) and instruments the program with assumptions representing the over-approximation of variable values. </p>

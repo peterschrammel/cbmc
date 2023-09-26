@@ -311,7 +311,7 @@ void test_get_message() {
   message_t msg2 = get_message();
   assert(msg1.timestamp &lt;= msg2.timestamp);
 }</code></pre>
-<p>The harness verifies that <em>get_message</em> assigns non-decreasing time stamps to the returned messages. However, simply treating <em>clock</em> as non-deterministic would not allow to prove this property. Thus, we can supply a model for reads from <em>clock</em>:</p>
+<p>The harness verifies that <em>get_message</em> assigns non-decreasing time stamps to the returned messages. However, simply treating <em>clock</em> as non-deterministic would not suffice to prove this property. Thus, we can supply a model for reads from <em>clock</em>:</p>
 <pre><code>// model for reads of the variable clock
 uint32_t clock_read_model() {
   static uint32_t clock_value = 0;
@@ -338,6 +338,9 @@ cbmc --function get_message_test get_message_test-mod.gb</code></pre>
 </dd>
 <dt><strong>--nondet-static-exclude</strong> <em>e</em></dt>
 <dd><p>same as nondet-static except for the variable <em>e</em> (use multiple times if required)</p>
+</dd>
+<dt><strong>--nondet-static-matching</strong> <em>r</em></dt>
+<dd><p>add nondeterministic initialization of variables with static lifetime matching regex <em>r</em></p>
 </dd>
 <dt><strong>--function-enter</strong> <em>f</em><br />
 <strong>--function-exit</strong> <em>f</em><br />
@@ -724,6 +727,9 @@ void call(fptr_t fptr) {
 <dt><strong>--reachability-slice</strong></dt>
 <dd><p>remove instructions that cannot appear on a trace from entry point to a property</p>
 </dd>
+<dt><strong>--reachability-slice-fb</strong></dt>
+<dd><p>remove instructions that cannot appear on a trace from entry point through a property</p>
+</dd>
 <dt><strong>--full-slice</strong></dt>
 <dd><p>slice away instructions that don't affect assertions</p>
 </dd>
@@ -753,6 +759,12 @@ void call(fptr_t fptr) {
 <dl>
 <dt><strong>--apply-loop-contracts</strong></dt>
 <dd><p>check and use loop contracts when provided</p>
+</dd>
+<dt><strong>-loop-contracts-no-unwind</strong></dt>
+<dd><p>do not unwind transformed loops</p>
+</dd>
+<dt><strong>-loop-contracts-file</strong> <em>file</em></dt>
+<dd><p>annotate loop contracts from the file to the goto program</p>
 </dd>
 <dt><strong>--replace-call-with-contract</strong> <em>fun</em></dt>
 <dd><p>replace calls to <em>fun</em> with <em>fun</em>'s contract</p>

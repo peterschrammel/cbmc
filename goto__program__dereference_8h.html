@@ -107,7 +107,7 @@ $(document).ready(function(){initNavTree('goto__program__dereference_8h.html',''
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="goto__program__dereference_8h__incl.svg" width="1954" height="754"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="goto__program__dereference_8h__incl.svg" width="1935" height="754"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -131,12 +131,12 @@ Classes</h2></td></tr>
 Macros</h2></td></tr>
 <tr class="memitem:a7589e7cb5bdf5b3ecdc31ab8d9a93291"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="goto__program__dereference_8h.html#a7589e7cb5bdf5b3ecdc31ab8d9a93291">OPT_REMOVE_POINTERS</a>&#160;&#160;&#160;&quot;(remove-pointers)&quot;</td></tr>
 <tr class="separator:a7589e7cb5bdf5b3ecdc31ab8d9a93291"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af1fe6297ae037ebff43a17de1d0642cf"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="goto__program__dereference_8h.html#af1fe6297ae037ebff43a17de1d0642cf">HELP_REMOVE_POINTERS</a>&#160;&#160;&#160;  &quot; --remove-pointers            converts pointer arithmetic to base+offset expressions\n&quot; /* NOLINT(whitespace/line_length) */</td></tr>
+<tr class="memitem:af1fe6297ae037ebff43a17de1d0642cf"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="goto__program__dereference_8h.html#af1fe6297ae037ebff43a17de1d0642cf">HELP_REMOVE_POINTERS</a></td></tr>
 <tr class="separator:af1fe6297ae037ebff43a17de1d0642cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a679daee18a133bc6935bed2680de00be"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="goto__program__dereference_8h.html#a679daee18a133bc6935bed2680de00be">dereference</a> (const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> target, <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;, <a class="el" href="classvalue__setst.html">value_setst</a> &amp;)</td></tr>
+<tr class="memitem:a679daee18a133bc6935bed2680de00be"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="goto__program__dereference_8h.html#a679daee18a133bc6935bed2680de00be">dereference</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> target, <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;, <a class="el" href="classvalue__setst.html">value_setst</a> &amp;)</td></tr>
 <tr class="memdesc:a679daee18a133bc6935bed2680de00be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove dereferences in <code>expr</code> using <code>value_sets</code> to determine to what objects the pointers may be pointing to.  <a href="goto__program__dereference_8h.html#a679daee18a133bc6935bed2680de00be">More...</a><br /></td></tr>
 <tr class="separator:a679daee18a133bc6935bed2680de00be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a653b676c6714b5dbdda53afc121abe37"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="goto__program__dereference_8h.html#a653b676c6714b5dbdda53afc121abe37">remove_pointers</a> (<a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;, <a class="el" href="classvalue__setst.html">value_setst</a> &amp;)</td></tr>
@@ -155,12 +155,14 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define HELP_REMOVE_POINTERS&#160;&#160;&#160;  &quot; --remove-pointers            converts pointer arithmetic to base+offset expressions\n&quot; /* NOLINT(whitespace/line_length) */</td>
+          <td class="memname">#define HELP_REMOVE_POINTERS</td>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="goto__program__dereference_8h_source.html#l00113">113</a> of file <a class="el" href="goto__program__dereference_8h_source.html">goto_program_dereference.h</a>.</p>
+<b>Value:</b><div class="fragment"><div class="line">  <span class="stringliteral">&quot; {y--remove-pointers} \t &quot;</span>                                                  \</div>
+<div class="line">  <span class="stringliteral">&quot;converts pointer arithmetic to base+offset expressions\n&quot;</span></div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="goto__program__dereference_8h_source.html#l00112">112</a> of file <a class="el" href="goto__program__dereference_8h_source.html">goto_program_dereference.h</a>.</p>
 
 </div>
 </div>
@@ -190,7 +192,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">void dereference </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>function_id</em>, </td>
         </tr>
         <tr>
