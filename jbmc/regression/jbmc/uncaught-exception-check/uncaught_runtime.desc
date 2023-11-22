@@ -1,0 +1,13 @@
+CORE
+Uncaught.foo
+--throw-runtime-exceptions --throw-assertion-error --trace --uncaught-exception-check-only-for java.lang.RuntimeException --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
+dynamic_object.*java::java.lang.NullPointerException
+^Violated property:$
+^  no uncaught exception$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+dynamic_object.*java:java.lang.AssertionError
+--
+Checks that the uncaught exception is a RuntimeException rather than an AssertionError.

@@ -1,0 +1,9 @@
+CORE
+Uncaught.foo
+--throw-runtime-exceptions --throw-assertion-error --trace --uncaught-exception-check-only-for java.lang.IllegalArgumentException --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Checks that no exception of the specified type is uncaught.
