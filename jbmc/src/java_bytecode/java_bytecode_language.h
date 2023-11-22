@@ -32,7 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 // clang-format off
 #define JAVA_BYTECODE_LANGUAGE_OPTIONS /*NOLINT*/ \
   "(disable-uncaught-exception-check)" \
-  "(uncaught-exception-check-for-assertions-only)" \
+  "(uncaught-exception-check-only-for):" \
   "(throw-assertion-error)" \
   "(assert-no-exceptions-thrown)" \
   "(java-assume-inputs-non-null)" \
@@ -56,9 +56,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #define JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP \
   " {y--disable-uncaught-exception-check} \t " \
   "ignore uncaught exceptions and errors\n" \
-  " {y--uncaught-exception-check-for-assertions-only} \t " \
-  "ignore uncaught exceptions and errors " \
-  "except java.lang.AssertionError\n" \
+  " {y--uncaught-exception-check-only-for} \t " \
+  "check uncaught exceptions and errors only for the given " \
+  "class and its subclasses, e.g. \"java.lang.AssertionError\"\n" \
   " {y--throw-assertion-error} \t " \
   "throw java.lang.AssertionError on violated assert statements instead of " \
   "failing at the location of the assert statement\n" \
@@ -214,7 +214,7 @@ struct java_bytecode_language_optionst
   bool string_refinement_enabled = false;
   bool throw_runtime_exceptions = false;
   bool assert_uncaught_exceptions = false;
-  bool assert_uncaught_exceptions_for_assertions_only = false;
+  optionalt<std::string> assert_uncaught_exceptions_only_for = {};
   bool throw_assertion_error = false;
   bool threading_support = false;
   bool nondet_static = false;

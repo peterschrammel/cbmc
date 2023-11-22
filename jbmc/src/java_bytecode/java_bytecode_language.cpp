@@ -59,9 +59,14 @@ void parse_java_language_options(const cmdlinet &cmd, optionst &options)
     "throw-runtime-exceptions", cmd.isset("throw-runtime-exceptions"));
   options.set_option(
     "uncaught-exception-check", !cmd.isset("disable-uncaught-exception-check"));
-  options.set_option(
-    "uncaught-exception-check-for-assertions-only",
-    cmd.isset("uncaught-exception-check-for-assertions-only"));
+
+  if(cmd.isset("uncaught-exception-check-only-for"))
+  {
+    options.set_option(
+      "uncaught-exception-check-only-for",
+      cmd.get_value("uncaught-exception-check-only-for"));
+  }
+
   options.set_option(
     "throw-assertion-error", cmd.isset("throw-assertion-error"));
   options.set_option(
@@ -154,8 +159,11 @@ java_bytecode_language_optionst::java_bytecode_language_optionst(
     options.get_bool_option("throw-runtime-exceptions");
   assert_uncaught_exceptions =
     options.get_bool_option("uncaught-exception-check");
-  assert_uncaught_exceptions_for_assertions_only =
-    options.get_bool_option("uncaught-exception-check-for-assertions-only");
+  if(options.is_set("uncaught-exception-check-only-for"))
+    assert_uncaught_exceptions_only_for =
+      options.get_option("uncaught-exception-check-only-for");
+  else
+    assert_uncaught_exceptions_only_for = {};
   throw_assertion_error = options.get_bool_option("throw-assertion-error");
   assert_no_exceptions_thrown =
     options.get_bool_option("assert-no-exceptions-thrown");
@@ -1088,7 +1096,7 @@ bool java_bytecode_languaget::generate_support_functions(
     get_message_handler(),
     language_options->assume_inputs_non_null,
     language_options->assert_uncaught_exceptions,
-    language_options->assert_uncaught_exceptions_for_assertions_only,
+    language_options->assert_uncaught_exceptions_only_for,
     object_factory_parameters,
     get_pointer_type_selector(),
     language_options->string_refinement_enabled,

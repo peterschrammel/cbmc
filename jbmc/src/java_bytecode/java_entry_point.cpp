@@ -604,7 +604,7 @@ bool java_entry_point(
   message_handlert &message_handler,
   bool assume_init_pointers_not_null,
   bool assert_uncaught_exceptions,
-  bool assert_uncaught_exceptions_for_assertions_only,
+  optionalt<std::string> assert_uncaught_exceptions_only_for,
   const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
   bool string_refinement_enabled,
@@ -629,7 +629,7 @@ bool java_entry_point(
     symbol_table,
     message_handler,
     assert_uncaught_exceptions,
-    assert_uncaught_exceptions_for_assertions_only,
+    assert_uncaught_exceptions_only_for,
     object_factory_parameters,
     pointer_type_selector,
     build_arguments);
@@ -640,7 +640,7 @@ bool generate_java_start_function(
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   bool assert_uncaught_exceptions,
-  bool assert_uncaught_exceptions_for_assertions_only,
+  optionalt<std::string> assert_uncaught_exceptions_only_for,
   const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
   const build_argumentst &build_arguments)
@@ -763,7 +763,7 @@ bool generate_java_start_function(
       init_code,
       exc_symbol,
       symbol.location,
-      assert_uncaught_exceptions_for_assertions_only);
+      assert_uncaught_exceptions_only_for);
   }
 
   // create a symbol for the __CPROVER__start function, associate the code that
