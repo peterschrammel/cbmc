@@ -568,12 +568,12 @@ void java_bytecode_instrument_uncaught_exceptions(
   code_blockt &init_code,
   const symbolt &exc_symbol,
   const source_locationt &source_location,
-  bool assertions_only)
+  optionalt<std::string> only_for_exception)
 {
-  if(assertions_only)
+  if(only_for_exception)
   {
     code_assertt assert_no_exception(not_exprt(java_instanceof_exprt(
-      exc_symbol.symbol_expr(), java_classname("java.lang.AssertionError"))));
+      exc_symbol.symbol_expr(), java_classname(*only_for_exception))));
     source_locationt assert_location = source_location;
     assert_location.set_comment("no uncaught exception");
     assert_no_exception.add_source_location() = assert_location;
