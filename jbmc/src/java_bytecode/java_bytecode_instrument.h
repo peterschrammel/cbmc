@@ -11,6 +11,8 @@ Date:   June 2017
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_INSTRUMENT_H
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_INSTRUMENT_H
 
+#include <util/optional.h>
+
 #include <string>
 #include <vector>
 
@@ -35,7 +37,7 @@ void java_bytecode_instrument_uncaught_exceptions(
   code_blockt &init_code,
   const symbolt &exc_symbol,
   const source_locationt &source_location,
-  bool assertions_only);
+  optionalt<std::string> assert_uncaught_exceptions_only_for);
 
 extern const std::vector<std::string> exception_needed_classes;
 
