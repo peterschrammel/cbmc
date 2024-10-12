@@ -103,25 +103,24 @@ $(document).ready(function(){initNavTree('dfcc_8cpp.html',''); initResizable(); 
 <code>#include &lt;<a class="el" href="mathematical__expr_8h_source.html">util/mathematical_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="mathematical__types_8h_source.html">util/mathematical_types.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="namespace_8h_source.html">util/namespace.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="optional_8h_source.html">util/optional.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="pointer__expr_8h_source.html">util/pointer_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="pointer__offset__size_8h_source.html">util/pointer_offset_size.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="pointer__predicates_8h_source.html">util/pointer_predicates.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="prefix_8h_source.html">util/prefix.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="std__expr_8h_source.html">util/std_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="string__utils_8h_source.html">util/string_utils.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="goto__convert__functions_8h_source.html">goto-programs/goto_convert_functions.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="goto__functions_8h_source.html">goto-programs/goto_functions.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="goto__inline_8h_source.html">goto-programs/goto_inline.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="goto__model_8h_source.html">goto-programs/goto_model.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="initialize__goto__model_8h_source.html">goto-programs/initialize_goto_model.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="link__to__library_8h_source.html">goto-programs/link_to_library.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="remove__skip_8h_source.html">goto-programs/remove_skip.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="remove__unused__functions_8h_source.html">goto-programs/remove_unused_functions.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="ansi__c__entry__point_8h_source.html">ansi-c/ansi_c_entry_point.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="c__expr_8h_source.html">ansi-c/c_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="c__object__factory__parameters_8h_source.html">ansi-c/c_object_factory_parameters.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="ansi-c_2cprover__library_8h_source.html">ansi-c/cprover_library.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="goto__convert__functions_8h_source.html">ansi-c/goto-conversion/goto_convert_functions.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="link__to__library_8h_source.html">ansi-c/goto-conversion/link_to_library.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="cfg__info_8h_source.html">goto-instrument/contracts/cfg_info.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="utils_8h_source.html">goto-instrument/contracts/utils.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="nondet__static_8h_source.html">goto-instrument/nondet_static.h</a>&gt;</code><br />
@@ -130,13 +129,12 @@ $(document).ready(function(){initNavTree('dfcc_8cpp.html',''); initResizable(); 
 <code>#include &lt;<a class="el" href="mode_8h_source.html">langapi/mode.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="static__lifetime__init_8h_source.html">linking/static_lifetime_init.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="dfcc__lift__memory__predicates_8h_source.html">dfcc_lift_memory_predicates.h</a>&quot;</code><br />
-<code>#include &lt;iostream&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for dfcc.cpp:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="dfcc_8cpp__incl.svg" width="5066" height="663"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="dfcc_8cpp__incl.svg" width="5442" height="738"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -146,12 +144,9 @@ $(document).ready(function(){initNavTree('dfcc_8cpp.html',''); initResizable(); 
 Functions</h2></td></tr>
 <tr class="memitem:a551092f802d7511a29c5a94aa51f5f20"><td class="memItemLeft" align="right" valign="top">static std::pair&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc_8cpp.html#a551092f802d7511a29c5a94aa51f5f20">parse_function_contract_pair</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;cli_flag)</td></tr>
 <tr class="separator:a551092f802d7511a29c5a94aa51f5f20"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga643c9eb853f28143d9a4a975844d99c4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dfcc-module.html#ga643c9eb853f28143d9a4a975844d99c4">dfcc</a> (const <a class="el" href="classoptionst.html">optionst</a> &amp;options, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;harness_id, const <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;to_check, const bool allow_recursive_calls, const std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;to_replace, const bool apply_loop_contracts, const bool unwind_transformed_loops, const std::set&lt; std::string &gt; &amp;to_exclude_from_nondet_static, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
-<tr class="memdesc:ga643c9eb853f28143d9a4a975844d99c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies function contracts transformation to GOTO model, using the dynamic frame condition checking approach.  <a href="group__dfcc-module.html#ga643c9eb853f28143d9a4a975844d99c4">More...</a><br /></td></tr>
-<tr class="separator:ga643c9eb853f28143d9a4a975844d99c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga46a51b92364a93b0f1975238bb5d0994"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dfcc-module.html#ga46a51b92364a93b0f1975238bb5d0994">dfcc</a> (const <a class="el" href="classoptionst.html">optionst</a> &amp;options, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;harness_id, const <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; std::pair&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt;&gt; &amp;to_check, const bool allow_recursive_calls, const std::map&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;to_replace, const bool apply_loop_contracts, const bool unwind_transformed_loops, const std::set&lt; std::string &gt; &amp;to_exclude_from_nondet_static, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
-<tr class="memdesc:ga46a51b92364a93b0f1975238bb5d0994"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies function contracts and loop contracts transformation to GOTO model, using the dynamic frame condition checking approach.  <a href="group__dfcc-module.html#ga46a51b92364a93b0f1975238bb5d0994">More...</a><br /></td></tr>
-<tr class="separator:ga46a51b92364a93b0f1975238bb5d0994"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6919243ec4c04ea33fa91a043a06e9b3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__dfcc-module.html#ga6919243ec4c04ea33fa91a043a06e9b3">dfcc</a> (const <a class="el" href="classoptionst.html">optionst</a> &amp;options, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;harness_id, const std::optional&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;to_check, const bool allow_recursive_calls, const std::set&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt; &amp;to_replace, const <a class="el" href="structloop__contract__configt.html">loop_contract_configt</a> loop_contract_config, const std::set&lt; std::string &gt; &amp;to_exclude_from_nondet_static, <a class="el" href="classmessage__handlert.html">message_handlert</a> &amp;message_handler)</td></tr>
+<tr class="memdesc:ga6919243ec4c04ea33fa91a043a06e9b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies function contracts transformation to GOTO model, using the dynamic frame condition checking approach.  <a href="group__dfcc-module.html#ga6919243ec4c04ea33fa91a043a06e9b3">More...</a><br /></td></tr>
+<tr class="separator:ga6919243ec4c04ea33fa91a043a06e9b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a551092f802d7511a29c5a94aa51f5f20"></a>
@@ -178,7 +173,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00077">77</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc_8cpp_source.html#l00074">74</a> of file <a class="el" href="dfcc_8cpp_source.html">dfcc.cpp</a>.</p>
 
 </div>
 </div>

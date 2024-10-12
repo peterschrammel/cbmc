@@ -5,6 +5,7 @@ var classconfigt =
     [ "cppt", "structconfigt_1_1cppt.html", "structconfigt_1_1cppt" ],
     [ "javat", "structconfigt_1_1javat.html", "structconfigt_1_1javat" ],
     [ "verilogt", "structconfigt_1_1verilogt.html", "structconfigt_1_1verilogt" ],
+    [ "max_malloc_size", "classconfigt.html#aabd629509cf78655135bd5c47866e647", null ],
     [ "object_bits_info", "classconfigt.html#a67eb5a80f10aec480ac30f2dfb81a34d", null ],
     [ "set", "classconfigt.html#a40a799302a1c539d1e2cc232dbf7ac27", null ],
     [ "set_arch", "classconfigt.html#a2e57e31f2c6225eb4baef887b9248def", null ],
@@ -17,6 +18,6 @@ var classconfigt =
     [ "bv_encoding", "classconfigt.html#a3aebe19a257e5d0102e520f9f4795e8e", null ],
     [ "cpp", "classconfigt.html#aedbfce998716782dc36030eb658cb8fb", null ],
     [ "java", "classconfigt.html#ad6a908848c26735512f5a50dcecb9d9c", null ],
-    [ "main", "classconfigt.html#a41ea95a51ebb0cf87fbdb80035ac5c79", null ],
+    [ "main", "classconfigt.html#ad034d6bcca495d458498ea444031eea1", null ],
     [ "verilog", "classconfigt.html#a67046260417ca1171458380c936ee2ec", null ]
 ];

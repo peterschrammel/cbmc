@@ -4,6 +4,9 @@
 <p><strong>cbmc [--property <em>property-id</em><strong>]</strong> <em>file.c</em> ...</strong></p>
 <p><strong>cbmc [--show-properties] <em>file.c</em> ...</strong></p>
 <p><strong>cbmc [--all-properties] <em>file.c</em> ...</strong></p>
+<p><strong>cbmc [--no-standard-checks] <em>file.c</em> ...</strong></p>
+<p><strong>cbmc [--no-standard-checks] [--pointer-check] <em>file.c</em> ...</strong></p>
+<p><strong>cbmc [--no-bounds-check] <em>file.c</em> ...</strong></p>
 <p><strong>goto-cc [-I <em>include-path</em><strong>]</strong> [-c] <em>file.c</em> [-o <em>outfile.o</em><strong>]</strong></strong></p>
 <p><strong>goto-instrument <em>infile</em> <em>outfile</em></strong></p>
 <p>Only the most useful options are listed here; see below for the remainder.</p>
@@ -13,8 +16,73 @@
 <p><strong>goto-instrument</strong>(1) reads a GOTO binary, performs a given program transformation, and then writes the resulting program as GOTO binary on disc.</p>
 <p>The usual flow is to (1) translate source into a GOTO binary using goto-cc, then (2) perform instrumentation with goto-instrument, and finally (3) perform the analysis with cbmc.</p>
 <h1>OPTIONS</h1>
+<h2>Standard Checks</h2>
+<p>From version <strong>6.0</strong> onwards, <strong>cbmc</strong>, <strong>goto-analyzer</strong> and some other tools apply some checks to the program by default (called the "standard checks"), with the aim to provide a better user experience for a non-expert user of the tool. These checks are:</p>
+<dl>
+<dt><strong>--pointer-check</strong></dt>
+<dd><p>enable pointer checks</p>
+</dd>
+<dt><strong>--bounds-check</strong></dt>
+<dd><p>enable array bounds checks</p>
+</dd>
+<dt><strong>--undefined-shift-check</strong></dt>
+<dd><p>check shift greater than bit-width</p>
+</dd>
+<dt><strong>--div-by-zero-check</strong></dt>
+<dd><p>enable division by zero checks for integer division</p>
+</dd>
+<dt><strong>--float-div-by-zero-check</strong></dt>
+<dd><p>enable division by zero checks for floating-point division</p>
+</dd>
+<dt><strong>--pointer-primitive-check</strong></dt>
+<dd><p>checks that all pointers in pointer primitives are valid or null</p>
+</dd>
+<dt><strong>--signed-overflow-check</strong></dt>
+<dd><p>enable signed arithmetic over- and underflow checks</p>
+</dd>
+<dt><strong>--malloc-may-fail</strong></dt>
+<dd><p>allow malloc calls to return a null pointer</p>
+</dd>
+<dt><strong>--malloc-fail-null</strong></dt>
+<dd><p>set malloc failure mode to return null</p>
+</dd>
+<dt><strong>--unwinding-assertions</strong></dt>
+<dd><p>generate unwinding assertions (cannot be used with <strong>--cover</strong>)</p>
+</dd>
+</dl>
+<p>These checks can all be deactivated at once by using the <strong>--no-standard-checks</strong> flag like in the header example, or individually, by prepending a <strong>no-</strong> before the flag, like so:</p>
+<dl>
+<dt><strong>--no-pointer-check</strong></dt>
+<dd><p>disable pointer checks</p>
+</dd>
+<dt><strong>--no-bounds-check</strong></dt>
+<dd><p>disable array bounds checks</p>
+</dd>
+<dt><strong>--no-undefined-shift-check</strong></dt>
+<dd><p>do not perform check for shift greater than bit-width</p>
+</dd>
+<dt><strong>--no-div-by-zero-check</strong></dt>
+<dd><p>disable division by zero checks</p>
+</dd>
+<dt><strong>--no-pointer-primitive-check</strong></dt>
+<dd><p>do not check that all pointers in pointer primitives are valid or null</p>
+</dd>
+<dt><strong>--no-signed-overflow-check</strong></dt>
+<dd><p>disable signed arithmetic over- and underflow checks</p>
+</dd>
+<dt><strong>--no-malloc-may-fail</strong></dt>
+<dd><p>do not allow malloc calls to fail by default</p>
+</dd>
+<dt><strong>--no-unwinding-assertions</strong></dt>
+<dd><p>do not generate unwinding assertions</p>
+</dd>
+</dl>
+<p>If an already set flag is re-set, like calling <strong>--pointer-check</strong> when default checks are already on, the flag is simply ignored.</p>
 <h2>Analysis options:</h2>
 <dl>
+<dt><strong>--no-standard-checks</strong></dt>
+<dd><p>disable the standard (default) checks applied to a C/GOTO program (see above for more information)</p>
+</dd>
 <dt><strong>--show-properties</strong></dt>
 <dd><p>show the properties, but don't run analysis</p>
 </dd>
@@ -91,7 +159,7 @@
 <dd><p>Set analysis architecture, which defaults to the host architecture. Use one of: <strong>alpha</strong>, <strong>arm</strong>, <strong>arm64</strong>, <strong>armel</strong>, <strong>armhf</strong>, <strong>hppa</strong>, <strong>i386</strong>, <strong>ia64</strong>, <strong>mips</strong>, <strong>mips64</strong>, <strong>mips64el</strong>, <strong>mipsel</strong>, <strong>mipsn32</strong>, <strong>mipsn32el</strong>, <strong>powerpc</strong>, <strong>ppc64</strong>, <strong>ppc64le</strong>, <strong>riscv64</strong>, <strong>s390</strong>, <strong>s390x</strong>, <strong>sh4</strong>, <strong>sparc</strong>, <strong>sparc64</strong>, <strong>v850</strong>, <strong>x32</strong>, <strong>x86_64</strong>, or <strong>none</strong>.</p>
 </dd>
 <dt><strong>--os</strong> <em>os</em></dt>
-<dd><p>Set analysis operating system, which defaults to the host operating system. Use one of: <strong>freebsd</strong>, <strong>linux</strong>, <strong>macos</strong>, <strong>solaris</strong>, or <strong>windows</strong>.</p>
+<dd><p>Set analysis operating system, which defaults to the host operating system. Use one of: <strong>freebsd</strong>, <strong>linux</strong>, <strong>macos</strong>, <strong>netbsd</strong>, <strong>openbsd</strong>, <strong>solaris</strong>, <strong>hurd</strong>, or <strong>windows</strong>.</p>
 </dd>
 <dt><strong>--i386-linux</strong>, <strong>--i386-win32</strong>, <strong>--i386-macos</strong>, <strong>--ppc-macos</strong>, <strong>--win32</strong>, <strong>--winx64</strong></dt>
 <dd><p>Set analysis architecture and operating system.</p>
@@ -231,9 +299,6 @@
 <dt><strong>--drop-unused-functions</strong></dt>
 <dd><p>drop functions trivially unreachable from main function</p>
 </dd>
-<dt><strong>--havoc-undefined-functions</strong></dt>
-<dd><p>for any function that has no body, assign non-deterministic values to any parameters passed as non-const pointers and the return value</p>
-</dd>
 </dl>
 <h2>Semantic transformations:</h2>
 <dl>
@@ -273,11 +338,11 @@
 <dt><strong>--show-loops</strong></dt>
 <dd><p>show the loops in the program</p>
 </dd>
-<dt><strong>--unwind</strong> nr</dt>
-<dd><p>unwind nr times</p>
+<dt><strong>--unwind</strong> <em>nr</em></dt>
+<dd><p>unwind all loops at most <em>nr</em> times</p>
 </dd>
-<dt><strong>--unwindset</strong> [T:]L:B,...</dt>
-<dd><p>unwind loop L with a bound of B (optionally restricted to thread T) (use <strong>--show-loops</strong> to get the loop IDs)</p>
+<dt><strong>--unwindset</strong> [<em>T</em>:]<em>L</em>:<em>B</em>,...</dt>
+<dd><p>unwind loop <em>L</em> with a bound of <em>B</em>, optionally restricted to thread <em>T</em>, and overriding what may be set as default unwinding via <strong>--unwind</strong> (use <strong>--show-loops</strong> to get the loop IDs)</p>
 </dd>
 <dt><strong>--incremental-loop</strong> L</dt>
 <dd><p>check properties after each unwinding of loop L (use <strong>--show-loops</strong> to get the loop IDs)</p>
@@ -298,10 +363,10 @@
 <dd><p>remove assignments unrelated to property</p>
 </dd>
 <dt><strong>--unwinding-assertions</strong></dt>
-<dd><p>generate unwinding assertions (cannot be used with <strong>--cover</strong>)</p>
+<dd><p>generate unwinding assertions (which are enabled by default; overrides <strong>--no-unwinding-assertions</strong> when both of these are given); cannot be used with <strong>--cover</strong></p>
 </dd>
 <dt><strong>--partial-loops</strong></dt>
-<dd><p>permit paths with partial loops</p>
+<dd><p>permit paths that execute loops only partially (up to the given unwinding bound) and then continue beyond the loop even when the loop condition would still hold (such paths may be spurious, resulting in false alarms)</p>
 </dd>
 <dt><strong>--no-self-loops-to-assumptions</strong></dt>
 <dd><p>do not simplify while(1){} to assume(0)</p>

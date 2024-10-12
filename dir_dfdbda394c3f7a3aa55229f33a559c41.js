@@ -48,7 +48,9 @@ var dir_dfdbda394c3f7a3aa55229f33a559c41 =
       [ "uninitialized_typet", "classuninitialized__typet.html", "classuninitialized__typet" ]
     ] ],
     [ "cpp_parser.cpp", "cpp__parser_8cpp.html", "cpp__parser_8cpp" ],
-    [ "cpp_parser.h", "cpp__parser_8h.html", "cpp__parser_8h" ],
+    [ "cpp_parser.h", "cpp__parser_8h.html", [
+      [ "cpp_parsert", "classcpp__parsert.html", "classcpp__parsert" ]
+    ] ],
     [ "cpp_scope.cpp", "cpp__scope_8cpp.html", "cpp__scope_8cpp" ],
     [ "cpp_scope.h", "cpp__scope_8h.html", "cpp__scope_8h" ],
     [ "cpp_scopes.cpp", "cpp__scopes_8cpp.html", null ],

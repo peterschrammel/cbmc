@@ -1,14 +1,13 @@
 var classsolver__factoryt_1_1solvert =
 [
-    [ "solvert", "classsolver__factoryt_1_1solvert.html#a2ff933e7756f6648faaf015dad47e6aa", null ],
-    [ "solvert", "classsolver__factoryt_1_1solvert.html#a17e60269fd729ff705139184fe9576aa", null ],
-    [ "solvert", "classsolver__factoryt_1_1solvert.html#a7d32bab73942fcaaddb0dad0b5b8d849", null ],
-    [ "decision_procedure", "classsolver__factoryt_1_1solvert.html#a7ad6c7ac76deb457c45663a0e0d3c612", null ],
-    [ "set_decision_procedure", "classsolver__factoryt_1_1solvert.html#a361b2b5204bb3cf169f7e74963ecf3d9", null ],
-    [ "set_ofstream", "classsolver__factoryt_1_1solvert.html#a86949737a45f6f1b6f5690633056ec58", null ],
-    [ "set_prop", "classsolver__factoryt_1_1solvert.html#ab2f41370ec7dfca693a0ebfd3252fa31", null ],
-    [ "stack_decision_procedure", "classsolver__factoryt_1_1solvert.html#a7c3f9a98f4809a0172e2ca8a53ae6582", null ],
-    [ "decision_procedure_ptr", "classsolver__factoryt_1_1solvert.html#a29132ca8d53c3c3cad812560e06d26c8", null ],
+    [ "solvert", "classsolver__factoryt_1_1solvert.html#a837bdeae56c228b0569c6937c97b9fc1", null ],
+    [ "solvert", "classsolver__factoryt_1_1solvert.html#a901d08ef52b9c4a94cb00639cbb5b169", null ],
+    [ "solvert", "classsolver__factoryt_1_1solvert.html#a7d1727fbc5e5a2ecb0d3ebe8b79ccd74", null ],
+    [ "solvert", "classsolver__factoryt_1_1solvert.html#a7dea30153b864da5eea4a935e7ff0ac7", null ],
+    [ "boolbv_decision_procedure", "classsolver__factoryt_1_1solvert.html#a6a55cf9a2ffae295688b4174ed0a4f17", null ],
+    [ "decision_procedure", "classsolver__factoryt_1_1solvert.html#adac569aa0eca6f8341795981aeff1c6a", null ],
+    [ "decision_procedure_is_boolbvt_ptr", "classsolver__factoryt_1_1solvert.html#af4d82b2bcbba1dc904075280baf0fd6f", null ],
+    [ "decision_procedure_ptr", "classsolver__factoryt_1_1solvert.html#a1b0fe6d972cd47b05391a005236babeb", null ],
     [ "ofstream_ptr", "classsolver__factoryt_1_1solvert.html#a572cf154da2bc8af260bab27719e244d", null ],
     [ "prop_ptr", "classsolver__factoryt_1_1solvert.html#a2833b50aa4fbd372343df47cb30d4b41", null ]
 ];

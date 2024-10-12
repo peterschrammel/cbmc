@@ -2,7 +2,7 @@ var group__dfcc_module =
 [
     [ "dfcc.h", "dfcc_8h.html", null ],
     [ "dfcct", "classdfcct.html", [
-      [ "dfcct", "classdfcct.html#a9fb706919c00e7d034ba33b8307a216f", null ],
+      [ "dfcct", "classdfcct.html#a489422353e3a2eba74826001fad6cb9b", null ],
       [ "check_transform_goto_model_preconditions", "classdfcct.html#a866e917d642e523a0efa4019dde9d61e", null ],
       [ "instrument_harness_function", "classdfcct.html#a1e6ce41e4f34d847b5dddfc8f4bc000a", null ],
       [ "instrument_other_functions", "classdfcct.html#a2388b1d8922bcaea275f2d4e8a941ba4", null ],
@@ -23,7 +23,7 @@ var group__dfcc_module =
       [ "instrument", "classdfcct.html#a99c66a5ec01c109314a988750f7b3eac", null ],
       [ "library", "classdfcct.html#a9cc1c63e43fea45a8bf5557be05c6d91", null ],
       [ "log", "classdfcct.html#a6e85cf09b373a87f153f40ac5003d18b", null ],
-      [ "loop_contract_mode", "classdfcct.html#a702650a805d2770a7dbbd29df4508ed5", null ],
+      [ "loop_contract_config", "classdfcct.html#a2a826ea1b556ca12bb24f6792212f209", null ],
       [ "max_assigns_clause_size", "classdfcct.html#a8b6e9e9bd01786b03cb827f7e6cc465d", null ],
       [ "memory_predicates", "classdfcct.html#a5d4f8fdd6358c4053754f8eefa056244", null ],
       [ "message_handler", "classdfcct.html#ab25bd5b238085ffa1288f5ba32268991", null ],
@@ -33,10 +33,9 @@ var group__dfcc_module =
       [ "pure_contract_symbols", "classdfcct.html#a165f24947156fe2dfd8e61de9dfdb220", null ],
       [ "spec_functions", "classdfcct.html#a19dbbc1ecd901a32c8f8650b67b6ef33", null ],
       [ "swap_and_wrap", "classdfcct.html#a5b7ad9b33c59871b6124e4ff20867f8b", null ],
-      [ "to_check", "classdfcct.html#a7ecb2a11d4929247f2751191e1fb4a99", null ],
+      [ "to_check", "classdfcct.html#a72298354086f88a82cb8be16b3d5c6f5", null ],
       [ "to_exclude_from_nondet_static", "classdfcct.html#a47e707c9ff690b90c4cc48c17e4a94ea", null ],
       [ "to_replace", "classdfcct.html#adc52fa5f0c20e1ae57851937c1b065b7", null ]
     ] ],
-    [ "dfcc", "group__dfcc-module.html#ga643c9eb853f28143d9a4a975844d99c4", null ],
-    [ "dfcc", "group__dfcc-module.html#ga46a51b92364a93b0f1975238bb5d0994", null ]
+    [ "dfcc", "group__dfcc-module.html#ga6919243ec4c04ea33fa91a043a06e9b3", null ]
 ];

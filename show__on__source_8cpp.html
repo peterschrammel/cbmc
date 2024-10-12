@@ -96,6 +96,7 @@ $(document).ready(function(){initNavTree('show__on__source_8cpp.html',''); initR
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="show__on__source_8h_source.html">show_on_source.h</a>&quot;</code><br />
 <code>#include &lt;<a class="el" href="src_2util_2message_8h_source.html">util/message.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="unicode_8h_source.html">util/unicode.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="ai_8h_source.html">analyses/ai.h</a>&gt;</code><br />
 <code>#include &lt;fstream&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -103,7 +104,7 @@ $(document).ready(function(){initNavTree('show__on__source_8cpp.html',''); initR
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="show__on__source_8cpp__incl.svg" width="2619" height="1067"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="show__on__source_8cpp__incl.svg" width="2687" height="1067"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -111,9 +112,9 @@ $(document).ready(function(){initNavTree('show__on__source_8cpp.html',''); initR
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a6358dcad3d8805bdcd4d7aca32ea5fbd"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="show__on__source_8cpp.html#a6358dcad3d8805bdcd4d7aca32ea5fbd">show_location</a> (const <a class="el" href="classai__baset.html">ai_baset</a> &amp;ai, <a class="el" href="classai__baset.html#a0cfc0a58d1d91dded976b169d53e3079">ai_baset::locationt</a> loc)</td></tr>
-<tr class="memdesc:a6358dcad3d8805bdcd4d7aca32ea5fbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">get the name of the file referred to at a location loc, if any  <a href="show__on__source_8cpp.html#a6358dcad3d8805bdcd4d7aca32ea5fbd">More...</a><br /></td></tr>
-<tr class="separator:a6358dcad3d8805bdcd4d7aca32ea5fbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3fffee3679f3b4feed220fa5c2b0f6cb"><td class="memItemLeft" align="right" valign="top">static std::optional&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="show__on__source_8cpp.html#a3fffee3679f3b4feed220fa5c2b0f6cb">show_location</a> (const <a class="el" href="classai__baset.html">ai_baset</a> &amp;ai, <a class="el" href="classai__baset.html#a0cfc0a58d1d91dded976b169d53e3079">ai_baset::locationt</a> loc)</td></tr>
+<tr class="memdesc:a3fffee3679f3b4feed220fa5c2b0f6cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">get the name of the file referred to at a location loc, if any  <a href="show__on__source_8cpp.html#a3fffee3679f3b4feed220fa5c2b0f6cb">More...</a><br /></td></tr>
+<tr class="separator:a3fffee3679f3b4feed220fa5c2b0f6cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab8742d2bb03f821f7c6be3320a2ab278"><td class="memItemLeft" align="right" valign="top">static std::set&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="show__on__source_8cpp.html#ab8742d2bb03f821f7c6be3320a2ab278">get_source_files</a> (const <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model, const <a class="el" href="classai__baset.html">ai_baset</a> &amp;ai)</td></tr>
 <tr class="memdesc:ab8742d2bb03f821f7c6be3320a2ab278"><td class="mdescLeft">&#160;</td><td class="mdescRight">get the source files with non-top abstract states  <a href="show__on__source_8cpp.html#ab8742d2bb03f821f7c6be3320a2ab278">More...</a><br /></td></tr>
 <tr class="separator:ab8742d2bb03f821f7c6be3320a2ab278"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -164,7 +165,7 @@ Functions</h2></td></tr>
 
 <p>get the source files with non-top abstract states </p>
 
-<p class="definition">Definition at line <a class="el" href="show__on__source_8cpp_source.html#l00038">38</a> of file <a class="el" href="show__on__source_8cpp_source.html">show_on_source.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="show__on__source_8cpp_source.html#l00035">35</a> of file <a class="el" href="show__on__source_8cpp_source.html">show_on_source.cpp</a>.</p>
 
 </div>
 </div>
@@ -210,12 +211,12 @@ Functions</h2></td></tr>
 
 <p>print a string with indent to match given sample line </p>
 
-<p class="definition">Definition at line <a class="el" href="show__on__source_8cpp_source.html#l00056">56</a> of file <a class="el" href="show__on__source_8cpp_source.html">show_on_source.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="show__on__source_8cpp_source.html#l00053">53</a> of file <a class="el" href="show__on__source_8cpp_source.html">show_on_source.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a6358dcad3d8805bdcd4d7aca32ea5fbd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6358dcad3d8805bdcd4d7aca32ea5fbd">&#9670;&nbsp;</a></span>show_location()</h2>
+<a id="a3fffee3679f3b4feed220fa5c2b0f6cb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3fffee3679f3b4feed220fa5c2b0f6cb">&#9670;&nbsp;</a></span>show_location()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -224,7 +225,7 @@ Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static <a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt;std::string&gt; show_location </td>
+          <td class="memname">static std::optional&lt;std::string&gt; show_location </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classai__baset.html">ai_baset</a> &amp;&#160;</td>
           <td class="paramname"><em>ai</em>, </td>
@@ -250,7 +251,7 @@ Functions</h2></td></tr>
 
 <p>get the name of the file referred to at a location loc, if any </p>
 
-<p class="definition">Definition at line <a class="el" href="show__on__source_8cpp_source.html#l00024">24</a> of file <a class="el" href="show__on__source_8cpp_source.html">show_on_source.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="show__on__source_8cpp_source.html#l00021">21</a> of file <a class="el" href="show__on__source_8cpp_source.html">show_on_source.cpp</a>.</p>
 
 </div>
 </div>
@@ -288,7 +289,7 @@ Functions</h2></td></tr>
 
 <p>output source code annotated with abstract states </p>
 
-<p class="definition">Definition at line <a class="el" href="show__on__source_8cpp_source.html#l00136">136</a> of file <a class="el" href="show__on__source_8cpp_source.html">show_on_source.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="show__on__source_8cpp_source.html#l00129">129</a> of file <a class="el" href="show__on__source_8cpp_source.html">show_on_source.cpp</a>.</p>
 
 </div>
 </div>
@@ -332,7 +333,7 @@ Functions</h2></td></tr>
 
 <p>output source code annotated with abstract states for given file </p>
 
-<p class="definition">Definition at line <a class="el" href="show__on__source_8cpp_source.html#l00071">71</a> of file <a class="el" href="show__on__source_8cpp_source.html">show_on_source.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="show__on__source_8cpp_source.html#l00068">68</a> of file <a class="el" href="show__on__source_8cpp_source.html">show_on_source.cpp</a>.</p>
 
 </div>
 </div>

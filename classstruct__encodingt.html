@@ -126,11 +126,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a7a60cb1f47f247dafe049135557f33cb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstruct__encodingt.html#a7a60cb1f47f247dafe049135557f33cb">decode</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;encoded, const <a class="el" href="classstruct__tag__typet.html">struct_tag_typet</a> &amp;original_type) const</td></tr>
 <tr class="memdesc:a7a60cb1f47f247dafe049135557f33cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reconstructs a struct expression of the <code>original_type</code> using the data from the bit vector <code>encoded</code> expression.  <a href="classstruct__encodingt.html#a7a60cb1f47f247dafe049135557f33cb">More...</a><br /></td></tr>
 <tr class="separator:a7a60cb1f47f247dafe049135557f33cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a95c85a808124c88e42ce722c5a9f9ae4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstruct__encodingt.html#a95c85a808124c88e42ce722c5a9f9ae4">decode</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;encoded, const <a class="el" href="classunion__tag__typet.html">union_tag_typet</a> &amp;original_type) const</td></tr>
+<tr class="separator:a95c85a808124c88e42ce722c5a9f9ae4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
 <tr class="memitem:a88179d5b2392421dfa49da6af7834067"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstruct__encodingt.html#a88179d5b2392421dfa49da6af7834067">encode_member</a> (const <a class="el" href="classmember__exprt.html">member_exprt</a> &amp;member_expr) const</td></tr>
-<tr class="memdesc:a88179d5b2392421dfa49da6af7834067"><td class="mdescLeft">&#160;</td><td class="mdescRight">The member expression selects the value of a field from a struct.  <a href="classstruct__encodingt.html#a88179d5b2392421dfa49da6af7834067">More...</a><br /></td></tr>
+<tr class="memdesc:a88179d5b2392421dfa49da6af7834067"><td class="mdescLeft">&#160;</td><td class="mdescRight">The member expression selects the value of a field from a struct or union.  <a href="classstruct__encodingt.html#a88179d5b2392421dfa49da6af7834067">More...</a><br /></td></tr>
 <tr class="separator:a88179d5b2392421dfa49da6af7834067"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
@@ -143,7 +145,7 @@ Private Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Encodes struct types/values into non-struct expressions/types. </p>
 
-<p class="definition">Definition at line <a class="el" href="struct__encoding_8h_source.html#l00017">17</a> of file <a class="el" href="struct__encoding_8h_source.html">struct_encoding.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="struct__encoding_8h_source.html#l00018">18</a> of file <a class="el" href="struct__encoding_8h_source.html">struct_encoding.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a8a520bcff95d5f858b8016855410d119"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8a520bcff95d5f858b8016855410d119">&#9670;&nbsp;</a></span>struct_encodingt() <span class="overload">[1/2]</span></h2>
@@ -169,7 +171,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00019">19</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00021">21</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
 
 </div>
 </div>
@@ -189,7 +191,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00024">24</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00026">26</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
 
 </div>
 </div>
@@ -220,7 +222,7 @@ Private Attributes</h2></td></tr>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a id="a7a60cb1f47f247dafe049135557f33cb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7a60cb1f47f247dafe049135557f33cb">&#9670;&nbsp;</a></span>decode()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a7a60cb1f47f247dafe049135557f33cb">&#9670;&nbsp;</a></span>decode() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -247,7 +249,37 @@ Private Attributes</h2></td></tr>
 
 <p>Reconstructs a struct expression of the <code>original_type</code> using the data from the bit vector <code>encoded</code> expression. </p>
 
-<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00193">193</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00256">256</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a95c85a808124c88e42ce722c5a9f9ae4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a95c85a808124c88e42ce722c5a9f9ae4">&#9670;&nbsp;</a></span>decode() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classexprt.html">exprt</a> struct_encodingt::decode </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>encoded</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classunion__tag__typet.html">union_tag_typet</a> &amp;&#160;</td>
+          <td class="paramname"><em>original_type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00284">284</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
 
 </div>
 </div>
@@ -267,7 +299,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00169">169</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00216">216</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
 
 </div>
 </div>
@@ -287,7 +319,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00032">32</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00047">47</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
 
 </div>
 </div>
@@ -315,10 +347,10 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>The member expression selects the value of a field from a struct. </p>
-<p>The struct is encoded as a single bitvector where the first field is stored in the highest bits. The second field is stored in the next highest set of bits and so on. As offsets are indexed from the lowest bit, any field can be selected by extracting the range of bits starting from an offset based on the combined width of the fields which follow the field being selected. </p>
+<p>The member expression selects the value of a field from a struct or union. </p>
+<p>Both structs and unions are encoded into a single large bit vector. The fields of a union are encoded into the lowest bits, with padding in the highest bits if needed. Structs are encoded as a single bitvector where the first field is stored in the highest bits. The second field is stored in the next highest set of bits and so on. As offsets are indexed from the lowest bit, any field can be selected by extracting the range of bits starting from an offset based on the combined width of the fields which follow the field being selected. </p>
 
-<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00155">155</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="struct__encoding_8cpp_source.html#l00194">194</a> of file <a class="el" href="struct__encoding_8cpp_source.html">struct_encoding.cpp</a>.</p>
 
 </div>
 </div>
@@ -343,7 +375,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="struct__encoding_8h_source.html#l00032">32</a> of file <a class="el" href="struct__encoding_8h_source.html">struct_encoding.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="struct__encoding_8h_source.html#l00035">35</a> of file <a class="el" href="struct__encoding_8h_source.html">struct_encoding.h</a>.</p>
 
 </div>
 </div>
@@ -367,7 +399,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="struct__encoding_8h_source.html#l00033">33</a> of file <a class="el" href="struct__encoding_8h_source.html">struct_encoding.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="struct__encoding_8h_source.html#l00036">36</a> of file <a class="el" href="struct__encoding_8h_source.html">struct_encoding.h</a>.</p>
 
 </div>
 </div>

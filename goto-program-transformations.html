@@ -99,7 +99,7 @@ Core Transformation Passes</h1>
 <h2><a class="anchor" id="assembly-transform"></a>
 Removal/Lowering of Assembly</h2>
 <p>This pass goes through the goto model and removes or lowers instances of assembly intructions. Assembly instructions are stored in instances of the <code>other</code> instruction.</p>
-<p>The implementation of this pass is called via the <a class="el" href="remove__asm_8h.html#a2b072c1e9ba650d417d6fa8eb28e381e">remove_asm(goto_modelt &amp;)</a> function. For full documentation of this pass see <a class="el" href="remove__asm_8h.html">remove_asm.h</a></p>
+<p>The implementation of this pass is called via the <a class="el" href="remove__asm_8h.html#a91a05c44e29f32fa11500ced8090a9e1">remove_asm(goto_modelt &amp;, message_handlert &amp;)</a> function. For full documentation of this pass see <a class="el" href="remove__asm_8h.html">remove_asm.h</a></p>
 <p><em>This pass has no predecessor.</em></p>
 <h2><a class="anchor" id="linking-transform"></a>
 Linking of Standard Libraries</h2>
@@ -115,7 +115,7 @@ Removal/Lowering of Function Pointers</h2>
 <h2><a class="anchor" id="mmio-transform"></a>
 Memory Mapped IO Instrumentation</h2>
 <p>This pass finds pointer dereferences and adds corresponding calls to the <code>__CPROVER_mm_io_r</code> and <code>__CPROVER_mm_io_w</code> modelling functions if they exist. See the device behaviour section of <code>modeling-mmio.md</code> for details of modeling memory-mapped I/O regions of device interfaces. This pass is always carried out but will only make changes if one of the modelling functions exist.</p>
-<p>The implementation of this pass is called via the <a class="el" href="mm__io_8h.html#aba2408a2ac06acdc97bcafad16586b23">mm_io</a> function. Further documentation of this pass can be found in <a class="el" href="mm__io_8h.html">mm_io.h</a></p>
+<p>The implementation of this pass is called via the <a class="el" href="mm__io_8h.html#ab990f28ba87ac487bc55b340e76da51d">mm_io</a> function. Further documentation of this pass can be found in <a class="el" href="mm__io_8h.html">mm_io.h</a></p>
 <p><em>Predecessor pass is <a class="el" href="goto-program-transformations.html#function-pointer-transform">Removal/Lowering of Function Pointers</a> .</em></p>
 <h2><a class="anchor" id="precondition-transform"></a>
 Instrument/Remove Preconditions</h2>
@@ -212,9 +212,9 @@ Add Coverage Goals</h2>
 <p><em>Predecessor pass is <a class="el" href="goto-program-transformations.html#remove-skip-transform">Remove Skip Instructions</a> .</em></p>
 <h2><a class="anchor" id="slicing-transforms"></a>
 Slicing</h2>
-<p>This includes several slicing passes as specified by various slicing command line options. The reachability slicer is enabled by the <code>--reachability-slice</code> command line option. The implementation of this pass is called via the <a class="el" href="reachability__slicer_8h.html#a7b182970f6c9e43371c61dba5cbc54a8">reachability_slicer(goto_modelt &amp;, message_handlert &amp;)</a> function. The full slicer is enabled by the <code>--full-slice</code> command line option. The implementation of this pass is called via the <a class="el" href="full__slicer_8h.html#a9d6f40be7bbd8dbd78b3b820a9e3749d">full_slicer(goto_modelt &amp;)</a> function.</p>
+<p>This includes several slicing passes as specified by various slicing command line options. The reachability slicer is enabled by the <code>--reachability-slice</code> command line option. The implementation of this pass is called via the <a class="el" href="reachability__slicer_8h.html#a7b182970f6c9e43371c61dba5cbc54a8">reachability_slicer(goto_modelt &amp;, message_handlert &amp;)</a> function. The full slicer is enabled by the <code>--full-slice</code> command line option. The implementation of this pass is called via the <a class="el" href="full__slicer_8h.html#a11fed0fe823caef378b79bb1eece8506">full_slicer(goto_modelt &amp;, message_handlert &amp;)</a> function.</p>
 <p><em>Predecessor pass is <a class="el" href="goto-program-transformations.html#properties-transform">Label Properties</a> .</em></p>
-<p>Last modified: 2023-09-26 22:31:23 +0200 </p>
+<p>Last modified: 2024-09-29 16:08:10 -0400 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

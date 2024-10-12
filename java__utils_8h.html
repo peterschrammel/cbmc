@@ -98,7 +98,6 @@ $(document).ready(function(){initNavTree('java__utils_8h.html',''); initResizabl
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;unordered_set&gt;</code><br />
-<code>#include &lt;<a class="el" href="nodiscard_8h_source.html">util/nodiscard.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="pointer__expr_8h_source.html">util/pointer_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="resolve__inherited__component_8h_source.html">goto-programs/resolve_inherited_component.h</a>&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -190,23 +189,23 @@ Functions</h2></td></tr>
 <tr class="memitem:afb63f314609cf12c7884e4ba407f032f"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#afb63f314609cf12c7884e4ba407f032f">pretty_print_java_type</a> (const std::string &amp;fqn_java_type)</td></tr>
 <tr class="memdesc:afb63f314609cf12c7884e4ba407f032f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Strip the package name from a java type, for the type to be pretty printed (java::java.lang.Integer -&gt; Integer).  <a href="java__utils_8h.html#afb63f314609cf12c7884e4ba407f032f">More...</a><br /></td></tr>
 <tr class="separator:afb63f314609cf12c7884e4ba407f032f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af8bcdd9e42842c100435d61466ec707f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classresolve__inherited__componentt_1_1inherited__componentt.html">resolve_inherited_componentt::inherited_componentt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#af8bcdd9e42842c100435d61466ec707f">get_inherited_component</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;component_class_id, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;component_name, const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, bool include_interfaces)</td></tr>
-<tr class="memdesc:af8bcdd9e42842c100435d61466ec707f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds an inherited component (method or field), taking component visibility into account.  <a href="java__utils_8h.html#af8bcdd9e42842c100435d61466ec707f">More...</a><br /></td></tr>
-<tr class="separator:af8bcdd9e42842c100435d61466ec707f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0ced08e4ca4fadebe286001a191d03c"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="classresolve__inherited__componentt_1_1inherited__componentt.html">resolve_inherited_componentt::inherited_componentt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#ad0ced08e4ca4fadebe286001a191d03c">get_inherited_component</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;component_class_id, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;component_name, const <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, bool include_interfaces)</td></tr>
+<tr class="memdesc:ad0ced08e4ca4fadebe286001a191d03c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds an inherited component (method or field), taking component visibility into account.  <a href="java__utils_8h.html#ad0ced08e4ca4fadebe286001a191d03c">More...</a><br /></td></tr>
+<tr class="separator:ad0ced08e4ca4fadebe286001a191d03c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaa7219675bbfa3781a7c40ff5f138709"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#aaa7219675bbfa3781a7c40ff5f138709">is_non_null_library_global</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;)</td></tr>
 <tr class="memdesc:aaa7219675bbfa3781a7c40ff5f138709"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if a symbol is a well-known non-null global.  <a href="java__utils_8h.html#aaa7219675bbfa3781a7c40ff5f138709">More...</a><br /></td></tr>
 <tr class="separator:aaa7219675bbfa3781a7c40ff5f138709"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a49fc9008a1330e6329658847b547673b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsymbolt.html">symbolt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a49fc9008a1330e6329658847b547673b">fresh_java_symbol</a> (const <a class="el" href="classtypet.html">typet</a> &amp;type, const std::string &amp;basename_prefix, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;source_location, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_name, <a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table)</td></tr>
 <tr class="separator:a49fc9008a1330e6329658847b547673b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4ebae8caea79ca846955c4237d7f0915"><td class="memItemLeft" align="right" valign="top"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a4ebae8caea79ca846955c4237d7f0915">declaring_class</a> (const <a class="el" href="classsymbolt.html">symbolt</a> &amp;symbol)</td></tr>
-<tr class="memdesc:a4ebae8caea79ca846955c4237d7f0915"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the identifier of the class which declared a given <code>symbol</code>.  <a href="java__utils_8h.html#a4ebae8caea79ca846955c4237d7f0915">More...</a><br /></td></tr>
-<tr class="separator:a4ebae8caea79ca846955c4237d7f0915"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5c20fc5d92ae7b166e1ae96b0b902424"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a5c20fc5d92ae7b166e1ae96b0b902424">set_declaring_class</a> (<a class="el" href="classsymbolt.html">symbolt</a> &amp;symbol, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;<a class="el" href="java__utils_8h.html#a4ebae8caea79ca846955c4237d7f0915">declaring_class</a>)</td></tr>
+<tr class="memitem:a311344961a89d136fc69d8b53083e46c"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a311344961a89d136fc69d8b53083e46c">declaring_class</a> (const <a class="el" href="classsymbolt.html">symbolt</a> &amp;symbol)</td></tr>
+<tr class="memdesc:a311344961a89d136fc69d8b53083e46c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the identifier of the class which declared a given <code>symbol</code>.  <a href="java__utils_8h.html#a311344961a89d136fc69d8b53083e46c">More...</a><br /></td></tr>
+<tr class="separator:a311344961a89d136fc69d8b53083e46c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c20fc5d92ae7b166e1ae96b0b902424"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a5c20fc5d92ae7b166e1ae96b0b902424">set_declaring_class</a> (<a class="el" href="classsymbolt.html">symbolt</a> &amp;symbol, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;<a class="el" href="java__utils_8h.html#a311344961a89d136fc69d8b53083e46c">declaring_class</a>)</td></tr>
 <tr class="memdesc:a5c20fc5d92ae7b166e1ae96b0b902424"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the identifier of the class which declared a given <code>symbol</code> to <code>declaring_class</code>.  <a href="java__utils_8h.html#a5c20fc5d92ae7b166e1ae96b0b902424">More...</a><br /></td></tr>
 <tr class="separator:a5c20fc5d92ae7b166e1ae96b0b902424"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2e09e1fbfb5d08c9df24a0b6acce3c03"><td class="memItemLeft" align="right" valign="top"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#a2e09e1fbfb5d08c9df24a0b6acce3c03">class_name_from_method_name</a> (const std::string &amp;method_name)</td></tr>
-<tr class="memdesc:a2e09e1fbfb5d08c9df24a0b6acce3c03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get JVM type name of the class in which <code>method_name</code> is defined.  <a href="java__utils_8h.html#a2e09e1fbfb5d08c9df24a0b6acce3c03">More...</a><br /></td></tr>
-<tr class="separator:a2e09e1fbfb5d08c9df24a0b6acce3c03"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae18a8f330d49fbe452689b4c9f95a344"><td class="memItemLeft" align="right" valign="top">std::optional&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="java__utils_8h.html#ae18a8f330d49fbe452689b4c9f95a344">class_name_from_method_name</a> (const std::string &amp;method_name)</td></tr>
+<tr class="memdesc:ae18a8f330d49fbe452689b4c9f95a344"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get JVM type name of the class in which <code>method_name</code> is defined.  <a href="java__utils_8h.html#ae18a8f330d49fbe452689b4c9f95a344">More...</a><br /></td></tr>
+<tr class="separator:ae18a8f330d49fbe452689b4c9f95a344"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -227,7 +226,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="java__utils_8h_source.html#l00104">104</a> of file <a class="el" href="java__utils_8h_source.html">java_utils.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__utils_8h_source.html#l00103">103</a> of file <a class="el" href="java__utils_8h_source.html">java_utils.h</a>.</p>
 
 </div>
 </div>
@@ -256,18 +255,18 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00282">282</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00281">281</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a2e09e1fbfb5d08c9df24a0b6acce3c03"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2e09e1fbfb5d08c9df24a0b6acce3c03">&#9670;&nbsp;</a></span>class_name_from_method_name()</h2>
+<a id="ae18a8f330d49fbe452689b4c9f95a344"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae18a8f330d49fbe452689b4c9f95a344">&#9670;&nbsp;</a></span>class_name_from_method_name()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt;std::string&gt; class_name_from_method_name </td>
+          <td class="memname">std::optional&lt;std::string&gt; class_name_from_method_name </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>method_name</em></td><td>)</td>
@@ -279,18 +278,18 @@ Variables</h2></td></tr>
 <p>Get JVM type name of the class in which <code>method_name</code> is defined. </p>
 <p>Returns an empty optional if the class name cannot be retrieved, e.g. method_name is an internal function. </p>
 
-<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00581">581</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00580">580</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a4ebae8caea79ca846955c4237d7f0915"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4ebae8caea79ca846955c4237d7f0915">&#9670;&nbsp;</a></span>declaring_class()</h2>
+<a id="a311344961a89d136fc69d8b53083e46c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a311344961a89d136fc69d8b53083e46c">&#9670;&nbsp;</a></span>declaring_class()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt;<a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&gt; declaring_class </td>
+          <td class="memname">std::optional&lt;<a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&gt; declaring_class </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classsymbolt.html">symbolt</a> &amp;&#160;</td>
           <td class="paramname"><em>symbol</em></td><td>)</td>
@@ -302,7 +301,7 @@ Variables</h2></td></tr>
 <p>Gets the identifier of the class which declared a given <code>symbol</code>. </p>
 <p>If the symbol is not declared by a class then an empty optional is returned. This is used for method symbols and static field symbols to link them back to the class which declared them. </p>
 
-<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00569">569</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00568">568</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -358,7 +357,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the index of the matching corresponding closing delimiter in <code>src</code> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00303">303</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00302">302</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -417,7 +416,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>fresh-named symbol with the requested name pattern </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00556">556</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00555">555</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -485,14 +484,14 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="af8bcdd9e42842c100435d61466ec707f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af8bcdd9e42842c100435d61466ec707f">&#9670;&nbsp;</a></span>get_inherited_component()</h2>
+<a id="ad0ced08e4ca4fadebe286001a191d03c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad0ced08e4ca4fadebe286001a191d03c">&#9670;&nbsp;</a></span>get_inherited_component()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt;<a class="el" href="classresolve__inherited__componentt_1_1inherited__componentt.html">resolve_inherited_componentt::inherited_componentt</a>&gt; get_inherited_component </td>
+          <td class="memname">std::optional&lt;<a class="el" href="classresolve__inherited__componentt_1_1inherited__componentt.html">resolve_inherited_componentt::inherited_componentt</a>&gt; get_inherited_component </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
           <td class="paramname"><em>component_class_id</em>, </td>
@@ -535,7 +534,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the concrete component referred to if any is found, or an invalid <a class="el" href="classresolve__inherited__componentt_1_1inherited__componentt.html">resolve_inherited_componentt::inherited_componentt</a> otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00449">449</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00448">448</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -636,7 +635,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if this static field is known never to be null </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00520">520</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00519">519</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -719,7 +718,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00342">342</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00341">341</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -837,7 +836,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a function application expression representing: <code>function_name(arguments)</code> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00385">385</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00384">384</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -868,7 +867,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Attaches a source location to an expression and all of its subexpressions. </p>
-<p>Usually only codet needs this, but there are a few known examples of expressions needing a location, such as <code><a class="el" href="classgoto__convertt.html#a734c3e7a0c005e53166fe98fa2b08add" title="add function calls to function queue for later processing">goto_convertt::do_function_call_symbol</a></code> (function() needs a location) and <code><a class="el" href="classgoto__convertt.html#a74adee3be1eda9342d4ff5502260584a">goto_convertt::clean_expr</a></code> (any subexpression being split into a separate instruction needs a location), so for safety we give every mentioned expression a location. Any code or expressions with source location fields already set keep those fields using rules of <a class="el" href="classsource__locationt.html#a009ab1a4a63a2b4a8acf53bbf8f1a45d" title="Set all unset source-location fields in this object to their values in &#39;from&#39;.">source_locationt::merge</a>. </p>
+<p>Usually only codet needs this, but there are a few known examples of expressions needing a location, such as <code><a class="el" href="classgoto__convertt.html#a734c3e7a0c005e53166fe98fa2b08add" title="add function calls to function queue for later processing">goto_convertt::do_function_call_symbol</a></code> (function() needs a location) and <code><a class="el" href="classgoto__convertt.html#aed71820ae4bd3154a5730614dbe782a1">goto_convertt::clean_expr</a></code> (any subexpression being split into a separate instruction needs a location), so for safety we give every mentioned expression a location. Any code or expressions with source location fields already set keep those fields using rules of <a class="el" href="classsource__locationt.html#a009ab1a4a63a2b4a8acf53bbf8f1a45d" title="Set all unset source-location fields in this object to their values in &#39;from&#39;.">source_locationt::merge</a>. </p>
 
 <p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00198">198</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
 
@@ -902,7 +901,7 @@ Variables</h2></td></tr>
 
 <p>Given a pointer type to a Java class and a type representing a more specific Java class, return a pointer type to the more specific class with the same structure as the original pointer type. </p>
 
-<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00270">270</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00269">269</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -931,7 +930,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The pretty printed type if there was a match of the qualifiers, or the type as it was passed otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00422">422</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00421">421</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -1009,7 +1008,7 @@ Variables</h2></td></tr>
 
 <p>Sets the identifier of the class which declared a given <code>symbol</code> to <code>declaring_class</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00575">575</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00574">574</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -1038,7 +1037,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the identifier without without java:: prefix </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00408">408</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00407">407</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -1065,7 +1064,7 @@ Variables</h2></td></tr>
 
 <p>Methods belonging to the class org.cprover.CProver that should be ignored (not converted), leaving the driver program to stub them if it wishes. </p>
 
-<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00530">530</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="java__utils_8cpp_source.html#l00529">529</a> of file <a class="el" href="java__utils_8cpp_source.html">java_utils.cpp</a>.</p>
 
 </div>
 </div>

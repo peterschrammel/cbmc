@@ -1,10 +1,10 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/byte_operators.h" name="/home/runner/work/cbmc/cbmc/src/util/byte_operators.h">
 <area shape="rect" id="node1" title="Expression classes for byte&#45;level operators." alt="" coords="850,5,1073,47"/>
-<area shape="rect" id="node2" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="698,767,790,793"/>
+<area shape="rect" id="node2" href="$src_2util_2invariant_8h.html" title=" " alt="" coords="701,767,793,793"/>
 <area shape="rect" id="node7" href="$std__expr_8h.html" title="API to expression classes." alt="" coords="875,95,965,121"/>
-<area shape="rect" id="node3" title=" " alt="" coords="758,841,823,868"/>
-<area shape="rect" id="node4" title=" " alt="" coords="659,841,733,868"/>
-<area shape="rect" id="node5" title=" " alt="" coords="321,841,380,868"/>
+<area shape="rect" id="node3" title=" " alt="" coords="761,841,826,868"/>
+<area shape="rect" id="node4" title=" " alt="" coords="661,841,736,868"/>
+<area shape="rect" id="node5" title=" " alt="" coords="337,841,396,868"/>
 <area shape="rect" id="node6" title=" " alt="" coords="10,841,102,868"/>
 <area shape="rect" id="node8" href="$expr__cast_8h.html" title="Templated functions to cast to specific exprt&#45;derived classes." alt="" coords="399,244,497,271"/>
 <area shape="rect" id="node23" href="$std__types_8h.html" title="Pre&#45;defined types." alt="" coords="647,169,745,196"/>
@@ -16,11 +16,11 @@
 <area shape="rect" id="node20" href="$validation__mode_8h.html" title=" " alt="" coords="251,543,394,569"/>
 <area shape="rect" id="node21" href="$validate__types_8h.html" title=" " alt="" coords="511,468,641,495"/>
 <area shape="rect" id="node22" href="$validate__expressions_8h.html" title=" " alt="" coords="355,393,527,420"/>
-<area shape="rect" id="node14" href="$source__location_8h.html" title=" " alt="" coords="317,617,453,644"/>
+<area shape="rect" id="node14" href="$source__location_8h.html" title=" " alt="" coords="324,617,460,644"/>
 <area shape="rect" id="node18" href="$validate_8h.html" title=" " alt="" coords="106,468,193,495"/>
-<area shape="rect" id="node15" href="$deprecate_8h.html" title=" " alt="" coords="516,692,615,719"/>
-<area shape="rect" id="node16" href="$irep_8h.html" title=" " alt="" coords="321,692,380,719"/>
-<area shape="rect" id="node17" href="$optional_8h.html" title=" " alt="" coords="405,692,491,719"/>
+<area shape="rect" id="node15" href="$deprecate_8h.html" title=" " alt="" coords="519,692,617,719"/>
+<area shape="rect" id="node16" href="$irep_8h.html" title=" " alt="" coords="337,692,396,719"/>
+<area shape="rect" id="node17" title=" " alt="" coords="420,692,495,719"/>
 <area shape="rect" id="node19" href="$exception__utils_8h.html" title=" " alt="" coords="93,543,227,569"/>
 <area shape="rect" id="node24" href="$mp__arith_8h.html" title=" " alt="" coords="762,244,854,271"/>
 <area shape="rect" id="node27" title=" " alt="" coords="534,244,658,271"/>

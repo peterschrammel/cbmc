@@ -1,8 +1,6 @@
 var classconstant__interval__exprt =
 [
-    [ "constant_interval_exprt", "classconstant__interval__exprt.html#ae93e2a6f7c881909b236ff6f00104345", null ],
-    [ "constant_interval_exprt", "classconstant__interval__exprt.html#ac5b65ae27c902731846cb3632e3c31e3", null ],
-    [ "constant_interval_exprt", "classconstant__interval__exprt.html#a7c67a896e4d300be65440066a94e57d3", null ],
+    [ "constant_interval_exprt", "classconstant__interval__exprt.html#a04b2d2c2e9fecd6f2602589321a0805a", null ],
     [ "constant_interval_exprt", "classconstant__interval__exprt.html#a2adb9210f889a304d0d2c0d8bf64fe65", null ],
     [ "constant_interval_exprt", "classconstant__interval__exprt.html#acbecadfac828ab4ea83696c2092fed7e", null ],
     [ "abs", "classconstant__interval__exprt.html#aec26ffa991c8993f6924017a5717733e", null ],
@@ -125,8 +123,8 @@ var classconstant__interval__exprt =
     [ "logical_or", "classconstant__interval__exprt.html#aab603a2ab1abb54d05892210e0b9ffa5", null ],
     [ "logical_xor", "classconstant__interval__exprt.html#a7ebde4cedbaa9f8bc503faf571adaf88", null ],
     [ "logical_xor", "classconstant__interval__exprt.html#adb595cb4528b83187d881c0bc8f165d9", null ],
-    [ "max", "classconstant__interval__exprt.html#ad58843d70d05a95924024f14a8168b29", null ],
-    [ "min", "classconstant__interval__exprt.html#ad4f5092d4c94466ec801089b92299248", null ],
+    [ "max", "classconstant__interval__exprt.html#a0540efcaf99f1ec17a9cea601d22e940", null ],
+    [ "min", "classconstant__interval__exprt.html#a1b17f5034cb8fc17204810ecab30543a", null ],
     [ "minus", "classconstant__interval__exprt.html#a8c35d122568e5fd939ec1eca81522ffa", null ],
     [ "minus", "classconstant__interval__exprt.html#a186109dc69c97f6b2c677a119d49cecf", null ],
     [ "modulo", "classconstant__interval__exprt.html#a77e8964c8f04b8465ce18159f10a5e28", null ],
@@ -142,6 +140,7 @@ var classconstant__interval__exprt =
     [ "right_shift", "classconstant__interval__exprt.html#ae14e807fc34d78501d1c5f74b22887b3", null ],
     [ "simplified_expr", "classconstant__interval__exprt.html#ab1c991eed5387c1314bcc33485adac9f", null ],
     [ "simplified_interval", "classconstant__interval__exprt.html#af5aa561bdf8cbf631bc1e7c6388a901a", null ],
+    [ "singleton", "classconstant__interval__exprt.html#aacee2cf4540f3191eb9fa2c72e3e934a", null ],
     [ "to_string", "classconstant__interval__exprt.html#a9de6630f4b022262ee948c9426847b5b", null ],
     [ "top", "classconstant__interval__exprt.html#ae8629ccd83ead83e00b1f43d46834040", null ],
     [ "top", "classconstant__interval__exprt.html#ac2b6fafe5bd22e20796391e68b956a8a", null ],

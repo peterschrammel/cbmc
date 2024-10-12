@@ -109,25 +109,25 @@ $(document).ready(function(){initNavTree('sharing__node_8h_source.html',''); ini
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &lt;forward_list&gt;</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;type_traits&gt;</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#ifndef SN_SMALL_MAP</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="sharing__node_8h.html#a7e1d4579ff85bd35c33156971e497009">   23</a></span>&#160;<span class="preprocessor">#define SN_SMALL_MAP 1</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#ifndef SN_SHARE_KEYS</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="sharing__node_8h.html#a5ff46011b8e2a8d013486f1b19ddaa46">   27</a></span>&#160;<span class="preprocessor">#define SN_SHARE_KEYS 0</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#if SN_SMALL_MAP == 1</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="small__map_8h.html">small_map.h</a>&quot;</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#include &lt;map&gt;</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="as__const_8h.html">as_const.h</a>&quot;</span></div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="unit_2testing-utils_2invariant_8h.html">invariant.h</a>&quot;</span></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="make__unique_8h.html">make_unique.h</a>&quot;</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;functional&gt;</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;type_traits&gt;</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#ifndef SN_SMALL_MAP</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno"><a class="line" href="sharing__node_8h.html#a7e1d4579ff85bd35c33156971e497009">   24</a></span>&#160;<span class="preprocessor">#define SN_SMALL_MAP 1</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#ifndef SN_SHARE_KEYS</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="sharing__node_8h.html#a5ff46011b8e2a8d013486f1b19ddaa46">   28</a></span>&#160;<span class="preprocessor">#define SN_SHARE_KEYS 0</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#if SN_SMALL_MAP == 1</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="small__map_8h.html">small_map.h</a>&quot;</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">#include &lt;map&gt;</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="as__const_8h.html">as_const.h</a>&quot;</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="unit_2testing-utils_2invariant_8h.html">invariant.h</a>&quot;</span></div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="small__shared__n__way__ptr_8h.html">small_shared_n_way_ptr.h</a>&quot;</span></div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="small__shared__ptr_8h.html">small_shared_ptr.h</a>&quot;</span></div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
@@ -638,7 +638,6 @@ $(document).ready(function(){initNavTree('sharing__node_8h_source.html',''); ini
 <div class="ttc" id="aclasssmall__shared__n__way__ptrt_html_adb4f27dd712e8847d6cae4089e644caa"><div class="ttname"><a href="classsmall__shared__n__way__ptrt.html#adb4f27dd712e8847d6cae4089e644caa">small_shared_n_way_ptrt&lt; d_containert&lt; keyT, valueT, equalT &gt;, d_leaft&lt; keyT, valueT, equalT &gt;, d_internalt&lt; keyT, valueT, equalT &gt; &gt;::use_countt</a></div><div class="ttdeci">decltype(std::declval&lt; typename get_typet&lt; 0, Ts... &gt;::type &gt;() .get_use_count()) typedef use_countt</div><div class="ttdef"><b>Definition:</b> <a href="small__shared__n__way__ptr_8h_source.html#l00101">small_shared_n_way_ptr.h:98</a></div></div>
 <div class="ttc" id="aclasssmall__shared__n__way__ptrt_html_af8b06f023ac85f93ea1c12b14f344250"><div class="ttname"><a href="classsmall__shared__n__way__ptrt.html#af8b06f023ac85f93ea1c12b14f344250">small_shared_n_way_ptrt::swap</a></div><div class="ttdeci">void swap(small_shared_n_way_ptrt &amp;rhs)</div><div class="ttdef"><b>Definition:</b> <a href="small__shared__n__way__ptr_8h_source.html#l00174">small_shared_n_way_ptr.h:174</a></div></div>
 <div class="ttc" id="airep__hash_8h_html_a6f2aef269e9e7c90182bcb65e01977d3"><div class="ttname"><a href="irep__hash_8h.html#a6f2aef269e9e7c90182bcb65e01977d3">r</a></div><div class="ttdeci">static int8_t r</div><div class="ttdef"><b>Definition:</b> <a href="irep__hash_8h_source.html#l00059">irep_hash.h:60</a></div></div>
-<div class="ttc" id="amake__unique_8h_html"><div class="ttname"><a href="make__unique_8h.html">make_unique.h</a></div></div>
 <div class="ttc" id="asharing__node_8h_html_a04abff4716dc7bc7fc476230f3720b15"><div class="ttname"><a href="sharing__node_8h.html#a04abff4716dc7bc7fc476230f3720b15">SN_ASSERT</a></div><div class="ttdeci">#define SN_ASSERT(b)</div><div class="ttdef"><b>Definition:</b> <a href="sharing__node_8h_source.html#l00046">sharing_node.h:46</a></div></div>
 <div class="ttc" id="asharing__node_8h_html_a2dfe4ec7ef38872f074231872eefa6a2"><div class="ttname"><a href="sharing__node_8h.html#a2dfe4ec7ef38872f074231872eefa6a2">d_baset</a></div><div class="ttdeci">small_shared_n_way_pointee_baset&lt; 3, unsigned &gt; d_baset</div><div class="ttdef"><b>Definition:</b> <a href="sharing__node_8h_source.html#l00065">sharing_node.h:65</a></div></div>
 <div class="ttc" id="asharing__node_8h_html_a8490185196cbbbf07f8748beead4a36b"><div class="ttname"><a href="sharing__node_8h.html#a8490185196cbbbf07f8748beead4a36b">SN_ASSERT_USE</a></div><div class="ttdeci">#define SN_ASSERT_USE(v, b)</div><div class="ttdef"><b>Definition:</b> <a href="sharing__node_8h_source.html#l00047">sharing_node.h:47</a></div></div>

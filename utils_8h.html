@@ -97,17 +97,19 @@ $(document).ready(function(){initNavTree('utils_8h.html',''); initResizable(); }
 <div class="title">utils.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="goto__convert__class_8h_source.html">goto-programs/goto_convert_class.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="goto__convert__class_8h_source.html">ansi-c/goto-conversion/goto_convert_class.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="goto__model_8h_source.html">goto-programs/goto_model.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="loop__ids_8h_source.html">goto-programs/loop_ids.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="local__may__alias_8h_source.html">analyses/local_may_alias.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="havoc__utils_8h_source.html">goto-instrument/havoc_utils.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="loop__utils_8h_source.html">goto-instrument/loop_utils.h</a>&gt;</code><br />
 <code>#include &lt;vector&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for utils.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="utils_8h__incl.svg" width="2364" height="1231"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="utils_8h__incl.svg" width="3287" height="976"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -115,7 +117,7 @@ $(document).ready(function(){initNavTree('utils_8h.html',''); initResizable(); }
 <div id="dynsection-1-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="utils_8h__dep__incl.svg" width="5230" height="527"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="utils_8h__dep__incl.svg" width="4620" height="527"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -165,24 +167,24 @@ Functions</h2></td></tr>
 <tr class="memitem:a2636321c60f87bb1a79d8e8ba0d59dac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#a2636321c60f87bb1a79d8e8ba0d59dac">insert_before_and_update_jumps</a> (<a class="el" href="classgoto__programt.html">goto_programt</a> &amp;destination, <a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a> &amp;target, const <a class="el" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a> &amp;i)</td></tr>
 <tr class="memdesc:a2636321c60f87bb1a79d8e8ba0d59dac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert a goto instruction before a target instruction iterator and update targets of all jumps that points to the iterator to jumping to the inserted instruction.  <a href="utils_8h.html#a2636321c60f87bb1a79d8e8ba0d59dac">More...</a><br /></td></tr>
 <tr class="separator:a2636321c60f87bb1a79d8e8ba0d59dac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aba81cb53e8d0082cbe68db4136188024"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#aba81cb53e8d0082cbe68db4136188024">simplify_gotos</a> (<a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
-<tr class="memdesc:aba81cb53e8d0082cbe68db4136188024"><td class="mdescLeft">&#160;</td><td class="mdescRight">Turns goto instructions <code>IF cond GOTO label</code> where the condition statically simplifies to <code>false</code> into SKIP instructions.  <a href="utils_8h.html#aba81cb53e8d0082cbe68db4136188024">More...</a><br /></td></tr>
-<tr class="separator:aba81cb53e8d0082cbe68db4136188024"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3813c832f1bc8415bed3d3f17d14b763"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#a3813c832f1bc8415bed3d3f17d14b763">is_loop_free</a> (const <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, <a class="el" href="classmessaget.html">messaget</a> &amp;log)</td></tr>
-<tr class="memdesc:a3813c832f1bc8415bed3d3f17d14b763"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true iff the given program is loop-free, i.e.  <a href="utils_8h.html#a3813c832f1bc8415bed3d3f17d14b763">More...</a><br /></td></tr>
-<tr class="separator:a3813c832f1bc8415bed3d3f17d14b763"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a90cb59d025201658c14ea7cb25f17d35"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#a90cb59d025201658c14ea7cb25f17d35">simplify_gotos</a> (<a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
+<tr class="memdesc:a90cb59d025201658c14ea7cb25f17d35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Turns goto instructions <code>IF cond GOTO label</code> where the condition statically simplifies to <code>false</code> into SKIP instructions.  <a href="utils_8h.html#a90cb59d025201658c14ea7cb25f17d35">More...</a><br /></td></tr>
+<tr class="separator:a90cb59d025201658c14ea7cb25f17d35"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a347ede8327e2002d1bfa8e5133d11a27"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#a347ede8327e2002d1bfa8e5133d11a27">is_loop_free</a> (const <a class="el" href="classgoto__programt.html">goto_programt</a> &amp;goto_program, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, <a class="el" href="classmessaget.html">messaget</a> &amp;<a class="el" href="math_8c.html#adb302c9aafbaa5e180d9f60ee954bb82">log</a>)</td></tr>
+<tr class="memdesc:a347ede8327e2002d1bfa8e5133d11a27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true iff the given program is loop-free, i.e.  <a href="utils_8h.html#a347ede8327e2002d1bfa8e5133d11a27">More...</a><br /></td></tr>
+<tr class="separator:a347ede8327e2002d1bfa8e5133d11a27"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c73b0b817e6e049ea409d0c86e7b3e3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#a1c73b0b817e6e049ea409d0c86e7b3e3">make_assigns_clause_replacement_tracking_comment</a> (const <a class="el" href="classexprt.html">exprt</a> &amp;target, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
 <tr class="memdesc:a1c73b0b817e6e049ea409d0c86e7b3e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> that essentially says that <code>target</code> was assigned by the contract of <code>function_id</code>.  <a href="utils_8h.html#a1c73b0b817e6e049ea409d0c86e7b3e3">More...</a><br /></td></tr>
 <tr class="separator:a1c73b0b817e6e049ea409d0c86e7b3e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5da8544cddc0cac684c91b55b4d2ab4f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#a5da8544cddc0cac684c91b55b4d2ab4f">is_assigns_clause_replacement_tracking_comment</a> (const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;<a class="el" href="race__check_8cpp.html#a2217bb60214bb77be5471bc6ba4aafc7">comment</a>)</td></tr>
 <tr class="memdesc:a5da8544cddc0cac684c91b55b4d2ab4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the given comment matches the type of comments created by <a class="el" href="utils_8h.html#a1c73b0b817e6e049ea409d0c86e7b3e3">make_assigns_clause_replacement_tracking_comment</a>.  <a href="utils_8h.html#a5da8544cddc0cac684c91b55b4d2ab4f">More...</a><br /></td></tr>
 <tr class="separator:a5da8544cddc0cac684c91b55b4d2ab4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2b040a282aa48c89e8738cbc128e3822"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#a2b040a282aa48c89e8738cbc128e3822">infer_loop_assigns</a> (const <a class="el" href="classlocal__may__aliast.html">local_may_aliast</a> &amp;local_may_alias, const <a class="el" href="loop__utils_8h.html#a1b7ef608962ab556c4d637991d616023">loopt</a> &amp;loop, <a class="el" href="havoc__utils_8h.html#a3cb48127eadbd7ae4878b91c91439bee">assignst</a> &amp;assigns)</td></tr>
+<tr class="memdesc:a2b040a282aa48c89e8738cbc128e3822"><td class="mdescLeft">&#160;</td><td class="mdescRight">Infer loop assigns using alias analysis result <code>local_may_alias</code>.  <a href="utils_8h.html#a2b040a282aa48c89e8738cbc128e3822">More...</a><br /></td></tr>
+<tr class="separator:a2b040a282aa48c89e8738cbc128e3822"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ec8b1b695a472d1ee3ffc455fb07995"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#a8ec8b1b695a472d1ee3ffc455fb07995">widen_assigns</a> (<a class="el" href="havoc__utils_8h.html#a3cb48127eadbd7ae4878b91c91439bee">assignst</a> &amp;assigns, const <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns)</td></tr>
 <tr class="memdesc:a8ec8b1b695a472d1ee3ffc455fb07995"><td class="mdescLeft">&#160;</td><td class="mdescRight">Widen expressions in <code>assigns</code> with the following strategy.  <a href="utils_8h.html#a8ec8b1b695a472d1ee3ffc455fb07995">More...</a><br /></td></tr>
 <tr class="separator:a8ec8b1b695a472d1ee3ffc455fb07995"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a294e2a465538cef6fe58910023492ac3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#a294e2a465538cef6fe58910023492ac3">add_quantified_variable</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, <a class="el" href="classexprt.html">exprt</a> &amp;expression, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;mode)</td></tr>
-<tr class="memdesc:a294e2a465538cef6fe58910023492ac3"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function recursively searches <code>expression</code> to find nested or non-nested quantified expressions.  <a href="utils_8h.html#a294e2a465538cef6fe58910023492ac3">More...</a><br /></td></tr>
-<tr class="separator:a294e2a465538cef6fe58910023492ac3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0b931288a19e60b91ac791eb53cbf9a1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structreplace__history__parametert.html">replace_history_parametert</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#a0b931288a19e60b91ac791eb53cbf9a1">replace_history_old</a> (<a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;symbol_table, const <a class="el" href="classexprt.html">exprt</a> &amp;expr, const <a class="el" href="classsource__locationt.html">source_locationt</a> &amp;location, const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;mode)</td></tr>
 <tr class="memdesc:a0b931288a19e60b91ac791eb53cbf9a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function recursively identifies the "old" expressions within <code>expr</code> and replaces them with corresponding history variables.  <a href="utils_8h.html#a0b931288a19e60b91ac791eb53cbf9a1">More...</a><br /></td></tr>
 <tr class="separator:a0b931288a19e60b91ac791eb53cbf9a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -218,6 +220,15 @@ Functions</h2></td></tr>
 <tr class="memitem:a5b70f6fb5fede91018331caeb1991280"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgoto__programt.html#a482e1655ec4a9670ab70f49c0cfb4b09">goto_programt::targett</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#a5b70f6fb5fede91018331caeb1991280">get_loop_head</a> (const unsigned int loop_number, <a class="el" href="classgoto__functiont.html">goto_functiont</a> &amp;function)</td></tr>
 <tr class="memdesc:a5b70f6fb5fede91018331caeb1991280"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find and return the first instruction of the natural loop with <code>loop_number</code> in <code>function</code>.  <a href="utils_8h.html#a5b70f6fb5fede91018331caeb1991280">More...</a><br /></td></tr>
 <tr class="separator:a5b70f6fb5fede91018331caeb1991280"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2dd9b5e29dad3f207a13ed8a34644bf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#af2dd9b5e29dad3f207a13ed8a34644bf">get_loop_invariants</a> (const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;loop_end, const bool check_side_effect=true)</td></tr>
+<tr class="memdesc:af2dd9b5e29dad3f207a13ed8a34644bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract loop invariants from annotated loop end.  <a href="utils_8h.html#af2dd9b5e29dad3f207a13ed8a34644bf">More...</a><br /></td></tr>
+<tr class="separator:af2dd9b5e29dad3f207a13ed8a34644bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a877a2a163b03545e093c694671a414"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#a3a877a2a163b03545e093c694671a414">get_loop_assigns</a> (const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;loop_end)</td></tr>
+<tr class="memdesc:a3a877a2a163b03545e093c694671a414"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract loop assigns from annotated loop end.  <a href="utils_8h.html#a3a877a2a163b03545e093c694671a414">More...</a><br /></td></tr>
+<tr class="separator:a3a877a2a163b03545e093c694671a414"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae86effaa2a5d639ed4d4b0ed546c3916"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#ae86effaa2a5d639ed4d4b0ed546c3916">get_loop_decreases</a> (const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;loop_end, const bool check_side_effect=true)</td></tr>
+<tr class="memdesc:ae86effaa2a5d639ed4d4b0ed546c3916"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract loop decreases from annotated loop end.  <a href="utils_8h.html#ae86effaa2a5d639ed4d4b0ed546c3916">More...</a><br /></td></tr>
+<tr class="separator:ae86effaa2a5d639ed4d4b0ed546c3916"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aab60371e081d74195d69c087bb3b9543"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8h.html#aab60371e081d74195d69c087bb3b9543">annotate_invariants</a> (const <a class="el" href="utils_8h.html#a64838a6fe2bdb68b1dfbc524788ea90c">invariant_mapt</a> &amp;invariant_map, <a class="el" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</td></tr>
 <tr class="memdesc:aab60371e081d74195d69c087bb3b9543"><td class="mdescLeft">&#160;</td><td class="mdescRight">Annotate the invariants in <code>invariant_map</code> to their corresponding loops.  <a href="utils_8h.html#aab60371e081d74195d69c087bb3b9543">More...</a><br /></td></tr>
 <tr class="separator:aab60371e081d74195d69c087bb3b9543"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -243,7 +254,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="utils_8h_source.html#l00024">24</a> of file <a class="el" href="utils_8h_source.html">utils.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8h_source.html#l00026">26</a> of file <a class="el" href="utils_8h_source.html">utils.h</a>.</p>
 
 </div>
 </div>
@@ -259,7 +270,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="utils_8h_source.html#l00023">23</a> of file <a class="el" href="utils_8h_source.html">utils.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8h_source.html#l00025">25</a> of file <a class="el" href="utils_8h_source.html">utils.h</a>.</p>
 
 </div>
 </div>
@@ -275,7 +286,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="utils_8h_source.html#l00025">25</a> of file <a class="el" href="utils_8h_source.html">utils.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8h_source.html#l00027">27</a> of file <a class="el" href="utils_8h_source.html">utils.h</a>.</p>
 
 </div>
 </div>
@@ -291,7 +302,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="utils_8h_source.html#l00026">26</a> of file <a class="el" href="utils_8h_source.html">utils.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8h_source.html#l00028">28</a> of file <a class="el" href="utils_8h_source.html">utils.h</a>.</p>
 
 </div>
 </div>
@@ -308,50 +319,11 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="utils_8h_source.html#l00030">30</a> of file <a class="el" href="utils_8h_source.html">utils.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8h_source.html#l00032">32</a> of file <a class="el" href="utils_8h_source.html">utils.h</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a294e2a465538cef6fe58910023492ac3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a294e2a465538cef6fe58910023492ac3">&#9670;&nbsp;</a></span>add_quantified_variable()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void add_quantified_variable </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classsymbol__table__baset.html">symbol_table_baset</a> &amp;&#160;</td>
-          <td class="paramname"><em>symbol_table</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
-          <td class="paramname"><em>expression</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
-          <td class="paramname"><em>mode</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>This function recursively searches <code>expression</code> to find nested or non-nested quantified expressions. </p>
-<p>When a quantified expression is found, a fresh quantified variable is added to the symbol table and <code>expression</code> is updated to use this fresh variable. </p>
-
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00367">367</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
-
-</div>
-</div>
 <a id="a593dcf3d2c7f0c9332afe812cc5ec689"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a593dcf3d2c7f0c9332afe812cc5ec689">&#9670;&nbsp;</a></span>all_dereferences_are_valid()</h2>
 
@@ -391,7 +363,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A conjunctive expression that checks validity of all pointers that are dereferenced within <code>expr</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00172">172</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00175">175</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -421,7 +393,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00742">742</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00747">747</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -454,7 +426,7 @@ Functions</h2></td></tr>
 <p>Annotate the assigns in <code>assigns_map</code> to their corresponding loops. </p>
 <p>Corresponding loops are specified by keys of <code>assigns_map</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00720">720</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00725">725</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -487,7 +459,7 @@ Functions</h2></td></tr>
 <p>Annotate the decreases in <code>decreases_map</code> to their corresponding loops. </p>
 <p>Corresponding loops are specified by keys of <code>decreases_map</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00761">761</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00766">766</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -520,7 +492,7 @@ Functions</h2></td></tr>
 <p>Annotate the invariants in <code>invariant_map</code> to their corresponding loops. </p>
 <p>Corresponding loops are specified by keys of <code>invariant_map</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00700">700</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00705">705</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -564,7 +536,7 @@ Functions</h2></td></tr>
 
 <p>This function generates all the instructions required to initialize history variables. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00549">549</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00494">494</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -605,7 +577,62 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A lexicographic less-than comparison expression: LHS &lt; RHS. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00190">190</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00193">193</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a3a877a2a163b03545e093c694671a414"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a877a2a163b03545e093c694671a414">&#9670;&nbsp;</a></span>get_loop_assigns()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classexprt.html">exprt</a> get_loop_assigns </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;&#160;</td>
+          <td class="paramname"><em>loop_end</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Extract loop assigns from annotated loop end. </p>
+
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00683">683</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+
+</div>
+</div>
+<a id="ae86effaa2a5d639ed4d4b0ed546c3916"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae86effaa2a5d639ed4d4b0ed546c3916">&#9670;&nbsp;</a></span>get_loop_decreases()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classexprt.html">exprt</a> get_loop_decreases </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;&#160;</td>
+          <td class="paramname"><em>loop_end</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>check_side_effect</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Extract loop decreases from annotated loop end. </p>
+<p>Will check if the loop decreases is side-effect free if <code>check_side_effect`</code> is set. </p>
+
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00688">688</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -638,7 +665,7 @@ Functions</h2></td></tr>
 <p>Find and return the last instruction of the natural loop with <code>loop_number</code> in <code>function</code>. </p>
 <p>loop_end -&gt; loop_head </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00689">689</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00634">634</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -668,7 +695,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00615">615</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00560">560</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -700,7 +727,7 @@ Functions</h2></td></tr>
 
 <p>Find the goto instruction of <code>loop</code> that jumps to <code>loop_head</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00639">639</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00584">584</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -733,7 +760,7 @@ Functions</h2></td></tr>
 <p>Find and return the first instruction of the natural loop with <code>loop_number</code> in <code>function</code>. </p>
 <p>loop_end -&gt; loop_head </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00695">695</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00640">640</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -771,7 +798,40 @@ Functions</h2></td></tr>
 
 <p>Return loop head if <code>finding_head</code> is true, Otherwise return loop end. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00662">662</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00607">607</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+
+</div>
+</div>
+<a id="af2dd9b5e29dad3f207a13ed8a34644bf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af2dd9b5e29dad3f207a13ed8a34644bf">&#9670;&nbsp;</a></span>get_loop_invariants()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classexprt.html">exprt</a> get_loop_invariants </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classgoto__programt.html#a4fbd003af91fdc813da302d90a00513d">goto_programt::const_targett</a> &amp;&#160;</td>
+          <td class="paramname"><em>loop_end</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>check_side_effect</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Extract loop invariants from annotated loop end. </p>
+<p>Will check if the loop invariant is side-effect free if <code>check_side_effect`</code> is set. </p>
+
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00666">666</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -803,7 +863,45 @@ Functions</h2></td></tr>
 
 <p>Convert the suffix digits right after <code>prefix</code> of <code>str</code> into unsigned. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00601">601</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00546">546</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a2b040a282aa48c89e8738cbc128e3822"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b040a282aa48c89e8738cbc128e3822">&#9670;&nbsp;</a></span>infer_loop_assigns()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void infer_loop_assigns </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classlocal__may__aliast.html">local_may_aliast</a> &amp;&#160;</td>
+          <td class="paramname"><em>local_may_alias</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="loop__utils_8h.html#a1b7ef608962ab556c4d637991d616023">loopt</a> &amp;&#160;</td>
+          <td class="paramname"><em>loop</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="havoc__utils_8h.html#a3cb48127eadbd7ae4878b91c91439bee">assignst</a> &amp;&#160;</td>
+          <td class="paramname"><em>assigns</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Infer loop assigns using alias analysis result <code>local_may_alias</code>. </p>
+
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00344">344</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -852,7 +950,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00244">244</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00247">247</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -899,7 +997,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00234">234</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00237">237</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -931,7 +1029,7 @@ Functions</h2></td></tr>
 
 <p>Return true if <code>target</code> is an assignment to an instrumented variable with name <code>var_name</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00579">579</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00524">524</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -953,12 +1051,12 @@ Functions</h2></td></tr>
 
 <p>Returns true if the given comment matches the type of comments created by <a class="el" href="utils_8h.html#a1c73b0b817e6e049ea409d0c86e7b3e3">make_assigns_clause_replacement_tracking_comment</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00335">335</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00338">338</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a3813c832f1bc8415bed3d3f17d14b763"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3813c832f1bc8415bed3d3f17d14b763">&#9670;&nbsp;</a></span>is_loop_free()</h2>
+<a id="a347ede8327e2002d1bfa8e5133d11a27"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a347ede8327e2002d1bfa8e5133d11a27">&#9670;&nbsp;</a></span>is_loop_free()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -972,7 +1070,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
           <td class="paramname"><em>ns</em>, </td>
         </tr>
         <tr>
@@ -992,7 +1090,7 @@ Functions</h2></td></tr>
 <p>Returns true iff the given program is loop-free, i.e. </p>
 <p>if each SCC of its CFG contains a single element. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00268">268</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00271">271</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -1014,7 +1112,7 @@ Functions</h2></td></tr>
 
 <p>Return true if <code>target</code> is the end of some transformed loop. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00571">571</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00516">516</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -1036,7 +1134,7 @@ Functions</h2></td></tr>
 
 <p>Return true if <code>target</code> is the head of some transformed loop. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00563">563</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00508">508</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -1074,7 +1172,7 @@ Functions</h2></td></tr>
 
 <p>Returns an <a class="el" href="irep_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> that essentially says that <code>target</code> was assigned by the contract of <code>function_id</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00326">326</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00329">329</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -1118,7 +1216,7 @@ Functions</h2></td></tr>
 
 <p>This function recursively identifies the "loop_entry" expressions within <code>expr</code> and replaces them with corresponding history variables. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00530">530</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00475">475</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -1162,12 +1260,12 @@ Functions</h2></td></tr>
 
 <p>This function recursively identifies the "old" expressions within <code>expr</code> and replaces them with corresponding history variables. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00511">511</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00456">456</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
-<a id="aba81cb53e8d0082cbe68db4136188024"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aba81cb53e8d0082cbe68db4136188024">&#9670;&nbsp;</a></span>simplify_gotos()</h2>
+<a id="a90cb59d025201658c14ea7cb25f17d35"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a90cb59d025201658c14ea7cb25f17d35">&#9670;&nbsp;</a></span>simplify_gotos()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1181,7 +1279,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
           <td class="paramname"><em>ns</em>&#160;</td>
         </tr>
         <tr>
@@ -1194,7 +1292,7 @@ Functions</h2></td></tr>
 
 <p>Turns goto instructions <code>IF cond GOTO label</code> where the condition statically simplifies to <code>false</code> into SKIP instructions. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00257">257</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00260">260</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -1227,7 +1325,7 @@ Functions</h2></td></tr>
 <p>Widen expressions in <code>assigns</code> with the following strategy. </p>
 <p>If an expression is an array index or object dereference expression, with a non-constant offset, e.g. a[i] or *(b+i) with a non-constant <code>i</code>, then replace it by the entire underlying object. Otherwise, e.g. for a[i] or *(b+i) when <code>i</code> is a known constant, keep the expression in the result. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00341">341</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8cpp_source.html#l00360">360</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>

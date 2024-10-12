@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CBMC: /home/runner/work/cbmc/cbmc/src/goto-programs/format_strings.h File Reference</title>
+<title>CBMC: /home/runner/work/cbmc/cbmc/src/ansi-c/goto-conversion/format_strings.h File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -99,17 +99,17 @@ $(document).ready(function(){initNavTree('format__strings_8h.html',''); initResi
 
 <p>Format String <a class="el" href="class_parser.html">Parser</a>.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;string&gt;</code><br />
-<code>#include &lt;list&gt;</code><br />
-<code>#include &lt;<a class="el" href="irep_8h_source.html">util/irep.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="irep_8h_source.html">util/irep.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="mp__arith_8h_source.html">util/mp_arith.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="optional_8h_source.html">util/optional.h</a>&gt;</code><br />
+<code>#include &lt;list&gt;</code><br />
+<code>#include &lt;optional&gt;</code><br />
+<code>#include &lt;string&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for format_strings.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="format__strings_8h__incl.svg" width="1424" height="515"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="format__strings_8h__incl.svg" width="1608" height="515"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -117,7 +117,7 @@ $(document).ready(function(){initNavTree('format__strings_8h.html',''); initResi
 <div id="dynsection-1-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="format__strings_8h__dep__incl.svg" width="630" height="171"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="format__strings_8h__dep__incl.svg" width="798" height="171"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -137,8 +137,8 @@ Typedefs</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:a256e2911df3b394de61aa43b133ced52"><td class="memItemLeft" align="right" valign="top"><a class="el" href="format__strings_8h.html#ab232cba724f5764f9c8bcb0e0160b209">format_token_listt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="format__strings_8h.html#a256e2911df3b394de61aa43b133ced52">parse_format_string</a> (const std::string &amp;)</td></tr>
 <tr class="separator:a256e2911df3b394de61aa43b133ced52"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afc750f5ce665b9a5e1eb608faf27974b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt; <a class="el" href="classtypet.html">typet</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="format__strings_8h.html#afc750f5ce665b9a5e1eb608faf27974b">get_type</a> (const <a class="el" href="classformat__tokent.html">format_tokent</a> &amp;)</td></tr>
-<tr class="separator:afc750f5ce665b9a5e1eb608faf27974b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab427dcf5109b78471d894a1be4633773"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="classtypet.html">typet</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="format__strings_8h.html#ab427dcf5109b78471d894a1be4633773">get_type</a> (const <a class="el" href="classformat__tokent.html">format_tokent</a> &amp;)</td></tr>
+<tr class="separator:ab427dcf5109b78471d894a1be4633773"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Format String <a class="el" href="class_parser.html">Parser</a>. </p>
@@ -157,19 +157,19 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="format__strings_8h_source.html#l00090">90</a> of file <a class="el" href="format__strings_8h_source.html">format_strings.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="format__strings_8h_source.html#l00091">91</a> of file <a class="el" href="format__strings_8h_source.html">format_strings.h</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="afc750f5ce665b9a5e1eb608faf27974b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afc750f5ce665b9a5e1eb608faf27974b">&#9670;&nbsp;</a></span>get_type()</h2>
+<a id="ab427dcf5109b78471d894a1be4633773"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab427dcf5109b78471d894a1be4633773">&#9670;&nbsp;</a></span>get_type()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="optional_8h.html#ad5436a839660990c49c85e1b84723a69">optionalt</a>&lt;<a class="el" href="classtypet.html">typet</a>&gt; get_type </td>
+          <td class="memname">std::optional&lt;<a class="el" href="classtypet.html">typet</a>&gt; get_type </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classformat__tokent.html">format_tokent</a> &amp;&#160;</td>
           <td class="paramname"><em>token</em></td><td>)</td>
@@ -178,7 +178,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="format__strings_8cpp_source.html#l00228">228</a> of file <a class="el" href="format__strings_8cpp_source.html">format_strings.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="format__strings_8cpp_source.html#l00245">245</a> of file <a class="el" href="format__strings_8cpp_source.html">format_strings.cpp</a>.</p>
 
 </div>
 </div>
@@ -198,7 +198,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="format__strings_8cpp_source.html#l00186">186</a> of file <a class="el" href="format__strings_8cpp_source.html">format_strings.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="format__strings_8cpp_source.html#l00202">202</a> of file <a class="el" href="format__strings_8cpp_source.html">format_strings.cpp</a>.</p>
 
 </div>
 </div>
@@ -207,7 +207,7 @@ Functions</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_807c5b2c83e0c14a10083f60cf67ca05.html">goto-programs</a></li><li class="navelem"><a class="el" href="format__strings_8h.html">format_strings.h</a></li>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_f88182c44268ef6b082d02d66ccc5f99.html">ansi-c</a></li><li class="navelem"><a class="el" href="dir_0ea4c3d6b179c025c29bf4f50d04840d.html">goto-conversion</a></li><li class="navelem"><a class="el" href="format__strings_8h.html">format_strings.h</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>

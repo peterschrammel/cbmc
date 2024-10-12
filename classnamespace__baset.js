@@ -4,6 +4,7 @@ var classnamespace__baset =
     [ "follow", "classnamespace__baset.html#a08ff1828dbaf894a44a23f50a700255a", null ],
     [ "follow_macros", "classnamespace__baset.html#a502de850e529a8dc9395c3839142740c", null ],
     [ "follow_tag", "classnamespace__baset.html#a1dd4e7c520bf6fa01b07276b786360a8", null ],
+    [ "follow_tag", "classnamespace__baset.html#ae3799dedcee82ca3d64174f1d43d3cf2", null ],
     [ "follow_tag", "classnamespace__baset.html#ac865821b708ccc6d325c4d79b4a66c13", null ],
     [ "follow_tag", "classnamespace__baset.html#a9a5ad94024723d598ae0b8b67e7a3710", null ],
     [ "lookup", "classnamespace__baset.html#a0509ac32210c7c8e9a686126ff4cbca1", null ],
