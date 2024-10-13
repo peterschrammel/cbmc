@@ -1,9 +1,9 @@
 CORE
-src/Test
+src/TestNotInPackage
 
 ^EXIT=6$
 ^SIGNAL=0$
-Could not find or load main class src.Test
+Could not find or load main class src.TestNotInPackage
 --
 --
-Test class is not in src package. Therefore, this must fail.
+TestNotInPackage class is not in src package. Therefore, this must fail.
