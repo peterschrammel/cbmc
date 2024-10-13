@@ -9,7 +9,7 @@ class NondetDirectFromMethod
 {
   A methodReturningA()
   {
-    return CProver.nondetWithoutNull();
+    return CProver.nondetWithoutNull(new A());
   }
 
   void main()

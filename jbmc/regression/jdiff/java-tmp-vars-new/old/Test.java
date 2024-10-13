@@ -12,6 +12,6 @@ public class Test {
   }
 
   public A f01(A z) {
-    return org.cprover.CProver.nondetWithoutNull();
+    return org.cprover.CProver.nondetWithoutNull(z);
   }
 }

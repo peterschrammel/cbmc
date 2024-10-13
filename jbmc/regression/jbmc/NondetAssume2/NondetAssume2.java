@@ -10,7 +10,7 @@ class NondetAssume2
 {
   void main()
   {
-    C c = CProver.nondetWithNull();
+    C c = CProver.nondetWithNull(new C());
     CProver.assume(c != null);
     assert c != null;
   }

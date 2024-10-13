@@ -1,45 +1,45 @@
 public class Main {
     public void replaceNondetAssignment() {
-        Object temp = org.cprover.CProver.nondetWithoutNull();
+        Object temp = org.cprover.CProver.nondetWithoutNull(new Object());
     }
 
     public void replaceNondetAssignmentUnbox() {
-        int temp = org.cprover.CProver.nondetWithoutNull();
+        int temp = org.cprover.CProver.nondetWithoutNull(new Integer());
     }
 
     public void replaceNondetAssignmentImplicitCast() {
-        Integer temp = org.cprover.CProver.nondetWithoutNull();
+        Integer temp = org.cprover.CProver.nondetWithoutNull(new Integer());
     }
 
     public void replaceNondetAssignmentExplicitCast() {
-        Integer temp = (Integer)org.cprover.CProver.nondetWithoutNull();
+        Integer temp = (Integer)org.cprover.CProver.nondetWithoutNull(new Integer());
     }
 
     public void replaceNondetAssignmentAddition() {
-        int temp = ((int)org.cprover.CProver.nondetWithoutNull()) + 3;
+        int temp = ((int)org.cprover.CProver.nondetWithoutNull(new Integer())) + 3;
     }
 
     public void replaceNondetUnused() {
-        org.cprover.CProver.nondetWithoutNull();
+        org.cprover.CProver.nondetWithoutNull(new Object());
     }
 
     public int replaceNondetReturnUnboxed() {
-        return org.cprover.CProver.nondetWithoutNull();
+        return org.cprover.CProver.nondetWithoutNull(new Integer());
     }
 
     public Object replaceNondetReturn() {
-        return org.cprover.CProver.nondetWithoutNull();
+        return org.cprover.CProver.nondetWithoutNull(new Object());
     }
 
     public Integer replaceNondetReturnWithImplicitCast() {
-        return org.cprover.CProver.nondetWithoutNull();
+        return org.cprover.CProver.nondetWithoutNull(new Integer());
     }
 
     public Integer replaceNondetReturnWithExplicitCast() {
-        return (Integer)org.cprover.CProver.nondetWithoutNull();
+        return (Integer)org.cprover.CProver.nondetWithoutNull(new Integer());
     }
 
     public Integer replaceNondetReturnAddition() {
-        return ((int)org.cprover.CProver.nondetWithoutNull()) + 3;
+        return ((int)org.cprover.CProver.nondetWithoutNull(new Integer())) + 3;
     }
 }

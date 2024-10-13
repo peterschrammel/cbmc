@@ -4,7 +4,7 @@ class NondetArray3
 {
   void main()
   {
-    Integer[] ints = CProver.nondetWithoutNull();
+    Integer[] ints = CProver.nondetWithoutNull(new Integer[0]);
     assert ints != null;
 
     int num = 0;

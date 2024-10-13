@@ -18,7 +18,7 @@ class NondetGenericRecursive2
 {
   static void main()
   {
-    C c = CProver.nondetWithNull();
+    C c = CProver.nondetWithNull(new C());
     CProver.assume(c != null);
     CProver.assume(c.b != null);
     CProver.assume(c.b.a != null);
