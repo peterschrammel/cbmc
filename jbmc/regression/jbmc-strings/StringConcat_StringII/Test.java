@@ -2,7 +2,7 @@
 // javac Test.java ../cprover/CProverString.java
 import org.cprover.CProverString;
 
-class Test {
+public class Test {
     public void testSuccess(String s, String t, int start, int end) {
         // Filter
         if (s == null || t == null)

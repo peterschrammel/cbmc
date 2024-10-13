@@ -1,7 +1,7 @@
 // This test uses CProverString so should be compiled with
 // javac Test.java ../cprover/CProverString.java
 
-class Test {
+public class Test {
     public void testSuccess(String s, int start, int end) {
         // Filter
         if (s == null)

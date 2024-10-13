@@ -1,4 +1,4 @@
-class Test {
+public class Test {
   public void testBooleanSuccess() {
     StringBuffer sb = new StringBuffer("abc");
     sb.append(true);

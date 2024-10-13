@@ -1,4 +1,4 @@
-public class Test {
+class Test {
   public static String string1(String s) {
     if (s == null)
       return "null!";

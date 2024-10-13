@@ -1,6 +1,6 @@
 import org.cprover.CProver;
 
-class Test {
+public class Test {
     int size;
     int[] data1;
     int[] data2;

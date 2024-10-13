@@ -1,4 +1,4 @@
-class Test {
+public class Test {
 
   public int y = 5;
 

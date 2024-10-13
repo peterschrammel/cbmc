@@ -1,4 +1,4 @@
-class Test {
+public class Test {
     void test(String s) {
         // Filter
         if(s == null)

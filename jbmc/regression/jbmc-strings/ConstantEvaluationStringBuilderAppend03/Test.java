@@ -1,4 +1,4 @@
-class Test {
+public class Test {
   public void testBooleanSuccess() {
     StringBuilder sb = new StringBuilder("abc");
     sb.append(true);

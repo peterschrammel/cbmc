@@ -1,4 +1,4 @@
-class TestJar
+public class TestJar
 {
   public static void foo()
   {

@@ -10,7 +10,7 @@ class BWrapper {
   public boolean b;
 }
 
-class TestClass {
+public class TestClass {
   static void testFunction() {
     Gen<IWrapper> a = new Gen<>();
     Gen b = a;
