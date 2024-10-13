@@ -4,7 +4,7 @@ public class RegionMatches
     {
         String s3 = "Automatic Test Generation";
         String s4 = "automatic test generation";
-        String s4 = "automatic test generationn";
+        String s5 = "automatic test generationn";
 
         // test regionMatches (case sensitive)
         if (in == 0)
