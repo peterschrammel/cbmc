@@ -3,7 +3,7 @@ ClassCastExceptionTest
 --throw-runtime-exceptions
 ^EXIT=10$
 ^SIGNAL=0$
-^.*assertion at file ClassCastExceptionTest.java line 8 function.*: FAILURE$
+^.*assertion at file ClassCastExceptionTest.java line 7 function.*: FAILURE$
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring
