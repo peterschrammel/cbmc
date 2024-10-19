@@ -12,10 +12,10 @@ class catch1
   {
     try
     {
-      throw new some_exception2();
+      throw new some_exception1();
     }
     
-    catch(some_exception1 e)
+    catch(some_exception2 e)
     {
     }
   }
