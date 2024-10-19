@@ -4,7 +4,7 @@ NondetArrayPrimitive
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
-line 65 assertion.*: FAILURE
+line 58 assertion.*: FAILURE
 --
 ^warning: ignoring
 --
