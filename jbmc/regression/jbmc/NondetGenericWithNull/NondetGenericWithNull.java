@@ -6,7 +6,7 @@ class NondetGenericWithNull
 {
   static void main()
   {
-    B b = CProver.nondetWithNull();
+    B b = CProver.nondetWithNull(new B());
     assert b != null;
     assert b.a != 0;
   }
