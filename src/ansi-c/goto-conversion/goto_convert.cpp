@@ -1040,8 +1040,7 @@ void goto_convertt::convert_assert(
   clean_expr_resultt side_effects = clean_expr(cond, mode);
   dest.destructive_append(side_effects.side_effects);
 
-  source_locationt annotated_location = code.source_location();
-  annotated_location.set("user-provided", true);
+  const source_locationt annotated_location = code.source_location();
   dest.add(goto_programt::make_assertion(cond, annotated_location));
 
   destruct_locals(side_effects.temporaries, dest, ns);

@@ -576,6 +576,7 @@ void java_bytecode_instrument_uncaught_exceptions(
       exc_symbol.symbol_expr(), java_classname(*only_for_exception))));
     source_locationt assert_location = source_location;
     assert_location.set_comment("no uncaught exception");
+    assert_location.set("user-provided", false);
     assert_no_exception.add_source_location() = assert_location;
 
     init_code.add(std::move(assert_no_exception));
@@ -589,6 +590,7 @@ void java_bytecode_instrument_uncaught_exceptions(
 
   source_locationt assert_location = source_location;
   assert_location.set_comment("no uncaught exception");
+  assert_location.set("user-provided", false);
   assert_no_exception.add_source_location() = assert_location;
 
   init_code.add(std::move(assert_no_exception));
