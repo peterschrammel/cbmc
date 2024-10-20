@@ -80,7 +80,7 @@ bool java_entry_point(
   class message_handlert &message_handler,
   bool assume_init_pointers_not_null,
   bool assert_uncaught_exceptions,
-  optionalt<std::string> assert_uncaught_exceptions_only_for,
+  std::optional<std::string> assert_uncaught_exceptions_only_for,
   const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
   bool string_refinement_enabled,
@@ -159,7 +159,7 @@ bool generate_java_start_function(
   class symbol_table_baset &symbol_table,
   class message_handlert &message_handler,
   bool assert_uncaught_exceptions,
-  optionalt<std::string> assert_uncaught_exceptions_only_for,
+  std::optional<std::string> assert_uncaught_exceptions_only_for,
   const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
   const build_argumentst &build_arguments);
