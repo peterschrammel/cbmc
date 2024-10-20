@@ -3,8 +3,8 @@ Test
 --max-nondet-string-length 1000 --function Test.check --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --unwind 10
 ^EXIT=10$
 ^SIGNAL=0$
-assertion at file Test.java line 8 function .*: SUCCESS
-assertion at file Test.java line 11 function .*: FAILURE
-assertion at file Test.java line 14 function .*: FAILURE
-assertion at file Test.java line 17 function .*: SUCCESS
-assertion at file Test.java line 20 function .*: FAILURE
+assertion at file Test.java line 9 function .*: SUCCESS
+assertion at file Test.java line 12 function .*: FAILURE
+assertion at file Test.java line 15 function .*: FAILURE
+assertion at file Test.java line 18 function .*: SUCCESS
+assertion at file Test.java line 21 function .*: FAILURE
