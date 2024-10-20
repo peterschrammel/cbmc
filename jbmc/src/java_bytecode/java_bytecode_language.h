@@ -213,7 +213,7 @@ struct java_bytecode_language_optionst
   bool string_refinement_enabled = false;
   bool throw_runtime_exceptions = false;
   bool assert_uncaught_exceptions = false;
-  optionalt<std::string> assert_uncaught_exceptions_only_for = {};
+  std::optional<std::string> assert_uncaught_exceptions_only_for = {};
   bool throw_assertion_error = false;
   bool threading_support = false;
   bool nondet_static = false;

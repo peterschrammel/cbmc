@@ -568,7 +568,7 @@ void java_bytecode_instrument_uncaught_exceptions(
   code_blockt &init_code,
   const symbolt &exc_symbol,
   const source_locationt &source_location,
-  optionalt<std::string> only_for_exception)
+  std::optional<std::string> only_for_exception)
 {
   if(only_for_exception)
   {
