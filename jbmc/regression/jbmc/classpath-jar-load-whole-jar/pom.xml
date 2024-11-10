@@ -4,8 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.cprover.regression</groupId>
-  <artifactId>regression</artifactId>
+  <artifactId>regression.jbmc.classpath-jar-load-whole-jar</artifactId>
   <version>1.0-SNAPSHOT</version>
+
+  <parent>
+    <groupId>org.cprover.regression</groupId>
+    <artifactId>regression.jbmc</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
 
   <build>
     <finalName>jar-file</finalName>
@@ -23,10 +29,5 @@
       </plugin>
     </plugins>
   </build>
-
-  <properties>
-   <maven.compiler.source>1.8</maven.compiler.source>
-   <maven.compiler.target>1.8</maven.compiler.target>
-  </properties>
 
 </project>

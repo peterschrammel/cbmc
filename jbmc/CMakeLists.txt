@@ -31,8 +31,28 @@ add_custom_target(java-models-library ALL
 )
 
 install(
-  FILES
-    "${CMAKE_CURRENT_SOURCE_DIR}/lib/java-models-library/target/core-models.jar"
-    "${CMAKE_CURRENT_SOURCE_DIR}/lib/java-models-library/target/cprover-api.jar"
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/lib/java-models-library/target/core-models.jar"
+        "${CMAKE_CURRENT_SOURCE_DIR}/lib/java-models-library/target/cprover-api.jar"
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+# java regression tests
+file(GLOB_RECURSE java_regression_sources "regression/**/*.java,regression/**/*.kt,regression/**/*.j,regression/**/pom.xml")
+file(GLOB java_regression_test_dirs LIST_DIRECTORIES true "regression/*/*")
+foreach(dir ${java_regression_test_dirs})
+    # TODO: remove the last condition as soon as jbmc/deterministic_assignments_json has been converted
+    IF(IS_DIRECTORY ${dir} AND EXISTS "${dir}/pom.xml" AND NOT EXISTS "${dir}/Foo.class")
+        list(APPEND java_regression_compiled_sources "${dir}/target")
+    ENDIF()
+endforeach()
+
+add_custom_command(OUTPUT ${java_regression_compiled_sources}
+    COMMAND ${MAVEN_PROGRAM} --quiet package
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/regression
+    DEPENDS ${java_regression_sources}
+)
+
+add_custom_target(java-regression ALL
+    DEPENDS ${java_regression_compiled_sources}
 )
