@@ -15,6 +15,7 @@ DIRS = cbmc-shadow-memory \
        cbmc-incr-oneloop \
        cbmc-incr-smt2 \
        cbmc-incr \
+       cbmc-lazy-c-seq \
        cbmc-output-file \
        cbmc-with-incr \
        array-refinement-with-incr \
