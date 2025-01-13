@@ -11,26 +11,25 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "bmc_util.h"
 
-#include <iostream>
+#include <util/json_stream.h>
+#include <util/ui_message.h>
 
 #include <goto-programs/graphml_witness.h>
 #include <goto-programs/json_goto_trace.h>
 #include <goto-programs/xml_goto_trace.h>
 
 #include <goto-symex/build_goto_trace.h>
+#include <goto-symex/lazy_c_seq.h>
 #include <goto-symex/memory_model_pso.h>
 #include <goto-symex/slice.h>
 #include <goto-symex/symex_target_equation.h>
-
 #include <linking/static_lifetime_init.h>
-
 #include <solvers/decision_procedure.h>
-
-#include <util/json_stream.h>
-#include <util/ui_message.h>
 
 #include "goto_symex_property_decider.h"
 #include "symex_bmc.h"
+
+#include <iostream>
 
 void message_building_error_trace(messaget &log)
 {
@@ -330,9 +329,17 @@ void postprocess_equation(
   // add a partial ordering, if required
   if(equation.has_threads())
   {
-    std::unique_ptr<memory_model_baset> memory_model =
-      get_memory_model(options, ns);
-    (*memory_model)(equation, ui_message_handler);
+    if(options.get_unsigned_int_option("lazy-c-seq-rounds") > 0)
+    {
+      lazy_c_seqt(ns, options.get_unsigned_int_option("lazy-c-seq-rounds"))(
+        equation, ui_message_handler);
+    }
+    else
+    {
+      std::unique_ptr<memory_model_baset> memory_model =
+        get_memory_model(options, ns);
+      (*memory_model)(equation, ui_message_handler);
+    }
   }
 
   messaget log(ui_message_handler);
