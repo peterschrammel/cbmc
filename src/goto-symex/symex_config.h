@@ -61,6 +61,9 @@ struct symex_configt final
   ///   Used in goto_symext::dereference_rec
   bool cache_dereferences;
 
+  /// Number of rounds for the LazyCSeq context-bounded concurrency encoding
+  std::size_t lazy_c_seq_rounds;
+
   /// \brief Construct a symex_configt using options specified in an
   /// \ref optionst
   explicit symex_configt(const optionst &options);
