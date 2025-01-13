@@ -352,6 +352,16 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
       << messaget::eom;
   }
 
+  if(cmdline.isset("lazy-c-seq-rounds"))
+  {
+    options.set_option(
+      "lazy-c-seq-rounds", cmdline.get_value("lazy-c-seq-rounds"));
+    log.warning() << "**** WARNING: Context-bounded analysis may yield unsound "
+                     "verification "
+                     "results"
+                  << messaget::eom;
+  }
+
   if(cmdline.isset("slice-by-trace"))
   {
     log.error() << "--slice-by-trace has been removed" << messaget::eom;
