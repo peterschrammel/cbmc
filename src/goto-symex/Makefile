@@ -5,6 +5,7 @@ SRC = auto_objects.cpp \
       goto_state.cpp \
       goto_symex.cpp \
       goto_symex_state.cpp \
+      lazy_c_seq.cpp \
       memory_model.cpp \
       memory_model_pso.cpp \
       memory_model_sc.cpp \
