@@ -8,7 +8,7 @@ void lazy_c_seqt::operator()(
   message_handlert &message_handler)
 {
   messaget log{message_handler};
-  log.statistics() << "Adding LazyCSeq constraints" << messaget::eom;
+  log.statistics() << "Adding LazyCSeq constraints with " << rounds << " rounds" << messaget::eom;
 
   for(const auto &step : equation.SSA_steps)
   {
@@ -24,5 +24,8 @@ void lazy_c_seqt::operator()(
                     << "Read: " << step.source.pc->location_number
                     << messaget::eom;
     }
+
+    exprt tmp;
+    simplify(tmp, ns);
   }
 }
