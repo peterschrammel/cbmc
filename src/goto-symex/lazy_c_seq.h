@@ -19,6 +19,16 @@ public:
 private:
   const namespacet &ns;
   const std::size_t rounds;
+
+  void collect_reads_and_writes(
+    symex_target_equationt::SSA_stepst ssa_steps,
+    std::unordered_map<
+      unsigned,
+      symex_target_equationt::SSA_stepst::const_iterator> reads,
+    std::unordered_map<
+      unsigned,
+      symex_target_equationt::SSA_stepst::const_iterator> writes,
+    message_handlert &message_handler);
 };
 
 #endif //CPROVER_GOTO_SYMEX_LAZY_C_SEQ_H
