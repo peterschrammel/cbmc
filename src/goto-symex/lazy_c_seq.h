@@ -31,7 +31,7 @@ private:
     message_handlert &message_handler);
 
   void create_write_constraints(
-    symex_target_equationt::SSA_stepst &ssa_steps,
+    symex_target_equationt &equation,
     const std::unordered_map<
       unsigned,
       std::vector<symex_target_equationt::SSA_stepst::const_iterator>> &writes,

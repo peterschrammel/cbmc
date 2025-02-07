@@ -43,11 +43,12 @@ void lazy_c_seqt::create_write_constraints(
   messaget log{message_handler};
 
   // last write of main thread
-  symex_target_equationt::SSA_stepst::const_iterator last_write_of_previous_round;
+  symex_target_equationt::SSA_stepst::const_iterator
+    last_write_of_previous_round;
   std::unordered_set<irep_idt> global_variables;
   for(auto &s_it : writes.at(0))
   {
-      global_variables.insert(s_it->ssa_lhs.get_object_name());
+    global_variables.insert(s_it->ssa_lhs.get_object_name());
   }
 
   for(irep_idt variable : global_variables)
@@ -91,7 +92,8 @@ void lazy_c_seqt::create_write_constraints(
             last_write_of_current_round->ssa_lhs,
             last_write_of_previous_round->ssa_lhs}};
         log.warning() << format(constraint) << messaget::eom;
-        equation.constraint(constraint,"write constraint", last_write_of_current_round->source);
+        equation.constraint(
+          constraint, "write constraint", last_write_of_current_round->source);
         last_write_of_previous_round = std::prev(equation.SSA_steps.cend());
       }
     }
