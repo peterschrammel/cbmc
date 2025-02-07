@@ -4,6 +4,8 @@
 #include "lazy_c_seq.h"
 
 #include <util/cprover_prefix.h>
+#include <util/format.h>
+#include <util/format_expr.h>
 #include <util/pointer_expr.h>
 #include <util/prefix.h>
 
@@ -40,6 +42,8 @@ void lazy_c_seqt::create_write_constraints(
 {
   messaget log{message_handler};
 
+  //TODO: we need to do this by selecting one global variable at a time
+
   // last write of main thread
   exprt last_write_of_previous_round;
   for(auto &s_it : writes.at(0))
@@ -58,14 +62,17 @@ void lazy_c_seqt::create_write_constraints(
         last_write_of_current_round = s_it;
       }
       std::string suffix =
-        "_L" + last_write_of_current_round->source.pc->location_number + "_R" +
-        round;
+        "_L" +
+        std::to_string(
+          last_write_of_current_round->source.pc->location_number) +
+        "_R" + std::to_string(round);
       irep_idt statement_label_name = "J" + suffix;
       symbol_exprt statement_label{statement_label_name, bool_typet{}};
 
       // We don't need to check that this is a symbol because we have alread done that in collect_reads_and_writes.
       irep_idt end_of_round_name =
-        to_symbol_expr(last_write_of_current_round->ssa_lhs).get_identifier() +
+        id2string(to_symbol_expr(last_write_of_current_round->ssa_lhs)
+                    .get_identifier()) +
         suffix;
       symbol_exprt end_of_round_value{
         end_of_round_name, last_write_of_current_round->ssa_lhs.type()};
@@ -75,6 +82,8 @@ void lazy_c_seqt::create_write_constraints(
           statement_label,
           last_write_of_current_round->ssa_lhs,
           last_write_of_previous_round}};
+      log.warning() << format(constraint) << messaget::eom;
+      last_write_of_previous_round = end_of_round_value;
     }
   }
 }
