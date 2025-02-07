@@ -42,48 +42,64 @@ void lazy_c_seqt::create_write_constraints(
 {
   messaget log{message_handler};
 
-  //TODO: we need to do this by selecting one global variable at a time
-
   // last write of main thread
   exprt last_write_of_previous_round;
+  std::vector<irep_idt> global_variables;
   for(auto &s_it : writes.at(0))
   {
-    last_write_of_previous_round = s_it->ssa_lhs;
+    bool contain = false;
+    for(irep_idt variable : global_variables)
+    {
+      if(variable == s_it->ssa_lhs.get_object_name())
+        contain = true;
+    }
+    if(!contain)
+      global_variables.push_back(s_it->ssa_lhs.get_object_name());
   }
 
-  for(std::size_t round = 1; round <= rounds; ++round)
+  for(irep_idt variable : global_variables)
   {
-    symex_target_equationt::SSA_stepst::const_iterator
-      last_write_of_current_round;
-    for(unsigned thread_nr = 1; thread_nr < writes.size(); ++thread_nr)
+    for(auto &s_it : writes.at(0))
     {
-      for(auto &s_it : writes.at(thread_nr))
-      {
-        last_write_of_current_round = s_it;
-      }
-      std::string suffix =
-        "_L" +
-        std::to_string(
-          last_write_of_current_round->source.pc->location_number) +
-        "_R" + std::to_string(round);
-      irep_idt statement_label_name = "J" + suffix;
-      symbol_exprt statement_label{statement_label_name, bool_typet{}};
+      if(s_it->ssa_lhs.get_object_name() == variable)
+        last_write_of_previous_round = s_it->ssa_lhs;
+    }
 
-      // We don't need to check that this is a symbol because we have alread done that in collect_reads_and_writes.
-      irep_idt end_of_round_name =
-        id2string(to_symbol_expr(last_write_of_current_round->ssa_lhs)
-                    .get_identifier()) +
-        suffix;
-      symbol_exprt end_of_round_value{
-        end_of_round_name, last_write_of_current_round->ssa_lhs.type()};
-      equal_exprt constraint{
-        end_of_round_value,
-        if_exprt{
-          statement_label,
-          last_write_of_current_round->ssa_lhs,
-          last_write_of_previous_round}};
-      log.warning() << format(constraint) << messaget::eom;
-      last_write_of_previous_round = end_of_round_value;
+    for(std::size_t round = 1; round <= rounds; ++round)
+    {
+      symex_target_equationt::SSA_stepst::const_iterator
+        last_write_of_current_round;
+      for(unsigned thread_nr = 1; thread_nr < writes.size(); ++thread_nr)
+      {
+        for(auto &s_it : writes.at(thread_nr))
+        {
+          if(s_it->ssa_lhs.get_object_name() == variable)
+            last_write_of_current_round = s_it;
+        }
+        std::string suffix =
+          "_L" +
+          std::to_string(
+            last_write_of_current_round->source.pc->location_number) +
+          "_R" + std::to_string(round);
+        irep_idt statement_label_name = "J" + suffix;
+        symbol_exprt statement_label{statement_label_name, bool_typet{}};
+
+        // We don't need to check that this is a symbol because we have alread done that in collect_reads_and_writes.
+        irep_idt end_of_round_name =
+          id2string(to_symbol_expr(last_write_of_current_round->ssa_lhs)
+                      .get_identifier()) +
+          suffix;
+        symbol_exprt end_of_round_value{
+          end_of_round_name, last_write_of_current_round->ssa_lhs.type()};
+        equal_exprt constraint{
+          end_of_round_value,
+          if_exprt{
+            statement_label,
+            last_write_of_current_round->ssa_lhs,
+            last_write_of_previous_round}};
+        log.warning() << format(constraint) << messaget::eom;
+        last_write_of_previous_round = end_of_round_value;
+      }
     }
   }
 }
