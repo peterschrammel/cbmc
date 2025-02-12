@@ -43,8 +43,7 @@ void lazy_c_seqt::create_write_constraints(
   messaget log{message_handler};
 
   // last write of main thread
-  symex_target_equationt::SSA_stepst::const_iterator
-    last_write_of_previous_round;
+  exprt last_write_of_previous_round;
   std::unordered_set<irep_idt> global_variables;
   for(auto &s_it : writes.at(0))
   {
@@ -56,20 +55,26 @@ void lazy_c_seqt::create_write_constraints(
     for(auto &s_it : writes.at(0))
     {
       if(s_it->ssa_lhs.get_object_name() == variable)
-        last_write_of_previous_round = s_it;
+        last_write_of_previous_round = s_it->ssa_lhs;
     }
 
     for(std::size_t round = 1; round <= rounds; ++round)
     {
       symex_target_equationt::SSA_stepst::const_iterator
-        last_write_of_current_round = last_write_of_previous_round;
+        last_write_of_current_round;
       for(unsigned thread_nr = 1; thread_nr < writes.size(); ++thread_nr)
       {
+        bool var_contained = false;
         for(auto &s_it : writes.at(thread_nr))
         {
           if(s_it->ssa_lhs.get_object_name() == variable)
+          {
+            var_contained = true;
             last_write_of_current_round = s_it;
+          }
         }
+        if(!var_contained)
+          continue;
         std::string suffix =
           "_L" +
           std::to_string(
@@ -90,11 +95,11 @@ void lazy_c_seqt::create_write_constraints(
           if_exprt{
             statement_label,
             last_write_of_current_round->ssa_lhs,
-            last_write_of_previous_round->ssa_lhs}};
+            last_write_of_previous_round}};
         log.warning() << format(constraint) << messaget::eom;
         equation.constraint(
           constraint, "write constraint", last_write_of_current_round->source);
-        last_write_of_previous_round = std::prev(equation.SSA_steps.cend());
+        last_write_of_previous_round = end_of_round_value;
       }
     }
   }
