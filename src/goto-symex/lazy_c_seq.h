@@ -22,9 +22,9 @@ private:
 
   void collect_reads_and_writes(
     const symex_target_equationt::SSA_stepst &ssa_steps,
-    std::unordered_map<
-      unsigned,
-      std::vector<symex_target_equationt::SSA_stepst::const_iterator>> &reads,
+    std::vector<std::pair<
+      symex_target_equationt::SSA_stepst::const_iterator,
+      symex_target_equationt::SSA_stepst::const_iterator>> &reads,
     std::unordered_map<
       unsigned,
       std::vector<symex_target_equationt::SSA_stepst::const_iterator>> &writes,
@@ -35,6 +35,13 @@ private:
     const std::unordered_map<
       unsigned,
       std::vector<symex_target_equationt::SSA_stepst::const_iterator>> &writes,
+    message_handlert &message_handler);
+
+  void create_read_constraints(
+    symex_target_equationt &equation,
+    const std::vector<std::pair<
+      symex_target_equationt::SSA_stepst::const_iterator,
+      symex_target_equationt::SSA_stepst::const_iterator>> &reads,
     message_handlert &message_handler);
 };
 

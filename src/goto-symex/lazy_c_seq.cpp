@@ -17,9 +17,9 @@ void lazy_c_seqt::operator()(
   log.statistics() << "Adding LazyCSeq constraints with " << rounds << " rounds"
                    << messaget::eom;
 
-  std::unordered_map<
-    unsigned,
-    std::vector<symex_target_equationt::SSA_stepst::const_iterator>>
+  std::vector<std::pair<
+    symex_target_equationt::SSA_stepst::const_iterator,
+    symex_target_equationt::SSA_stepst::const_iterator>>
     reads;
   std::unordered_map<
     unsigned,
@@ -28,6 +28,8 @@ void lazy_c_seqt::operator()(
   collect_reads_and_writes(equation.SSA_steps, reads, writes, message_handler);
 
   create_write_constraints(equation, writes, message_handler);
+
+  create_read_constraints(equation, reads, message_handler);
 
   exprt tmp;
   simplify(tmp, ns);
@@ -45,14 +47,14 @@ void lazy_c_seqt::create_write_constraints(
   // last write of main thread
   exprt last_write_of_previous_round;
   std::unordered_set<irep_idt> global_variables;
-  for(auto &s_it : writes.at(0))
+  for(const auto &s_it : writes.at(0))
   {
     global_variables.insert(s_it->ssa_lhs.get_object_name());
   }
 
   for(irep_idt variable : global_variables)
   {
-    for(auto &s_it : writes.at(0))
+    for(const auto &s_it : writes.at(0))
     {
       if(s_it->ssa_lhs.get_object_name() == variable)
         last_write_of_previous_round = s_it->ssa_lhs;
@@ -65,7 +67,7 @@ void lazy_c_seqt::create_write_constraints(
       for(unsigned thread_nr = 1; thread_nr < writes.size(); ++thread_nr)
       {
         bool var_contained = false;
-        for(auto &s_it : writes.at(thread_nr))
+        for(const auto &s_it : writes.at(thread_nr))
         {
           if(s_it->ssa_lhs.get_object_name() == variable)
           {
@@ -105,17 +107,43 @@ void lazy_c_seqt::create_write_constraints(
   }
 }
 
+void lazy_c_seqt::create_read_constraints(
+  symex_target_equationt &equation,
+  const std::vector<std::pair<
+    symex_target_equationt::SSA_stepst::const_iterator,
+    symex_target_equationt::SSA_stepst::const_iterator>> &reads,
+  message_handlert &message_handler)
+{
+  messaget log{message_handler};
+  for(const auto &read : reads)
+  {
+    if(read.second == equation.SSA_steps.cend())
+    {
+      //TODO: use initialization or value from the previous round
+    }
+    equal_exprt constraint{
+      end_of_round_value,
+      if_exprt{
+        statement_label,
+        last_write_of_current_round->ssa_lhs,
+        last_write_of_previous_round}};
+    log.warning() << format(constraint) << messaget::eom;
+    equation.constraint(constraint, "read constraint", read.first->source);
+  }
+}
+
 void lazy_c_seqt::collect_reads_and_writes(
   const symex_target_equationt::SSA_stepst &ssa_steps,
-  std::unordered_map<
-    unsigned,
-    std::vector<symex_target_equationt::SSA_stepst::const_iterator>> &reads,
+  std::vector<std::pair<
+    symex_target_equationt::SSA_stepst::const_iterator,
+    symex_target_equationt::SSA_stepst::const_iterator>> &reads,
   std::unordered_map<
     unsigned,
     std::vector<symex_target_equationt::SSA_stepst::const_iterator>> &writes,
   message_handlert &message_handler)
 {
   messaget log{message_handler};
+  symex_target_equationt::SSA_stepst::const_iterator previous_write;
   for(symex_target_equationt::SSA_stepst::const_iterator s_it =
         ssa_steps.begin();
       s_it != ssa_steps.end();
@@ -184,6 +212,7 @@ void lazy_c_seqt::collect_reads_and_writes(
                       << to_symbol_expr(s_it->ssa_lhs).get_identifier() << "\tL"
                       << s_it->source.pc->location_number << messaget::eom;
         writes[s_it->source.thread_nr].emplace_back(s_it);
+        previous_write = s_it;
       }
       else
       {
@@ -204,7 +233,7 @@ void lazy_c_seqt::collect_reads_and_writes(
                       << to_symbol_expr(s_it->ssa_lhs).get_identifier() << "\tL"
                       << s_it->source.pc->location_number << messaget::eom;
 
-        reads[s_it->source.thread_nr].emplace_back(s_it);
+        reads.emplace_back(std::pair(s_it, previous_write));
       }
       else
       {
