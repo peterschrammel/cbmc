@@ -9,6 +9,8 @@
 #include <util/pointer_expr.h>
 #include <util/prefix.h>
 
+#include <optional>
+
 void lazy_c_seqt::operator()(
   symex_target_equationt &equation,
   message_handlert &message_handler)
@@ -19,17 +21,21 @@ void lazy_c_seqt::operator()(
 
   std::vector<std::pair<
     symex_target_equationt::SSA_stepst::const_iterator,
-    symex_target_equationt::SSA_stepst::const_iterator>>
+    std::optional<symex_target_equationt::SSA_stepst::const_iterator>>>
     reads;
   std::unordered_map<
     unsigned,
     std::vector<symex_target_equationt::SSA_stepst::const_iterator>>
     writes;
+  std::unordered_map<irep_idt, irep_idt> last_update;
+  std::unordered_map<irep_idt, irep_idt> last_update_main;
   collect_reads_and_writes(equation.SSA_steps, reads, writes, message_handler);
 
-  create_write_constraints(equation, writes, message_handler);
+  create_write_constraints(
+    equation, writes, last_update, last_update_main, message_handler);
 
-  create_read_constraints(equation, reads, message_handler);
+  create_read_constraints(
+    equation, reads, last_update, last_update_main, message_handler);
 
   exprt tmp;
   simplify(tmp, ns);
@@ -40,9 +46,14 @@ void lazy_c_seqt::create_write_constraints(
   const std::unordered_map<
     unsigned,
     std::vector<symex_target_equationt::SSA_stepst::const_iterator>> &writes,
+  std::unordered_map<irep_idt, irep_idt> &last_update,
+  std::unordered_map<irep_idt, irep_idt> &last_update_main,
   message_handlert &message_handler)
 {
   messaget log{message_handler};
+
+  log.warning() << "-------------------WRITES--------------------------"
+                << messaget::eom;
 
   // last write of main thread
   exprt last_write_of_previous_round;
@@ -57,7 +68,11 @@ void lazy_c_seqt::create_write_constraints(
     for(const auto &s_it : writes.at(0))
     {
       if(s_it->ssa_lhs.get_object_name() == variable)
+      {
         last_write_of_previous_round = s_it->ssa_lhs;
+        last_update_main[variable] = id2string(
+          to_symbol_expr(last_write_of_previous_round).get_identifier());
+      }
     }
 
     for(std::size_t round = 1; round <= rounds; ++round)
@@ -102,6 +117,13 @@ void lazy_c_seqt::create_write_constraints(
         equation.constraint(
           constraint, "write constraint", last_write_of_current_round->source);
         last_write_of_previous_round = end_of_round_value;
+
+        last_update[variable] =
+          id2string(to_symbol_expr(last_write_of_current_round->ssa_lhs)
+                      .get_identifier()) +
+          "_L" +
+          std::to_string(
+            last_write_of_current_round->source.pc->location_number);
       }
     }
   }
@@ -111,24 +133,70 @@ void lazy_c_seqt::create_read_constraints(
   symex_target_equationt &equation,
   const std::vector<std::pair<
     symex_target_equationt::SSA_stepst::const_iterator,
-    symex_target_equationt::SSA_stepst::const_iterator>> &reads,
+    std::optional<symex_target_equationt::SSA_stepst::const_iterator>>> &reads,
+  std::unordered_map<irep_idt, irep_idt> &last_update,
+  std::unordered_map<irep_idt, irep_idt> &last_update_main,
   message_handlert &message_handler)
 {
   messaget log{message_handler};
+  log.warning() << "-------------------READS--------------------------"
+                << messaget::eom;
+
   for(const auto &read : reads)
   {
-    if(read.second == equation.SSA_steps.cend())
+    for(std::size_t round = 1; round <= rounds; ++round)
     {
-      //TODO: use initialization or value from the previous round
+      auto read_variable = read.first;
+      std::string condition_suffix =
+        "_L" + std::to_string(read_variable->source.pc->location_number) +
+        "_R" + std::to_string(round);
+      irep_idt statement_label_name = "J" + condition_suffix;
+      symbol_exprt statement_label{statement_label_name, bool_typet{}};
+
+      std::string variable_suffix;
+      irep_idt variable_round_name;
+      typet type = read.first->ssa_lhs.type();
+
+      if(!read.second.has_value())
+      {
+        if(round == 1)
+        {
+          //log.warning() << "DEFAULT VALUE:" << messaget::eom;
+          variable_round_name = id2string(
+            last_update_main[read.first->ssa_lhs.get_original_name()]);
+        }
+        else
+        {
+          //log.warning() << "VALUE FROM PREVIOUS ROUND:" << messaget::eom;
+          variable_round_name =
+            id2string(last_update[read.first->ssa_lhs.get_original_name()]) +
+            "_R" + std::to_string(round - 1);
+        }
+      }
+      else
+      {
+        //log.warning() << "VALUE FROM CURRENT ROUND:" << messaget::eom;
+        variable_suffix =
+          "_L" +
+          std::to_string(read.second.value()->source.pc->location_number) +
+          "_R" + std::to_string(round);
+
+        variable_round_name =
+          id2string(
+            to_symbol_expr(read.second.value()->ssa_lhs).get_identifier()) +
+          variable_suffix;
+
+        type = read.second.value()->ssa_lhs.type();
+      }
+
+      symbol_exprt round_value{variable_round_name, type};
+
+      equal_exprt constraint{
+        read_variable->ssa_lhs,
+        if_exprt{statement_label, round_value, read_variable->ssa_lhs}};
+      log.warning() << format(constraint) << messaget::eom;
+      equation.constraint(constraint, "read constraint", read_variable->source);
     }
-    equal_exprt constraint{
-      end_of_round_value,
-      if_exprt{
-        statement_label,
-        last_write_of_current_round->ssa_lhs,
-        last_write_of_previous_round}};
-    log.warning() << format(constraint) << messaget::eom;
-    equation.constraint(constraint, "read constraint", read.first->source);
   }
 }
 
@@ -136,14 +204,18 @@ void lazy_c_seqt::collect_reads_and_writes(
   const symex_target_equationt::SSA_stepst &ssa_steps,
   std::vector<std::pair<
     symex_target_equationt::SSA_stepst::const_iterator,
-    symex_target_equationt::SSA_stepst::const_iterator>> &reads,
+    std::optional<symex_target_equationt::SSA_stepst::const_iterator>>> &reads,
   std::unordered_map<
     unsigned,
     std::vector<symex_target_equationt::SSA_stepst::const_iterator>> &writes,
   message_handlert &message_handler)
 {
   messaget log{message_handler};
-  symex_target_equationt::SSA_stepst::const_iterator previous_write;
+  std::unordered_map<
+    irep_idt,
+    std::optional<symex_target_equationt::SSA_stepst::const_iterator>>
+    previous_write;
+  previous_write.clear();
   for(symex_target_equationt::SSA_stepst::const_iterator s_it =
         ssa_steps.begin();
       s_it != ssa_steps.end();
@@ -212,7 +284,10 @@ void lazy_c_seqt::collect_reads_and_writes(
                       << to_symbol_expr(s_it->ssa_lhs).get_identifier() << "\tL"
                       << s_it->source.pc->location_number << messaget::eom;
         writes[s_it->source.thread_nr].emplace_back(s_it);
-        previous_write = s_it;
+        if(previous_write.count(s_it->ssa_lhs.get_object_name()) == 0)
+          previous_write[s_it->ssa_lhs.get_object_name()] = std::nullopt;
+        else
+          previous_write[s_it->ssa_lhs.get_object_name()] = s_it;
       }
       else
       {
@@ -233,7 +308,16 @@ void lazy_c_seqt::collect_reads_and_writes(
                       << to_symbol_expr(s_it->ssa_lhs).get_identifier() << "\tL"
                       << s_it->source.pc->location_number << messaget::eom;
 
-        reads.emplace_back(std::pair(s_it, previous_write));
+        if(s_it->source.thread_nr >= 1) //TODO: maybe we don't need this later
+        {
+          if(previous_write.count(s_it->ssa_lhs.get_object_name()) == 0)
+            reads.emplace_back(std::pair(s_it, std::nullopt));
+          else
+          {
+            reads.emplace_back(
+              std::pair(s_it, previous_write[s_it->ssa_lhs.get_object_name()]));
+          }
+        }
       }
       else
       {
