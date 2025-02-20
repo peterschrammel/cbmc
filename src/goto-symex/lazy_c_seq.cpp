@@ -97,7 +97,7 @@ void lazy_c_seqt::create_write_constraints(
           std::to_string(
             last_write_of_current_round->source.pc->location_number) +
           "_R" + std::to_string(round);
-        irep_idt statement_label_name = "J" + suffix;
+        irep_idt statement_label_name = "E" + suffix;
         symbol_exprt statement_label{statement_label_name, bool_typet{}};
 
         // We don't need to check that this is a symbol because we have alread done that in collect_reads_and_writes.
@@ -144,13 +144,14 @@ void lazy_c_seqt::create_read_constraints(
 
   for(const auto &read : reads)
   {
-    for(std::size_t round = 1; round <= rounds; ++round)
+    std::vector<std::pair<exprt, exprt>> constraints;
+    auto read_variable = read.first;
+    for(std::size_t round = rounds; round >= 1; --round)
     {
-      auto read_variable = read.first;
       std::string condition_suffix =
         "_L" + std::to_string(read_variable->source.pc->location_number) +
         "_R" + std::to_string(round);
-      irep_idt statement_label_name = "J" + condition_suffix;
+      irep_idt statement_label_name = "E" + condition_suffix;
       symbol_exprt statement_label{statement_label_name, bool_typet{}};
 
       std::string variable_suffix;
@@ -191,12 +192,21 @@ void lazy_c_seqt::create_read_constraints(
 
       symbol_exprt round_value{variable_round_name, type};
 
-      equal_exprt constraint{
-        read_variable->ssa_lhs,
-        if_exprt{statement_label, round_value, read_variable->ssa_lhs}};
-      log.warning() << format(constraint) << messaget::eom;
-      equation.constraint(constraint, "read constraint", read_variable->source);
+      constraints.emplace_back(std::pair(statement_label, round_value));
     }
+
+    exprt previous_expr = read_variable->ssa_lhs;
+    exprt constraint;
+    for(const auto &pair : constraints)
+    {
+      if_exprt temp_constraint{pair.first, pair.second, previous_expr};
+      constraint = temp_constraint;
+      previous_expr = constraint;
+    }
+    equal_exprt final_constraint{read_variable->ssa_lhs, constraint};
+    log.warning() << format(final_constraint) << messaget::eom;
+    equation.constraint(
+      final_constraint, "read constraint", read_variable->source);
   }
 }
 
