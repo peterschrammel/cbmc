@@ -49,6 +49,17 @@ private:
     std::unordered_map<irep_idt, irep_idt> &last_update,
     std::unordered_map<irep_idt, irep_idt> &last_update_main,
     message_handlert &message_handler);
+
+  void create_reach_constraint(
+    symex_target_equationt &equation,
+    std::vector<std::pair<
+      symex_target_equationt::SSA_stepst::const_iterator,
+      std::optional<symex_target_equationt::SSA_stepst::const_iterator>>>
+      &reads,
+    std::unordered_map<
+      unsigned,
+      std::vector<symex_target_equationt::SSA_stepst::const_iterator>> &writes,
+    message_handlert &message_handler);
 };
 
 #endif //CPROVER_GOTO_SYMEX_LAZY_C_SEQ_H

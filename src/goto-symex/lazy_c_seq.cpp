@@ -9,6 +9,7 @@
 #include <util/pointer_expr.h>
 #include <util/prefix.h>
 
+#include <math.h>
 #include <optional>
 
 void lazy_c_seqt::operator()(
@@ -36,6 +37,8 @@ void lazy_c_seqt::operator()(
 
   create_read_constraints(
     equation, reads, last_update, last_update_main, message_handler);
+
+  create_reach_constraint(equation, reads, writes, message_handler);
 
   exprt tmp;
   simplify(tmp, ns);
@@ -207,6 +210,90 @@ void lazy_c_seqt::create_read_constraints(
     log.warning() << format(final_constraint) << messaget::eom;
     equation.constraint(
       final_constraint, "read constraint", read_variable->source);
+  }
+}
+
+void lazy_c_seqt::create_reach_constraint(
+  symex_target_equationt &equation,
+  std::vector<std::pair<
+    symex_target_equationt::SSA_stepst::const_iterator,
+    std::optional<symex_target_equationt::SSA_stepst::const_iterator>>> &reads,
+  std::unordered_map<
+    unsigned,
+    std::vector<symex_target_equationt::SSA_stepst::const_iterator>> &writes,
+  message_handlert &message_handler)
+{
+  messaget log{message_handler};
+
+  log.warning() << "-------------------REACH--------------------------"
+                << messaget::eom;
+
+  for(auto read : reads)
+  {
+    std::string label_name =
+      "_L" + std::to_string(read.first->source.pc->location_number);
+    std::string thread_name =
+      "_T" + std::to_string(read.first->source.thread_nr);
+    std::string round_name = "_R" + std::to_string(writes.size());
+
+    irep_idt statement_label_name = "E" + label_name + round_name;
+    symbol_exprt statement_label{statement_label_name, bool_typet{}};
+
+    exprt previous_expr = statement_label;
+    exprt constraint;
+    for(std::size_t round = rounds - 1; round >= 1; --round)
+    {
+      std::string round_name = "_R" + std::to_string(round);
+
+      irep_idt statement_label_name = "E" + label_name + round_name;
+      symbol_exprt statement_label{statement_label_name, bool_typet{}};
+
+      or_exprt temp_constraint{statement_label, previous_expr};
+      constraint = temp_constraint;
+      previous_expr = constraint;
+    }
+
+    irep_idt reach_name = "reach" + label_name + thread_name;
+    symbol_exprt reach{reach_name, bool_typet{}};
+
+    equal_exprt final_constraint{reach, constraint};
+    log.warning() << format(final_constraint) << messaget::eom;
+    equation.constraint(
+      final_constraint, "reach constraint", read.first->source);
+  }
+
+  for(unsigned thread_nr = 1; thread_nr < writes.size(); ++thread_nr)
+  {
+    for(const auto &write : writes.at(thread_nr))
+    {
+      std::string label_name =
+        "_L" + std::to_string(write->source.pc->location_number);
+      std::string thread_name = "_T" + std::to_string(write->source.thread_nr);
+      std::string round_name = "_R" + std::to_string(writes.size());
+
+      irep_idt statement_label_name = "E" + label_name + round_name;
+      symbol_exprt statement_label{statement_label_name, bool_typet{}};
+
+      exprt previous_expr = statement_label;
+      exprt constraint;
+      for(std::size_t round = rounds; round > 1; --round)
+      {
+        std::string round_name = "_R" + std::to_string(round);
+
+        irep_idt statement_label_name = "E" + label_name + round_name;
+        symbol_exprt statement_label{statement_label_name, bool_typet{}};
+
+        or_exprt temp_constraint{statement_label, previous_expr};
+        constraint = temp_constraint;
+        previous_expr = constraint;
+      }
+      irep_idt reach_name = "reach" + label_name + thread_name;
+      symbol_exprt reach{reach_name, bool_typet{}};
+
+      equal_exprt final_constraint{reach, constraint};
+      log.warning() << format(final_constraint) << messaget::eom;
+      equation.constraint(final_constraint, "reach constraint", write->source);
+    }
   }
 }
 
