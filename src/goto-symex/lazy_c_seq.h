@@ -60,6 +60,10 @@ private:
       unsigned,
       std::vector<symex_target_equationt::SSA_stepst::const_iterator>> &writes,
     message_handlert &message_handler);
+
+  void handling_guards(
+    symex_target_equationt &equation,
+    message_handlert &message_handler);
 };
 
 #endif //CPROVER_GOTO_SYMEX_LAZY_C_SEQ_H

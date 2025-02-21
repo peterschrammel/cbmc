@@ -8,8 +8,8 @@
 #include <util/format_expr.h>
 #include <util/pointer_expr.h>
 #include <util/prefix.h>
+#include <util/simplify_expr.h>
 
-#include <math.h>
 #include <optional>
 
 void lazy_c_seqt::operator()(
@@ -39,6 +39,8 @@ void lazy_c_seqt::operator()(
     equation, reads, last_update, last_update_main, message_handler);
 
   create_reach_constraint(equation, reads, writes, message_handler);
+
+  handling_guards(equation, message_handler);
 
   exprt tmp;
   simplify(tmp, ns);
@@ -295,6 +297,132 @@ void lazy_c_seqt::create_reach_constraint(
       equation.constraint(final_constraint, "reach constraint", write->source);
     }
   }
+}
+
+void lazy_c_seqt::handling_guards(
+  symex_target_equationt &equation,
+  message_handlert &message_handler)
+{
+  messaget log{message_handler};
+
+  log.warning() << "-------------------GUARDS--------------------------"
+                << messaget::eom;
+
+  symex_target_equationt temp_equation{equation};
+  temp_equation.clear();
+
+  auto ssa_steps = equation.SSA_steps;
+
+  exprt previous_reach = true_exprt{};
+
+  for(symex_target_equationt::SSA_stepst::const_iterator s_it =
+        ssa_steps.begin();
+      s_it != ssa_steps.end();
+      s_it++)
+  {
+    bool skip = false;
+    const std::string &file =
+      id2string(s_it->source.pc->source_location().get_file());
+    if(
+      file.find("builtin-library") != std::string::npos ||
+      file.find("built-in-additions") != std::string::npos)
+    {
+      skip = true;
+    }
+    if(s_it->is_shared_read() || s_it->is_shared_write())
+    {
+      const bool has_cprover_prefix =
+        can_cast_expr<symbol_exprt>(s_it->ssa_lhs) &&
+        has_prefix(
+          id2string(to_symbol_expr(s_it->ssa_lhs).get_identifier()),
+          CPROVER_PREFIX);
+      if(has_cprover_prefix)
+      {
+        skip = true;
+      }
+    }
+    if(s_it->is_shared_read() || s_it->is_shared_write())
+    {
+      if(can_cast_expr<symbol_exprt>(s_it->ssa_lhs))
+      {
+        const typet &type = to_symbol_expr(s_it->ssa_lhs).type();
+        //log.warning() << "Type of " << to_symbol_expr(s_it->ssa_lhs).get_identifier() << ": " << type.pretty() << messaget::eom;
+        if(
+          can_cast_type<pointer_typet>(type) &&
+          can_cast_type<struct_tag_typet>(to_pointer_type(type).base_type()))
+        {
+          if(
+            id2string(to_struct_tag_type(to_pointer_type(type).base_type())
+                        .get_identifier()) == "tag-_opaque_pthread_t")
+          {
+            //log.warning() << "Skipped" << messaget::eom;
+            skip = true;
+          }
+        }
+      }
+      if(!can_cast_expr<symbol_exprt>(s_it->ssa_lhs))
+      {
+        skip = true;
+      }
+    }
+
+    if(
+      (s_it->is_assert() || s_it->is_assume() || s_it->is_shared_read() ||
+       s_it->is_shared_write()) &&
+      s_it->source.thread_nr > 0 && !skip)
+    {
+      exprt guard = s_it->guard;
+      if(s_it->is_shared_read() || s_it->is_shared_write())
+      {
+        //log.warning() << "s_it->guard: " << format(s_it->guard) << messaget::eom;
+
+        std::string label_name =
+          "_L" + std::to_string(s_it->source.pc->location_number);
+        std::string thread_name = "_T" + std::to_string(s_it->source.thread_nr);
+
+        irep_idt reach_name = "reach" + label_name + thread_name;
+        symbol_exprt reach{
+          reach_name,
+          bool_typet{}}; //TODO: we already have it, is that ok or we have to take it from the previous functions?
+        and_exprt new_guard{reach, guard};
+        simplify(new_guard, this->ns);
+
+        SSA_stept step = equation.SSA_steps.front();
+        equation.SSA_steps.pop_front();
+        step.guard = new_guard;
+        temp_equation.SSA_steps.emplace_back(step);
+
+        log.warning() << format(step.get_ssa_expr()) << messaget::eom;
+        log.warning() << "guard: " << format(step.guard) << messaget::eom;
+        previous_reach = reach;
+      }
+
+      if(s_it->is_assert() || s_it->is_assume())
+      {
+        and_exprt new_guard{previous_reach, guard};
+        simplify(new_guard, this->ns);
+
+        SSA_stept step = equation.SSA_steps.front();
+        equation.SSA_steps.pop_front();
+        step.guard = new_guard;
+        //log.warning() << "s_it->cond_expr: " << format(s_it->cond_expr.operands().at(s_it->cond_expr.operands().size()-1)) << messaget::eom;
+        step.cond_expr = implies_exprt{
+          new_guard,
+          s_it->cond_expr.operands().at(s_it->cond_expr.operands().size() - 1)};
+        temp_equation.SSA_steps.emplace_back(step);
+
+        log.warning() << format(step.get_ssa_expr()) << messaget::eom;
+        log.warning() << "guard: " << format(step.guard) << messaget::eom;
+      }
+    }
+    else
+    {
+      SSA_stept step = equation.SSA_steps.front();
+      equation.SSA_steps.pop_front();
+      temp_equation.SSA_steps.emplace_back(step);
+    }
+  }
+  equation = temp_equation;
 }
 
 void lazy_c_seqt::collect_reads_and_writes(
