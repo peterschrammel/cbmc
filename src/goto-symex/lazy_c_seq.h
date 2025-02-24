@@ -26,6 +26,7 @@ private:
       symex_target_equationt::SSA_stepst::const_iterator,
       std::optional<symex_target_equationt::SSA_stepst::const_iterator>>>
       &reads,
+    std::vector<symex_target_equationt::SSA_stepst::const_iterator> &main_reads,
     std::unordered_map<
       unsigned,
       std::vector<symex_target_equationt::SSA_stepst::const_iterator>> &writes,
@@ -36,7 +37,9 @@ private:
     const std::unordered_map<
       unsigned,
       std::vector<symex_target_equationt::SSA_stepst::const_iterator>> &writes,
-    std::unordered_map<irep_idt, irep_idt> &last_update,
+    std::unordered_map<
+      irep_idt,
+      symex_target_equationt::SSA_stepst::const_iterator> &last_update,
     std::unordered_map<irep_idt, irep_idt> &last_update_main,
     message_handlert &message_handler);
 
@@ -46,8 +49,18 @@ private:
       symex_target_equationt::SSA_stepst::const_iterator,
       std::optional<symex_target_equationt::SSA_stepst::const_iterator>>>
       &reads,
-    std::unordered_map<irep_idt, irep_idt> &last_update,
+    std::unordered_map<
+      irep_idt,
+      symex_target_equationt::SSA_stepst::const_iterator> &last_update,
     std::unordered_map<irep_idt, irep_idt> &last_update_main,
+    message_handlert &message_handler);
+
+  void create_main_read_constraints(
+    symex_target_equationt &equation,
+    std::unordered_map<
+      irep_idt,
+      symex_target_equationt::SSA_stepst::const_iterator> &last_update,
+    std::vector<symex_target_equationt::SSA_stepst::const_iterator> &main_reads,
     message_handlert &message_handler);
 
   void create_reach_constraint(
