@@ -48,6 +48,8 @@ void lazy_c_seqt::operator()(
   create_main_read_constraints(
     equation, last_update, main_reads, message_handler);
 
+  create_cprover_constraints(equation, message_handler);
+
   //handling_guards(equation, message_handler);
 
   exprt tmp;
@@ -507,6 +509,51 @@ void lazy_c_seqt::handling_guards(
     }
   }
   equation = temp_equation;
+}
+
+void lazy_c_seqt::create_cprover_constraints(
+  symex_target_equationt &equation,
+  message_handlert &message_handler)
+{
+  std::
+    unordered_map<irep_idt, symex_target_equationt::SSA_stepst::const_iterator>
+      last_upadte;
+  messaget log{message_handler};
+  log.warning() << "-------------------CPROVER--------------------------"
+                << messaget::eom;
+
+  auto ssa_steps = equation.SSA_steps;
+  for(symex_target_equationt::SSA_stepst::const_iterator s_it =
+        ssa_steps.begin();
+      s_it != ssa_steps.end();
+      s_it++)
+  {
+    const std::string &file =
+      id2string(s_it->source.pc->source_location().get_file());
+    if(!(file.find("builtin-library") != std::string::npos ||
+         file.find("built-in-additions") != std::string::npos))
+    {
+      continue;
+    }
+    if(s_it->is_shared_write())
+    {
+      last_upadte[s_it->ssa_lhs.get_object_name()] = s_it;
+    }
+    if(s_it->is_shared_read())
+    {
+      irep_idt previous_name =
+        id2string(s_it->ssa_lhs.get_object_name()) + "#" +
+        id2string(
+          last_upadte[s_it->ssa_lhs.get_object_name()]->ssa_lhs.get_level_2());
+      symbol_exprt previous{
+        previous_name,
+        last_upadte[s_it->ssa_lhs.get_object_name()]->ssa_lhs.type()};
+
+      equal_exprt constraint{previous, s_it->ssa_lhs};
+      log.warning() << format(constraint) << messaget::eom;
+      equation.constraint(constraint, "cprover constraint", s_it->source);
+    }
+  }
 }
 
 void lazy_c_seqt::collect_reads_and_writes(

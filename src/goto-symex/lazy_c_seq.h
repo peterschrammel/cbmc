@@ -77,6 +77,10 @@ private:
   void handling_guards(
     symex_target_equationt &equation,
     message_handlert &message_handler);
+
+  void create_cprover_constraints(
+    symex_target_equationt &equation,
+    message_handlert &message_handler);
 };
 
 #endif //CPROVER_GOTO_SYMEX_LAZY_C_SEQ_H
