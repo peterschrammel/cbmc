@@ -407,9 +407,8 @@ void lazy_c_seqt::create_cs_constraint(
         irep_idt cs_next_name = "cs" + thread_name + round_next_name;
         symbol_exprt cs_next{cs_next_name, unsignedbv_typet{8}};
 
-        /*irep_idt active_thread_name = "active_thread" + thread_name + round_curr_name;
-        symbol_exprt active_thread{active_thread_name, bool_typet{}};*/
-        exprt active_thread = true_exprt{};
+        irep_idt active_thread_name = "active_thread" + thread_name + round_curr_name;
+        symbol_exprt active_thread{active_thread_name, bool_typet{}};
 
         greater_than_or_equal_exprt expr_1{cs_curr, label};
         greater_than_exprt expr_2{cs_next, label};
@@ -448,9 +447,8 @@ void lazy_c_seqt::create_cs_constraint(
       irep_idt cs_next_name = "cs" + thread_name + round_next_name;
       symbol_exprt cs_next{cs_next_name, unsignedbv_typet{8}};
 
-      /*irep_idt active_thread_name = "active_thread" + thread_name + round_curr_name;
-      symbol_exprt active_thread{active_thread_name, bool_typet{}};*/
-      exprt active_thread = true_exprt{};
+      irep_idt active_thread_name = "active_thread" + thread_name + round_curr_name;
+      symbol_exprt active_thread{active_thread_name, bool_typet{}};
 
       greater_than_or_equal_exprt expr_1{cs_curr, label};
       greater_than_exprt expr_2{cs_next, label};
