@@ -122,33 +122,36 @@ void lazy_c_seqt::create_write_constraints(
         }
         if(!var_contained)
           continue;
-        std::string suffix =
-          "_L" +
-          std::to_string(
-            last_write_of_current_round->source.pc->location_number) +
-          "_R" + std::to_string(round);
-        irep_idt statement_label_name = "E" + suffix;
-        symbol_exprt statement_label{statement_label_name, bool_typet{}};
+        for(const auto &s_it : writes.at(thread_nr))
+        {
+          std::string suffix =
+            "_L" +
+            std::to_string(
+              s_it->source.pc->location_number) +
+            "_R" + std::to_string(round);
+          irep_idt statement_label_name = "E" + suffix;
+          symbol_exprt statement_label{statement_label_name, bool_typet{}};
 
-        // We don't need to check that this is a symbol because we have alread done that in collect_reads_and_writes.
-        irep_idt end_of_round_name =
-          id2string(to_symbol_expr(last_write_of_current_round->ssa_lhs)
-                      .get_identifier()) +
-          suffix;
-        symbol_exprt end_of_round_value{
-          end_of_round_name, last_write_of_current_round->ssa_lhs.type()};
-        equal_exprt constraint{
-          end_of_round_value,
-          if_exprt{
-            statement_label,
-            last_write_of_current_round->ssa_lhs,
-            last_write_of_previous_round}};
-        log.warning() << format(constraint) << messaget::eom;
-        equation.constraint(
-          constraint, "write constraint", last_write_of_current_round->source);
-        last_write_of_previous_round = end_of_round_value;
+          // We don't need to check that this is a symbol because we have alread done that in collect_reads_and_writes.
+          irep_idt end_of_round_name =
+            id2string(to_symbol_expr(s_it->ssa_lhs)
+                        .get_identifier()) +
+            suffix;
+          symbol_exprt end_of_round_value{
+            end_of_round_name, s_it->ssa_lhs.type()};
+          equal_exprt constraint{
+            end_of_round_value,
+            if_exprt{
+              statement_label,
+              last_write_of_current_round->ssa_lhs,
+              last_write_of_previous_round}};
+          log.warning() << format(constraint) << messaget::eom;
+          equation.constraint(
+            constraint, "write constraint", s_it->source);
+          last_write_of_previous_round = end_of_round_value;
 
-        last_update[variable] = last_write_of_current_round;
+          last_update[variable] = s_it;
+        }
       }
     }
   }
