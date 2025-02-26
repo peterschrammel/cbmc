@@ -9,6 +9,9 @@
 #include <util/pointer_expr.h>
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
+#include <util/source_location.h>
+
+#include "arith_tools.h"
 
 #include <optional>
 
@@ -33,22 +36,32 @@ void lazy_c_seqt::operator()(
     unordered_map<irep_idt, symex_target_equationt::SSA_stepst::const_iterator>
       last_update;
   std::unordered_map<irep_idt, irep_idt> last_update_main;
+  std::
+    unordered_map<irep_idt, symex_target_equationt::SSA_stepst::const_iterator>
+      last_cprover_upadte;
 
   collect_reads_and_writes(
     equation.SSA_steps, reads, main_reads, writes, message_handler);
 
-  create_write_constraints(
-    equation, writes, last_update, last_update_main, message_handler);
+  if(!writes.empty())
+    create_write_constraints(
+      equation, writes, last_update, last_update_main, message_handler);
 
-  create_read_constraints(
-    equation, reads, last_update, last_update_main, message_handler);
+  if(!reads.empty())
+    create_read_constraints(
+      equation, reads, writes, last_update, last_update_main, message_handler);
 
-  create_reach_constraint(equation, reads, writes, message_handler);
+  create_cprover_constraints(equation, last_cprover_upadte, message_handler);
 
-  create_main_read_constraints(
-    equation, last_update, main_reads, message_handler);
+  if(!(writes.empty() && reads.empty()))
+  {
+    //create_cs_constraint(equation,reads,writes,message_handler);
+    create_reach_constraint(equation, reads, writes, message_handler);
+  }
 
-  create_cprover_constraints(equation, message_handler);
+  if(!main_reads.empty())
+    create_main_read_constraints(
+      equation, last_update, main_reads, message_handler);
 
   //handling_guards(equation, message_handler);
 
@@ -146,6 +159,9 @@ void lazy_c_seqt::create_read_constraints(
   const std::vector<std::pair<
     symex_target_equationt::SSA_stepst::const_iterator,
     std::optional<symex_target_equationt::SSA_stepst::const_iterator>>> &reads,
+  const std::unordered_map<
+    unsigned,
+    std::vector<symex_target_equationt::SSA_stepst::const_iterator>> &writes,
   std::unordered_map<
     irep_idt,
     symex_target_equationt::SSA_stepst::const_iterator> &last_update,
@@ -160,6 +176,21 @@ void lazy_c_seqt::create_read_constraints(
   {
     std::vector<std::pair<exprt, exprt>> constraints;
     auto read_variable = read.first;
+    typet type = read_variable->ssa_lhs.type();
+
+    if(!check_if_write_in_threads(writes, read_variable))
+    {
+      auto previous_name =
+        id2string(last_update_main[read_variable->ssa_lhs.get_original_name()]);
+      symbol_exprt previous{previous_name, type};
+      equal_exprt constraint{read_variable->ssa_lhs, previous};
+
+      log.warning() << format(constraint) << messaget::eom;
+      equation.constraint(constraint, "read constraint", read_variable->source);
+
+      continue;
+    }
+
     for(std::size_t round = rounds; round >= 1; --round)
     {
       std::string condition_suffix =
@@ -170,7 +201,6 @@ void lazy_c_seqt::create_read_constraints(
 
       std::string variable_suffix;
       irep_idt variable_round_name;
-      typet type = read.first->ssa_lhs.type();
 
       if(!read.second.has_value())
       {
@@ -230,6 +260,29 @@ void lazy_c_seqt::create_read_constraints(
   }
 }
 
+bool lazy_c_seqt::check_if_write_in_threads(
+  const std::unordered_map<
+    unsigned,
+    std::vector<symex_target_equationt::SSA_stepst::const_iterator>> &writes,
+  symex_target_equationt::SSA_stepst::const_iterator current_read)
+{
+  bool var_contained = false;
+  for(unsigned thread_nr = 1; thread_nr < writes.size(); ++thread_nr)
+  {
+    for(const auto &s_it : writes.at(thread_nr))
+    {
+      if(
+        s_it->ssa_lhs.get_object_name() ==
+        current_read->ssa_lhs.get_object_name())
+      {
+        var_contained = true;
+        break;
+      }
+    }
+  }
+  return var_contained;
+}
+
 void lazy_c_seqt::create_main_read_constraints(
   symex_target_equationt &equation,
   std::unordered_map<
@@ -261,6 +314,152 @@ void lazy_c_seqt::create_main_read_constraints(
 
     log.warning() << format(constraint) << messaget::eom;
     equation.constraint(constraint, "read constraint", read->source);
+  }
+}
+
+void lazy_c_seqt::create_cs_constraint(
+  symex_target_equationt &equation,
+  std::vector<std::pair<
+    symex_target_equationt::SSA_stepst::const_iterator,
+    std::optional<symex_target_equationt::SSA_stepst::const_iterator>>> &reads,
+  std::unordered_map<
+    unsigned,
+    std::vector<symex_target_equationt::SSA_stepst::const_iterator>> &writes,
+  message_handlert &message_handler)
+{
+  messaget log{message_handler};
+  log.warning() << "-------------------CS--------------------------"
+                << messaget::eom;
+
+  for(size_t thread = 1; thread <= writes.size(); ++thread)
+  {
+    exprt previous;
+    for(size_t round = 1; round <= rounds; ++round)
+    {
+      irep_idt cs_name =
+        "cs_T" + std::to_string(thread) + "_R" + std::to_string(round);
+      symbol_exprt cs{cs_name, unsignedbv_typet{8}}; //TODO: check type
+
+      if(round == 1)
+      {
+        exprt zero{
+          from_integer({0}, unsignedbv_typet{8})}; //TODO: check corretness
+        less_than_or_equal_exprt constraint{zero, cs};
+        log.warning() << format(constraint) << messaget::eom;
+        equation.constraint(
+          constraint,
+          "cs constraint",
+          equation.SSA_steps.begin()->source); //TODO: check source
+        previous = cs;
+        continue;
+      }
+      less_than_or_equal_exprt constraint{previous, cs};
+      log.warning() << format(constraint) << messaget::eom;
+      equation.constraint(
+        constraint,
+        "cs constraint",
+        equation.SSA_steps.begin()->source); //TODO: check source
+      previous = cs;
+      if(round == rounds)
+      {
+        int max_read = reinterpret_cast<unsigned>(
+          reads.back().first->source.pc->location_number);
+        int max_write = reinterpret_cast<unsigned>(
+          writes[writes.size() - 1].back()->source.pc->location_number);
+        int max_num = max_read > max_write ? max_read + 1 : max_write + 1;
+        exprt max{from_integer(
+          {max_num}, unsignedbv_typet{8})}; //TODO: check corretness
+        less_than_or_equal_exprt constraint{cs, max};
+        log.warning() << format(constraint) << messaget::eom;
+        equation.constraint(
+          constraint,
+          "cs constraint",
+          equation.SSA_steps.begin()->source); //TODO: check source
+        previous = cs;
+      }
+    }
+  }
+  for(unsigned thread = 1; thread < writes.size(); ++thread)
+  {
+    for(const auto &write : writes.at(thread))
+    {
+      for(size_t round = 1; round <= rounds; ++round)
+      {
+        std::string label_name =
+          "_L" + std::to_string(write->source.pc->location_number);
+        std::string round_curr_name = "_R" + std::to_string(round);
+        std::string round_next_name = "_R" + std::to_string(round + 1);
+        std::string thread_name = "_T" + std::to_string(thread);
+
+        int label_int =
+          reinterpret_cast<unsigned>(write->source.pc->location_number);
+        exprt label{from_integer({label_int}, unsignedbv_typet{8})};
+
+        irep_idt statement_label_name = "E" + label_name + round_curr_name;
+        symbol_exprt statement_label{statement_label_name, bool_typet{}};
+
+        irep_idt cs_curr_name = "cs" + thread_name + round_curr_name;
+        symbol_exprt cs_curr{cs_curr_name, unsignedbv_typet{8}};
+
+        irep_idt cs_next_name = "cs" + thread_name + round_next_name;
+        symbol_exprt cs_next{cs_next_name, unsignedbv_typet{8}};
+
+        /*irep_idt active_thread_name = "active_thread" + thread_name + round_curr_name;
+        symbol_exprt active_thread{active_thread_name, bool_typet{}};*/
+        exprt active_thread = true_exprt{};
+
+        greater_than_or_equal_exprt expr_1{cs_curr, label};
+        greater_than_exprt expr_2{cs_next, label};
+        and_exprt expr_3{expr_1, expr_2};
+        and_exprt expr_4{active_thread, expr_3};
+        and_exprt expr_5{expr_4, write->guard};
+        equal_exprt constraint{statement_label, expr_5};
+        simplify(constraint, ns);
+
+        log.warning() << format(constraint) << messaget::eom;
+        equation.constraint(constraint, "cs constraint", write->source);
+      }
+    }
+  }
+  for(auto read : reads)
+  {
+    for(size_t round = 1; round <= rounds; ++round)
+    {
+      std::string label_name =
+        "_L" + std::to_string(read.first->source.pc->location_number);
+      std::string round_curr_name = "_R" + std::to_string(round);
+      std::string round_next_name = "_R" + std::to_string(round + 1);
+      std::string thread_name =
+        "_T" + std::to_string(read.first->source.thread_nr);
+
+      int label_int =
+        reinterpret_cast<unsigned>(read.first->source.pc->location_number);
+      exprt label{from_integer({label_int}, unsignedbv_typet{8})};
+
+      irep_idt statement_label_name = "E" + label_name + round_curr_name;
+      symbol_exprt statement_label{statement_label_name, bool_typet{}};
+
+      irep_idt cs_curr_name = "cs" + thread_name + round_curr_name;
+      symbol_exprt cs_curr{cs_curr_name, unsignedbv_typet{8}};
+
+      irep_idt cs_next_name = "cs" + thread_name + round_next_name;
+      symbol_exprt cs_next{cs_next_name, unsignedbv_typet{8}};
+
+      /*irep_idt active_thread_name = "active_thread" + thread_name + round_curr_name;
+      symbol_exprt active_thread{active_thread_name, bool_typet{}};*/
+      exprt active_thread = true_exprt{};
+
+      greater_than_or_equal_exprt expr_1{cs_curr, label};
+      greater_than_exprt expr_2{cs_next, label};
+      and_exprt expr_3{expr_1, expr_2};
+      and_exprt expr_4{active_thread, expr_3};
+      and_exprt expr_5{expr_4, read.first->guard};
+      equal_exprt constraint{statement_label, expr_5};
+      simplify(constraint, ns);
+
+      log.warning() << format(constraint) << messaget::eom;
+      equation.constraint(constraint, "cs constraint", read.first->source);
+    }
   }
 }
 
@@ -311,6 +510,7 @@ void lazy_c_seqt::create_reach_constraint(
     log.warning() << format(final_constraint) << messaget::eom;
     equation.constraint(
       final_constraint, "reach constraint", read.first->source);
+
     log.warning() << format(reach) << messaget::eom;
     equation.constraint(reach, "reach constraint", read.first->source);
   }
@@ -366,7 +566,7 @@ void lazy_c_seqt::handling_guards(
 
   auto ssa_steps = equation.SSA_steps;
 
-  exprt previous_reach = true_exprt{};
+  symex_target_equationt::SSA_stepst::const_iterator previous_shared_event;
 
   for(symex_target_equationt::SSA_stepst::const_iterator s_it =
         ssa_steps.begin();
@@ -431,12 +631,12 @@ void lazy_c_seqt::handling_guards(
     }*/
 
     if(
-      (s_it->is_assert() || s_it->is_assume() || s_it->is_shared_read() ||
-       s_it->is_shared_write() || s_it->is_assignment()) &&
+      (s_it->is_assert() || s_it->is_assume() /*|| s_it->is_shared_read() ||
+       s_it->is_shared_write() || s_it->is_assignment()*/) &&
       s_it->source.thread_nr > 0 && !skip)
     {
       exprt guard = s_it->guard;
-      if(s_it->is_shared_read() || s_it->is_shared_write())
+      /*if(s_it->is_shared_read() || s_it->is_shared_write())
       {
         //log.warning() << "s_it->guard: " << format(s_it->guard) << messaget::eom;
 
@@ -481,10 +681,19 @@ void lazy_c_seqt::handling_guards(
 
         log.warning() << format(step.get_ssa_expr()) << messaget::eom;
         log.warning() << "guard: " << format(step.guard) << messaget::eom;
-      }
+      }*/
 
       if(s_it->is_assert() || s_it->is_assume())
       {
+        std::string label_name =
+          "_L" +
+          std::to_string(previous_shared_event->source.pc->location_number);
+        std::string thread_name =
+          "_T" + std::to_string(previous_shared_event->source.thread_nr);
+
+        irep_idt reach_name = "reach" + label_name + thread_name;
+        symbol_exprt previous_reach{reach_name, bool_typet{}};
+
         and_exprt new_guard{previous_reach, guard};
         simplify(new_guard, this->ns);
 
@@ -503,6 +712,8 @@ void lazy_c_seqt::handling_guards(
     }
     else
     {
+      if((s_it->is_shared_read() || s_it->is_shared_write()) && !skip)
+        previous_shared_event = s_it;
       SSA_stept step = equation.SSA_steps.front();
       equation.SSA_steps.pop_front();
       temp_equation.SSA_steps.emplace_back(step);
@@ -513,16 +724,18 @@ void lazy_c_seqt::handling_guards(
 
 void lazy_c_seqt::create_cprover_constraints(
   symex_target_equationt &equation,
+  std::unordered_map<
+    irep_idt,
+    symex_target_equationt::SSA_stepst::const_iterator> &last_cprover_upadte,
   message_handlert &message_handler)
 {
-  std::
-    unordered_map<irep_idt, symex_target_equationt::SSA_stepst::const_iterator>
-      last_upadte;
+  //std::vector<symex_target_equationt::SSA_stepst::const_iterator> atomic_op;
   messaget log{message_handler};
   log.warning() << "-------------------CPROVER--------------------------"
                 << messaget::eom;
 
   auto ssa_steps = equation.SSA_steps;
+  //bool atomic_section = false;
   for(symex_target_equationt::SSA_stepst::const_iterator s_it =
         ssa_steps.begin();
       s_it != ssa_steps.end();
@@ -533,21 +746,52 @@ void lazy_c_seqt::create_cprover_constraints(
     if(!(file.find("builtin-library") != std::string::npos ||
          file.find("built-in-additions") != std::string::npos))
     {
+      /*if(s_it->is_atomic_begin()) //TODO: manage atomic sections
+      {
+        atomic_section = true;
+      }
+      if(s_it->is_atomic_end())
+      {
+        exprt or_expr{false_exprt{}};
+        for(size_t round = 1; round <= rounds; ++round)
+        {
+          exprt and_expr{true_exprt{}};
+          for(auto op : atomic_op)
+          {
+            irep_idt statement_name = "E_L" + std::to_string(op->source.pc->location_number) + "_R" + std::to_string(round);
+            symbol_exprt statement{statement_name, bool_typet{}};
+
+            and_exprt and_temp_expr{statement, and_expr};
+            and_expr = and_temp_expr;
+          }
+          or_exprt or_temp_expr{and_expr, or_expr};
+          or_expr = or_temp_expr;
+        }
+        simplify(or_expr, ns);
+        log.warning() << format(or_expr) << messaget::eom;
+        equation.constraint(or_expr, "atomic constraint", s_it->source);
+        atomic_op.clear();
+        atomic_section = false;
+      }
+      if(atomic_section)
+      {
+        atomic_op.emplace_back(s_it);
+      }*/
       continue;
     }
     if(s_it->is_shared_write())
     {
-      last_upadte[s_it->ssa_lhs.get_object_name()] = s_it;
+      last_cprover_upadte[s_it->ssa_lhs.get_object_name()] = s_it;
     }
     if(s_it->is_shared_read())
     {
       irep_idt previous_name =
         id2string(s_it->ssa_lhs.get_object_name()) + "#" +
-        id2string(
-          last_upadte[s_it->ssa_lhs.get_object_name()]->ssa_lhs.get_level_2());
+        id2string(last_cprover_upadte[s_it->ssa_lhs.get_object_name()]
+                    ->ssa_lhs.get_level_2());
       symbol_exprt previous{
         previous_name,
-        last_upadte[s_it->ssa_lhs.get_object_name()]->ssa_lhs.type()};
+        last_cprover_upadte[s_it->ssa_lhs.get_object_name()]->ssa_lhs.type()};
 
       equal_exprt constraint{previous, s_it->ssa_lhs};
       log.warning() << format(constraint) << messaget::eom;

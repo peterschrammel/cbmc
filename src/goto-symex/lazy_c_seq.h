@@ -49,11 +49,20 @@ private:
       symex_target_equationt::SSA_stepst::const_iterator,
       std::optional<symex_target_equationt::SSA_stepst::const_iterator>>>
       &reads,
+    const std::unordered_map<
+      unsigned,
+      std::vector<symex_target_equationt::SSA_stepst::const_iterator>> &writes,
     std::unordered_map<
       irep_idt,
       symex_target_equationt::SSA_stepst::const_iterator> &last_update,
     std::unordered_map<irep_idt, irep_idt> &last_update_main,
     message_handlert &message_handler);
+
+  bool check_if_write_in_threads(
+    const std::unordered_map<
+      unsigned,
+      std::vector<symex_target_equationt::SSA_stepst::const_iterator>> &writes,
+    symex_target_equationt::SSA_stepst::const_iterator current_read);
 
   void create_main_read_constraints(
     symex_target_equationt &equation,
@@ -61,6 +70,17 @@ private:
       irep_idt,
       symex_target_equationt::SSA_stepst::const_iterator> &last_update,
     std::vector<symex_target_equationt::SSA_stepst::const_iterator> &main_reads,
+    message_handlert &message_handler);
+
+  void create_cs_constraint(
+    symex_target_equationt &equation,
+    std::vector<std::pair<
+      symex_target_equationt::SSA_stepst::const_iterator,
+      std::optional<symex_target_equationt::SSA_stepst::const_iterator>>>
+      &reads,
+    std::unordered_map<
+      unsigned,
+      std::vector<symex_target_equationt::SSA_stepst::const_iterator>> &writes,
     message_handlert &message_handler);
 
   void create_reach_constraint(
@@ -80,6 +100,9 @@ private:
 
   void create_cprover_constraints(
     symex_target_equationt &equation,
+    std::unordered_map<
+      irep_idt,
+      symex_target_equationt::SSA_stepst::const_iterator> &last_cprover_upadte,
     message_handlert &message_handler);
 };
 
