@@ -92,6 +92,7 @@ private:
     std::unordered_map<
       unsigned,
       std::vector<symex_target_equationt::SSA_stepst::const_iterator>> &writes,
+      symex_target_equationt::SSA_stepst::const_iterator &exited_array,
     message_handlert &message_handler);
 
   void handling_guards(
@@ -103,6 +104,7 @@ private:
     std::unordered_map<
       irep_idt,
       symex_target_equationt::SSA_stepst::const_iterator> &last_cprover_upadte,
+      symex_target_equationt::SSA_stepst::const_iterator &exited_array,
     message_handlert &message_handler);
 };
 
