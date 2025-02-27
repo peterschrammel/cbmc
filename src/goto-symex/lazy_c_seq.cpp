@@ -740,7 +740,7 @@ void lazy_c_seqt::handling_guards(
         //log.warning() << "s_it->cond_expr: " << format(s_it->cond_expr.operands().at(s_it->cond_expr.operands().size()-1)) << messaget::eom;
         step.cond_expr = implies_exprt{
           new_guard,
-          s_it->cond_expr.operands().at(s_it->cond_expr.operands().size() - 1)};
+          s_it->cond_expr};
         temp_equation.SSA_steps.emplace_back(step);
 
         log.warning() << format(step.get_ssa_expr()) << messaget::eom;
