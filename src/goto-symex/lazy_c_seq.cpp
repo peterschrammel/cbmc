@@ -732,7 +732,7 @@ void lazy_c_seqt::handling_guards(
         symbol_exprt previous_reach{reach_name, bool_typet{}};
 
         and_exprt new_guard{previous_reach, guard};
-        simplify(new_guard, this->ns);
+        simplify(new_guard, ns);
 
         SSA_stept step = equation.SSA_steps.front();
         equation.SSA_steps.pop_front();
