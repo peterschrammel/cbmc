@@ -338,6 +338,23 @@ void lazy_c_seqt::create_cs_constraint(
   for(unsigned thread = 1; thread < writes.size(); ++thread)
   {
     exprt previous;
+    int max_read = 0;
+    for(auto &read : reads)
+    {
+      if(read.first->source.thread_nr == thread && (int)reinterpret_cast<unsigned>(read.first->source.pc->location_number) > max_read)
+      {
+        max_read = reinterpret_cast<unsigned>(read.first->source.pc->location_number);
+      }
+    }
+    int max_write = 0;
+    for(auto &write : writes.at(thread))
+    {
+      if(write->source.thread_nr == thread && (int)reinterpret_cast<unsigned>(write->source.pc->location_number) > max_read)
+      {
+        max_read = reinterpret_cast<unsigned>(write->source.pc->location_number);
+      }
+    }
+    int max_num = max_read > max_write ? max_read + 1 : max_write + 1;
     for(size_t round = 1; round <= rounds; ++round)
     {
       irep_idt cs_name =
