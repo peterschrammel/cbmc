@@ -113,7 +113,7 @@ void lazy_c_seqt::create_write_constraints(
       for(unsigned thread_nr = 1; thread_nr < writes.size(); ++thread_nr)
       {
         bool var_contained = false;
-        for(const auto &s_it : writes.at(thread_nr))
+        for(const auto &s_it : writes.at(thread_nr)) //TODO: check if there are writes in that thread
         {
           if(s_it->ssa_lhs.get_object_name() == variable)
           {
