@@ -64,7 +64,7 @@ void lazy_c_seqt::operator()(
     create_main_read_constraints(
       equation, last_update, main_reads, message_handler);
 
-  //handling_guards(equation, message_handler);
+  handling_guards(equation, message_handler);
 
   exprt tmp;
   simplify(tmp, ns);
