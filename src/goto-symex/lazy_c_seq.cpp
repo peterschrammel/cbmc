@@ -108,8 +108,6 @@ void lazy_c_seqt::create_write_constraints(
 
     for(std::size_t round = 1; round <= rounds; ++round)
     {
-      symex_target_equationt::SSA_stepst::const_iterator
-        last_write_of_current_round;
       for(unsigned thread_nr = 1; thread_nr < writes.size(); ++thread_nr)
       {
         bool var_contained = false;
@@ -118,7 +116,6 @@ void lazy_c_seqt::create_write_constraints(
           if(s_it->ssa_lhs.get_object_name() == variable)
           {
             var_contained = true;
-            last_write_of_current_round = s_it;
           }
         }
         if(!var_contained)
@@ -143,9 +140,7 @@ void lazy_c_seqt::create_write_constraints(
           equal_exprt constraint{
             end_of_round_value,
             if_exprt{
-              statement_label,
-              last_write_of_current_round->ssa_lhs,
-              last_write_of_previous_round}};
+              statement_label, s_it->ssa_lhs, last_write_of_previous_round}};
           log.warning() << format(constraint) << messaget::eom;
           equation.constraint(
             constraint, "write constraint", s_it->source);
