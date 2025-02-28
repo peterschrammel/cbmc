@@ -387,6 +387,19 @@ void lazy_c_seqt::create_cs_constraint(
           "cs constraint",
           equation.SSA_steps.begin()->source); //TODO: check source
         previous = cs;
+
+        irep_idt thread_exited_name =
+          "thread_exited_T" + std::to_string(thread);
+        symbol_exprt thread_exited{thread_exited_name, bool_typet{}};
+        equal_exprt thread_exited_constraint{
+          thread_exited,
+          greater_than_or_equal_exprt{
+            cs, from_integer({max_num}, unsignedbv_typet{8})}};
+        log.warning() << format(thread_exited_constraint) << messaget::eom;
+        equation.constraint(
+          thread_exited_constraint,
+          "cs constraint",
+          equation.SSA_steps.begin()->source); //TODO: check source
       }
     }
   }
@@ -603,6 +616,8 @@ void lazy_c_seqt::handling_guards(
 
   symex_target_equationt::SSA_stepst::const_iterator previous_shared_event;
 
+  int thread = 1;
+
   for(symex_target_equationt::SSA_stepst::const_iterator s_it =
         ssa_steps.begin();
       s_it != ssa_steps.end();
@@ -749,7 +764,38 @@ void lazy_c_seqt::handling_guards(
     {
       if((s_it->is_shared_read() || s_it->is_shared_write()) && !skip)
         previous_shared_event = s_it;
+
       SSA_stept step = equation.SSA_steps.front();
+
+      if(file.find("builtin-library-__spawned_thread") != std::string::npos)
+      {
+        std::stringstream rhs_stream;
+        rhs_stream << format(s_it->ssa_rhs);
+        std::string rhs = rhs_stream.str();
+        //log.warning() << "rhs: " << rhs << messaget::eom;
+        //log.warning() << "step: " << format(s_it->get_ssa_expr()) << messaget::eom;
+
+        if(
+          s_it->is_assignment() &&
+          s_it->ssa_lhs.get_object_name() == "__CPROVER_threads_exited" &&
+          rhs.find("with") != std::string::npos)
+        {
+          with_exprt old_rhs = to_with_expr(step.ssa_rhs);
+
+          irep_idt thread_exited_name =
+            "thread_exited_T" + std::to_string(thread);
+          thread++;
+          symbol_exprt thread_exited{thread_exited_name, bool_typet{}};
+
+          with_exprt new_rhs{old_rhs.old(), old_rhs.where(), thread_exited};
+
+          step.ssa_rhs = new_rhs;
+          step.cond_expr = equal_exprt{step.ssa_lhs, step.ssa_rhs};
+
+          log.warning() << format(step.get_ssa_expr()) << messaget::eom;
+          log.warning() << "guard: " << format(step.guard) << messaget::eom;
+        }
+      }
       equation.SSA_steps.pop_front();
       temp_equation.SSA_steps.emplace_back(step);
     }
