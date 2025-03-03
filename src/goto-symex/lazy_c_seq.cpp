@@ -513,6 +513,10 @@ void lazy_c_seqt::create_reach_constraint(
   log.warning() << "-------------------REACH--------------------------"
                 << messaget::eom;
 
+  std::unordered_map<
+    unsigned,
+    std::vector<exprt>> events;
+
   for(auto &read : reads)
   {
     std::string label_name =
@@ -540,21 +544,13 @@ void lazy_c_seqt::create_reach_constraint(
 
     irep_idt reach_name = "reach" + label_name + thread_name;
     symbol_exprt reach{reach_name, bool_typet{}};
+    events[read.first->source.thread_nr].emplace_back(reach);
 
     equal_exprt final_constraint{reach, constraint};
     simplify(final_constraint, ns);
     log.warning() << format(final_constraint) << messaget::eom;
     equation.constraint(
       final_constraint, "reach constraint", read.first->source);
-
-    index_exprt exited{
-      exited_array,
-      from_integer({read.first->source.thread_nr}, unsignedbv_typet{8})};
-    equal_exprt reach_constraint{reach, exited};
-    simplify(reach_constraint, ns);
-    log.warning() << format(reach_constraint) << messaget::eom;
-    equation.constraint(
-      reach_constraint, "reach constraint", read.first->source);
   }
 
   for(unsigned thread_nr = 1; thread_nr < writes.size(); ++thread_nr)
@@ -584,19 +580,28 @@ void lazy_c_seqt::create_reach_constraint(
       }
       irep_idt reach_name = "reach" + label_name + thread_name;
       symbol_exprt reach{reach_name, bool_typet{}};
+      events[thread_nr].emplace_back(reach);
 
       equal_exprt final_constraint{reach, constraint};
       simplify(final_constraint, ns);
       log.warning() << format(final_constraint) << messaget::eom;
       equation.constraint(final_constraint, "reach constraint", write->source);
-
-      index_exprt exited{
-        exited_array, from_integer({thread_nr}, unsignedbv_typet{8})};
-      equal_exprt reach_constraint{reach, exited};
-      simplify(reach_constraint, ns);
-      log.warning() << format(reach_constraint) << messaget::eom;
-      equation.constraint(reach_constraint, "reach constraint", write->source);
     }
+  }
+
+  for(unsigned thread_nr = 1; thread_nr < writes.size(); ++thread_nr)
+  {
+    exprt and_constraint{true_exprt{}};
+    for(auto &event : events.at(thread_nr))
+    {
+      and_constraint = and_exprt{and_constraint, event};
+    }
+    index_exprt exited{
+      exited_array, from_integer({thread_nr}, unsignedbv_typet{8})};
+    equal_exprt reach_constraint{exited, and_constraint};
+    simplify(reach_constraint, ns);
+    log.warning() << format(reach_constraint) << messaget::eom;
+    equation.constraint(reach_constraint, "reach constraint", equation.SSA_steps.begin()->source);
   }
 }
 
