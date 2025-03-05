@@ -1,6 +1,6 @@
+#include <assert.h>
 #include <pthread.h>
 #include <stdio.h>
-#include <assert.h>
 
 extern void __VERIFIER_atomic_begin(void);
 extern void __VERIFIER_atomic_end(void);
@@ -17,8 +17,8 @@ void *t1(void *arg)
 void *t2(void *arg)
 {
   int b;
-  b = x;
-  x = 42;
+  b = x + 1;
+  x = b;
 }
 
 int main(void)
@@ -33,5 +33,5 @@ int main(void)
   pthread_join(id2, NULL);
   //x=x;
 
-  assert(x == 42 || x == 43);
+  assert((x == 43 || x == 44));
 }
