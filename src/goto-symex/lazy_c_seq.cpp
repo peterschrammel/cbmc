@@ -334,22 +334,44 @@ void lazy_c_seqt::create_cs_constraint(
   {
     exprt previous;
     int max_read = 0;
+    int min_read = std::numeric_limits<int>::max();
     for(auto &read : reads)
     {
       if(read.first->source.thread_nr == thread && (int)reinterpret_cast<unsigned>(read.first->source.pc->location_number) > max_read)
       {
         max_read = reinterpret_cast<unsigned>(read.first->source.pc->location_number);
       }
+      if(
+        read.first->source.thread_nr == thread &&
+        (int)reinterpret_cast<unsigned>(
+          read.first->source.pc->location_number) < min_read)
+      {
+        min_read =
+          reinterpret_cast<unsigned>(read.first->source.pc->location_number);
+      }
     }
     int max_write = 0;
+    int min_write = std::numeric_limits<int>::max();
     for(auto &write : writes.at(thread))
     {
-      if(write->source.thread_nr == thread && (int)reinterpret_cast<unsigned>(write->source.pc->location_number) > max_read)
+      if(
+        write->source.thread_nr == thread &&
+        (int)reinterpret_cast<unsigned>(write->source.pc->location_number) >
+          max_write)
+      {
+        max_read =
+          reinterpret_cast<unsigned>(write->source.pc->location_number);
+      }
+      if(
+        write->source.thread_nr == thread &&
+        (int)reinterpret_cast<unsigned>(write->source.pc->location_number) <
+          min_write)
       {
         max_read = reinterpret_cast<unsigned>(write->source.pc->location_number);
       }
     }
     int max_num = max_read > max_write ? max_read + 1 : max_write + 1;
+    int min_num = min_read < min_write ? min_read : min_write;
     for(size_t round = 1; round <= rounds; ++round)
     {
       irep_idt cs_name =
@@ -358,9 +380,9 @@ void lazy_c_seqt::create_cs_constraint(
 
       if(round == 1)
       {
-        exprt zero{
-          from_integer({0}, unsignedbv_typet{8})}; //TODO: check corretness
-        less_than_or_equal_exprt constraint{zero, cs};
+        exprt min{from_integer(
+          {min_num}, unsignedbv_typet{8})}; //TODO: check corretness
+        less_than_or_equal_exprt constraint{min, cs};
         log.warning() << format(constraint) << messaget::eom;
         equation.constraint(
           constraint,
