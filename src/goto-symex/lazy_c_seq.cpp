@@ -63,9 +63,9 @@ void lazy_c_seqt::operator()(
 
   /*f(!main_reads.empty())
     create_main_read_constraints(
-      equation, last_update, main_reads, message_handler);
+      equation, last_update, main_reads, message_handler);*/
 
-  handling_guards(equation, message_handler);*/
+  handling_guards(equation, message_handler);
 
   exprt tmp;
   simplify(tmp, ns);
@@ -772,8 +772,7 @@ void lazy_c_seqt::create_reach_constraint(
   }*/
 }
 
-//TODO: REWRITE
-/*void lazy_c_seqt::handling_guards(
+void lazy_c_seqt::handling_guards(
   symex_target_equationt &equation,
   message_handlert &message_handler)
 {
@@ -794,7 +793,7 @@ void lazy_c_seqt::create_reach_constraint(
       s_it != ssa_steps.end();
       s_it++)
   {
-    bool skip = false;
+    /*bool skip = false;
     const std::string &file =
       id2string(s_it->source.pc->source_location().get_file());
     if(
@@ -841,48 +840,46 @@ void lazy_c_seqt::create_reach_constraint(
     if(
       (s_it->is_assert() || s_it->is_assume()) && s_it->source.thread_nr > 0 &&
       !skip)
+    {*/
+    exprt guard = s_it->guard;
+
+    if(s_it->is_assert() || s_it->is_assume())
     {
-      exprt guard = s_it->guard;
+      std::string label_name =
+        "_L" +
+        std::to_string(previous_shared_event->source.pc->location_number);
+      std::string thread_name =
+        "_T" + std::to_string(previous_shared_event->source.thread_nr);
 
-      if(s_it->is_assert() || s_it->is_assume())
-      {
-        std::string label_name =
-          "_L" +
-          std::to_string(previous_shared_event->source.pc->location_number);
-        std::string thread_name =
-          "_T" + std::to_string(previous_shared_event->source.thread_nr);
+      irep_idt reach_name = "reach" + label_name + thread_name;
+      symbol_exprt previous_reach{reach_name, bool_typet{}};
 
-        irep_idt reach_name = "reach" + label_name + thread_name;
-        symbol_exprt previous_reach{reach_name, bool_typet{}};
-
-        and_exprt new_guard{previous_reach, guard};
-        simplify(new_guard, ns);
-
-        SSA_stept step = equation.SSA_steps.front();
-        equation.SSA_steps.pop_front();
-        step.guard = new_guard;
-        step.cond_expr = implies_exprt{
-          new_guard,
-          s_it->cond_expr};
-        temp_equation.SSA_steps.emplace_back(step);
-
-        log.warning() << format(step.get_ssa_expr()) << messaget::eom;
-        log.warning() << "guard: " << format(step.guard) << messaget::eom;
-      }
-    }
-    else
-    {
-      if((s_it->is_shared_read() || s_it->is_shared_write()) && !skip)
-        previous_shared_event = s_it;
+      and_exprt new_guard{previous_reach, guard};
+      simplify(new_guard, ns);
 
       SSA_stept step = equation.SSA_steps.front();
-
       equation.SSA_steps.pop_front();
+      step.guard = new_guard;
+      step.cond_expr = implies_exprt{new_guard, s_it->cond_expr};
       temp_equation.SSA_steps.emplace_back(step);
+
+      log.warning() << format(step.get_ssa_expr()) << messaget::eom;
+      log.warning() << "guard: " << format(step.guard) << messaget::eom;
+      }
+      //}
+      else
+      {
+        if(s_it->is_shared_read() || s_it->is_shared_write())
+          previous_shared_event = s_it;
+
+        SSA_stept step = equation.SSA_steps.front();
+
+        equation.SSA_steps.pop_front();
+        temp_equation.SSA_steps.emplace_back(step);
     }
   }
   equation = temp_equation;
-}*/
+}
 
 //TODO: REMOVE
 /*void lazy_c_seqt::create_cprover_constraints(
