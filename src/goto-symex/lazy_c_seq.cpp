@@ -44,11 +44,11 @@ void lazy_c_seqt::operator()(
   collect_reads_and_writes(
     equation.SSA_steps, reads, main_reads, writes, message_handler);
 
-  if(!writes.empty())
-    create_write_constraints(
-      equation, writes, last_update, last_update_main, message_handler);
+  //if(!writes.empty())
+  create_write_constraints(
+    equation, writes, last_update, last_update_main, message_handler);
 
-  if(!reads.empty())
+  /*if(!reads.empty())
     create_read_constraints(
       equation, reads, writes, last_update, last_update_main, message_handler);
 
@@ -64,7 +64,7 @@ void lazy_c_seqt::operator()(
     create_main_read_constraints(
       equation, last_update, main_reads, message_handler);
 
-  handling_guards(equation, message_handler);
+  handling_guards(equation, message_handler);*/
 
   exprt tmp;
   simplify(tmp, ns);
@@ -86,6 +86,39 @@ void lazy_c_seqt::create_write_constraints(
   log.warning() << "-------------------WRITES--------------------------"
                 << messaget::eom;
 
+  for(auto global_variable : global_variables)
+  {
+    if(this->writes.count(global_variable) == 0)
+      continue;
+    exprt previous = this->writes.at(global_variable).front()->ssa_lhs;
+    this->writes.at(global_variable)
+      .erase(this->writes.at(global_variable).begin());
+    for(std::size_t round = 1; round <= rounds; ++round)
+    {
+      for(const auto write : this->writes.at(global_variable))
+      {
+        std::string suffix = "_L" +
+                             std::to_string(write->source.pc->location_number) +
+                             "_R" + std::to_string(round);
+        irep_idt lazy_variable_name =
+          id2string(to_symbol_expr(write->ssa_lhs).get_identifier()) + suffix;
+        const symbol_exprt lazy_variable{lazy_variable_name, write->ssa_lhs.type()};
+
+        irep_idt exec_name = "E" + suffix;
+        const symbol_exprt exec{exec_name, bool_typet{}};
+
+        equal_exprt constraint{
+          lazy_variable, if_exprt{exec, write->ssa_lhs, previous}};
+
+        log.warning() << format(constraint) << messaget::eom;
+        equation.constraint(constraint, "write constraint", write->source);
+
+        previous = lazy_variable;
+      }
+    }
+  }
+
+  /*
   // last write of main thread
   exprt last_write_of_previous_round;
   std::unordered_set<irep_idt> global_variables;
@@ -150,10 +183,11 @@ void lazy_c_seqt::create_write_constraints(
         }
       }
     }
-  }
+  }*/
 }
 
-void lazy_c_seqt::create_read_constraints(
+//TODO: REWRITE
+/*void lazy_c_seqt::create_read_constraints(
   symex_target_equationt &equation,
   const std::vector<std::pair<
     symex_target_equationt::SSA_stepst::const_iterator,
@@ -257,9 +291,10 @@ void lazy_c_seqt::create_read_constraints(
     equation.constraint(
       final_constraint, "read constraint", read_variable->source);
   }
-}
+}*/
 
-bool lazy_c_seqt::check_if_write_in_threads(
+//TODO: CHECK
+/*bool lazy_c_seqt::check_if_write_in_threads(
   const std::unordered_map<
     unsigned,
     std::vector<symex_target_equationt::SSA_stepst::const_iterator>> &writes,
@@ -280,9 +315,10 @@ bool lazy_c_seqt::check_if_write_in_threads(
     }
   }
   return var_contained;
-}
+}*/
 
-void lazy_c_seqt::create_main_read_constraints(
+//TODO: REMOVE
+/*void lazy_c_seqt::create_main_read_constraints(
   symex_target_equationt &equation,
   std::unordered_map<
     irep_idt,
@@ -344,9 +380,10 @@ void lazy_c_seqt::create_main_read_constraints(
     log.warning() << format(constraint) << messaget::eom;
     equation.constraint(constraint, "main constraint", read->source);
   }
-}
+}*/
 
-void lazy_c_seqt::create_cs_constraint(
+//TODO: CHECK
+/*void lazy_c_seqt::create_cs_constraint(
   symex_target_equationt &equation,
   std::vector<std::pair<
     symex_target_equationt::SSA_stepst::const_iterator,
@@ -534,9 +571,10 @@ void lazy_c_seqt::create_cs_constraint(
       equation.constraint(constraint, "cs constraint", read.first->source);
     }
   }
-}
+}*/
 
-void lazy_c_seqt::create_reach_constraint(
+//TODO: REWRITE
+/*void lazy_c_seqt::create_reach_constraint(
   symex_target_equationt &equation,
   std::vector<std::pair<
     symex_target_equationt::SSA_stepst::const_iterator,
@@ -648,9 +686,10 @@ void lazy_c_seqt::create_reach_constraint(
         equation.SSA_steps.begin()->source);
     }
   }
-}
+}*/
 
-void lazy_c_seqt::handling_guards(
+//TODO: REWRITE
+/*void lazy_c_seqt::handling_guards(
   symex_target_equationt &equation,
   message_handlert &message_handler)
 {
@@ -759,9 +798,10 @@ void lazy_c_seqt::handling_guards(
     }
   }
   equation = temp_equation;
-}
+}*/
 
-void lazy_c_seqt::create_cprover_constraints(
+//TODO: REMOVE
+/*void lazy_c_seqt::create_cprover_constraints(
   symex_target_equationt &equation,
   std::unordered_map<
     irep_idt,
@@ -785,8 +825,8 @@ void lazy_c_seqt::create_cprover_constraints(
       id2string(s_it->source.pc->source_location().get_file());
     if(!(file.find("builtin-library") != std::string::npos ||
          file.find("built-in-additions") != std::string::npos))
-    {
-      /*if(s_it->is_atomic_begin()) //TODO: manage atomic sections
+    {*/
+/*if(s_it->is_atomic_begin()) //TODO: manage atomic sections
       {
         atomic_section = true;
       }
@@ -817,7 +857,7 @@ void lazy_c_seqt::create_cprover_constraints(
       {
         atomic_op.emplace_back(s_it);
       }*/
-      continue;
+/*continue;
     }
     if(s_it->is_shared_write())
     {
@@ -847,7 +887,7 @@ void lazy_c_seqt::create_cprover_constraints(
       }
     }
   }
-}
+}*/
 
 void lazy_c_seqt::collect_reads_and_writes(
   const symex_target_equationt::SSA_stepst &ssa_steps,
@@ -871,7 +911,7 @@ void lazy_c_seqt::collect_reads_and_writes(
       s_it != ssa_steps.end();
       s_it++)
   {
-    const std::string &file =
+    /*const std::string &file =
       id2string(s_it->source.pc->source_location().get_file());
     if(
       file.find("builtin-library") != std::string::npos ||
@@ -910,7 +950,7 @@ void lazy_c_seqt::collect_reads_and_writes(
           }
         }
       }
-    }
+    }*/
     //log.warning() << "Not skipped" << messaget::eom;
 
     /*
@@ -933,13 +973,15 @@ void lazy_c_seqt::collect_reads_and_writes(
                       << "   \t"
                       << to_symbol_expr(s_it->ssa_lhs).get_identifier() << "\tL"
                       << s_it->source.pc->location_number << messaget::eom;
-        writes[s_it->source.thread_nr].emplace_back(s_it);
-        if(
+        this->writes[s_it->ssa_lhs.get_object_name()].emplace_back(s_it);
+        this->global_variables.insert(s_it->ssa_lhs.get_object_name());
+
+        /*if(
           previous_write.count(s_it->ssa_lhs.get_object_name()) == 0 ||
           s_it->source.thread_nr == 0)
           previous_write[s_it->ssa_lhs.get_object_name()] = std::nullopt;
         else
-          previous_write[s_it->ssa_lhs.get_object_name()] = s_it;
+          previous_write[s_it->ssa_lhs.get_object_name()] = s_it;*/
       }
       else
       {
@@ -960,7 +1002,9 @@ void lazy_c_seqt::collect_reads_and_writes(
                       << to_symbol_expr(s_it->ssa_lhs).get_identifier() << "\tL"
                       << s_it->source.pc->location_number << messaget::eom;
 
-        if(s_it->source.thread_nr >= 1)
+        this->reads[s_it->ssa_lhs.get_object_name()].emplace_back(s_it);
+        this->global_variables.insert(s_it->ssa_lhs.get_object_name());
+        /*if(s_it->source.thread_nr >= 1)
         {
           if(previous_write.count(s_it->ssa_lhs.get_object_name()) == 0)
             reads.emplace_back(std::pair(s_it, std::nullopt));
@@ -977,7 +1021,7 @@ void lazy_c_seqt::collect_reads_and_writes(
             log.warning() << "Main Read " << messaget::eom;
             main_reads.emplace_back(s_it);
           }
-        }
+        }*/
       }
       else
       {

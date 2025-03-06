@@ -19,6 +19,12 @@ public:
 private:
   const namespacet &ns;
   const std::size_t rounds;
+  std::size_t threads;
+  std::unordered_set<irep_idt> global_variables;
+  std::unordered_map<
+    irep_idt,
+    std::vector<symex_target_equationt::SSA_stepst::const_iterator>>
+    writes;
 
   void collect_reads_and_writes(
     const symex_target_equationt::SSA_stepst &ssa_steps,
