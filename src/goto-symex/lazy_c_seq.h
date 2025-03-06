@@ -19,7 +19,7 @@ public:
 private:
   const namespacet &ns;
   const std::size_t rounds;
-  std::size_t threads;
+  std::size_t threads = 0;
   std::unordered_set<irep_idt> global_variables;
   std::unordered_map<
     irep_idt,

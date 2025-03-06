@@ -52,15 +52,15 @@ void lazy_c_seqt::operator()(
   create_read_constraints(
     equation, reads, writes, last_update, last_update_main, message_handler);
 
-  /*if(!(writes.empty() && reads.empty()))
+  //if(!(writes.empty() && reads.empty()))
   {
     create_cs_constraint(equation, reads, writes, message_handler);
-    create_cprover_constraints(
-      equation, last_cprover_upadte, exited_array, message_handler);
-    create_reach_constraint(equation, reads, writes, exited_array, message_handler);
+    //create_cprover_constraints(
+    //  equation, last_cprover_upadte, exited_array, message_handler);
+    //create_reach_constraint(equation, reads, writes, exited_array, message_handler);
   }
 
-  if(!main_reads.empty())
+  /*f(!main_reads.empty())
     create_main_read_constraints(
       equation, last_update, main_reads, message_handler);
 
@@ -437,8 +437,7 @@ lazy_c_seqt::previous(irep_idt variable, unsigned location, std::size_t round)
   }
 }*/
 
-//TODO: CHECK
-/*void lazy_c_seqt::create_cs_constraint(
+void lazy_c_seqt::create_cs_constraint(
   symex_target_equationt &equation,
   std::vector<std::pair<
     symex_target_equationt::SSA_stepst::const_iterator,
@@ -452,44 +451,56 @@ lazy_c_seqt::previous(irep_idt variable, unsigned location, std::size_t round)
   log.warning() << "-------------------CS--------------------------"
                 << messaget::eom;
 
-  for(unsigned thread = 1; thread < writes.size(); ++thread)
+  for(unsigned thread = 0; thread <= threads; ++thread)
   {
     exprt previous;
     int max_read = 0;
     int min_read = std::numeric_limits<int>::max();
-    for(auto &read : reads)
-    {
-      if(read.first->source.thread_nr == thread && (int)reinterpret_cast<unsigned>(read.first->source.pc->location_number) > max_read)
-      {
-        max_read = reinterpret_cast<unsigned>(read.first->source.pc->location_number);
-      }
-      if(
-        read.first->source.thread_nr == thread &&
-        (int)reinterpret_cast<unsigned>(
-          read.first->source.pc->location_number) < min_read)
-      {
-        min_read =
-          reinterpret_cast<unsigned>(read.first->source.pc->location_number);
-      }
-    }
     int max_write = 0;
     int min_write = std::numeric_limits<int>::max();
-    for(auto &write : writes.at(thread))
+    for(auto global_variable : global_variables)
     {
-      if(
-        write->source.thread_nr == thread &&
-        (int)reinterpret_cast<unsigned>(write->source.pc->location_number) >
-          max_write)
+      if(this->reads.count(global_variable) == 0)
+        continue;
+      for(auto &read : this->reads.at(global_variable))
       {
-        max_read =
-          reinterpret_cast<unsigned>(write->source.pc->location_number);
+        if(
+          read->source.thread_nr == thread &&
+          (int)reinterpret_cast<unsigned>(read->source.pc->location_number) >
+            max_read)
+        {
+          max_read =
+            reinterpret_cast<unsigned>(read->source.pc->location_number);
+        }
+        if(
+          read->source.thread_nr == thread &&
+          (int)reinterpret_cast<unsigned>(read->source.pc->location_number) <
+            min_read)
+        {
+          min_read =
+            reinterpret_cast<unsigned>(read->source.pc->location_number);
+        }
       }
-      if(
-        write->source.thread_nr == thread &&
-        (int)reinterpret_cast<unsigned>(write->source.pc->location_number) <
-          min_write)
+      if(this->writes.count(global_variable) == 0)
+        continue;
+      for(auto &write : this->writes.at(global_variable))
       {
-        max_read = reinterpret_cast<unsigned>(write->source.pc->location_number);
+        if(
+          write->source.thread_nr == thread &&
+          (int)reinterpret_cast<unsigned>(write->source.pc->location_number) >
+            max_write)
+        {
+          max_write =
+            reinterpret_cast<unsigned>(write->source.pc->location_number);
+        }
+        if(
+          write->source.thread_nr == thread &&
+          (int)reinterpret_cast<unsigned>(write->source.pc->location_number) <
+            min_write)
+        {
+          min_write =
+            reinterpret_cast<unsigned>(write->source.pc->location_number);
+        }
       }
     }
     int max_num = max_read > max_write ? max_read + 1 : max_write + 1;
@@ -534,9 +545,11 @@ lazy_c_seqt::previous(irep_idt variable, unsigned location, std::size_t round)
       }
     }
   }
-  for(unsigned thread = 1; thread < writes.size(); ++thread)
+  for(auto global_variable : global_variables)
   {
-    for(const auto &write : writes.at(thread))
+    if(this->writes.count(global_variable) == 0)
+      continue;
+    for(const auto &write : this->writes.at(global_variable))
     {
       for(size_t round = 1; round <= rounds; ++round)
       {
@@ -544,7 +557,8 @@ lazy_c_seqt::previous(irep_idt variable, unsigned location, std::size_t round)
           "_L" + std::to_string(write->source.pc->location_number);
         std::string round_curr_name = "_R" + std::to_string(round);
         std::string round_prev_name = "_R" + std::to_string(round - 1);
-        std::string thread_name = "_T" + std::to_string(thread);
+        std::string thread_name =
+          "_T" + std::to_string(write->source.thread_nr);
 
         int label_int =
           reinterpret_cast<unsigned>(write->source.pc->location_number);
@@ -580,53 +594,56 @@ lazy_c_seqt::previous(irep_idt variable, unsigned location, std::size_t round)
         equation.constraint(constraint, "cs constraint", write->source);
       }
     }
-  }
-  for(auto read : reads)
-  {
-    for(size_t round = 1; round <= rounds; ++round)
+    if(this->reads.count(global_variable) == 0)
+      continue;
+    for(auto read : this->reads.at(global_variable))
     {
-      std::string label_name =
-        "_L" + std::to_string(read.first->source.pc->location_number);
-      std::string round_curr_name = "_R" + std::to_string(round);
-      std::string round_prev_name = "_R" + std::to_string(round - 1);
-      std::string thread_name =
-        "_T" + std::to_string(read.first->source.thread_nr);
-
-      int label_int =
-        reinterpret_cast<unsigned>(read.first->source.pc->location_number);
-      exprt label{from_integer({label_int}, unsignedbv_typet{8})};
-
-      irep_idt statement_label_name = "E" + label_name + round_curr_name;
-      symbol_exprt statement_label{statement_label_name, bool_typet{}};
-
-      irep_idt cs_curr_name = "cs" + thread_name + round_curr_name;
-      symbol_exprt cs_curr{cs_curr_name, unsignedbv_typet{8}};
-
-      irep_idt cs_prev_name = "cs" + thread_name + round_prev_name;
-      symbol_exprt cs_prev{cs_prev_name, unsignedbv_typet{8}};
-
-      irep_idt active_thread_name = "active_thread" + thread_name + round_curr_name;
-      symbol_exprt active_thread{active_thread_name, bool_typet{}};
-
-      greater_than_exprt expr_1{cs_curr, label};
-      exprt expr_2;
-      if(round == 1)
-        expr_2 = true_exprt{};
-      else
+      for(size_t round = 1; round <= rounds; ++round)
       {
-        expr_2 = less_than_or_equal_exprt{cs_prev,label};
-      }
-      and_exprt expr_3{expr_1, expr_2};
-      and_exprt expr_4{true_exprt{}, expr_3};
-      and_exprt expr_5{expr_4, read.first->guard};
-      equal_exprt constraint{statement_label, expr_5};
-      simplify(constraint, ns);
+        std::string label_name =
+          "_L" + std::to_string(read->source.pc->location_number);
+        std::string round_curr_name = "_R" + std::to_string(round);
+        std::string round_prev_name = "_R" + std::to_string(round - 1);
+        std::string thread_name = "_T" + std::to_string(read->source.thread_nr);
 
-      log.warning() << format(constraint) << messaget::eom;
-      equation.constraint(constraint, "cs constraint", read.first->source);
+        int label_int =
+          reinterpret_cast<unsigned>(read->source.pc->location_number);
+        exprt label{from_integer({label_int}, unsignedbv_typet{8})};
+
+        irep_idt statement_label_name = "E" + label_name + round_curr_name;
+        symbol_exprt statement_label{statement_label_name, bool_typet{}};
+
+        irep_idt cs_curr_name = "cs" + thread_name + round_curr_name;
+        symbol_exprt cs_curr{cs_curr_name, unsignedbv_typet{8}};
+
+        irep_idt cs_prev_name = "cs" + thread_name + round_prev_name;
+        symbol_exprt cs_prev{cs_prev_name, unsignedbv_typet{8}};
+
+        irep_idt active_thread_name =
+          "active_thread" + thread_name +
+          round_curr_name; //TODO: active_thread = !cprover_thread_exited
+        symbol_exprt active_thread{active_thread_name, bool_typet{}};
+
+        greater_than_exprt expr_1{cs_curr, label};
+        exprt expr_2;
+        if(round == 1)
+          expr_2 = true_exprt{};
+        else
+        {
+          expr_2 = less_than_or_equal_exprt{cs_prev, label};
+        }
+        and_exprt expr_3{expr_1, expr_2};
+        and_exprt expr_4{true_exprt{}, expr_3};
+        and_exprt expr_5{expr_4, read->guard};
+        equal_exprt constraint{statement_label, expr_5};
+        simplify(constraint, ns);
+
+        log.warning() << format(constraint) << messaget::eom;
+        equation.constraint(constraint, "cs constraint", read->source);
+      }
     }
   }
-}*/
+}
 
 //TODO: REWRITE
 /*void lazy_c_seqt::create_reach_constraint(
@@ -966,6 +983,8 @@ void lazy_c_seqt::collect_reads_and_writes(
       s_it != ssa_steps.end();
       s_it++)
   {
+    if(s_it->source.thread_nr > threads)
+      threads = s_it->source.thread_nr;
     /*const std::string &file =
       id2string(s_it->source.pc->source_location().get_file());
     if(
