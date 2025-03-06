@@ -24,6 +24,10 @@ private:
   std::unordered_map<
     irep_idt,
     std::vector<symex_target_equationt::SSA_stepst::const_iterator>>
+    reads;
+  std::unordered_map<
+    irep_idt,
+    std::vector<symex_target_equationt::SSA_stepst::const_iterator>>
     writes;
 
   void collect_reads_and_writes(
