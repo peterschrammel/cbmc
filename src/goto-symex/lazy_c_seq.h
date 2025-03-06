@@ -29,6 +29,14 @@ private:
     irep_idt,
     std::vector<symex_target_equationt::SSA_stepst::const_iterator>>
     writes;
+  struct lazy_variable
+  {
+    irep_idt name;
+    std::size_t round;
+    unsigned location;
+    symbol_exprt symbol;
+  };
+  std::unordered_map<irep_idt, std::vector<lazy_variable>> lazy_variables;
 
   void collect_reads_and_writes(
     const symex_target_equationt::SSA_stepst &ssa_steps,
@@ -67,6 +75,9 @@ private:
       symex_target_equationt::SSA_stepst::const_iterator> &last_update,
     std::unordered_map<irep_idt, irep_idt> &last_update_main,
     message_handlert &message_handler);
+
+  symbol_exprt
+  previous(irep_idt variable, unsigned location, std::size_t round);
 
   bool check_if_write_in_threads(
     const std::unordered_map<

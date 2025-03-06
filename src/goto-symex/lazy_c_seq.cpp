@@ -48,11 +48,11 @@ void lazy_c_seqt::operator()(
   create_write_constraints(
     equation, writes, last_update, last_update_main, message_handler);
 
-  /*if(!reads.empty())
-    create_read_constraints(
-      equation, reads, writes, last_update, last_update_main, message_handler);
+  //if(!reads.empty())
+  create_read_constraints(
+    equation, reads, writes, last_update, last_update_main, message_handler);
 
-  if(!(writes.empty() && reads.empty()))
+  /*if(!(writes.empty() && reads.empty()))
   {
     create_cs_constraint(equation, reads, writes, message_handler);
     create_cprover_constraints(
@@ -91,6 +91,9 @@ void lazy_c_seqt::create_write_constraints(
     if(this->writes.count(global_variable) == 0)
       continue;
     exprt previous = this->writes.at(global_variable).front()->ssa_lhs;
+    lazy_variable lazy_struct = lazy_variable{
+      global_variable, 0, 0, this->writes.at(global_variable).front()->ssa_lhs};
+    this->lazy_variables[global_variable].emplace_back(lazy_struct);
     this->writes.at(global_variable)
       .erase(this->writes.at(global_variable).begin());
     for(std::size_t round = 1; round <= rounds; ++round)
@@ -102,18 +105,25 @@ void lazy_c_seqt::create_write_constraints(
                              "_R" + std::to_string(round);
         irep_idt lazy_variable_name =
           id2string(to_symbol_expr(write->ssa_lhs).get_identifier()) + suffix;
-        const symbol_exprt lazy_variable{lazy_variable_name, write->ssa_lhs.type()};
+        const symbol_exprt lazy_variable_exprt{
+          lazy_variable_name, write->ssa_lhs.type()};
+        lazy_variable lazy_struct = lazy_variable{
+          global_variable,
+          round,
+          write->source.pc->location_number,
+          lazy_variable_exprt};
+        this->lazy_variables[global_variable].emplace_back(lazy_struct);
 
         irep_idt exec_name = "E" + suffix;
         const symbol_exprt exec{exec_name, bool_typet{}};
 
         equal_exprt constraint{
-          lazy_variable, if_exprt{exec, write->ssa_lhs, previous}};
+          lazy_variable_exprt, if_exprt{exec, write->ssa_lhs, previous}};
 
         log.warning() << format(constraint) << messaget::eom;
         equation.constraint(constraint, "write constraint", write->source);
 
-        previous = lazy_variable;
+        previous = lazy_variable_exprt;
       }
     }
   }
@@ -186,8 +196,7 @@ void lazy_c_seqt::create_write_constraints(
   }*/
 }
 
-//TODO: REWRITE
-/*void lazy_c_seqt::create_read_constraints(
+void lazy_c_seqt::create_read_constraints(
   symex_target_equationt &equation,
   const std::vector<std::pair<
     symex_target_equationt::SSA_stepst::const_iterator,
@@ -205,7 +214,32 @@ void lazy_c_seqt::create_write_constraints(
   log.warning() << "-------------------READS--------------------------"
                 << messaget::eom;
 
-  for(const auto &read : reads)
+  for(auto global_variable : global_variables)
+  {
+    if(this->reads.count(global_variable) == 0)
+      continue;
+    for(const auto read : this->reads.at(global_variable))
+    {
+      exprt temp_constraint = read->ssa_lhs;
+      for(std::size_t round = rounds; round >= 1; --round)
+      {
+        std::string suffix = "_L" +
+                             std::to_string(read->source.pc->location_number) +
+                             "_R" + std::to_string(round);
+        irep_idt exec_name = "E" + suffix;
+        const symbol_exprt exec{exec_name, bool_typet{}};
+
+        temp_constraint = if_exprt{
+          exec,
+          previous(global_variable, read->source.pc->location_number, round),
+          temp_constraint};
+      }
+      equal_exprt final_constraint{read->ssa_lhs, temp_constraint};
+      log.warning() << format(final_constraint) << messaget::eom;
+      equation.constraint(final_constraint, "read constraint", read->source);
+    }
+  }
+  /*for(const auto &read : reads)
   {
     std::vector<std::pair<exprt, exprt>> constraints;
     auto read_variable = read.first;
@@ -290,8 +324,29 @@ void lazy_c_seqt::create_write_constraints(
     log.warning() << format(final_constraint) << messaget::eom;
     equation.constraint(
       final_constraint, "read constraint", read_variable->source);
+  }*/
+}
+
+symbol_exprt
+lazy_c_seqt::previous(irep_idt variable, unsigned location, std::size_t round)
+{
+  symbol_exprt previous = lazy_variables.at(variable).front().symbol;
+  for(const auto &lazy_variable : lazy_variables.at(variable))
+  {
+    if(round > lazy_variable.round)
+    {
+      previous = lazy_variable.symbol;
+      continue;
+    }
+    if(location > lazy_variable.location)
+    {
+      previous = lazy_variable.symbol;
+      continue;
+    }
+    return previous;
   }
-}*/
+  return previous;
+}
 
 //TODO: CHECK
 /*bool lazy_c_seqt::check_if_write_in_threads(
