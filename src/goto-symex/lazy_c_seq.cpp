@@ -57,7 +57,8 @@ void lazy_c_seqt::operator()(
     create_cs_constraint(equation, reads, writes, message_handler);
     //create_cprover_constraints(
     //  equation, last_cprover_upadte, exited_array, message_handler);
-    //create_reach_constraint(equation, reads, writes, exited_array, message_handler);
+    create_reach_constraint(
+      equation, reads, writes, exited_array, message_handler);
   }
 
   /*f(!main_reads.empty())
@@ -460,46 +461,48 @@ void lazy_c_seqt::create_cs_constraint(
     int min_write = std::numeric_limits<int>::max();
     for(auto global_variable : global_variables)
     {
-      if(this->reads.count(global_variable) == 0)
-        continue;
-      for(auto &read : this->reads.at(global_variable))
+      if(this->reads.count(global_variable) != 0)
       {
-        if(
-          read->source.thread_nr == thread &&
-          (int)reinterpret_cast<unsigned>(read->source.pc->location_number) >
-            max_read)
+        for(auto &read : this->reads.at(global_variable))
         {
-          max_read =
-            reinterpret_cast<unsigned>(read->source.pc->location_number);
-        }
-        if(
-          read->source.thread_nr == thread &&
-          (int)reinterpret_cast<unsigned>(read->source.pc->location_number) <
-            min_read)
-        {
-          min_read =
-            reinterpret_cast<unsigned>(read->source.pc->location_number);
+          if(
+            read->source.thread_nr == thread &&
+            (int)reinterpret_cast<unsigned>(read->source.pc->location_number) >
+              max_read)
+          {
+            max_read =
+              reinterpret_cast<unsigned>(read->source.pc->location_number);
+          }
+          if(
+            read->source.thread_nr == thread &&
+            (int)reinterpret_cast<unsigned>(read->source.pc->location_number) <
+              min_read)
+          {
+            min_read =
+              reinterpret_cast<unsigned>(read->source.pc->location_number);
+          }
         }
       }
-      if(this->writes.count(global_variable) == 0)
-        continue;
-      for(auto &write : this->writes.at(global_variable))
+      if(this->writes.count(global_variable) != 0)
       {
-        if(
-          write->source.thread_nr == thread &&
-          (int)reinterpret_cast<unsigned>(write->source.pc->location_number) >
-            max_write)
+        for(auto &write : this->writes.at(global_variable))
         {
-          max_write =
-            reinterpret_cast<unsigned>(write->source.pc->location_number);
-        }
-        if(
-          write->source.thread_nr == thread &&
-          (int)reinterpret_cast<unsigned>(write->source.pc->location_number) <
-            min_write)
-        {
-          min_write =
-            reinterpret_cast<unsigned>(write->source.pc->location_number);
+          if(
+            write->source.thread_nr == thread &&
+            (int)reinterpret_cast<unsigned>(write->source.pc->location_number) >
+              max_write)
+          {
+            max_write =
+              reinterpret_cast<unsigned>(write->source.pc->location_number);
+          }
+          if(
+            write->source.thread_nr == thread &&
+            (int)reinterpret_cast<unsigned>(write->source.pc->location_number) <
+              min_write)
+          {
+            min_write =
+              reinterpret_cast<unsigned>(write->source.pc->location_number);
+          }
         }
       }
     }
@@ -547,99 +550,103 @@ void lazy_c_seqt::create_cs_constraint(
   }
   for(auto global_variable : global_variables)
   {
-    if(this->writes.count(global_variable) == 0)
-      continue;
-    for(const auto &write : this->writes.at(global_variable))
+    if(this->writes.count(global_variable) != 0)
     {
-      for(size_t round = 1; round <= rounds; ++round)
+      for(const auto &write : this->writes.at(global_variable))
       {
-        std::string label_name =
-          "_L" + std::to_string(write->source.pc->location_number);
-        std::string round_curr_name = "_R" + std::to_string(round);
-        std::string round_prev_name = "_R" + std::to_string(round - 1);
-        std::string thread_name =
-          "_T" + std::to_string(write->source.thread_nr);
-
-        int label_int =
-          reinterpret_cast<unsigned>(write->source.pc->location_number);
-        exprt label{from_integer({label_int}, unsignedbv_typet{8})};
-
-        irep_idt statement_label_name = "E" + label_name + round_curr_name;
-        symbol_exprt statement_label{statement_label_name, bool_typet{}};
-
-        irep_idt cs_curr_name = "cs" + thread_name + round_curr_name;
-        symbol_exprt cs_curr{cs_curr_name, unsignedbv_typet{8}};
-
-        irep_idt cs_prev_name = "cs" + thread_name + round_prev_name;
-        symbol_exprt cs_prev{cs_prev_name, unsignedbv_typet{8}};
-
-        irep_idt active_thread_name = "active_thread" + thread_name + round_curr_name;
-        symbol_exprt active_thread{active_thread_name, bool_typet{}};
-
-        greater_than_exprt expr_1{cs_curr, label};
-        exprt expr_2;
-        if(round == 1)
-          expr_2 = true_exprt{};
-        else
+        for(size_t round = 1; round <= rounds; ++round)
         {
-          expr_2 = less_than_or_equal_exprt{cs_prev, label};
-        }
-        and_exprt expr_3{expr_1, expr_2};
-        and_exprt expr_4{true_exprt{}, expr_3};
-        and_exprt expr_5{expr_4, write->guard};
-        equal_exprt constraint{statement_label, expr_5};
-        simplify(constraint, ns);
+          std::string label_name =
+            "_L" + std::to_string(write->source.pc->location_number);
+          std::string round_curr_name = "_R" + std::to_string(round);
+          std::string round_prev_name = "_R" + std::to_string(round - 1);
+          std::string thread_name =
+            "_T" + std::to_string(write->source.thread_nr);
 
-        log.warning() << format(constraint) << messaget::eom;
-        equation.constraint(constraint, "cs constraint", write->source);
+          int label_int =
+            reinterpret_cast<unsigned>(write->source.pc->location_number);
+          exprt label{from_integer({label_int}, unsignedbv_typet{8})};
+
+          irep_idt statement_label_name = "E" + label_name + round_curr_name;
+          symbol_exprt statement_label{statement_label_name, bool_typet{}};
+
+          irep_idt cs_curr_name = "cs" + thread_name + round_curr_name;
+          symbol_exprt cs_curr{cs_curr_name, unsignedbv_typet{8}};
+
+          irep_idt cs_prev_name = "cs" + thread_name + round_prev_name;
+          symbol_exprt cs_prev{cs_prev_name, unsignedbv_typet{8}};
+
+          irep_idt active_thread_name =
+            "active_thread" + thread_name + round_curr_name;
+          symbol_exprt active_thread{active_thread_name, bool_typet{}};
+
+          greater_than_exprt expr_1{cs_curr, label};
+          exprt expr_2;
+          if(round == 1)
+            expr_2 = true_exprt{};
+          else
+          {
+            expr_2 = less_than_or_equal_exprt{cs_prev, label};
+          }
+          and_exprt expr_3{expr_1, expr_2};
+          and_exprt expr_4{true_exprt{}, expr_3};
+          and_exprt expr_5{expr_4, write->guard};
+          equal_exprt constraint{statement_label, expr_5};
+          simplify(constraint, ns);
+
+          log.warning() << format(constraint) << messaget::eom;
+          equation.constraint(constraint, "cs constraint", write->source);
+        }
       }
     }
-    if(this->reads.count(global_variable) == 0)
-      continue;
-    for(auto read : this->reads.at(global_variable))
+    if(this->reads.count(global_variable) != 0)
     {
-      for(size_t round = 1; round <= rounds; ++round)
+      for(auto read : this->reads.at(global_variable))
       {
-        std::string label_name =
-          "_L" + std::to_string(read->source.pc->location_number);
-        std::string round_curr_name = "_R" + std::to_string(round);
-        std::string round_prev_name = "_R" + std::to_string(round - 1);
-        std::string thread_name = "_T" + std::to_string(read->source.thread_nr);
-
-        int label_int =
-          reinterpret_cast<unsigned>(read->source.pc->location_number);
-        exprt label{from_integer({label_int}, unsignedbv_typet{8})};
-
-        irep_idt statement_label_name = "E" + label_name + round_curr_name;
-        symbol_exprt statement_label{statement_label_name, bool_typet{}};
-
-        irep_idt cs_curr_name = "cs" + thread_name + round_curr_name;
-        symbol_exprt cs_curr{cs_curr_name, unsignedbv_typet{8}};
-
-        irep_idt cs_prev_name = "cs" + thread_name + round_prev_name;
-        symbol_exprt cs_prev{cs_prev_name, unsignedbv_typet{8}};
-
-        irep_idt active_thread_name =
-          "active_thread" + thread_name +
-          round_curr_name; //TODO: active_thread = !cprover_thread_exited
-        symbol_exprt active_thread{active_thread_name, bool_typet{}};
-
-        greater_than_exprt expr_1{cs_curr, label};
-        exprt expr_2;
-        if(round == 1)
-          expr_2 = true_exprt{};
-        else
+        for(size_t round = 1; round <= rounds; ++round)
         {
-          expr_2 = less_than_or_equal_exprt{cs_prev, label};
-        }
-        and_exprt expr_3{expr_1, expr_2};
-        and_exprt expr_4{true_exprt{}, expr_3};
-        and_exprt expr_5{expr_4, read->guard};
-        equal_exprt constraint{statement_label, expr_5};
-        simplify(constraint, ns);
+          std::string label_name =
+            "_L" + std::to_string(read->source.pc->location_number);
+          std::string round_curr_name = "_R" + std::to_string(round);
+          std::string round_prev_name = "_R" + std::to_string(round - 1);
+          std::string thread_name =
+            "_T" + std::to_string(read->source.thread_nr);
 
-        log.warning() << format(constraint) << messaget::eom;
-        equation.constraint(constraint, "cs constraint", read->source);
+          int label_int =
+            reinterpret_cast<unsigned>(read->source.pc->location_number);
+          exprt label{from_integer({label_int}, unsignedbv_typet{8})};
+
+          irep_idt statement_label_name = "E" + label_name + round_curr_name;
+          symbol_exprt statement_label{statement_label_name, bool_typet{}};
+
+          irep_idt cs_curr_name = "cs" + thread_name + round_curr_name;
+          symbol_exprt cs_curr{cs_curr_name, unsignedbv_typet{8}};
+
+          irep_idt cs_prev_name = "cs" + thread_name + round_prev_name;
+          symbol_exprt cs_prev{cs_prev_name, unsignedbv_typet{8}};
+
+          irep_idt active_thread_name =
+            "active_thread" + thread_name +
+            round_curr_name; //TODO: active_thread = !cprover_thread_exited
+          symbol_exprt active_thread{active_thread_name, bool_typet{}};
+
+          greater_than_exprt expr_1{cs_curr, label};
+          exprt expr_2;
+          if(round == 1)
+            expr_2 = true_exprt{};
+          else
+          {
+            expr_2 = less_than_or_equal_exprt{cs_prev, label};
+          }
+          and_exprt expr_3{expr_1, expr_2};
+          and_exprt expr_4{true_exprt{}, expr_3};
+          and_exprt expr_5{expr_4, read->guard};
+          equal_exprt constraint{statement_label, expr_5};
+          simplify(constraint, ns);
+
+          log.warning() << format(constraint) << messaget::eom;
+          equation.constraint(constraint, "cs constraint", read->source);
+        }
       }
     }
   }
