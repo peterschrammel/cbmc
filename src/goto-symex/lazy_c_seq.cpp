@@ -330,7 +330,7 @@ void lazy_c_seqt::create_cs_constraint(
 
           irep_idt active_thread_name =
             "active_thread" + thread_name +
-            round_curr_name; //TODO: active_thread = !cprover_thread_exited
+            round_curr_name; //TODO: implement active thread variables
           symbol_exprt active_thread{active_thread_name, bool_typet{}};
 
           greater_than_exprt expr_1{cs_curr, label};
