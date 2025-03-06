@@ -59,7 +59,6 @@ private:
 
   void create_reach_constraint(
     symex_target_equationt &equation,
-    exprt &exited_array,
     message_handlert &message_handler);
 
   void handling_guards(

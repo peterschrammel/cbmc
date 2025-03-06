@@ -23,24 +23,6 @@ void lazy_c_seqt::operator()(
   log.statistics() << "Adding LazyCSeq constraints with " << rounds << " rounds"
                    << messaget::eom;
 
-  std::vector<std::pair<
-    symex_target_equationt::SSA_stepst::const_iterator,
-    std::optional<symex_target_equationt::SSA_stepst::const_iterator>>>
-    reads;
-  std::unordered_map<
-    unsigned,
-    std::vector<symex_target_equationt::SSA_stepst::const_iterator>>
-    writes;
-  std::vector<symex_target_equationt::SSA_stepst::const_iterator> main_reads;
-  std::
-    unordered_map<irep_idt, symex_target_equationt::SSA_stepst::const_iterator>
-      last_update;
-  std::unordered_map<irep_idt, irep_idt> last_update_main;
-  std::
-    unordered_map<irep_idt, symex_target_equationt::SSA_stepst::const_iterator>
-      last_cprover_upadte;
-  exprt exited_array = nil_exprt{};
-
   collect_reads_and_writes(equation.SSA_steps, message_handler);
 
   create_write_constraints(equation, message_handler);
@@ -49,7 +31,7 @@ void lazy_c_seqt::operator()(
 
   create_cs_constraint(equation, message_handler);
 
-  create_reach_constraint(equation, exited_array, message_handler);
+  create_reach_constraint(equation, message_handler);
 
   handling_guards(equation, message_handler);
 
