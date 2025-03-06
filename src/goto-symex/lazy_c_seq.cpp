@@ -446,7 +446,7 @@ void lazy_c_seqt::create_reach_constraint(
     }
   }
 
-   //TODO: for each thread we need to see which Crover_thread_exited version is in the guard ad use it in the code below
+  //TODO: for each thread we need to see which Crover_thread_exited version is in the guard ad use it in the code below
   /*for(unsigned thread_nr = 0; thread_nr <= threads; ++thread_nr)
   {
     exprt and_constraint{true_exprt{}};
