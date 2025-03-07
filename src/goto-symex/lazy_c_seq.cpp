@@ -423,25 +423,6 @@ void lazy_c_seqt::create_reach_constraint(
       }
     }
   }
-
-  //TODO: for each thread we need to see which Crover_thread_exited version is in the guard ad use it in the code below
-  /*for(unsigned thread_nr = 0; thread_nr <= threads; ++thread_nr)
-  {
-    exprt and_constraint{true_exprt{}};
-
-    for(auto &event : events.at(thread_nr))
-    {
-      and_constraint = and_exprt{and_constraint, event};
-    }
-    index_exprt exited{exited_array, from_integer({thread_nr}, unsignedbv_typet{8})};
-    equal_exprt reach_constraint{true_exprt{}, and_constraint};
-    simplify(reach_constraint, ns);
-    log.warning() << format(reach_constraint) << messaget::eom;
-    equation.constraint(
-      reach_constraint,
-      "reach constraint",
-      equation.SSA_steps.begin()->source);
-  }*/
 }
 
 void lazy_c_seqt::handling_guards(
