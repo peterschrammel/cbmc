@@ -52,9 +52,12 @@ void lazy_c_seqt::create_write_constraints(
   {
     if(this->writes.count(global_variable) == 0)
       continue;
-    exprt previous = this->writes.at(global_variable).front()->ssa_lhs;
+    exprt previous = this->writes.at(global_variable).front().s_it->ssa_lhs;
     lazy_variable lazy_struct = lazy_variable{
-      global_variable, 0, 0, this->writes.at(global_variable).front()->ssa_lhs};
+      global_variable,
+      0,
+      0,
+      this->writes.at(global_variable).front().s_it->ssa_lhs};
     this->lazy_variables[global_variable].emplace_back(lazy_struct);
     this->writes.at(global_variable)
       .erase(this->writes.at(global_variable).begin());
@@ -62,28 +65,25 @@ void lazy_c_seqt::create_write_constraints(
     {
       for(const auto write : this->writes.at(global_variable))
       {
-        std::string suffix = "_L" +
-                             std::to_string(write->source.pc->location_number) +
-                             "_R" + std::to_string(round);
+        std::string suffix =
+          "_L" + std::to_string(write.label) + "_R" + std::to_string(round);
         irep_idt lazy_variable_name =
-          id2string(to_symbol_expr(write->ssa_lhs).get_identifier()) + suffix;
+          id2string(to_symbol_expr(write.s_it->ssa_lhs).get_identifier()) +
+          suffix;
         const symbol_exprt lazy_variable_exprt{
-          lazy_variable_name, write->ssa_lhs.type()};
+          lazy_variable_name, write.s_it->ssa_lhs.type()};
         lazy_variable lazy_struct = lazy_variable{
-          global_variable,
-          round,
-          write->source.pc->location_number,
-          lazy_variable_exprt};
+          global_variable, round, write.label, lazy_variable_exprt};
         this->lazy_variables[global_variable].emplace_back(lazy_struct);
 
         irep_idt exec_name = "E" + suffix;
         const symbol_exprt exec{exec_name, bool_typet{}};
 
         equal_exprt constraint{
-          lazy_variable_exprt, if_exprt{exec, write->ssa_lhs, previous}};
+          lazy_variable_exprt, if_exprt{exec, write.s_it->ssa_lhs, previous}};
 
         log.warning() << format(constraint) << messaget::eom;
-        equation.constraint(constraint, "write constraint", write->source);
+        equation.constraint(constraint, "write constraint", write.s_it->source);
 
         previous = lazy_variable_exprt;
       }
@@ -105,29 +105,27 @@ void lazy_c_seqt::create_read_constraints(
       continue;
     for(const auto read : this->reads.at(global_variable))
     {
-      exprt temp_constraint = read->ssa_lhs;
+      exprt temp_constraint = read.s_it->ssa_lhs;
       for(std::size_t round = rounds; round >= 1; --round)
       {
-        std::string suffix = "_L" +
-                             std::to_string(read->source.pc->location_number) +
-                             "_R" + std::to_string(round);
+        std::string suffix =
+          "_L" + std::to_string(read.label) + "_R" + std::to_string(round);
         irep_idt exec_name = "E" + suffix;
         const symbol_exprt exec{exec_name, bool_typet{}};
 
         temp_constraint = if_exprt{
-          exec,
-          previous(global_variable, read->source.pc->location_number, round),
-          temp_constraint};
+          exec, previous(global_variable, read.label, round), temp_constraint};
       }
-      equal_exprt final_constraint{read->ssa_lhs, temp_constraint};
+      equal_exprt final_constraint{read.s_it->ssa_lhs, temp_constraint};
       log.warning() << format(final_constraint) << messaget::eom;
-      equation.constraint(final_constraint, "read constraint", read->source);
+      equation.constraint(
+        final_constraint, "read constraint", read.s_it->source);
     }
   }
 }
 
 symbol_exprt
-lazy_c_seqt::previous(irep_idt variable, unsigned location, std::size_t round)
+lazy_c_seqt::previous(irep_idt variable, unsigned label, std::size_t round)
 {
   symbol_exprt previous = lazy_variables.at(variable).front().symbol;
   for(const auto &lazy_variable : lazy_variables.at(variable))
@@ -137,7 +135,7 @@ lazy_c_seqt::previous(irep_idt variable, unsigned location, std::size_t round)
       previous = lazy_variable.symbol;
       continue;
     }
-    if(location > lazy_variable.location)
+    if(label > lazy_variable.label)
     {
       previous = lazy_variable.symbol;
       continue;
@@ -158,31 +156,23 @@ void lazy_c_seqt::create_cs_constraint(
   for(unsigned thread = 0; thread <= threads; ++thread)
   {
     exprt previous;
-    int max_read = 0;
-    int min_read = std::numeric_limits<int>::max();
-    int max_write = 0;
-    int min_write = std::numeric_limits<int>::max();
+    unsigned max_read = 0;
+    unsigned min_read = std::numeric_limits<int>::max();
+    unsigned max_write = 0;
+    unsigned min_write = std::numeric_limits<int>::max();
     for(auto global_variable : global_variables)
     {
       if(this->reads.count(global_variable) != 0)
       {
         for(auto &read : this->reads.at(global_variable))
         {
-          if(
-            read->source.thread_nr == thread &&
-            (int)reinterpret_cast<unsigned>(read->source.pc->location_number) >
-              max_read)
+          if(read.s_it->source.thread_nr == thread && read.label > max_read)
           {
-            max_read =
-              reinterpret_cast<unsigned>(read->source.pc->location_number);
+            max_read = read.label;
           }
-          if(
-            read->source.thread_nr == thread &&
-            (int)reinterpret_cast<unsigned>(read->source.pc->location_number) <
-              min_read)
+          if(read.s_it->source.thread_nr == thread && read.label < min_read)
           {
-            min_read =
-              reinterpret_cast<unsigned>(read->source.pc->location_number);
+            min_read = read.label;
           }
         }
       }
@@ -190,27 +180,19 @@ void lazy_c_seqt::create_cs_constraint(
       {
         for(auto &write : this->writes.at(global_variable))
         {
-          if(
-            write->source.thread_nr == thread &&
-            (int)reinterpret_cast<unsigned>(write->source.pc->location_number) >
-              max_write)
+          if(write.s_it->source.thread_nr == thread && write.label > max_write)
           {
-            max_write =
-              reinterpret_cast<unsigned>(write->source.pc->location_number);
+            max_write = write.label;
           }
-          if(
-            write->source.thread_nr == thread &&
-            (int)reinterpret_cast<unsigned>(write->source.pc->location_number) <
-              min_write)
+          if(write.s_it->source.thread_nr == thread && write.label < min_write)
           {
-            min_write =
-              reinterpret_cast<unsigned>(write->source.pc->location_number);
+            min_write = write.label;
           }
         }
       }
     }
-    int max_num = max_read > max_write ? max_read + 1 : max_write + 1;
-    int min_num = min_read < min_write ? min_read : min_write;
+    unsigned max_num = max_read > max_write ? max_read + 1 : max_write + 1;
+    unsigned min_num = min_read < min_write ? min_read : min_write;
     for(size_t round = 1; round <= rounds; ++round)
     {
       irep_idt cs_name =
@@ -259,15 +241,13 @@ void lazy_c_seqt::create_cs_constraint(
       {
         for(size_t round = 1; round <= rounds; ++round)
         {
-          std::string label_name =
-            "_L" + std::to_string(write->source.pc->location_number);
+          std::string label_name = "_L" + std::to_string(write.label);
           std::string round_curr_name = "_R" + std::to_string(round);
           std::string round_prev_name = "_R" + std::to_string(round - 1);
           std::string thread_name =
-            "_T" + std::to_string(write->source.thread_nr);
+            "_T" + std::to_string(write.s_it->source.thread_nr);
 
-          int label_int =
-            reinterpret_cast<unsigned>(write->source.pc->location_number);
+          unsigned label_int = write.label;
           exprt label{from_integer({label_int}, unsignedbv_typet{8})};
 
           irep_idt statement_label_name = "E" + label_name + round_curr_name;
@@ -293,12 +273,12 @@ void lazy_c_seqt::create_cs_constraint(
           }
           and_exprt expr_3{expr_1, expr_2};
           and_exprt expr_4{true_exprt{}, expr_3};
-          and_exprt expr_5{expr_4, write->guard};
+          and_exprt expr_5{expr_4, write.s_it->guard};
           equal_exprt constraint{statement_label, expr_5};
           simplify(constraint, ns);
 
           log.warning() << format(constraint) << messaget::eom;
-          equation.constraint(constraint, "cs constraint", write->source);
+          equation.constraint(constraint, "cs constraint", write.s_it->source);
         }
       }
     }
@@ -308,15 +288,13 @@ void lazy_c_seqt::create_cs_constraint(
       {
         for(size_t round = 1; round <= rounds; ++round)
         {
-          std::string label_name =
-            "_L" + std::to_string(read->source.pc->location_number);
+          std::string label_name = "_L" + std::to_string(read.label);
           std::string round_curr_name = "_R" + std::to_string(round);
           std::string round_prev_name = "_R" + std::to_string(round - 1);
           std::string thread_name =
-            "_T" + std::to_string(read->source.thread_nr);
+            "_T" + std::to_string(read.s_it->source.thread_nr);
 
-          int label_int =
-            reinterpret_cast<unsigned>(read->source.pc->location_number);
+          unsigned label_int = read.label;
           exprt label{from_integer({label_int}, unsignedbv_typet{8})};
 
           irep_idt statement_label_name = "E" + label_name + round_curr_name;
@@ -343,12 +321,12 @@ void lazy_c_seqt::create_cs_constraint(
           }
           and_exprt expr_3{expr_1, expr_2};
           and_exprt expr_4{true_exprt{}, expr_3};
-          and_exprt expr_5{expr_4, read->guard};
+          and_exprt expr_5{expr_4, read.s_it->guard};
           equal_exprt constraint{statement_label, expr_5};
           simplify(constraint, ns);
 
           log.warning() << format(constraint) << messaget::eom;
-          equation.constraint(constraint, "cs constraint", read->source);
+          equation.constraint(constraint, "cs constraint", read.s_it->source);
         }
       }
     }
@@ -374,9 +352,9 @@ void lazy_c_seqt::create_reach_constraint(
     {
       for(auto &read : this->reads.at(global_variable))
       {
-        std::string label_name =
-          "_L" + std::to_string(read->source.pc->location_number);
-        std::string thread_name = "_T" + std::to_string(read->source.thread_nr);
+        std::string label_name = "_L" + std::to_string(read.label);
+        std::string thread_name =
+          "_T" + std::to_string(read.s_it->source.thread_nr);
         std::string round_name = "_R" + std::to_string(rounds);
 
         irep_idt statement_label_name = "E" + label_name + round_name;
@@ -398,12 +376,13 @@ void lazy_c_seqt::create_reach_constraint(
 
         irep_idt reach_name = "reach" + label_name + thread_name;
         symbol_exprt reach{reach_name, bool_typet{}};
-        events[read->source.thread_nr].emplace_back(reach);
+        events[read.s_it->source.thread_nr].emplace_back(reach);
 
         equal_exprt final_constraint{reach, constraint};
         simplify(final_constraint, ns);
         log.warning() << format(final_constraint) << messaget::eom;
-        equation.constraint(final_constraint, "reach constraint", read->source);
+        equation.constraint(
+          final_constraint, "reach constraint", read.s_it->source);
       }
     }
 
@@ -411,10 +390,9 @@ void lazy_c_seqt::create_reach_constraint(
     {
       for(auto &write : this->writes.at(global_variable))
       {
-        std::string label_name =
-          "_L" + std::to_string(write->source.pc->location_number);
+        std::string label_name = "_L" + std::to_string(write.label);
         std::string thread_name =
-          "_T" + std::to_string(write->source.thread_nr);
+          "_T" + std::to_string(write.s_it->source.thread_nr);
         std::string round_name = "_R" + std::to_string(rounds);
 
         irep_idt statement_label_name = "E" + label_name + round_name;
@@ -435,13 +413,13 @@ void lazy_c_seqt::create_reach_constraint(
         }
         irep_idt reach_name = "reach" + label_name + thread_name;
         symbol_exprt reach{reach_name, bool_typet{}};
-        events[write->source.thread_nr].emplace_back(reach);
+        events[write.s_it->source.thread_nr].emplace_back(reach);
 
         equal_exprt final_constraint{reach, constraint};
         simplify(final_constraint, ns);
         log.warning() << format(final_constraint) << messaget::eom;
         equation.constraint(
-          final_constraint, "reach constraint", write->source);
+          final_constraint, "reach constraint", write.s_it->source);
       }
     }
   }
@@ -480,8 +458,6 @@ void lazy_c_seqt::handling_guards(
 
   auto ssa_steps = equation.SSA_steps;
 
-  symex_target_equationt::SSA_stepst::const_iterator previous_shared_event;
-
   for(symex_target_equationt::SSA_stepst::const_iterator s_it =
         ssa_steps.begin();
       s_it != ssa_steps.end();
@@ -491,37 +467,38 @@ void lazy_c_seqt::handling_guards(
 
     if(s_it->is_assert() || s_it->is_assume())
     {
-      std::string label_name =
-        "_L" +
-        std::to_string(previous_shared_event->source.pc->location_number);
-      std::string thread_name =
-        "_T" + std::to_string(previous_shared_event->source.thread_nr);
-
-      irep_idt reach_name = "reach" + label_name + thread_name;
-      symbol_exprt previous_reach{reach_name, bool_typet{}};
-
-      and_exprt new_guard{previous_reach, guard};
-      simplify(new_guard, ns);
+      shared_event previous_event = previous_events.front();
+      previous_events.erase(previous_events.begin());
 
       SSA_stept step = equation.SSA_steps.front();
       equation.SSA_steps.pop_front();
-      step.guard = new_guard;
-      step.cond_expr = implies_exprt{new_guard, s_it->cond_expr};
-      temp_equation.SSA_steps.emplace_back(step);
 
-      log.warning() << format(step.get_ssa_expr()) << messaget::eom;
-      log.warning() << "guard: " << format(step.guard) << messaget::eom;
-      }
-      else
+      if(previous_event.s_it != ssa_steps.begin())
       {
-        if(s_it->is_shared_read() || s_it->is_shared_write())
-          previous_shared_event = s_it;
+        std::string label_name = "_L" + std::to_string(previous_event.label);
+        std::string thread_name =
+          "_T" + std::to_string(previous_event.s_it->source.thread_nr);
 
-        SSA_stept step = equation.SSA_steps.front();
+        irep_idt reach_name = "reach" + label_name + thread_name;
+        symbol_exprt previous_reach{reach_name, bool_typet{}};
 
-        equation.SSA_steps.pop_front();
-        temp_equation.SSA_steps.emplace_back(step);
+        and_exprt new_guard{previous_reach, guard};
+        simplify(new_guard, ns);
+        step.guard = new_guard;
+        step.cond_expr = implies_exprt{new_guard, s_it->cond_expr};
+
+        log.warning() << format(step.get_ssa_expr()) << messaget::eom;
+        log.warning() << "guard: " << format(step.guard) << messaget::eom;
       }
+      temp_equation.SSA_steps.emplace_back(step);
+    }
+    else
+    {
+      SSA_stept step = equation.SSA_steps.front();
+
+      equation.SSA_steps.pop_front();
+      temp_equation.SSA_steps.emplace_back(step);
+    }
   }
   equation = temp_equation;
 }
@@ -531,11 +508,11 @@ void lazy_c_seqt::collect_reads_and_writes(
   message_handlert &message_handler)
 {
   messaget log{message_handler};
-  std::unordered_map<
-    irep_idt,
-    std::optional<symex_target_equationt::SSA_stepst::const_iterator>>
-    previous_write;
-  previous_write.clear();
+
+  unsigned label = 1;
+
+  shared_event previous_event{ssa_steps.begin()};
+
   for(symex_target_equationt::SSA_stepst::const_iterator s_it =
         ssa_steps.begin();
       s_it != ssa_steps.end();
@@ -544,17 +521,27 @@ void lazy_c_seqt::collect_reads_and_writes(
     if(s_it->source.thread_nr > threads)
       threads = s_it->source.thread_nr;
 
+    if(s_it->is_assert() || s_it->is_assume())
+    {
+      previous_events.emplace_back(previous_event);
+    }
+
     if(s_it->is_shared_write())
     {
       // TODO: this may be too restrictive
       if(can_cast_expr<symbol_exprt>(s_it->ssa_lhs))
       {
-        log.warning() << "Thread: " << s_it->source.thread_nr
-                      << "\tWrite: " << s_it->source.pc->location_number
-                      << "   \t"
-                      << to_symbol_expr(s_it->ssa_lhs).get_identifier() << "\tL"
-                      << s_it->source.pc->location_number << messaget::eom;
-        this->writes[s_it->ssa_lhs.get_object_name()].emplace_back(s_it);
+        shared_event shared_event{s_it, label};
+        label++;
+        previous_event = shared_event;
+
+        log.warning()
+          << "Thread: " << shared_event.s_it->source.thread_nr
+          << "\tWrite: " << shared_event.label << "   \t"
+          << to_symbol_expr(shared_event.s_it->ssa_lhs).get_identifier()
+          << "\tL" << shared_event.label << messaget::eom;
+        this->writes[s_it->ssa_lhs.get_object_name()].emplace_back(
+          shared_event);
         this->global_variables.insert(s_it->ssa_lhs.get_object_name());
       }
       else
@@ -570,20 +557,23 @@ void lazy_c_seqt::collect_reads_and_writes(
       // TODO: this may be too restrictive
       if(can_cast_expr<symbol_exprt>(s_it->ssa_lhs))
       {
-        log.warning() << "Thread: " << s_it->source.thread_nr
-                      << "\tRead: " << s_it->source.pc->location_number
-                      << "     \t"
-                      << to_symbol_expr(s_it->ssa_lhs).get_identifier() << "\tL"
-                      << s_it->source.pc->location_number << messaget::eom;
+        shared_event shared_event{s_it, label};
+        label++;
+        previous_event = shared_event;
 
-        this->reads[s_it->ssa_lhs.get_object_name()].emplace_back(s_it);
+        log.warning()
+          << "Thread: " << shared_event.s_it->source.thread_nr
+          << "\tRead: " << shared_event.label << "   \t"
+          << to_symbol_expr(shared_event.s_it->ssa_lhs).get_identifier()
+          << "\tL" << shared_event.label << messaget::eom;
+
+        this->reads[s_it->ssa_lhs.get_object_name()].emplace_back(shared_event);
         this->global_variables.insert(s_it->ssa_lhs.get_object_name());
       }
       else
       {
-        log.warning() << "Skipping: "
-                      << "Thread: " << s_it->source.thread_nr
-                      << "\tWrite: " << s_it->source.pc->location_number
+        log.warning() << "Skipping: " << "Thread: " << s_it->source.thread_nr
+                      << "\tRead: " << s_it->source.pc->location_number
                       << messaget::eom;
       }
     }

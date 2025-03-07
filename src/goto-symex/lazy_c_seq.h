@@ -19,24 +19,25 @@ public:
 private:
   const namespacet &ns;
   const std::size_t rounds;
-  std::size_t threads = 0;
-  std::unordered_set<irep_idt> global_variables;
-  std::unordered_map<
-    irep_idt,
-    std::vector<symex_target_equationt::SSA_stepst::const_iterator>>
-    reads;
-  std::unordered_map<
-    irep_idt,
-    std::vector<symex_target_equationt::SSA_stepst::const_iterator>>
-    writes;
+  struct shared_event
+  {
+    symex_target_equationt::SSA_stepst::const_iterator s_it;
+    unsigned label;
+  };
   struct lazy_variable
   {
     irep_idt name;
     std::size_t round;
-    unsigned location;
+    unsigned label;
     symbol_exprt symbol;
   };
+
+  std::size_t threads = 0;
+  std::unordered_set<irep_idt> global_variables;
+  std::unordered_map<irep_idt, std::vector<shared_event>> writes;
+  std::unordered_map<irep_idt, std::vector<shared_event>> reads;
   std::unordered_map<irep_idt, std::vector<lazy_variable>> lazy_variables;
+  std::vector<shared_event> previous_events;
 
   void collect_reads_and_writes(
     const symex_target_equationt::SSA_stepst &ssa_steps,
@@ -50,8 +51,7 @@ private:
     symex_target_equationt &equation,
     message_handlert &message_handler);
 
-  symbol_exprt
-  previous(irep_idt variable, unsigned location, std::size_t round);
+  symbol_exprt previous(irep_idt variable, unsigned label, std::size_t round);
 
   void create_cs_constraint(
     symex_target_equationt &equation,
