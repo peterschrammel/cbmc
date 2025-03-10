@@ -64,6 +64,17 @@ private:
   void handling_guards(
     symex_target_equationt &equation,
     message_handlert &message_handler);
+
+  symbol_exprt
+  create_lazy_symbol(unsigned label, size_t round, ssa_exprt lhs, typet type);
+
+  symbol_exprt create_exec_symbol(unsigned label, size_t round);
+
+  symbol_exprt create_cs_symbol(size_t thread, size_t round);
+
+  symbol_exprt create_reach_symbol(unsigned label, size_t thread);
+
+  symbol_exprt create_active_thread_symbol(size_t thread, size_t round);
 };
 
 #endif //CPROVER_GOTO_SYMEX_LAZY_C_SEQ_H

@@ -65,19 +65,13 @@ void lazy_c_seqt::create_write_constraints(
     {
       for(const auto write : this->writes.at(global_variable))
       {
-        std::string suffix =
-          "_L" + std::to_string(write.label) + "_R" + std::to_string(round);
-        irep_idt lazy_variable_name =
-          id2string(to_symbol_expr(write.s_it->ssa_lhs).get_identifier()) +
-          suffix;
-        const symbol_exprt lazy_variable_exprt{
-          lazy_variable_name, write.s_it->ssa_lhs.type()};
+        const symbol_exprt lazy_variable_exprt = create_lazy_symbol(
+          write.label, round, write.s_it->ssa_lhs, write.s_it->ssa_lhs.type());
         lazy_variable lazy_struct = lazy_variable{
           global_variable, round, write.label, lazy_variable_exprt};
         this->lazy_variables[global_variable].emplace_back(lazy_struct);
 
-        irep_idt exec_name = "E" + suffix;
-        const symbol_exprt exec{exec_name, bool_typet{}};
+        const symbol_exprt exec = create_exec_symbol(write.label, round);
 
         equal_exprt constraint{
           lazy_variable_exprt, if_exprt{exec, write.s_it->ssa_lhs, previous}};
@@ -108,10 +102,7 @@ void lazy_c_seqt::create_read_constraints(
       exprt temp_constraint = read.s_it->ssa_lhs;
       for(std::size_t round = rounds; round >= 1; --round)
       {
-        std::string suffix =
-          "_L" + std::to_string(read.label) + "_R" + std::to_string(round);
-        irep_idt exec_name = "E" + suffix;
-        const symbol_exprt exec{exec_name, bool_typet{}};
+        const symbol_exprt exec = create_exec_symbol(read.label, round);
 
         temp_constraint = if_exprt{
           exec, previous(global_variable, read.label, round), temp_constraint};
@@ -195,9 +186,7 @@ void lazy_c_seqt::create_cs_constraint(
     unsigned min_num = min_read < min_write ? min_read : min_write;
     for(size_t round = 1; round <= rounds; ++round)
     {
-      irep_idt cs_name =
-        "cs_T" + std::to_string(thread) + "_R" + std::to_string(round);
-      symbol_exprt cs{cs_name, unsignedbv_typet{8}}; //TODO: check type
+      symbol_exprt cs = create_cs_symbol(thread, round);
 
       if(round == 1)
       {
@@ -241,27 +230,19 @@ void lazy_c_seqt::create_cs_constraint(
       {
         for(size_t round = 1; round <= rounds; ++round)
         {
-          std::string label_name = "_L" + std::to_string(write.label);
-          std::string round_curr_name = "_R" + std::to_string(round);
-          std::string round_prev_name = "_R" + std::to_string(round - 1);
-          std::string thread_name =
-            "_T" + std::to_string(write.s_it->source.thread_nr);
-
           unsigned label_int = write.label;
           exprt label{from_integer({label_int}, unsignedbv_typet{8})};
 
-          irep_idt statement_label_name = "E" + label_name + round_curr_name;
-          symbol_exprt statement_label{statement_label_name, bool_typet{}};
+          symbol_exprt exec = create_exec_symbol(write.label, round);
 
-          irep_idt cs_curr_name = "cs" + thread_name + round_curr_name;
-          symbol_exprt cs_curr{cs_curr_name, unsignedbv_typet{8}};
+          symbol_exprt cs_curr =
+            create_cs_symbol(write.s_it->source.thread_nr, round);
 
-          irep_idt cs_prev_name = "cs" + thread_name + round_prev_name;
-          symbol_exprt cs_prev{cs_prev_name, unsignedbv_typet{8}};
+          symbol_exprt cs_prev =
+            create_cs_symbol(write.s_it->source.thread_nr, round - 1);
 
-          irep_idt active_thread_name =
-            "active_thread" + thread_name + round_curr_name;
-          symbol_exprt active_thread{active_thread_name, bool_typet{}};
+          symbol_exprt active_thread =
+            create_active_thread_symbol(write.s_it->source.thread_nr, round);
 
           greater_than_exprt expr_1{cs_curr, label};
           exprt expr_2;
@@ -274,7 +255,7 @@ void lazy_c_seqt::create_cs_constraint(
           and_exprt expr_3{expr_1, expr_2};
           and_exprt expr_4{true_exprt{}, expr_3};
           and_exprt expr_5{expr_4, write.s_it->guard};
-          equal_exprt constraint{statement_label, expr_5};
+          equal_exprt constraint{exec, expr_5};
           simplify(constraint, ns);
 
           log.warning() << format(constraint) << messaget::eom;
@@ -288,28 +269,19 @@ void lazy_c_seqt::create_cs_constraint(
       {
         for(size_t round = 1; round <= rounds; ++round)
         {
-          std::string label_name = "_L" + std::to_string(read.label);
-          std::string round_curr_name = "_R" + std::to_string(round);
-          std::string round_prev_name = "_R" + std::to_string(round - 1);
-          std::string thread_name =
-            "_T" + std::to_string(read.s_it->source.thread_nr);
-
           unsigned label_int = read.label;
           exprt label{from_integer({label_int}, unsignedbv_typet{8})};
 
-          irep_idt statement_label_name = "E" + label_name + round_curr_name;
-          symbol_exprt statement_label{statement_label_name, bool_typet{}};
+          symbol_exprt exec = create_exec_symbol(read.label, round);
 
-          irep_idt cs_curr_name = "cs" + thread_name + round_curr_name;
-          symbol_exprt cs_curr{cs_curr_name, unsignedbv_typet{8}};
+          symbol_exprt cs_curr =
+            create_cs_symbol(read.s_it->source.thread_nr, round);
 
-          irep_idt cs_prev_name = "cs" + thread_name + round_prev_name;
-          symbol_exprt cs_prev{cs_prev_name, unsignedbv_typet{8}};
+          symbol_exprt cs_prev =
+            create_cs_symbol(read.s_it->source.thread_nr, round - 1);
 
-          irep_idt active_thread_name =
-            "active_thread" + thread_name +
-            round_curr_name; //TODO: implement active thread variables
-          symbol_exprt active_thread{active_thread_name, bool_typet{}};
+          symbol_exprt active_thread =
+            create_active_thread_symbol(read.s_it->source.thread_nr, round);
 
           greater_than_exprt expr_1{cs_curr, label};
           exprt expr_2;
@@ -322,7 +294,7 @@ void lazy_c_seqt::create_cs_constraint(
           and_exprt expr_3{expr_1, expr_2};
           and_exprt expr_4{true_exprt{}, expr_3};
           and_exprt expr_5{expr_4, read.s_it->guard};
-          equal_exprt constraint{statement_label, expr_5};
+          equal_exprt constraint{exec, expr_5};
           simplify(constraint, ns);
 
           log.warning() << format(constraint) << messaget::eom;
@@ -352,30 +324,21 @@ void lazy_c_seqt::create_reach_constraint(
     {
       for(auto &read : this->reads.at(global_variable))
       {
-        std::string label_name = "_L" + std::to_string(read.label);
-        std::string thread_name =
-          "_T" + std::to_string(read.s_it->source.thread_nr);
-        std::string round_name = "_R" + std::to_string(rounds);
+        symbol_exprt exec = create_exec_symbol(read.label, rounds);
 
-        irep_idt statement_label_name = "E" + label_name + round_name;
-        symbol_exprt statement_label{statement_label_name, bool_typet{}};
-
-        exprt previous_expr = statement_label;
+        exprt previous_expr = exec;
         exprt constraint;
         for(std::size_t round = rounds - 1; round >= 1; --round)
         {
-          std::string round_name = "_R" + std::to_string(round);
+          symbol_exprt exec = create_exec_symbol(read.label, round);
 
-          irep_idt statement_label_name = "E" + label_name + round_name;
-          symbol_exprt statement_label{statement_label_name, bool_typet{}};
-
-          or_exprt temp_constraint{statement_label, previous_expr};
+          or_exprt temp_constraint{exec, previous_expr};
           constraint = temp_constraint;
           previous_expr = constraint;
         }
 
-        irep_idt reach_name = "reach" + label_name + thread_name;
-        symbol_exprt reach{reach_name, bool_typet{}};
+        symbol_exprt reach =
+          create_reach_symbol(read.label, read.s_it->source.thread_nr);
         events[read.s_it->source.thread_nr].emplace_back(reach);
 
         equal_exprt final_constraint{reach, constraint};
@@ -390,29 +353,20 @@ void lazy_c_seqt::create_reach_constraint(
     {
       for(auto &write : this->writes.at(global_variable))
       {
-        std::string label_name = "_L" + std::to_string(write.label);
-        std::string thread_name =
-          "_T" + std::to_string(write.s_it->source.thread_nr);
-        std::string round_name = "_R" + std::to_string(rounds);
+        symbol_exprt exec = create_exec_symbol(write.label, rounds);
 
-        irep_idt statement_label_name = "E" + label_name + round_name;
-        symbol_exprt statement_label{statement_label_name, bool_typet{}};
-
-        exprt previous_expr = statement_label;
+        exprt previous_expr = exec;
         exprt constraint;
         for(std::size_t round = rounds - 1; round >= 1; --round)
         {
-          std::string round_name = "_R" + std::to_string(round);
+          symbol_exprt exec = create_exec_symbol(write.label, round);
 
-          irep_idt statement_label_name = "E" + label_name + round_name;
-          symbol_exprt statement_label{statement_label_name, bool_typet{}};
-
-          or_exprt temp_constraint{statement_label, previous_expr};
+          or_exprt temp_constraint{exec, previous_expr};
           constraint = temp_constraint;
           previous_expr = constraint;
         }
-        irep_idt reach_name = "reach" + label_name + thread_name;
-        symbol_exprt reach{reach_name, bool_typet{}};
+        symbol_exprt reach =
+          create_reach_symbol(write.label, write.s_it->source.thread_nr);
         events[write.s_it->source.thread_nr].emplace_back(reach);
 
         equal_exprt final_constraint{reach, constraint};
@@ -456,12 +410,8 @@ void lazy_c_seqt::handling_guards(
 
       if(previous_event.s_it != ssa_steps.begin())
       {
-        std::string label_name = "_L" + std::to_string(previous_event.label);
-        std::string thread_name =
-          "_T" + std::to_string(previous_event.s_it->source.thread_nr);
-
-        irep_idt reach_name = "reach" + label_name + thread_name;
-        symbol_exprt previous_reach{reach_name, bool_typet{}};
+        symbol_exprt previous_reach = create_reach_symbol(
+          previous_event.label, previous_event.s_it->source.thread_nr);
 
         and_exprt new_guard{previous_reach, guard};
         simplify(new_guard, ns);
@@ -559,4 +509,57 @@ void lazy_c_seqt::collect_reads_and_writes(
       }
     }
   }
+}
+
+symbol_exprt lazy_c_seqt::create_lazy_symbol(
+  unsigned label,
+  size_t round,
+  ssa_exprt lhs,
+  typet type)
+{
+  std::string suffix =
+    "_L" + std::to_string(label) + "_R" + std::to_string(round);
+  irep_idt lazy_variable_name =
+    id2string(to_symbol_expr(lhs).get_identifier()) + suffix;
+  symbol_exprt lazy_variable_exprt{lazy_variable_name, type};
+
+  return lazy_variable_exprt;
+}
+
+symbol_exprt lazy_c_seqt::create_exec_symbol(unsigned label, size_t round)
+{
+  irep_idt exec_name =
+    "E_L" + std::to_string(label) + "_R" + std::to_string(round);
+  ;
+  symbol_exprt exec{exec_name, bool_typet{}};
+
+  return exec;
+}
+
+symbol_exprt lazy_c_seqt::create_cs_symbol(size_t thread, size_t round)
+{
+  irep_idt cs_name =
+    "cs_T" + std::to_string(thread) + "_R" + std::to_string(round);
+  symbol_exprt cs{cs_name, unsignedbv_typet{8}};
+
+  return cs;
+}
+
+symbol_exprt lazy_c_seqt::create_reach_symbol(unsigned label, size_t thread)
+{
+  irep_idt reach_name =
+    "reach_L" + std::to_string(label) + "_T" + std::to_string(thread);
+  symbol_exprt reach{reach_name, bool_typet{}};
+
+  return reach;
+}
+
+symbol_exprt
+lazy_c_seqt::create_active_thread_symbol(size_t thread, size_t round)
+{
+  irep_idt active_thread_name =
+    "active_thread_T" + std::to_string(thread) + "_R" + std::to_string(round);
+  symbol_exprt active_thread{active_thread_name, bool_typet{}};
+
+  return active_thread;
 }
