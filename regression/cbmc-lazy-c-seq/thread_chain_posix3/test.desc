@@ -1,0 +1,8 @@
+KNOWNBUG pthread
+main.c
+-D_ENABLE_CHAIN_ -D_SANITY_CHECK_ --unwind 2 --lazy-c-seq-rounds 3
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

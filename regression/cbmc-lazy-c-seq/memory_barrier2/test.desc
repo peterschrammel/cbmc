@@ -1,0 +1,10 @@
+CORE
+main.c
+--mm tso --lazy-c-seq-rounds 3
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Some past change broke this test such that we now report verification failures.

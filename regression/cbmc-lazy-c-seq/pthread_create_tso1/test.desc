@@ -1,0 +1,8 @@
+CORE pthread
+main.c
+--no-pointer-check --mm tso --lazy-c-seq-rounds 3
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
