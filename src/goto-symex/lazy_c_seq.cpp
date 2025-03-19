@@ -53,12 +53,12 @@ void lazy_c_seqt::create_write_constraints(
     if(this->writes.count(global_variable) == 0)
       continue;
     exprt previous = this->writes.at(global_variable).front().s_it->ssa_lhs;
-    lazy_variable lazy_struct = lazy_variable{
+    lazy_variable first_lazy_struct = lazy_variable{
       global_variable,
       0,
       0,
       this->writes.at(global_variable).front().s_it->ssa_lhs};
-    this->lazy_variables[global_variable].emplace_back(lazy_struct);
+    this->lazy_variables[global_variable].emplace_back(first_lazy_struct);
     this->writes.at(global_variable)
       .erase(this->writes.at(global_variable).begin());
     for(std::size_t round = 1; round <= rounds; ++round)
@@ -212,10 +212,10 @@ void lazy_c_seqt::create_cs_constraint(
       {
         exprt max{from_integer(
           {max_num}, unsignedbv_typet{8})}; //TODO: check corretness
-        less_than_or_equal_exprt constraint{cs, max};
-        log.warning() << format(constraint) << messaget::eom;
+        less_than_or_equal_exprt last_constraint{cs, max};
+        log.warning() << format(last_constraint) << messaget::eom;
         equation.constraint(
-          constraint,
+          last_constraint,
           "cs constraint",
           equation.SSA_steps.begin()->source); //TODO: check source
         previous = cs;
@@ -324,9 +324,9 @@ void lazy_c_seqt::create_reach_constraint(
     {
       for(auto &read : this->reads.at(global_variable))
       {
-        symbol_exprt exec = create_exec_symbol(read.label, rounds);
+        symbol_exprt first_exec = create_exec_symbol(read.label, rounds);
 
-        exprt previous_expr = exec;
+        exprt previous_expr = first_exec;
         exprt constraint;
         for(std::size_t round = rounds - 1; round >= 1; --round)
         {
@@ -353,9 +353,9 @@ void lazy_c_seqt::create_reach_constraint(
     {
       for(auto &write : this->writes.at(global_variable))
       {
-        symbol_exprt exec = create_exec_symbol(write.label, rounds);
+        symbol_exprt first_exec = create_exec_symbol(write.label, rounds);
 
-        exprt previous_expr = exec;
+        exprt previous_expr = first_exec;
         exprt constraint;
         for(std::size_t round = rounds - 1; round >= 1; --round)
         {
