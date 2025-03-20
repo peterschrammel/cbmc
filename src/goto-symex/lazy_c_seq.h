@@ -26,7 +26,6 @@ private:
   };
   struct lazy_variable
   {
-    irep_idt name;
     std::size_t round;
     unsigned label;
     symbol_exprt symbol;
@@ -66,15 +65,15 @@ private:
     message_handlert &message_handler);
 
   symbol_exprt
-  create_lazy_symbol(unsigned label, size_t round, ssa_exprt lhs, typet type);
+  create_lazy_symbol(unsigned label, std::size_t round, ssa_exprt lhs, typet type);
 
-  symbol_exprt create_exec_symbol(unsigned label, size_t round);
+  symbol_exprt create_exec_symbol(unsigned label, std::size_t round);
 
-  symbol_exprt create_cs_symbol(size_t thread, size_t round);
+  symbol_exprt create_cs_symbol(std::size_t thread, std::size_t round);
 
-  symbol_exprt create_reach_symbol(unsigned label, size_t thread);
+  symbol_exprt create_reach_symbol(unsigned label, std::size_t thread);
 
-  symbol_exprt create_active_thread_symbol(size_t thread, size_t round);
+  symbol_exprt create_active_thread_symbol(std::size_t thread, std::size_t round);
 };
 
 #endif //CPROVER_GOTO_SYMEX_LAZY_C_SEQ_H

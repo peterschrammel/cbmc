@@ -54,7 +54,6 @@ void lazy_c_seqt::create_write_constraints(
       continue;
     exprt previous = this->writes.at(global_variable).front().s_it->ssa_lhs;
     lazy_variable first_lazy_struct = lazy_variable{
-      global_variable,
       0,
       0,
       this->writes.at(global_variable).front().s_it->ssa_lhs};
@@ -67,8 +66,7 @@ void lazy_c_seqt::create_write_constraints(
       {
         const symbol_exprt lazy_variable_exprt = create_lazy_symbol(
           write.label, round, write.s_it->ssa_lhs, write.s_it->ssa_lhs.type());
-        lazy_variable lazy_struct = lazy_variable{
-          global_variable, round, write.label, lazy_variable_exprt};
+        lazy_variable lazy_struct = lazy_variable{round, write.label, lazy_variable_exprt};
         this->lazy_variables[global_variable].emplace_back(lazy_struct);
 
         const symbol_exprt exec = create_exec_symbol(write.label, round);
@@ -471,9 +469,9 @@ void lazy_c_seqt::collect_reads_and_writes(
           << "\tWrite: " << shared_event.label << "   \t"
           << to_symbol_expr(shared_event.s_it->ssa_lhs).get_identifier()
           << "\tL" << shared_event.label << messaget::eom;
-        this->writes[s_it->ssa_lhs.get_object_name()].emplace_back(
-          shared_event);
-        this->global_variables.insert(s_it->ssa_lhs.get_object_name());
+
+        this->writes[shared_event.s_it->ssa_lhs.get_l1_object_identifier()].emplace_back(shared_event);
+        this->global_variables.emplace(shared_event.s_it->ssa_lhs.get_l1_object_identifier());
       }
       else
       {
@@ -498,8 +496,8 @@ void lazy_c_seqt::collect_reads_and_writes(
           << to_symbol_expr(shared_event.s_it->ssa_lhs).get_identifier()
           << "\tL" << shared_event.label << messaget::eom;
 
-        this->reads[s_it->ssa_lhs.get_object_name()].emplace_back(shared_event);
-        this->global_variables.insert(s_it->ssa_lhs.get_object_name());
+        this->reads[shared_event.s_it->ssa_lhs.get_l1_object_identifier()].emplace_back(shared_event);
+        this->global_variables.insert(shared_event.s_it->ssa_lhs.get_l1_object_identifier());
       }
       else
       {
