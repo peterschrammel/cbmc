@@ -292,6 +292,7 @@ int pthread_mutex_destroy(pthread_mutex_t *mutex)
 #endif
 
 __CPROVER_bool __CPROVER_threads_exited[__CPROVER_constant_infinity_uint];
+__CPROVER_bool __CPROVER_threads_active[__CPROVER_constant_infinity_uint];
 __CPROVER_thread_local unsigned long __CPROVER_thread_id = 0;
 #if 0
   // Destructor support is disabled as it is too expensive due to its extensive
@@ -319,6 +320,7 @@ void pthread_exit(void *value_ptr)
   }
 #endif
   __CPROVER_threads_exited[__CPROVER_thread_id]=1;
+  __CPROVER_threads_active[__CPROVER_thread_id] = 0;
   __CPROVER_assume(0);
 #ifdef LIBRARY_CHECK
   __builtin_unreachable();
@@ -545,6 +547,7 @@ int pthread_rwlock_wrlock(pthread_rwlock_t *lock)
 /* FUNCTION: __spawned_thread */
 
 __CPROVER_bool __CPROVER_threads_exited[__CPROVER_constant_infinity_uint];
+__CPROVER_bool __CPROVER_threads_active[__CPROVER_constant_infinity_uint];
 #ifndef LIBRARY_CHECK
 __CPROVER_thread_local unsigned long __CPROVER_thread_id = 0;
 #endif
@@ -605,6 +608,7 @@ __CPROVER_HIDE:;
   }
 #endif
   __CPROVER_threads_exited[this_thread_id] = 1;
+  __CPROVER_threads_active[this_thread_id] = 0;
 }
 
 /* FUNCTION: pthread_create */

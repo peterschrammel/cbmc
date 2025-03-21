@@ -131,6 +131,17 @@ void static_lifetime_init(
       auto code = static_lifetime_init(id, symbol_table);
       if(code.has_value())
         dest.add(std::move(*code));
+      if(id == CPROVER_PREFIX "threads_active")
+      {
+        const symbolt &symbol = ns.lookup(id);
+        index_exprt lhs{
+          symbol.symbol_expr(),
+          from_integer(0, signedbv_typet{64}),
+          bool_typet{}};
+        exprt rhs = true_exprt{};
+        auto add_code = code_frontend_assignt{lhs, rhs, symbol.location};
+        dest.add(std::move(add_code));
+      }
     }
 
   // now all other variables
