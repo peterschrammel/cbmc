@@ -612,6 +612,7 @@ __CPROVER_HIDE:;
 }
 
 /* FUNCTION: pthread_create */
+__CPROVER_bool __CPROVER_threads_active[__CPROVER_constant_infinity_uint];
 
 #ifndef __CPROVER_PTHREAD_H_INCLUDED
 #  include <pthread.h>
