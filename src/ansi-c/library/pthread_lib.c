@@ -653,6 +653,8 @@ int pthread_create(
   // pthread_t is a pointer type on some systems
   *thread=(pthread_t)this_thread_id;
 
+  __CPROVER_threads_active[this_thread_id] = 1;
+
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_set_must(thread, "pthread-id");
   #endif
