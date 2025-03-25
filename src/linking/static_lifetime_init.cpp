@@ -86,9 +86,19 @@ static std::optional<codet> static_lifetime_init(
   }
   else if(symbol.value.is_nil())
   {
-    const auto zero = zero_initializer(symbol.type, symbol.location, ns);
-    CHECK_RETURN(zero.has_value());
-    rhs = *zero;
+    if(identifier == CPROVER_PREFIX "active_thread")
+    {
+      const auto one =
+        expr_initializer(symbol.type, symbol.location, ns, true_exprt{});
+      CHECK_RETURN(one.has_value());
+      rhs = *one;
+    }
+    else
+    {
+      const auto zero = zero_initializer(symbol.type, symbol.location, ns);
+      CHECK_RETURN(zero.has_value());
+      rhs = *zero;
+    }
   }
   else
     rhs = symbol.value;
