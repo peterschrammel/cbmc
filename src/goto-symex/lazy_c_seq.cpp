@@ -102,8 +102,12 @@ void lazy_c_seqt::create_read_constraints(
       {
         const symbol_exprt exec = create_exec_symbol(read.label, round);
 
-        temp_constraint = if_exprt{
-          exec, previous(global_variable, read.label, round), temp_constraint};
+        std::optional<symbol_exprt> previous =
+          previous_shared(global_variable, read.label, round);
+        if(previous.has_value())
+        {
+          temp_constraint = if_exprt{exec, previous.value(), temp_constraint};
+        }
       }
       equal_exprt final_constraint{read.s_it->ssa_lhs, temp_constraint};
       log.warning() << format(final_constraint) << messaget::eom;
@@ -113,9 +117,13 @@ void lazy_c_seqt::create_read_constraints(
   }
 }
 
-symbol_exprt
-lazy_c_seqt::previous(irep_idt variable, unsigned label, std::size_t round)
+std::optional<symbol_exprt> lazy_c_seqt::previous_shared(
+  irep_idt variable,
+  unsigned label,
+  std::size_t round)
 {
+  if(lazy_variables.count(variable) == 0)
+    return std::nullopt;
   symbol_exprt previous = lazy_variables.at(variable).front().symbol;
   for(const auto &lazy_variable : lazy_variables.at(variable))
   {
@@ -239,8 +247,13 @@ void lazy_c_seqt::create_cs_constraint(
           symbol_exprt cs_prev =
             create_cs_symbol(write.s_it->source.thread_nr, round - 1);
 
-          symbol_exprt active_thread =
-            create_active_thread_symbol(write.s_it->source.thread_nr, round);
+          std::optional<symbol_exprt> active_thread =
+            previous_shared("__CPROVER_active_thread", write.label, round);
+          exprt active_thread_value = true_exprt{};
+          if(active_thread.has_value())
+          {
+            active_thread_value = active_thread.value();
+          }
 
           greater_than_exprt expr_1{cs_curr, label};
           exprt expr_2;
@@ -251,7 +264,7 @@ void lazy_c_seqt::create_cs_constraint(
             expr_2 = less_than_or_equal_exprt{cs_prev, label};
           }
           and_exprt expr_3{expr_1, expr_2};
-          and_exprt expr_4{true_exprt{}, expr_3};
+          and_exprt expr_4{active_thread_value, expr_3};
           and_exprt expr_5{expr_4, write.s_it->guard};
           equal_exprt constraint{exec, expr_5};
           simplify(constraint, ns);
@@ -278,8 +291,13 @@ void lazy_c_seqt::create_cs_constraint(
           symbol_exprt cs_prev =
             create_cs_symbol(read.s_it->source.thread_nr, round - 1);
 
-          symbol_exprt active_thread =
-            create_active_thread_symbol(read.s_it->source.thread_nr, round);
+          std::optional<symbol_exprt> active_thread =
+            previous_shared("__CPROVER_active_thread", read.label, round);
+          exprt active_thread_value = true_exprt{};
+          if(active_thread.has_value())
+          {
+            active_thread_value = active_thread.value();
+          }
 
           greater_than_exprt expr_1{cs_curr, label};
           exprt expr_2;
@@ -290,7 +308,7 @@ void lazy_c_seqt::create_cs_constraint(
             expr_2 = less_than_or_equal_exprt{cs_prev, label};
           }
           and_exprt expr_3{expr_1, expr_2};
-          and_exprt expr_4{true_exprt{}, expr_3};
+          and_exprt expr_4{active_thread_value, expr_3};
           and_exprt expr_5{expr_4, read.s_it->guard};
           equal_exprt constraint{exec, expr_5};
           simplify(constraint, ns);
@@ -414,8 +432,9 @@ void lazy_c_seqt::handling_guards(
         and_exprt new_guard{previous_reach, guard};
         simplify(new_guard, ns);
         step.guard = new_guard;
-        step.cond_expr = implies_exprt{new_guard, s_it->cond_expr};
-
+        exprt new_expr = implies_exprt{new_guard, s_it->cond_expr};
+        simplify(new_expr, ns);
+        step.cond_expr = new_expr;
         log.warning() << format(step.get_ssa_expr()) << messaget::eom;
         log.warning() << "guard: " << format(step.guard) << messaget::eom;
       }
@@ -550,14 +569,4 @@ symbol_exprt lazy_c_seqt::create_reach_symbol(unsigned label, size_t thread)
   symbol_exprt reach{reach_name, bool_typet{}};
 
   return reach;
-}
-
-symbol_exprt
-lazy_c_seqt::create_active_thread_symbol(size_t thread, size_t round)
-{
-  irep_idt active_thread_name =
-    "active_thread_T" + std::to_string(thread) + "_R" + std::to_string(round);
-  symbol_exprt active_thread{active_thread_name, bool_typet{}};
-
-  return active_thread;
 }
