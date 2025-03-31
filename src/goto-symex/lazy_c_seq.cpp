@@ -547,7 +547,6 @@ symbol_exprt lazy_c_seqt::create_exec_symbol(unsigned label, size_t round)
 {
   irep_idt exec_name =
     "E_L" + std::to_string(label) + "_R" + std::to_string(round);
-  ;
   symbol_exprt exec{exec_name, bool_typet{}};
 
   return exec;
