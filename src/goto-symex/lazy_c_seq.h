@@ -30,13 +30,24 @@ private:
     unsigned label;
     symbol_exprt symbol;
   };
+  struct active_thread
+  {
+    unsigned thread;
+    std::size_t l2;
+    symbol_exprt symbol;
+  };
 
   std::size_t threads = 0;
   std::unordered_set<irep_idt> global_variables;
   std::unordered_map<irep_idt, std::vector<shared_event>> writes;
   std::unordered_map<irep_idt, std::vector<shared_event>> reads;
   std::unordered_map<irep_idt, std::vector<lazy_variable>> lazy_variables;
+  std::unordered_map<unsigned, active_thread> active_threads_vector;
   std::vector<shared_event> previous_events;
+
+  void handling_active_threads(
+    symex_target_equationt &equation,
+    message_handlert &message_handler);
 
   void collect_reads_and_writes(
     const symex_target_equationt::SSA_stepst &ssa_steps,
@@ -70,9 +81,21 @@ private:
 
   symbol_exprt create_exec_symbol(unsigned label, std::size_t round);
 
+  symbol_exprt create_enabled_symbol(unsigned label, std::size_t round);
+
   symbol_exprt create_cs_symbol(std::size_t thread, std::size_t round);
 
   symbol_exprt create_reach_symbol(unsigned label, std::size_t thread);
+
+  symbol_exprt create_active_thread_symbol(unsigned thread);
+
+  void create_active_thread_statements(
+    const symex_targett::sourcet &source,
+    exprt &guard,
+    unsigned &thread,
+    symex_target_equationt &equation,
+    message_handlert &message_handler,
+    const exprt &value);
 };
 
 #endif //CPROVER_GOTO_SYMEX_LAZY_C_SEQ_H

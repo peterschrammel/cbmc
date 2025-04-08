@@ -292,8 +292,6 @@ int pthread_mutex_destroy(pthread_mutex_t *mutex)
 #endif
 
 __CPROVER_bool __CPROVER_threads_exited[__CPROVER_constant_infinity_uint];
-__CPROVER_bool __CPROVER_threads_active[__CPROVER_constant_infinity_uint];
-__CPROVER_bool __CPROVER_active_thread;
 __CPROVER_thread_local unsigned long __CPROVER_thread_id = 0;
 #if 0
   // Destructor support is disabled as it is too expensive due to its extensive
@@ -321,8 +319,6 @@ void pthread_exit(void *value_ptr)
   }
 #endif
   __CPROVER_threads_exited[__CPROVER_thread_id]=1;
-  __CPROVER_threads_active[__CPROVER_thread_id] = 0;
-  __CPROVER_active_thread = __CPROVER_threads_active[__CPROVER_thread_id];
   __CPROVER_assume(0);
 #ifdef LIBRARY_CHECK
   __builtin_unreachable();
@@ -342,7 +338,6 @@ void pthread_exit(void *value_ptr)
 #endif
 
 __CPROVER_bool __CPROVER_threads_exited[__CPROVER_constant_infinity_uint];
-__CPROVER_bool __CPROVER_threads_active[__CPROVER_constant_infinity_uint];
 #ifndef LIBRARY_CHECK
 __CPROVER_thread_local unsigned long __CPROVER_thread_id = 0;
 #endif
@@ -362,7 +357,6 @@ __CPROVER_HIDE:;
   if((unsigned long)thread==__CPROVER_thread_id) return EDEADLK;
   if(value_ptr!=0) (void)**(char**)value_ptr;
   __CPROVER_assume(__CPROVER_threads_exited[(unsigned long)thread]);
-  __CPROVER_assume(!__CPROVER_threads_active[(unsigned long)thread]);
 
   return 0;
 }
@@ -551,8 +545,6 @@ int pthread_rwlock_wrlock(pthread_rwlock_t *lock)
 /* FUNCTION: __spawned_thread */
 
 __CPROVER_bool __CPROVER_threads_exited[__CPROVER_constant_infinity_uint];
-__CPROVER_bool __CPROVER_threads_active[__CPROVER_constant_infinity_uint];
-__CPROVER_bool __CPROVER_active_thread;
 #ifndef LIBRARY_CHECK
 __CPROVER_thread_local unsigned long __CPROVER_thread_id = 0;
 #endif
@@ -613,13 +605,9 @@ __CPROVER_HIDE:;
   }
 #endif
   __CPROVER_threads_exited[this_thread_id] = 1;
-  __CPROVER_threads_active[this_thread_id] = 0;
-  __CPROVER_active_thread = __CPROVER_threads_active[this_thread_id];
 }
 
 /* FUNCTION: pthread_create */
-__CPROVER_bool __CPROVER_threads_active[__CPROVER_constant_infinity_uint];
-__CPROVER_bool __CPROVER_active_thread;
 
 #ifndef __CPROVER_PTHREAD_H_INCLUDED
 #  include <pthread.h>
@@ -660,9 +648,6 @@ int pthread_create(
 
   // pthread_t is a pointer type on some systems
   *thread=(pthread_t)this_thread_id;
-
-  __CPROVER_threads_active[this_thread_id] = 1;
-  __CPROVER_active_thread = __CPROVER_threads_active[this_thread_id];
 
 #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_set_must(thread, "pthread-id");

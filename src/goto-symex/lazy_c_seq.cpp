@@ -23,6 +23,8 @@ void lazy_c_seqt::operator()(
   log.statistics() << "Adding LazyCSeq constraints with " << rounds << " rounds"
                    << messaget::eom;
 
+  handling_active_threads(equation, message_handler);
+
   collect_reads_and_writes(equation.SSA_steps, message_handler);
 
   create_write_constraints(equation, message_handler);
@@ -241,14 +243,18 @@ void lazy_c_seqt::create_cs_constraint(
 
           symbol_exprt exec = create_exec_symbol(write.label, round);
 
+          symbol_exprt enabled = create_enabled_symbol(write.label, round);
+
           symbol_exprt cs_curr =
             create_cs_symbol(write.s_it->source.thread_nr, round);
 
           symbol_exprt cs_prev =
             create_cs_symbol(write.s_it->source.thread_nr, round - 1);
 
+          std::string active_name =
+            "active_thread_T" + std::to_string(write.s_it->source.thread_nr);
           std::optional<symbol_exprt> active_thread =
-            previous_shared("__CPROVER_active_thread", write.label, round);
+            previous_shared(active_name, write.label, round);
           exprt active_thread_value = true_exprt{};
           if(active_thread.has_value())
           {
@@ -264,11 +270,20 @@ void lazy_c_seqt::create_cs_constraint(
             expr_2 = less_than_or_equal_exprt{cs_prev, label};
           }
           and_exprt expr_3{expr_1, expr_2};
-          and_exprt expr_4{active_thread_value, expr_3};
-          and_exprt expr_5{expr_4, write.s_it->guard};
+          equal_exprt enabled_expr{enabled, expr_3};
+          simplify(enabled_expr, ns);
+          log.warning() << format(enabled_expr) << messaget::eom;
+          equation.constraint(
+            enabled_expr, "cs constraint", write.s_it->source);
+
+          implies_exprt active_expr{enabled, active_thread_value};
+          simplify(active_expr, ns);
+          log.warning() << format(active_expr) << messaget::eom;
+          equation.constraint(active_expr, "cs constraint", write.s_it->source);
+
+          and_exprt expr_5{enabled, write.s_it->guard};
           equal_exprt constraint{exec, expr_5};
           simplify(constraint, ns);
-
           log.warning() << format(constraint) << messaget::eom;
           equation.constraint(constraint, "cs constraint", write.s_it->source);
         }
@@ -285,14 +300,18 @@ void lazy_c_seqt::create_cs_constraint(
 
           symbol_exprt exec = create_exec_symbol(read.label, round);
 
+          symbol_exprt enabled = create_enabled_symbol(read.label, round);
+
           symbol_exprt cs_curr =
             create_cs_symbol(read.s_it->source.thread_nr, round);
 
           symbol_exprt cs_prev =
             create_cs_symbol(read.s_it->source.thread_nr, round - 1);
 
+          std::string active_name =
+            "active_thread_T" + std::to_string(read.s_it->source.thread_nr);
           std::optional<symbol_exprt> active_thread =
-            previous_shared("__CPROVER_active_thread", read.label, round);
+            previous_shared(active_name, read.label, round);
           exprt active_thread_value = true_exprt{};
           if(active_thread.has_value())
           {
@@ -308,11 +327,19 @@ void lazy_c_seqt::create_cs_constraint(
             expr_2 = less_than_or_equal_exprt{cs_prev, label};
           }
           and_exprt expr_3{expr_1, expr_2};
-          and_exprt expr_4{active_thread_value, expr_3};
-          and_exprt expr_5{expr_4, read.s_it->guard};
+          equal_exprt enabled_expr{enabled, expr_3};
+          simplify(enabled_expr, ns);
+          log.warning() << format(enabled_expr) << messaget::eom;
+          equation.constraint(enabled_expr, "cs constraint", read.s_it->source);
+
+          implies_exprt active_expr{enabled, active_thread_value};
+          simplify(active_expr, ns);
+          log.warning() << format(active_expr) << messaget::eom;
+          equation.constraint(active_expr, "cs constraint", read.s_it->source);
+
+          and_exprt expr_5{enabled, read.s_it->guard};
           equal_exprt constraint{exec, expr_5};
           simplify(constraint, ns);
-
           log.warning() << format(constraint) << messaget::eom;
           equation.constraint(constraint, "cs constraint", read.s_it->source);
         }
@@ -452,11 +479,177 @@ void lazy_c_seqt::handling_guards(
   equation = temp_equation;
 }
 
+void lazy_c_seqt::handling_active_threads(
+  symex_target_equationt &equation,
+  message_handlert &message_handler)
+{
+  messaget log{message_handler};
+
+  log.warning() << "-------------------ACTIVE THREAD--------------------------"
+                << messaget::eom;
+
+  symex_target_equationt temp_equation{equation};
+  temp_equation.clear();
+
+  auto ssa_steps = equation.SSA_steps;
+
+  unsigned thread_current = 999;
+
+  for(symex_target_equationt::SSA_stepst::const_iterator s_it =
+        ssa_steps.begin();
+      s_it != ssa_steps.end();
+      s_it++)
+  {
+    exprt guard = s_it->guard;
+
+    if(s_it->source.thread_nr != thread_current)
+      thread_current = s_it->source.thread_nr;
+  }
+
+  exprt guard = true_exprt{};
+
+  for(unsigned thread = 0; thread <= thread_current; thread++)
+  {
+    create_active_thread_symbol(thread);
+    if(thread == 0)
+      create_active_thread_statements(
+        ssa_steps.begin()->source,
+        guard,
+        thread,
+        temp_equation,
+        message_handler,
+        true_exprt{});
+    else
+      create_active_thread_statements(
+        ssa_steps.begin()->source,
+        guard,
+        thread,
+        temp_equation,
+        message_handler,
+        false_exprt{});
+  }
+
+  unsigned thread_created = 1;
+  thread_current = 999;
+
+  for(symex_target_equationt::SSA_stepst::const_iterator s_it =
+        ssa_steps.begin();
+      s_it != ssa_steps.end();
+      s_it++)
+  {
+    guard = s_it->guard;
+
+    if(s_it->source.thread_nr != thread_current)
+      thread_current = s_it->source.thread_nr;
+
+    if(s_it->is_function_call() && s_it->called_function == "pthread_create")
+    {
+      create_active_thread_statements(
+        s_it->source,
+        guard,
+        thread_created,
+        temp_equation,
+        message_handler,
+        true_exprt{});
+
+      thread_created++;
+
+      SSA_stept step{equation.SSA_steps.front()};
+
+      equation.SSA_steps.pop_front();
+      temp_equation.SSA_steps.emplace_back(step);
+    }
+    else
+    {
+      if(
+        s_it->source.thread_nr != 0 && s_it->is_shared_write() &&
+        s_it->ssa_lhs.get_object_name() == "__CPROVER_threads_exited")
+      {
+        SSA_stept step{equation.SSA_steps.front()};
+
+        equation.SSA_steps.pop_front();
+        temp_equation.SSA_steps.emplace_back(step);
+
+        create_active_thread_statements(
+          s_it->source,
+          guard,
+          thread_current,
+          temp_equation,
+          message_handler,
+          false_exprt{});
+      }
+      else
+      {
+        if(
+          s_it->source.thread_nr == 0 && s_it->is_assignment() &&
+          s_it->ssa_lhs.get_object_name() == "return'")
+        {
+          SSA_stept step{equation.SSA_steps.front()};
+
+          equation.SSA_steps.pop_front();
+          temp_equation.SSA_steps.emplace_back(step);
+
+          create_active_thread_statements(
+            s_it->source,
+            guard,
+            thread_current,
+            temp_equation,
+            message_handler,
+            false_exprt{});
+        }
+        else
+        {
+          SSA_stept step{equation.SSA_steps.front()};
+
+          equation.SSA_steps.pop_front();
+          temp_equation.SSA_steps.emplace_back(step);
+        }
+      }
+    }
+  }
+  equation = temp_equation;
+}
+
+void lazy_c_seqt::create_active_thread_statements(
+  const symex_targett::sourcet &source,
+  exprt &guard,
+  unsigned &thread,
+  symex_target_equationt &equation,
+  message_handlert &message_handler,
+  const exprt &value)
+{
+  messaget log{message_handler};
+
+  SSA_stept event_step{source, goto_trace_stept::typet::SHARED_WRITE};
+  event_step.guard = guard;
+  ssa_exprt event_expr{active_threads_vector.at(thread).symbol};
+  event_expr.set_level_2(active_threads_vector.at(thread).l2);
+  event_step.ssa_lhs = event_expr;
+  equation.SSA_steps.emplace_back(event_step);
+  log.warning() << format(event_step.get_ssa_expr()) << messaget::eom;
+
+  SSA_stept active_step{source, goto_trace_stept::typet::ASSIGNMENT};
+  active_step.guard = guard;
+  ssa_exprt active_expr{active_threads_vector.at(thread).symbol};
+  active_expr.set_level_2(active_threads_vector.at(thread).l2);
+  active_threads_vector.at(thread).l2++;
+  active_step.ssa_lhs = active_expr;
+  active_step.ssa_rhs = value;
+  active_step.cond_expr = equal_exprt{active_step.ssa_lhs, active_step.ssa_rhs};
+  active_step.assignment_type =
+    symex_targett::assignment_typet::VISIBLE_ACTUAL_PARAMETER;
+  equation.SSA_steps.emplace_back(active_step);
+  log.warning() << format(active_step.get_ssa_expr()) << messaget::eom;
+}
+
 void lazy_c_seqt::collect_reads_and_writes(
   const symex_target_equationt::SSA_stepst &ssa_steps,
   message_handlert &message_handler)
 {
   messaget log{message_handler};
+
+  log.warning() << "-------------------COLLECTING--------------------------"
+                << messaget::eom;
 
   unsigned label = 1;
 
@@ -547,8 +740,17 @@ symbol_exprt lazy_c_seqt::create_lazy_symbol(
 symbol_exprt lazy_c_seqt::create_exec_symbol(unsigned label, size_t round)
 {
   irep_idt exec_name =
-    "E_L" + std::to_string(label) + "_R" + std::to_string(round);
+    "Ex_L" + std::to_string(label) + "_R" + std::to_string(round);
   symbol_exprt exec{exec_name, bool_typet{}};
+
+  return exec;
+}
+
+symbol_exprt lazy_c_seqt::create_enabled_symbol(unsigned label, size_t round)
+{
+  irep_idt enabled_name =
+    "En_L" + std::to_string(label) + "_R" + std::to_string(round);
+  symbol_exprt exec{enabled_name, bool_typet{}};
 
   return exec;
 }
@@ -569,4 +771,15 @@ symbol_exprt lazy_c_seqt::create_reach_symbol(unsigned label, size_t thread)
   symbol_exprt reach{reach_name, bool_typet{}};
 
   return reach;
+}
+
+symbol_exprt lazy_c_seqt::create_active_thread_symbol(unsigned thread)
+{
+  irep_idt active_thread_name = "active_thread_T" + std::to_string(thread);
+  symbol_exprt active_thread_expr{active_thread_name, bool_typet{}};
+
+  active_thread active_thread_struct{thread, 1, active_thread_expr};
+  active_threads_vector.emplace(thread, active_thread_struct);
+
+  return active_thread_expr;
 }
