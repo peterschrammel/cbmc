@@ -1,6 +1,6 @@
 CORE pthread
 main.c
---no-standard-checks --error-label ERROR --lazy-c-seq-rounds 3
+--no-standard-checks --error-label ERROR --lazy-c-seq-rounds 7
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
