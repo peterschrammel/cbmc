@@ -421,7 +421,7 @@ void lazy_c_seqt::handling_guards(
       shared_event previous_event = previous_events.front();
       previous_events.erase(previous_events.begin());
 
-      SSA_stept step = equation.SSA_steps.front();
+      SSA_stept step{equation.SSA_steps.front()};
       equation.SSA_steps.pop_front();
 
       if(previous_event.s_it != ssa_steps.begin())
@@ -443,7 +443,7 @@ void lazy_c_seqt::handling_guards(
     }
     else
     {
-      SSA_stept step = equation.SSA_steps.front();
+      SSA_stept step{equation.SSA_steps.front()};
 
       equation.SSA_steps.pop_front();
       temp_equation.SSA_steps.emplace_back(step);
