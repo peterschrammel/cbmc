@@ -370,7 +370,7 @@ void lazy_c_seqt::create_reach_constraint(
         symbol_exprt first_exec = create_exec_symbol(read.label, rounds);
 
         exprt previous_expr = first_exec;
-        exprt constraint;
+        exprt constraint = first_exec;
         for(std::size_t round = rounds - 1; round >= 1; --round)
         {
           symbol_exprt exec = create_exec_symbol(read.label, round);
@@ -399,7 +399,7 @@ void lazy_c_seqt::create_reach_constraint(
         symbol_exprt first_exec = create_exec_symbol(write.label, rounds);
 
         exprt previous_expr = first_exec;
-        exprt constraint;
+        exprt constraint = first_exec;
         for(std::size_t round = rounds - 1; round >= 1; --round)
         {
           symbol_exprt exec = create_exec_symbol(write.label, round);
