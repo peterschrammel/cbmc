@@ -1,0 +1,8 @@
+CORE
+main.c
+--lazy-c-seq-rounds 3 --no-standard-checks
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
