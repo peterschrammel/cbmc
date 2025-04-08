@@ -1,6 +1,6 @@
 CORE
 main.c
---lazy-c-seq-rounds 3
+--lazy-c-seq-rounds 1
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
