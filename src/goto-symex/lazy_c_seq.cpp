@@ -429,10 +429,11 @@ void lazy_c_seqt::handling_guards(
         symbol_exprt previous_reach = create_reach_symbol(
           previous_event.label, previous_event.s_it->source.thread_nr);
 
-        and_exprt new_guard{previous_reach, guard};
+        exprt new_guard = previous_reach;
         simplify(new_guard, ns);
         step.guard = new_guard;
-        exprt new_expr = implies_exprt{new_guard, s_it->cond_expr};
+        exprt new_cond = s_it->cond_expr;
+        exprt new_expr = implies_exprt{new_guard, new_cond};
         simplify(new_expr, ns);
         step.cond_expr = new_expr;
         log.warning() << format(step.get_ssa_expr()) << messaget::eom;
