@@ -92,6 +92,7 @@ private:
   void create_active_thread_statements(
     const symex_targett::sourcet &source,
     exprt &guard,
+    unsigned int atomic_section_id,
     unsigned &thread,
     symex_target_equationt &equation,
     message_handlert &message_handler,

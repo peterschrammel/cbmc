@@ -515,6 +515,7 @@ void lazy_c_seqt::handling_active_threads(
       create_active_thread_statements(
         ssa_steps.begin()->source,
         guard,
+        ssa_steps.begin()->atomic_section_id,
         thread,
         temp_equation,
         message_handler,
@@ -523,6 +524,7 @@ void lazy_c_seqt::handling_active_threads(
       create_active_thread_statements(
         ssa_steps.begin()->source,
         guard,
+        ssa_steps.begin()->atomic_section_id,
         thread,
         temp_equation,
         message_handler,
@@ -547,6 +549,7 @@ void lazy_c_seqt::handling_active_threads(
       create_active_thread_statements(
         s_it->source,
         guard,
+        s_it->atomic_section_id,
         thread_created,
         temp_equation,
         message_handler,
@@ -573,6 +576,7 @@ void lazy_c_seqt::handling_active_threads(
         create_active_thread_statements(
           s_it->source,
           guard,
+          s_it->atomic_section_id,
           thread_current,
           temp_equation,
           message_handler,
@@ -592,6 +596,7 @@ void lazy_c_seqt::handling_active_threads(
           create_active_thread_statements(
             s_it->source,
             guard,
+            s_it->atomic_section_id,
             thread_current,
             temp_equation,
             message_handler,
@@ -613,6 +618,7 @@ void lazy_c_seqt::handling_active_threads(
 void lazy_c_seqt::create_active_thread_statements(
   const symex_targett::sourcet &source,
   exprt &guard,
+  unsigned int atomic_section_id,
   unsigned &thread,
   symex_target_equationt &equation,
   message_handlert &message_handler,
@@ -625,6 +631,7 @@ void lazy_c_seqt::create_active_thread_statements(
   ssa_exprt event_expr{active_threads_vector.at(thread).symbol};
   event_expr.set_level_2(active_threads_vector.at(thread).l2);
   event_step.ssa_lhs = event_expr;
+  event_step.atomic_section_id = atomic_section_id;
   equation.SSA_steps.emplace_back(event_step);
   log.warning() << format(event_step.get_ssa_expr()) << messaget::eom;
 
@@ -638,6 +645,7 @@ void lazy_c_seqt::create_active_thread_statements(
   active_step.cond_expr = equal_exprt{active_step.ssa_lhs, active_step.ssa_rhs};
   active_step.assignment_type =
     symex_targett::assignment_typet::VISIBLE_ACTUAL_PARAMETER;
+  active_step.atomic_section_id = atomic_section_id;
   equation.SSA_steps.emplace_back(active_step);
   log.warning() << format(active_step.get_ssa_expr()) << messaget::eom;
 }
