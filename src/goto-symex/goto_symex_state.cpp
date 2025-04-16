@@ -415,7 +415,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
     const auto a_s_writes = written_in_atomic_section.find(ssa_l1);
     if(a_s_writes!=written_in_atomic_section.end())
     {
-      for(const auto &guard_in_list : a_s_writes->second)
+      for(const auto &guard_in_list : a_s_writes->second.first)
       {
         guardt g = guard_in_list;
         g-=guard;
@@ -436,7 +436,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
     // all branches flowing into this read
     guardt read_guard{false_exprt{}, guard_manager};
 
-    a_s_r_entryt &a_s_read=read_in_atomic_section[ssa_l1];
+    a_s_r_entryt &a_s_read = read_in_atomic_section[ssa_l1].first;
     for(const auto &a_s_read_guard : a_s_read.second)
     {
       guardt g = a_s_read_guard; // copy
@@ -557,7 +557,7 @@ bool goto_symex_statet::l2_thread_write_encoding(
     return false;
   case write_is_shared_resultt::IN_ATOMIC_SECTION:
   {
-    written_in_atomic_section[remove_level_2(expr)].push_back(guard);
+    written_in_atomic_section[remove_level_2(expr)].first.push_back(guard);
     return false;
   }
   case write_is_shared_resultt::SHARED:

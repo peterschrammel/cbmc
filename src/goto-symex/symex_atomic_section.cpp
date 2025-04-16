@@ -48,13 +48,14 @@ void goto_symext::symex_atomic_end(statet &state)
   for(const auto &pair : state.read_in_atomic_section)
   {
     ssa_exprt r = pair.first;
-    r.set_level_2(pair.second.first);
+    r.set_level_2(pair.second.first.first);
 
     // guard is the disjunction over reads
-    PRECONDITION(!pair.second.second.empty());
-    guardt read_guard(pair.second.second.front());
-    for(std::list<guardt>::const_iterator it = ++(pair.second.second.begin());
-        it != pair.second.second.end();
+    PRECONDITION(!pair.second.first.second.empty());
+    guardt read_guard(pair.second.first.second.front());
+    for(std::list<guardt>::const_iterator it =
+          ++(pair.second.first.second.begin());
+        it != pair.second.first.second.end();
         ++it)
       read_guard|=*it;
     exprt read_guard_expr=read_guard.as_expr();
@@ -73,10 +74,10 @@ void goto_symext::symex_atomic_end(statet &state)
     w.set_level_2(state.get_level2().latest_index(w.get_identifier()));
 
     // guard is the disjunction over writes
-    PRECONDITION(!pair.second.empty());
-    guardt write_guard(pair.second.front());
-    for(std::list<guardt>::const_iterator it = ++(pair.second.begin());
-        it != pair.second.end();
+    PRECONDITION(!pair.second.first.empty());
+    guardt write_guard(pair.second.first.front());
+    for(std::list<guardt>::const_iterator it = ++(pair.second.first.begin());
+        it != pair.second.first.end();
         ++it)
       write_guard|=*it;
     exprt write_guard_expr=write_guard.as_expr();
