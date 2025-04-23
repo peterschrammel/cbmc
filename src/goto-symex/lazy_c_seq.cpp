@@ -33,6 +33,8 @@ void lazy_c_seqt::operator()(
 
   create_cs_constraint(equation, message_handler);
 
+  handling_atomic_sections(equation, message_handler);
+
   create_reach_constraint(equation, message_handler);
 
   handling_guards(equation, message_handler);
@@ -477,6 +479,62 @@ void lazy_c_seqt::handling_guards(
     }
   }
   equation = temp_equation;
+}
+
+void lazy_c_seqt::handling_atomic_sections(
+  symex_target_equationt &equation,
+  message_handlert &message_handler)
+{
+  messaget log{message_handler};
+
+  log.warning()
+    << "-------------------ATOMIC SECTIONS--------------------------"
+    << messaget::eom;
+
+  for(auto global_variable : global_variables)
+  {
+    if(reads.count(global_variable) != 0)
+    {
+      for(auto read : reads.at(global_variable))
+      {
+        if(read.s_it->atomic_section_id > 0)
+        {
+          for(std::size_t round = 1; round < rounds; round++)
+          {
+            symbol_exprt cs =
+              create_cs_symbol(read.s_it->source.thread_nr, round);
+            notequal_exprt constraint{
+              cs, from_integer(read.label, unsignedbv_typet{8})};
+
+            log.warning() << format(constraint) << messaget::eom;
+            equation.constraint(
+              constraint, "atomic constraint", read.s_it->source);
+          }
+        }
+      }
+    }
+
+    if(reads.count(global_variable) != 0)
+    {
+      for(auto write : writes.at(global_variable))
+      {
+        if(write.s_it->atomic_section_id > 0)
+        {
+          for(std::size_t round = 1; round < rounds; round++)
+          {
+            symbol_exprt cs =
+              create_cs_symbol(write.s_it->source.thread_nr, round);
+            notequal_exprt constraint{
+              cs, from_integer(write.label, unsignedbv_typet{8})};
+
+            log.warning() << format(constraint) << messaget::eom;
+            equation.constraint(
+              constraint, "atomic constraint", write.s_it->source);
+          }
+        }
+      }
+    }
+  }
 }
 
 void lazy_c_seqt::handling_active_threads(

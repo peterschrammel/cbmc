@@ -49,6 +49,10 @@ private:
     symex_target_equationt &equation,
     message_handlert &message_handler);
 
+  void handling_atomic_sections(
+    symex_target_equationt &equation,
+    message_handlert &message_handler);
+
   void collect_reads_and_writes(
     const symex_target_equationt::SSA_stepst &ssa_steps,
     message_handlert &message_handler);

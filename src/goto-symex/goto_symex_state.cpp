@@ -497,6 +497,29 @@ bool goto_symex_statet::l2_thread_read_encoding(
     if(!no_write.op().is_false())
       a_s_read.second.back().add(no_write);
 
+    INVARIANT_STRUCTURED(
+      symex_target != nullptr, nullptr_exceptiont, "symex_target is null");
+    if(can_cast_expr<ssa_exprt>(tmp))
+    {
+      symex_target->shared_read(
+        guard_as_expr, to_ssa_expr(tmp), atomic_section_id, source);
+    }
+    /*else //TODO: check if we need something like this
+    {
+      symbol_exprt new_symbol_exprt{tmp.type()};
+      ssa_exprt new_ssa_expr{new_symbol_exprt};
+      new_ssa_expr = assignment(new_ssa_expr, tmp, ns, true, true);
+
+      symex_target->assignment(
+        guard_as_expr,
+        new_ssa_expr,
+        new_ssa_expr,
+        new_ssa_expr.get_original_expr(),
+        tmp,
+        source,
+        symex_targett::assignment_typet::PHI);
+    }*/
+
     return true;
   }
 
@@ -558,7 +581,7 @@ bool goto_symex_statet::l2_thread_write_encoding(
   case write_is_shared_resultt::IN_ATOMIC_SECTION:
   {
     written_in_atomic_section[remove_level_2(expr)].first.push_back(guard);
-    return false;
+    break;
   }
   case write_is_shared_resultt::SHARED:
     break;
