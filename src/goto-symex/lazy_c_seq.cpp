@@ -514,7 +514,7 @@ void lazy_c_seqt::handling_atomic_sections(
       }
     }
 
-    if(reads.count(global_variable) != 0)
+    if(writes.count(global_variable) != 0)
     {
       for(auto write : writes.at(global_variable))
       {
