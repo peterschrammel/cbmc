@@ -499,7 +499,7 @@ void lazy_c_seqt::handling_atomic_sections(
       {
         if(read.s_it->atomic_section_id > 0)
         {
-          for(std::size_t round = 1; round < rounds; round++)
+          for(std::size_t round = 1; round <= rounds; round++)
           {
             symbol_exprt cs =
               create_cs_symbol(read.s_it->source.thread_nr, round);
@@ -520,7 +520,7 @@ void lazy_c_seqt::handling_atomic_sections(
       {
         if(write.s_it->atomic_section_id > 0)
         {
-          for(std::size_t round = 1; round < rounds; round++)
+          for(std::size_t round = 1; round <= rounds; round++)
           {
             symbol_exprt cs =
               create_cs_symbol(write.s_it->source.thread_nr, round);
