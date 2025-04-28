@@ -477,6 +477,13 @@ bool goto_symex_statet::l2_thread_read_encoding(
     else
       tmp = if_exprt{cond.as_expr(), l2_true_case, l2_false_case.get()};
 
+    INVARIANT_STRUCTURED(
+      symex_target != nullptr, nullptr_exceptiont, "symex_target is null");
+    ssa_exprt r = ssa_l1;
+    r.set_level_2(a_s_read.first);
+    symex_target->shared_read(
+      guard_as_expr, r, atomic_section_id, source);
+
     record_events.push(false);
     ssa_exprt ssa_l2 = assignment(std::move(ssa_l1), tmp, ns, true, true).get();
     record_events.pop();
@@ -496,29 +503,6 @@ bool goto_symex_statet::l2_thread_read_encoding(
     a_s_read.second.push_back(guard);
     if(!no_write.op().is_false())
       a_s_read.second.back().add(no_write);
-
-    INVARIANT_STRUCTURED(
-      symex_target != nullptr, nullptr_exceptiont, "symex_target is null");
-    if(can_cast_expr<ssa_exprt>(tmp))
-    {
-      symex_target->shared_read(
-        guard_as_expr, to_ssa_expr(tmp), atomic_section_id, source);
-    }
-    /*else //TODO: check if we need something like this
-    {
-      symbol_exprt new_symbol_exprt{tmp.type()};
-      ssa_exprt new_ssa_expr{new_symbol_exprt};
-      new_ssa_expr = assignment(new_ssa_expr, tmp, ns, true, true);
-
-      symex_target->assignment(
-        guard_as_expr,
-        new_ssa_expr,
-        new_ssa_expr,
-        new_ssa_expr.get_original_expr(),
-        tmp,
-        source,
-        symex_targett::assignment_typet::PHI);
-    }*/
 
     return true;
   }
