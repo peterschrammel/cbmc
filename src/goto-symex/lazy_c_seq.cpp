@@ -702,7 +702,7 @@ void lazy_c_seqt::create_active_thread_statements(
   active_step.ssa_rhs = value;
   active_step.cond_expr = equal_exprt{active_step.ssa_lhs, active_step.ssa_rhs};
   active_step.assignment_type =
-    symex_targett::assignment_typet::VISIBLE_ACTUAL_PARAMETER;
+    symex_targett::assignment_typet::VISIBLE_ACTUAL_PARAMETER; //TODO: check
   active_step.atomic_section_id = atomic_section_id;
   equation.SSA_steps.emplace_back(active_step);
   log.warning() << format(active_step.get_ssa_expr()) << messaget::eom;
