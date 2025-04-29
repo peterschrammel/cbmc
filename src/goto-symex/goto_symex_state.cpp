@@ -565,7 +565,12 @@ bool goto_symex_statet::l2_thread_write_encoding(
   case write_is_shared_resultt::IN_ATOMIC_SECTION:
   {
     written_in_atomic_section[remove_level_2(expr)].first.push_back(guard);
-    break;
+    symex_target->shared_write(
+      guard.as_expr(),
+      expr,
+      atomic_section_id,
+      source);
+    return false;
   }
   case write_is_shared_resultt::SHARED:
     break;
