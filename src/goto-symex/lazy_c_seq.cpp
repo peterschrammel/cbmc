@@ -194,6 +194,7 @@ void lazy_c_seqt::create_cs_constraint(
     }
     unsigned max_num = max_read > max_write ? max_read + 1 : max_write + 1;
     unsigned min_num = min_read < min_write ? min_read : min_write;
+
     for(size_t round = 1; round <= rounds; ++round)
     {
       symbol_exprt cs = create_cs_symbol(thread, round);
@@ -201,7 +202,7 @@ void lazy_c_seqt::create_cs_constraint(
       if(round == 1)
       {
         exprt min{from_integer(
-          {min_num}, unsignedbv_typet{8})}; //TODO: check corretness
+          {min_num}, unsignedbv_typet{n_bit})}; //TODO: check corretness
         less_than_or_equal_exprt constraint{min, cs};
         log.warning() << format(constraint) << messaget::eom;
         equation.constraint(
@@ -221,7 +222,7 @@ void lazy_c_seqt::create_cs_constraint(
       if(round == rounds)
       {
         exprt max{from_integer(
-          {max_num}, unsignedbv_typet{8})}; //TODO: check corretness
+          {max_num}, unsignedbv_typet{n_bit})}; //TODO: check corretness
         less_than_or_equal_exprt last_constraint{cs, max};
         log.warning() << format(last_constraint) << messaget::eom;
         equation.constraint(
@@ -241,7 +242,7 @@ void lazy_c_seqt::create_cs_constraint(
         for(size_t round = 1; round <= rounds; ++round)
         {
           unsigned label_int = write.label;
-          exprt label{from_integer({label_int}, unsignedbv_typet{8})};
+          exprt label{from_integer({label_int}, unsignedbv_typet{n_bit})};
 
           symbol_exprt exec = create_exec_symbol(write.label, round);
 
@@ -298,7 +299,7 @@ void lazy_c_seqt::create_cs_constraint(
         for(size_t round = 1; round <= rounds; ++round)
         {
           unsigned label_int = read.label;
-          exprt label{from_integer({label_int}, unsignedbv_typet{8})};
+          exprt label{from_integer({label_int}, unsignedbv_typet{n_bit})};
 
           symbol_exprt exec = create_exec_symbol(read.label, round);
 
@@ -504,7 +505,7 @@ void lazy_c_seqt::handling_atomic_sections(
             symbol_exprt cs =
               create_cs_symbol(read.s_it->source.thread_nr, round);
             notequal_exprt constraint{
-              cs, from_integer(read.label, unsignedbv_typet{8})};
+              cs, from_integer(read.label, unsignedbv_typet{n_bit})};
 
             log.warning() << format(constraint) << messaget::eom;
             equation.constraint(
@@ -525,7 +526,7 @@ void lazy_c_seqt::handling_atomic_sections(
             symbol_exprt cs =
               create_cs_symbol(write.s_it->source.thread_nr, round);
             notequal_exprt constraint{
-              cs, from_integer(write.label, unsignedbv_typet{8})};
+              cs, from_integer(write.label, unsignedbv_typet{n_bit})};
 
             log.warning() << format(constraint) << messaget::eom;
             equation.constraint(
@@ -741,6 +742,7 @@ void lazy_c_seqt::collect_reads_and_writes(
       {
         shared_event shared_event{s_it, label};
         label++;
+        n_bit = 0 ? 0 : 32 - __builtin_clz(label);
         previous_event = shared_event;
 
         log.warning()
@@ -767,6 +769,7 @@ void lazy_c_seqt::collect_reads_and_writes(
       {
         shared_event shared_event{s_it, label};
         label++;
+        n_bit = 0 ? 0 : 32 - __builtin_clz(label);
         previous_event = shared_event;
 
         log.warning()
@@ -825,7 +828,7 @@ symbol_exprt lazy_c_seqt::create_cs_symbol(size_t thread, size_t round)
 {
   irep_idt cs_name =
     "cs_T" + std::to_string(thread) + "_R" + std::to_string(round);
-  symbol_exprt cs{cs_name, unsignedbv_typet{8}};
+  symbol_exprt cs{cs_name, unsignedbv_typet{n_bit}};
 
   return cs;
 }

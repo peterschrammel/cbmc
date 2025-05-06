@@ -45,6 +45,8 @@ private:
   std::unordered_map<unsigned, active_thread> active_threads_vector;
   std::vector<shared_event> previous_events;
 
+  unsigned n_bit;
+
   void handling_active_threads(
     symex_target_equationt &equation,
     message_handlert &message_handler);
