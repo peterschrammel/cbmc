@@ -202,7 +202,7 @@ void lazy_c_seqt::create_cs_constraint(
       if(round == 1)
       {
         exprt min{from_integer(
-          {min_num}, unsignedbv_typet{n_bit})}; //TODO: check corretness
+          {min_num-1}, unsignedbv_typet{n_bit})}; //TODO: check corretness
         less_than_or_equal_exprt constraint{min, cs};
         log.warning() << format(constraint) << messaget::eom;
         equation.constraint(
@@ -222,7 +222,7 @@ void lazy_c_seqt::create_cs_constraint(
       if(round == rounds)
       {
         exprt max{from_integer(
-          {max_num}, unsignedbv_typet{n_bit})}; //TODO: check corretness
+          {max_num+1}, unsignedbv_typet{n_bit})}; //TODO: check corretness
         less_than_or_equal_exprt last_constraint{cs, max};
         log.warning() << format(last_constraint) << messaget::eom;
         equation.constraint(
