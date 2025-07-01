@@ -743,6 +743,7 @@ void lazy_c_seqt::collect_reads_and_writes(
         shared_event shared_event{s_it, label};
         label++;
         n_bit = 0 ? 0 : 32 - __builtin_clz(label);
+        n_bit++;
         previous_event = shared_event;
 
         log.warning()
@@ -770,6 +771,7 @@ void lazy_c_seqt::collect_reads_and_writes(
         shared_event shared_event{s_it, label};
         label++;
         n_bit = 0 ? 0 : 32 - __builtin_clz(label);
+        n_bit++;
         previous_event = shared_event;
 
         log.warning()
