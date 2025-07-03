@@ -457,10 +457,15 @@ void lazy_c_seqt::handling_guards(
 
       if(previous_event.s_it != ssa_steps.begin())
       {
-        symbol_exprt previous_reach = create_reach_symbol(
-          previous_event.label, previous_event.s_it->source.thread_nr);
+        exprt previous_enabled = false_exprt{};
+        for(std::size_t round = 1; round <= rounds; round++)
+        {
+          previous_enabled = or_exprt{
+            previous_enabled,
+            create_enabled_symbol(previous_event.label, round)};
+        }
 
-        exprt new_guard = previous_reach;
+        exprt new_guard = and_exprt{previous_enabled, s_it->guard};
         simplify(new_guard, ns);
         step.guard = new_guard;
         exprt new_cond = s_it->cond_expr;
