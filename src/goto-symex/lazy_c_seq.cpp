@@ -210,15 +210,16 @@ void lazy_c_seqt::create_cs_constraint(
           "cs constraint",
           equation.SSA_steps.begin()->source); //TODO: check source
         previous = cs;
-        continue;
       }
-      less_than_or_equal_exprt constraint{previous, cs};
-      log.warning() << format(constraint) << messaget::eom;
-      equation.constraint(
-        constraint,
-        "cs constraint",
-        equation.SSA_steps.begin()->source); //TODO: check source
-      previous = cs;
+      else {
+        less_than_or_equal_exprt constraint{previous, cs};
+        log.warning() << format(constraint) << messaget::eom;
+        equation.constraint(
+          constraint,
+          "cs constraint",
+          equation.SSA_steps.begin()->source); //TODO: check source
+        previous = cs;
+      }
       if(round == rounds)
       {
         exprt max{from_integer(
