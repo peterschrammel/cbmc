@@ -45,7 +45,7 @@ private:
   std::unordered_map<unsigned, active_thread> active_threads_vector;
   std::vector<shared_event> previous_events;
   std::vector<std::pair<std::size_t, std::size_t>> atomic_sections;
-  std::unordered_map<std::size_t, std::size_t> thread_labels_map;
+  std::unordered_map<std::size_t, std::size_t> label_to_thread;
 
   unsigned n_bit;
 

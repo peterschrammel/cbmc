@@ -506,7 +506,7 @@ void lazy_c_seqt::handling_atomic_sections(
     {
       for(std::size_t round = 1; round <= rounds; round++)
       {
-        symbol_exprt cs = create_cs_symbol(thread_labels_map.at(at), round);
+        symbol_exprt cs = create_cs_symbol(label_to_thread.at(at), round);
         notequal_exprt constraint{
           cs, from_integer(at, unsignedbv_typet{n_bit})};
 
@@ -730,8 +730,8 @@ void lazy_c_seqt::collect_reads_and_writes(
       // TODO: this may be too restrictive
       if(can_cast_expr<symbol_exprt>(s_it->ssa_lhs))
       {
-        thread_labels_map[label] = s_it->source.thread_nr;
-        thread_labels_map[label + 1] = s_it->source.thread_nr;
+        label_to_thread[label] = s_it->source.thread_nr;
+        label_to_thread[label + 1] = s_it->source.thread_nr;
         shared_event shared_event{s_it, label};
         label += 2;
         n_bit = 0 ? 0 : 32 - __builtin_clz(label);
@@ -760,8 +760,8 @@ void lazy_c_seqt::collect_reads_and_writes(
       // TODO: this may be too restrictive
       if(can_cast_expr<symbol_exprt>(s_it->ssa_lhs))
       {
-        thread_labels_map[label] = s_it->source.thread_nr;
-        thread_labels_map[label + 1] = s_it->source.thread_nr;
+        label_to_thread[label] = s_it->source.thread_nr;
+        label_to_thread[label + 1] = s_it->source.thread_nr;
         shared_event shared_event{s_it, label};
         label += 2;
         n_bit = 0 ? 0 : 32 - __builtin_clz(label);
