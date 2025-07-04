@@ -371,18 +371,16 @@ void lazy_c_seqt::create_reach_constraint(
     {
       for(auto &read : this->reads.at(global_variable))
       {
-        symbol_exprt first_exec = create_exec_symbol(read.label, rounds);
+        exprt constraint = false_exprt{};
 
-        exprt previous_expr = first_exec;
-        exprt constraint = first_exec;
-        for(std::size_t round = rounds - 1; round >= 1; --round)
+        for(std::size_t round = 1; round <= rounds; round++)
         {
-          symbol_exprt exec = create_exec_symbol(read.label, round);
+          symbol_exprt enabled = create_enabled_symbol(read.label, round);
 
-          or_exprt temp_constraint{exec, previous_expr};
-          constraint = temp_constraint;
-          previous_expr = constraint;
+          constraint = or_exprt{constraint, enabled};
         }
+
+        simplify(constraint, ns);
 
         symbol_exprt reach =
           create_reach_symbol(read.label, read.s_it->source.thread_nr);
@@ -400,18 +398,15 @@ void lazy_c_seqt::create_reach_constraint(
     {
       for(auto &write : this->writes.at(global_variable))
       {
-        symbol_exprt first_exec = create_exec_symbol(write.label, rounds);
+        exprt constraint = false_exprt{};
 
-        exprt previous_expr = first_exec;
-        exprt constraint = first_exec;
-        for(std::size_t round = rounds - 1; round >= 1; --round)
+        for(std::size_t round = 1; round <= rounds; round++)
         {
-          symbol_exprt exec = create_exec_symbol(write.label, round);
+          symbol_exprt enabled = create_enabled_symbol(write.label, round);
 
-          or_exprt temp_constraint{exec, previous_expr};
-          constraint = temp_constraint;
-          previous_expr = constraint;
+          constraint = or_exprt{constraint, enabled};
         }
+
         symbol_exprt reach =
           create_reach_symbol(write.label, write.s_it->source.thread_nr);
         events[write.s_it->source.thread_nr].emplace_back(reach);
@@ -457,15 +452,10 @@ void lazy_c_seqt::handling_guards(
 
       if(previous_event.s_it != ssa_steps.begin())
       {
-        exprt previous_enabled = false_exprt{};
-        for(std::size_t round = 1; round <= rounds; round++)
-        {
-          previous_enabled = or_exprt{
-            previous_enabled,
-            create_enabled_symbol(previous_event.label, round)};
-        }
+        symbol_exprt reach = create_reach_symbol(
+          previous_event.label, previous_event.s_it->source.thread_nr);
 
-        exprt new_guard = and_exprt{previous_enabled, s_it->guard};
+        exprt new_guard = and_exprt{reach, s_it->guard};
         simplify(new_guard, ns);
         step.guard = new_guard;
         exprt new_cond = s_it->cond_expr;
