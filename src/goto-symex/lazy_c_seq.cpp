@@ -498,47 +498,21 @@ void lazy_c_seqt::handling_atomic_sections(
     << "-------------------ATOMIC SECTIONS--------------------------"
     << messaget::eom;
 
-  for(auto global_variable : global_variables)
+  for(auto atomic_section : atomic_sections)
   {
-    if(reads.count(global_variable) != 0)
+    log.warning() << "atomic section: L" << atomic_section.first << " : L"
+                  << atomic_section.second << messaget::eom;
+    for(size_t at = atomic_section.first; at <= atomic_section.second; at++)
     {
-      for(auto read : reads.at(global_variable))
+      for(std::size_t round = 1; round <= rounds; round++)
       {
-        if(read.s_it->atomic_section_id > 0)
-        {
-          for(std::size_t round = 1; round <= rounds; round++)
-          {
-            symbol_exprt cs =
-              create_cs_symbol(read.s_it->source.thread_nr, round);
-            notequal_exprt constraint{
-              cs, from_integer(read.label, unsignedbv_typet{n_bit})};
+        symbol_exprt cs = create_cs_symbol(thread_labels_map.at(at), round);
+        notequal_exprt constraint{
+          cs, from_integer(at, unsignedbv_typet{n_bit})};
 
-            log.warning() << format(constraint) << messaget::eom;
-            equation.constraint(
-              constraint, "atomic constraint", read.s_it->source);
-          }
-        }
-      }
-    }
-
-    if(writes.count(global_variable) != 0)
-    {
-      for(auto write : writes.at(global_variable))
-      {
-        if(write.s_it->atomic_section_id > 0)
-        {
-          for(std::size_t round = 1; round <= rounds; round++)
-          {
-            symbol_exprt cs =
-              create_cs_symbol(write.s_it->source.thread_nr, round);
-            notequal_exprt constraint{
-              cs, from_integer(write.label, unsignedbv_typet{n_bit})};
-
-            log.warning() << format(constraint) << messaget::eom;
-            equation.constraint(
-              constraint, "atomic constraint", write.s_it->source);
-          }
-        }
+        log.warning() << format(constraint) << messaget::eom;
+        equation.constraint(
+          constraint, "atomic constraint", equation.SSA_steps.begin()->source);
       }
     }
   }
@@ -741,13 +715,25 @@ void lazy_c_seqt::collect_reads_and_writes(
       previous_events.emplace_back(previous_event);
     }
 
+    if(s_it->is_atomic_begin())
+    {
+      atomic_sections.emplace_back(label, NULL);
+    }
+
+    if(s_it->is_atomic_end())
+    {
+      atomic_sections.back().second = label - 2;
+    }
+
     if(s_it->is_shared_write())
     {
       // TODO: this may be too restrictive
       if(can_cast_expr<symbol_exprt>(s_it->ssa_lhs))
       {
+        thread_labels_map[label] = s_it->source.thread_nr;
+        thread_labels_map[label + 1] = s_it->source.thread_nr;
         shared_event shared_event{s_it, label};
-        label++;
+        label += 2;
         n_bit = 0 ? 0 : 32 - __builtin_clz(label);
         n_bit++;
         previous_event = shared_event;
@@ -774,8 +760,10 @@ void lazy_c_seqt::collect_reads_and_writes(
       // TODO: this may be too restrictive
       if(can_cast_expr<symbol_exprt>(s_it->ssa_lhs))
       {
+        thread_labels_map[label] = s_it->source.thread_nr;
+        thread_labels_map[label + 1] = s_it->source.thread_nr;
         shared_event shared_event{s_it, label};
-        label++;
+        label += 2;
         n_bit = 0 ? 0 : 32 - __builtin_clz(label);
         n_bit++;
         previous_event = shared_event;
