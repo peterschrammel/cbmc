@@ -50,7 +50,8 @@ symex_configt::symex_configt(const optionst &options)
       options.get_signed_int_option("symex-complexity-limit") > 0),
     cache_dereferences{
       options.get_bool_option("symex-cache-dereferences")},
-    lazy_c_seq_rounds(options.get_unsigned_int_option("lazy-c-seq-rounds"))
+    lazy_c_seq_rounds(options.get_unsigned_int_option("lazy-c-seq-rounds")),
+    check_rounds(options.is_set("check-rounds"))
 {
 }
 

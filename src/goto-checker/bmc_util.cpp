@@ -331,7 +331,7 @@ void postprocess_equation(
   {
     if(options.get_unsigned_int_option("lazy-c-seq-rounds") > 0)
     {
-      lazy_c_seqt(ns, options.get_unsigned_int_option("lazy-c-seq-rounds"))(
+      lazy_c_seqt(ns, options.get_unsigned_int_option("lazy-c-seq-rounds"), options.is_set("check-rounds"))(
         equation, ui_message_handler);
     }
     else

@@ -64,6 +64,9 @@ struct symex_configt final
   /// Number of rounds for the LazyCSeq context-bounded concurrency encoding
   std::size_t lazy_c_seq_rounds;
 
+  /// When LazyCSeq concurrency encoding is enabled, check that the number of rounds is enough to detect bugs
+  bool check_rounds;
+
   /// \brief Construct a symex_configt using options specified in an
   /// \ref optionst
   explicit symex_configt(const optionst &options);

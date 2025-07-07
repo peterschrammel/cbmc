@@ -186,6 +186,7 @@ void run_property_decider(
   "(max-field-sensitivity-array-size):"                                        \
   "(no-array-field-sensitivity)"                                               \
   "(lazy-c-seq-rounds):"                                                       \
+  "(check-rounds)"                                                             \
   "(graphml-witness):"                                                         \
   "(symex-complexity-limit):"                                                  \
   "(symex-complexity-failed-child-loops-limit):"                               \
@@ -213,6 +214,9 @@ void run_property_decider(
   "the maximum field sensitivity size for arrays to 0\n" HELP_UNWINDSET        \
   " {y--lazy-c-seq-rounds} {unr} \t "                                          \
   "activate LazyCSeq concurrency encoding with {unr} rounds\n"                 \
+  " {y--check-rounds} \t "                                                     \
+  "when LazyCSeq concurrency encoding is enabled, check that the number of "   \
+  "rounds is enough to detect bugs \n"                                         \
   " {y--incremental-loop} {uL} \t "                                            \
   "check properties after each unwinding of loop {uL} (use {y--show-loops} "   \
   "to get the loop IDs)\n"                                                     \

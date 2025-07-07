@@ -362,6 +362,11 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
                   << messaget::eom;
   }
 
+  if(cmdline.isset("check-rounds"))
+  {
+    options.set_option("check-rounds", true);
+  }
+
   if(cmdline.isset("slice-by-trace"))
   {
     log.error() << "--slice-by-trace has been removed" << messaget::eom;
