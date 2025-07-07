@@ -47,6 +47,7 @@ private:
   std::vector<shared_event> previous_events;
   std::vector<std::pair<std::size_t, std::size_t>> atomic_sections;
   std::unordered_map<std::size_t, std::size_t> label_to_thread;
+  std::vector<symbol_exprt> reach_events;
 
   unsigned n_bit;
 

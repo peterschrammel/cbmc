@@ -409,6 +409,7 @@ void lazy_c_seqt::create_reach_constraint(
 
         symbol_exprt reach =
           create_reach_symbol(write.label, write.s_it->source.thread_nr);
+        reach_events.emplace_back(reach);
         events[write.s_it->source.thread_nr].emplace_back(reach);
 
         equal_exprt final_constraint{reach, constraint};
@@ -432,6 +433,8 @@ void lazy_c_seqt::handling_guards(
 
   symex_target_equationt temp_equation{equation};
   temp_equation.clear();
+
+  size_t check_rounds_assertions = 1;
 
   auto ssa_steps = equation.SSA_steps;
 
@@ -460,6 +463,33 @@ void lazy_c_seqt::handling_guards(
         step.guard = new_guard;
         exprt new_cond = s_it->cond_expr;
         exprt new_expr = implies_exprt{new_guard, new_cond};
+
+        if(check_rounds)
+        {
+          exprt check_rounds = true_exprt{};
+          for(const auto &reach_event : reach_events)
+          {
+            check_rounds = and_exprt{check_rounds, reach_event};
+          }
+          exprt check_rounds_guard = and_exprt{
+            check_rounds,
+            and_exprt{
+              s_it->guard, s_it->cond_expr}}; //TODO: we can remove cond_expr?
+          simplify(check_rounds_guard, ns);
+          exprt check_rounds_cond =
+            implies_exprt{check_rounds_guard, false_exprt{}};
+          simplify(check_rounds_cond, ns);
+          irep_idt check_rounds_property_id =
+            "check_rounds." + std::to_string(check_rounds_assertions);
+          temp_equation.assertion(
+            check_rounds_guard,
+            check_rounds_cond,
+            check_rounds_property_id,
+            "false = enough num of rounds",
+            equation.SSA_steps.begin()->source);
+          check_rounds_assertions++;
+        }
+
         simplify(new_expr, ns);
         step.cond_expr = new_expr;
         log.warning() << format(step.get_ssa_expr()) << messaget::eom;
