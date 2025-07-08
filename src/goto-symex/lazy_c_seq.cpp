@@ -39,8 +39,6 @@ void lazy_c_seqt::operator()(
 
   handling_guards(equation, message_handler);
 
-  exprt tmp;
-  simplify(tmp, ns);
 }
 
 void lazy_c_seqt::create_write_constraints(
@@ -361,10 +359,6 @@ void lazy_c_seqt::create_reach_constraint(
   log.warning() << "-------------------REACH--------------------------"
                 << messaget::eom;
 
-  std::unordered_map<
-    unsigned,
-    std::vector<exprt>> events;
-
   for(auto global_variable : global_variables)
   {
     if(this->reads.count(global_variable) != 0)
@@ -384,7 +378,6 @@ void lazy_c_seqt::create_reach_constraint(
 
         symbol_exprt reach =
           create_reach_symbol(read.label, read.s_it->source.thread_nr);
-        events[read.s_it->source.thread_nr].emplace_back(reach);
 
         equal_exprt final_constraint{reach, constraint};
         simplify(final_constraint, ns);
@@ -409,7 +402,6 @@ void lazy_c_seqt::create_reach_constraint(
 
         symbol_exprt reach =
           create_reach_symbol(write.label, write.s_it->source.thread_nr);
-        events[write.s_it->source.thread_nr].emplace_back(reach);
 
         equal_exprt final_constraint{reach, constraint};
         simplify(final_constraint, ns);
