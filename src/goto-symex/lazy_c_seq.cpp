@@ -200,13 +200,13 @@ void lazy_c_seqt::create_cs_constraint(
       if(round == 1)
       {
         exprt min{from_integer(
-          {min_num-1}, unsignedbv_typet{n_bit})}; //TODO: check corretness
+          {min_num-1}, unsignedbv_typet{n_bit})};
         less_than_or_equal_exprt constraint{min, cs};
         log.warning() << format(constraint) << messaget::eom;
         equation.constraint(
           constraint,
           "cs constraint",
-          equation.SSA_steps.begin()->source); //TODO: check source
+          equation.SSA_steps.begin()->source);
         previous = cs;
       }
       else {
@@ -215,19 +215,19 @@ void lazy_c_seqt::create_cs_constraint(
         equation.constraint(
           constraint,
           "cs constraint",
-          equation.SSA_steps.begin()->source); //TODO: check source
+          equation.SSA_steps.begin()->source);
         previous = cs;
       }
       if(round == rounds)
       {
         exprt max{from_integer(
-          {max_num+1}, unsignedbv_typet{n_bit})}; //TODO: check corretness
+          {max_num+1}, unsignedbv_typet{n_bit})};
         less_than_or_equal_exprt last_constraint{cs, max};
         log.warning() << format(last_constraint) << messaget::eom;
         equation.constraint(
           last_constraint,
           "cs constraint",
-          equation.SSA_steps.begin()->source); //TODO: check source
+          equation.SSA_steps.begin()->source);
         previous = cs;
       }
     }
