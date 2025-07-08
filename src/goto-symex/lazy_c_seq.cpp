@@ -786,38 +786,70 @@ symbol_exprt lazy_c_seqt::create_lazy_symbol(
 
 symbol_exprt lazy_c_seqt::create_exec_symbol(unsigned label, size_t round)
 {
+  for(const auto &exec : exec_vector)
+  {
+    if(exec.label == label && exec.round == round)
+      return exec.symbol;
+  }
   irep_idt exec_name =
     "Ex_L" + std::to_string(label) + "_R" + std::to_string(round);
-  symbol_exprt exec{exec_name, bool_typet{}};
+  symbol_exprt exec_symbol{exec_name, bool_typet{}};
 
-  return exec;
+  exec exec_struct{label, round, exec_symbol};
+  exec_vector.emplace_back(exec_struct);
+
+  return exec_symbol;
 }
 
 symbol_exprt lazy_c_seqt::create_enabled_symbol(unsigned label, size_t round)
 {
+  for(const auto &enabled : enabled_vector)
+  {
+    if(enabled.label == label && enabled.round == round)
+      return enabled.symbol;
+  }
   irep_idt enabled_name =
     "En_L" + std::to_string(label) + "_R" + std::to_string(round);
-  symbol_exprt exec{enabled_name, bool_typet{}};
+  symbol_exprt enabled_symbol{enabled_name, bool_typet{}};
 
-  return exec;
+  enabled enabled_struct{label, round, enabled_symbol};
+  enabled_vector.emplace_back(enabled_struct);
+
+  return enabled_symbol;
 }
 
 symbol_exprt lazy_c_seqt::create_cs_symbol(size_t thread, size_t round)
 {
+  for(const auto &cs : cs_vector)
+  {
+    if(cs.thread == thread && cs.round == round)
+      return cs.symbol;
+  }
   irep_idt cs_name =
     "cs_T" + std::to_string(thread) + "_R" + std::to_string(round);
-  symbol_exprt cs{cs_name, unsignedbv_typet{n_bit}};
+  symbol_exprt cs_symbol{cs_name, unsignedbv_typet{n_bit}};
 
-  return cs;
+  cs cs_struct{thread, round, cs_symbol};
+  cs_vector.emplace_back(cs_struct);
+
+  return cs_symbol;
 }
 
 symbol_exprt lazy_c_seqt::create_reach_symbol(unsigned label, size_t thread)
 {
+  for(const auto &reach : reach_vector)
+  {
+    if(reach.label == label && reach.thread == thread)
+      return reach.symbol;
+  }
   irep_idt reach_name =
     "reach_L" + std::to_string(label) + "_T" + std::to_string(thread);
-  symbol_exprt reach{reach_name, bool_typet{}};
+  symbol_exprt reach_symbol{reach_name, bool_typet{}};
 
-  return reach;
+  reach reach_struct{label, thread, reach_symbol};
+  reach_vector.emplace_back(reach_struct);
+
+  return reach_symbol;
 }
 
 symbol_exprt lazy_c_seqt::create_active_thread_symbol(unsigned thread)

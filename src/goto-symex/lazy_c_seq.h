@@ -36,6 +36,30 @@ private:
     std::size_t l2;
     symbol_exprt symbol;
   };
+  struct exec
+  {
+    unsigned label;
+    std::size_t round;
+    symbol_exprt symbol;
+  };
+  struct enabled
+  {
+    unsigned label;
+    std::size_t round;
+    symbol_exprt symbol;
+  };
+  struct cs
+  {
+    std::size_t thread;
+    std::size_t round;
+    symbol_exprt symbol;
+  };
+  struct reach
+  {
+    unsigned label;
+    std::size_t thread;
+    symbol_exprt symbol;
+  };
 
   std::size_t threads = 0;
   std::unordered_set<irep_idt> global_variables;
@@ -43,6 +67,10 @@ private:
   std::unordered_map<irep_idt, std::vector<shared_event>> reads;
   std::unordered_map<irep_idt, std::vector<lazy_variable>> lazy_variables;
   std::unordered_map<unsigned, active_thread> active_threads_vector;
+  std::vector<exec> exec_vector;
+  std::vector<enabled> enabled_vector;
+  std::vector<cs> cs_vector;
+  std::vector<reach> reach_vector;
   std::vector<shared_event> previous_events;
   std::vector<std::pair<std::size_t, std::size_t>> atomic_sections;
   std::unordered_map<std::size_t, std::size_t> label_to_thread;
