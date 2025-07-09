@@ -471,10 +471,7 @@ void lazy_c_seqt::handling_guards(
           {
             check_rounds = and_exprt{check_rounds, reach_event};
           }
-          exprt check_rounds_guard = and_exprt{
-            check_rounds,
-            and_exprt{
-              s_it->guard, s_it->cond_expr}}; //TODO: we can remove cond_expr?
+          exprt check_rounds_guard = and_exprt{s_it->guard, check_rounds};
           simplify(check_rounds_guard, ns);
           exprt check_rounds_cond =
             implies_exprt{check_rounds_guard, false_exprt{}};
