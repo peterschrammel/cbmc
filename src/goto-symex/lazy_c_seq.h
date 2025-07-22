@@ -65,13 +65,13 @@ private:
   std::unordered_set<irep_idt> global_variables;
   std::unordered_map<irep_idt, std::vector<shared_event>> writes;
   std::unordered_map<irep_idt, std::vector<shared_event>> reads;
+  std::vector<shared_event> blocking_events;
   std::unordered_map<irep_idt, std::vector<lazy_variable>> lazy_variables;
   std::unordered_map<unsigned, active_thread> active_threads_vector;
   std::vector<exec> exec_vector;
   std::vector<enabled> enabled_vector;
   std::vector<cs> cs_vector;
   std::vector<reach> reach_vector;
-  std::vector<shared_event> previous_events;
   std::vector<std::pair<std::size_t, std::size_t>> atomic_sections;
   std::unordered_map<std::size_t, std::size_t> label_to_thread;
 

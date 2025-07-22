@@ -35,8 +35,6 @@ void lazy_c_seqt::operator()(
 
   handling_atomic_sections(equation, message_handler);
 
-  create_reach_constraint(equation, message_handler);
-
   handling_guards(equation, message_handler);
 
 }
@@ -348,6 +346,63 @@ void lazy_c_seqt::create_cs_constraint(
       }
     }
   }
+  for(auto blocking_event : blocking_events)
+  {
+    for(size_t round = 1; round <= rounds; ++round)
+    {
+      unsigned label_int = blocking_event.label;
+      exprt label{from_integer({label_int}, unsignedbv_typet{n_bit})};
+
+      symbol_exprt exec = create_exec_symbol(blocking_event.label, round);
+
+      symbol_exprt enabled = create_enabled_symbol(blocking_event.label, round);
+
+      symbol_exprt cs_curr =
+        create_cs_symbol(blocking_event.s_it->source.thread_nr, round);
+
+      symbol_exprt cs_prev =
+        create_cs_symbol(blocking_event.s_it->source.thread_nr, round - 1);
+
+      std::string active_name =
+        "active_thread_T" +
+        std::to_string(blocking_event.s_it->source.thread_nr);
+      std::optional<symbol_exprt> active_thread =
+        previous_shared(active_name, blocking_event.label, round);
+      exprt active_thread_value = true_exprt{};
+      if(active_thread.has_value())
+      {
+        active_thread_value = active_thread.value();
+      }
+
+      greater_than_exprt expr_1{cs_curr, label};
+      exprt expr_2;
+      if(round == 1)
+        expr_2 = true_exprt{};
+      else
+      {
+        expr_2 = less_than_or_equal_exprt{cs_prev, label};
+      }
+      and_exprt expr_3{expr_1, expr_2};
+      equal_exprt enabled_expr{enabled, expr_3};
+      simplify(enabled_expr, ns);
+      log.warning() << format(enabled_expr) << messaget::eom;
+      equation.constraint(
+        enabled_expr, "cs constraint", blocking_event.s_it->source);
+
+      implies_exprt active_expr{enabled, active_thread_value};
+      simplify(active_expr, ns);
+      log.warning() << format(active_expr) << messaget::eom;
+      equation.constraint(
+        active_expr, "cs constraint", blocking_event.s_it->source);
+
+      and_exprt expr_5{enabled, blocking_event.s_it->guard};
+      equal_exprt constraint{exec, expr_5};
+      simplify(constraint, ns);
+      log.warning() << format(constraint) << messaget::eom;
+      equation.constraint(
+        constraint, "cs constraint", blocking_event.s_it->source);
+    }
+  }
 }
 
 void lazy_c_seqt::create_reach_constraint(
@@ -436,27 +491,40 @@ void lazy_c_seqt::handling_guards(
 
     if(s_it->is_assert() || s_it->is_assume())
     {
-      shared_event previous_event = previous_events.front();
-      previous_events.erase(previous_events.begin());
-
+      shared_event blocking_event = blocking_events.front();
+      blocking_events.erase(blocking_events.begin());
       SSA_stept step{equation.SSA_steps.front()};
       equation.SSA_steps.pop_front();
+      symbol_exprt reach = create_reach_symbol(
+        blocking_event.label, blocking_event.s_it->source.thread_nr);
 
-      if(previous_event.s_it != ssa_steps.begin())
+      exprt constraint = false_exprt{};
+
+      for(std::size_t round = 1; round <= rounds; round++)
       {
-        symbol_exprt reach = create_reach_symbol(
-          previous_event.label, previous_event.s_it->source.thread_nr);
+        symbol_exprt exec = create_exec_symbol(blocking_event.label, round);
 
-        exprt new_guard = and_exprt{reach, s_it->guard};
-        simplify(new_guard, ns);
-        step.guard = new_guard;
-        exprt new_cond = s_it->cond_expr;
-        exprt new_expr = implies_exprt{new_guard, new_cond};
-        simplify(new_expr, ns);
-        step.cond_expr = new_expr;
-        log.warning() << format(step.get_ssa_expr()) << messaget::eom;
-        log.warning() << "guard: " << format(step.guard) << messaget::eom;
+        constraint = or_exprt{constraint, exec};
       }
+
+      simplify(constraint, ns);
+
+      equal_exprt final_constraint{reach, constraint};
+      simplify(final_constraint, ns);
+      log.warning() << format(final_constraint) << messaget::eom;
+      temp_equation.constraint(
+        final_constraint,
+        "blocking statement constraint",
+        blocking_event.s_it->source);
+
+      exprt new_guard = reach;
+      step.guard = new_guard;
+      exprt new_cond = s_it->cond_expr;
+      exprt new_expr = implies_exprt{new_guard, new_cond};
+      simplify(new_expr, ns);
+      step.cond_expr = new_expr;
+      log.warning() << format(step.get_ssa_expr()) << messaget::eom;
+      log.warning() << "guard: " << format(step.guard) << messaget::eom;
       temp_equation.SSA_steps.emplace_back(step);
     }
     else
@@ -694,7 +762,19 @@ void lazy_c_seqt::collect_reads_and_writes(
 
     if(s_it->is_assert() || s_it->is_assume())
     {
-      previous_events.emplace_back(previous_event);
+      label_to_thread[label] = s_it->source.thread_nr;
+      label_to_thread[label + 1] = s_it->source.thread_nr;
+      shared_event shared_event{s_it, label};
+      label += 2;
+      n_bit = 0 ? 0 : 32 - __builtin_clz(label);
+      n_bit++;
+      previous_event = shared_event;
+
+      log.warning() << "Thread: " << shared_event.s_it->source.thread_nr
+                    << "\tBlocking statement: " << shared_event.label << "\t"
+                    << format(s_it->cond_expr) << messaget::eom;
+
+      this->blocking_events.emplace_back(shared_event);
     }
 
     if(s_it->is_atomic_begin())
