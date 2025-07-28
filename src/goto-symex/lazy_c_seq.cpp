@@ -552,18 +552,21 @@ void lazy_c_seqt::handling_atomic_sections(
   {
     log.warning() << "atomic section: L" << atomic_section.first << " : L"
                   << atomic_section.second << messaget::eom;
-    for(size_t at = atomic_section.first; at <= atomic_section.second; at++)
-    {
-      for(std::size_t round = 1; round <= rounds; round++)
-      {
-        symbol_exprt cs = create_cs_symbol(label_to_thread.at(at), round);
-        notequal_exprt constraint{
-          cs, from_integer(at, unsignedbv_typet{n_bit})};
+    exprt constraint;
 
-        log.warning() << format(constraint) << messaget::eom;
-        equation.constraint(
-          constraint, "atomic constraint", equation.SSA_steps.begin()->source);
-      }
+    for(std::size_t round = 1; round <= rounds; round++)
+    {
+      symbol_exprt cs =
+        create_cs_symbol(label_to_thread.at(atomic_section.first), round);
+      constraint = or_exprt{
+        less_than_exprt{
+          cs, from_integer(atomic_section.first, unsignedbv_typet{n_bit})},
+        greater_than_exprt{
+          cs, from_integer(atomic_section.second, unsignedbv_typet{n_bit})}};
+
+      log.warning() << format(constraint) << messaget::eom;
+      equation.constraint(
+        constraint, "atomic constraint", equation.SSA_steps.begin()->source);
     }
   }
 }
