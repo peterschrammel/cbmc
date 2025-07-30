@@ -753,7 +753,6 @@ void lazy_c_seqt::collect_reads_and_writes(
 
   unsigned label = 1;
 
-  shared_event previous_event{ssa_steps.begin()};
 
   for(symex_target_equationt::SSA_stepst::const_iterator s_it =
         ssa_steps.begin();
@@ -771,7 +770,6 @@ void lazy_c_seqt::collect_reads_and_writes(
       label += 2;
       n_bit = 0 ? 0 : 32 - __builtin_clz(label);
       n_bit++;
-      previous_event = shared_event;
 
       log.warning() << "Thread: " << shared_event.s_it->source.thread_nr
                     << "\tBlocking statement: " << shared_event.label << "\t"
@@ -801,7 +799,6 @@ void lazy_c_seqt::collect_reads_and_writes(
         label += 2;
         n_bit = 0 ? 0 : 32 - __builtin_clz(label);
         n_bit++;
-        previous_event = shared_event;
 
         log.warning()
           << "Thread: " << shared_event.s_it->source.thread_nr
@@ -831,7 +828,6 @@ void lazy_c_seqt::collect_reads_and_writes(
         label += 2;
         n_bit = 0 ? 0 : 32 - __builtin_clz(label);
         n_bit++;
-        previous_event = shared_event;
 
         log.warning()
           << "Thread: " << shared_event.s_it->source.thread_nr
