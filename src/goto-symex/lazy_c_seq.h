@@ -73,6 +73,7 @@ private:
   std::vector<cs> cs_vector;
   std::vector<reach> reach_vector;
   std::vector<std::pair<std::size_t, std::size_t>> atomic_sections;
+  std::unordered_map<irep_idt, shared_event> atomic_writes;
   std::unordered_map<std::size_t, std::size_t> label_to_thread;
 
   unsigned n_bit;

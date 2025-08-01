@@ -786,6 +786,11 @@ void lazy_c_seqt::collect_reads_and_writes(
     if(s_it->is_atomic_end())
     {
       atomic_sections.back().second = label - 2;
+      for(auto atomic_write : atomic_writes)
+      {
+        this->writes[atomic_write.first].emplace_back(atomic_write.second);
+      }
+      atomic_writes.clear();
     }
 
     if(s_it->is_shared_write())
@@ -805,9 +810,20 @@ void lazy_c_seqt::collect_reads_and_writes(
           << "\tWrite: " << shared_event.label << "   \t"
           << to_symbol_expr(shared_event.s_it->ssa_lhs).get_identifier()
           << "\tL" << shared_event.label << messaget::eom;
-
-        this->writes[shared_event.s_it->ssa_lhs.get_l1_object_identifier()].emplace_back(shared_event);
-        this->global_variables.emplace(shared_event.s_it->ssa_lhs.get_l1_object_identifier());
+        if(s_it->atomic_section_id == 0)
+        {
+          this->writes[shared_event.s_it->ssa_lhs.get_l1_object_identifier()]
+            .emplace_back(shared_event);
+          this->global_variables.emplace(
+            shared_event.s_it->ssa_lhs.get_l1_object_identifier());
+        }
+        else
+        {
+          atomic_writes[shared_event.s_it->ssa_lhs.get_l1_object_identifier()] =
+            shared_event;
+          this->global_variables.emplace(
+            shared_event.s_it->ssa_lhs.get_l1_object_identifier());
+        }
       }
       else
       {
