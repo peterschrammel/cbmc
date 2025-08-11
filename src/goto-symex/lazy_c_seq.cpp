@@ -767,9 +767,8 @@ void lazy_c_seqt::collect_reads_and_writes(
       label_to_thread[label] = s_it->source.thread_nr;
       label_to_thread[label + 1] = s_it->source.thread_nr;
       shared_event shared_event{s_it, label};
-      label += 2;
       n_bit = 0 ? 0 : 32 - __builtin_clz(label);
-      n_bit++;
+      label += 2;
 
       log.warning() << "Thread: " << shared_event.s_it->source.thread_nr
                     << "\tBlocking statement: " << shared_event.label << "\t"
@@ -793,17 +792,15 @@ void lazy_c_seqt::collect_reads_and_writes(
       atomic_writes.clear();
     }
 
-    if(s_it->is_shared_write())
-    {
+    if(s_it->is_shared_write()) {
       // TODO: this may be too restrictive
       if(can_cast_expr<symbol_exprt>(s_it->ssa_lhs))
       {
         label_to_thread[label] = s_it->source.thread_nr;
         label_to_thread[label + 1] = s_it->source.thread_nr;
         shared_event shared_event{s_it, label};
-        label += 2;
         n_bit = 0 ? 0 : 32 - __builtin_clz(label);
-        n_bit++;
+        label += 2;
 
         log.warning()
           << "Thread: " << shared_event.s_it->source.thread_nr
@@ -841,9 +838,8 @@ void lazy_c_seqt::collect_reads_and_writes(
         label_to_thread[label] = s_it->source.thread_nr;
         label_to_thread[label + 1] = s_it->source.thread_nr;
         shared_event shared_event{s_it, label};
-        label += 2;
         n_bit = 0 ? 0 : 32 - __builtin_clz(label);
-        n_bit++;
+        label += 2;
 
         log.warning()
           << "Thread: " << shared_event.s_it->source.thread_nr
