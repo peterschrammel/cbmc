@@ -766,7 +766,7 @@ void lazy_c_seqt::collect_reads_and_writes(
     {
       label_to_thread[label] = s_it->source.thread_nr;
       shared_event shared_event{s_it, label};
-      n_bit = 0 ? 0 : 32 - __builtin_clz(label);
+      n_bit = 0 ? 0 : 32 - __builtin_clz(label+1);
       label++;
 
       log.warning() << "Thread: " << shared_event.s_it->source.thread_nr
@@ -799,7 +799,7 @@ void lazy_c_seqt::collect_reads_and_writes(
       {
         label_to_thread[label] = s_it->source.thread_nr;
         shared_event shared_event{s_it, label};
-        n_bit = 0 ? 0 : 32 - __builtin_clz(label);
+        n_bit = 0 ? 0 : 32 - __builtin_clz(label+1);
         label++;
 
         log.warning()
@@ -837,7 +837,7 @@ void lazy_c_seqt::collect_reads_and_writes(
       {
         label_to_thread[label] = s_it->source.thread_nr;
         shared_event shared_event{s_it, label};
-        n_bit = 0 ? 0 : 32 - __builtin_clz(label);
+        n_bit = 0 ? 0 : 32 - __builtin_clz(label+1);
         label++;
 
         log.warning()
