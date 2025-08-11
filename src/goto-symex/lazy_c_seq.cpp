@@ -765,10 +765,9 @@ void lazy_c_seqt::collect_reads_and_writes(
     if(s_it->is_assert() || s_it->is_assume())
     {
       label_to_thread[label] = s_it->source.thread_nr;
-      label_to_thread[label + 1] = s_it->source.thread_nr;
       shared_event shared_event{s_it, label};
       n_bit = 0 ? 0 : 32 - __builtin_clz(label);
-      label += 2;
+      label++;
 
       log.warning() << "Thread: " << shared_event.s_it->source.thread_nr
                     << "\tBlocking statement: " << shared_event.label << "\t"
@@ -779,12 +778,14 @@ void lazy_c_seqt::collect_reads_and_writes(
 
     if(s_it->is_atomic_begin())
     {
+      label++;
       atomic_sections.emplace_back(label, NULL);
     }
 
     if(s_it->is_atomic_end())
     {
-      atomic_sections.back().second = label - 2;
+      atomic_sections.back().second = label;
+      label++;
       for(auto atomic_write : atomic_writes)
       {
         this->writes[atomic_write.first].emplace_back(atomic_write.second);
@@ -797,10 +798,9 @@ void lazy_c_seqt::collect_reads_and_writes(
       if(can_cast_expr<symbol_exprt>(s_it->ssa_lhs))
       {
         label_to_thread[label] = s_it->source.thread_nr;
-        label_to_thread[label + 1] = s_it->source.thread_nr;
         shared_event shared_event{s_it, label};
         n_bit = 0 ? 0 : 32 - __builtin_clz(label);
-        label += 2;
+        label++;
 
         log.warning()
           << "Thread: " << shared_event.s_it->source.thread_nr
@@ -836,10 +836,9 @@ void lazy_c_seqt::collect_reads_and_writes(
       if(can_cast_expr<symbol_exprt>(s_it->ssa_lhs))
       {
         label_to_thread[label] = s_it->source.thread_nr;
-        label_to_thread[label + 1] = s_it->source.thread_nr;
         shared_event shared_event{s_it, label};
         n_bit = 0 ? 0 : 32 - __builtin_clz(label);
-        label += 2;
+        label++;
 
         log.warning()
           << "Thread: " << shared_event.s_it->source.thread_nr
