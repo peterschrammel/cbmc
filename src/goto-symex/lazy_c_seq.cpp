@@ -778,6 +778,7 @@ void lazy_c_seqt::collect_reads_and_writes(
 
     if(s_it->is_atomic_begin())
     {
+      label_to_thread[label] = s_it->source.thread_nr;
       label++;
       atomic_sections.emplace_back(label, NULL);
     }
@@ -785,6 +786,7 @@ void lazy_c_seqt::collect_reads_and_writes(
     if(s_it->is_atomic_end())
     {
       atomic_sections.back().second = label;
+      label_to_thread[label] = s_it->source.thread_nr;
       label++;
       for(auto atomic_write : atomic_writes)
       {
