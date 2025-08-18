@@ -230,62 +230,72 @@ void lazy_c_seqt::create_cs_constraint(
       }
     }
   }
+
+  std::vector<std::size_t> past_labels;
+  past_labels.clear();
   for(auto global_variable : global_variables)
   {
     if(this->writes.count(global_variable) != 0)
     {
       for(const auto &write : this->writes.at(global_variable))
       {
-        for(size_t round = 1; round <= rounds; ++round)
+        if(!(std::find(past_labels.begin(), past_labels.end(), write.label) !=
+             past_labels.end()))
         {
-          unsigned label_int = write.label;
-          exprt label{from_integer({label_int}, unsignedbv_typet{n_bit})};
-
-          symbol_exprt exec = create_exec_symbol(write.label, round);
-
-          symbol_exprt enabled = create_enabled_symbol(write.label, round);
-
-          symbol_exprt cs_curr =
-            create_cs_symbol(write.s_it->source.thread_nr, round);
-
-          symbol_exprt cs_prev =
-            create_cs_symbol(write.s_it->source.thread_nr, round - 1);
-
-          std::string active_name =
-            "active_thread_T" + std::to_string(write.s_it->source.thread_nr);
-          std::optional<symbol_exprt> active_thread =
-            previous_shared(active_name, write.label, round);
-          exprt active_thread_value = true_exprt{};
-          if(active_thread.has_value())
+          past_labels.emplace_back(write.label);
+          for(size_t round = 1; round <= rounds; ++round)
           {
-            active_thread_value = active_thread.value();
+            unsigned label_int = write.label;
+            exprt label{from_integer({label_int}, unsignedbv_typet{n_bit})};
+
+            symbol_exprt exec = create_exec_symbol(write.label, round);
+
+            symbol_exprt enabled = create_enabled_symbol(write.label, round);
+
+            symbol_exprt cs_curr =
+              create_cs_symbol(write.s_it->source.thread_nr, round);
+
+            symbol_exprt cs_prev =
+              create_cs_symbol(write.s_it->source.thread_nr, round - 1);
+
+            std::string active_name =
+              "active_thread_T" + std::to_string(write.s_it->source.thread_nr);
+            std::optional<symbol_exprt> active_thread =
+              previous_shared(active_name, write.label, round);
+            exprt active_thread_value = true_exprt{};
+            if(active_thread.has_value())
+            {
+              active_thread_value = active_thread.value();
+            }
+
+            greater_than_exprt expr_1{cs_curr, label};
+            exprt expr_2;
+            if(round == 1)
+              expr_2 = true_exprt{};
+            else
+            {
+              expr_2 = less_than_or_equal_exprt{cs_prev, label};
+            }
+            and_exprt expr_3{expr_1, expr_2};
+            equal_exprt enabled_expr{enabled, expr_3};
+            simplify(enabled_expr, ns);
+            log.warning() << format(enabled_expr) << messaget::eom;
+            equation.constraint(
+              enabled_expr, "cs constraint", write.s_it->source);
+
+            implies_exprt active_expr{enabled, active_thread_value};
+            simplify(active_expr, ns);
+            log.warning() << format(active_expr) << messaget::eom;
+            equation.constraint(
+              active_expr, "cs constraint", write.s_it->source);
+
+            and_exprt expr_5{enabled, write.s_it->guard};
+            equal_exprt constraint{exec, expr_5};
+            simplify(constraint, ns);
+            log.warning() << format(constraint) << messaget::eom;
+            equation.constraint(
+              constraint, "cs constraint", write.s_it->source);
           }
-
-          greater_than_exprt expr_1{cs_curr, label};
-          exprt expr_2;
-          if(round == 1)
-            expr_2 = true_exprt{};
-          else
-          {
-            expr_2 = less_than_or_equal_exprt{cs_prev, label};
-          }
-          and_exprt expr_3{expr_1, expr_2};
-          equal_exprt enabled_expr{enabled, expr_3};
-          simplify(enabled_expr, ns);
-          log.warning() << format(enabled_expr) << messaget::eom;
-          equation.constraint(
-            enabled_expr, "cs constraint", write.s_it->source);
-
-          implies_exprt active_expr{enabled, active_thread_value};
-          simplify(active_expr, ns);
-          log.warning() << format(active_expr) << messaget::eom;
-          equation.constraint(active_expr, "cs constraint", write.s_it->source);
-
-          and_exprt expr_5{enabled, write.s_it->guard};
-          equal_exprt constraint{exec, expr_5};
-          simplify(constraint, ns);
-          log.warning() << format(constraint) << messaget::eom;
-          equation.constraint(constraint, "cs constraint", write.s_it->source);
         }
       }
     }
@@ -293,114 +303,128 @@ void lazy_c_seqt::create_cs_constraint(
     {
       for(auto read : this->reads.at(global_variable))
       {
-        for(size_t round = 1; round <= rounds; ++round)
+        if(!(std::find(past_labels.begin(), past_labels.end(), read.label) !=
+             past_labels.end()))
         {
-          unsigned label_int = read.label;
-          exprt label{from_integer({label_int}, unsignedbv_typet{n_bit})};
-
-          symbol_exprt exec = create_exec_symbol(read.label, round);
-
-          symbol_exprt enabled = create_enabled_symbol(read.label, round);
-
-          symbol_exprt cs_curr =
-            create_cs_symbol(read.s_it->source.thread_nr, round);
-
-          symbol_exprt cs_prev =
-            create_cs_symbol(read.s_it->source.thread_nr, round - 1);
-
-          std::string active_name =
-            "active_thread_T" + std::to_string(read.s_it->source.thread_nr);
-          std::optional<symbol_exprt> active_thread =
-            previous_shared(active_name, read.label, round);
-          exprt active_thread_value = true_exprt{};
-          if(active_thread.has_value())
+          past_labels.emplace_back(read.label);
+          for(size_t round = 1; round <= rounds; ++round)
           {
-            active_thread_value = active_thread.value();
+            unsigned label_int = read.label;
+            exprt label{from_integer({label_int}, unsignedbv_typet{n_bit})};
+
+            symbol_exprt exec = create_exec_symbol(read.label, round);
+
+            symbol_exprt enabled = create_enabled_symbol(read.label, round);
+
+            symbol_exprt cs_curr =
+              create_cs_symbol(read.s_it->source.thread_nr, round);
+
+            symbol_exprt cs_prev =
+              create_cs_symbol(read.s_it->source.thread_nr, round - 1);
+
+            std::string active_name =
+              "active_thread_T" + std::to_string(read.s_it->source.thread_nr);
+            std::optional<symbol_exprt> active_thread =
+              previous_shared(active_name, read.label, round);
+            exprt active_thread_value = true_exprt{};
+            if(active_thread.has_value())
+            {
+              active_thread_value = active_thread.value();
+            }
+
+            greater_than_exprt expr_1{cs_curr, label};
+            exprt expr_2;
+            if(round == 1)
+              expr_2 = true_exprt{};
+            else
+            {
+              expr_2 = less_than_or_equal_exprt{cs_prev, label};
+            }
+            and_exprt expr_3{expr_1, expr_2};
+            equal_exprt enabled_expr{enabled, expr_3};
+            simplify(enabled_expr, ns);
+            log.warning() << format(enabled_expr) << messaget::eom;
+            equation.constraint(
+              enabled_expr, "cs constraint", read.s_it->source);
+
+            implies_exprt active_expr{enabled, active_thread_value};
+            simplify(active_expr, ns);
+            log.warning() << format(active_expr) << messaget::eom;
+            equation.constraint(
+              active_expr, "cs constraint", read.s_it->source);
+
+            and_exprt expr_5{enabled, read.s_it->guard};
+            equal_exprt constraint{exec, expr_5};
+            simplify(constraint, ns);
+            log.warning() << format(constraint) << messaget::eom;
+            equation.constraint(constraint, "cs constraint", read.s_it->source);
           }
-
-          greater_than_exprt expr_1{cs_curr, label};
-          exprt expr_2;
-          if(round == 1)
-            expr_2 = true_exprt{};
-          else
-          {
-            expr_2 = less_than_or_equal_exprt{cs_prev, label};
-          }
-          and_exprt expr_3{expr_1, expr_2};
-          equal_exprt enabled_expr{enabled, expr_3};
-          simplify(enabled_expr, ns);
-          log.warning() << format(enabled_expr) << messaget::eom;
-          equation.constraint(enabled_expr, "cs constraint", read.s_it->source);
-
-          implies_exprt active_expr{enabled, active_thread_value};
-          simplify(active_expr, ns);
-          log.warning() << format(active_expr) << messaget::eom;
-          equation.constraint(active_expr, "cs constraint", read.s_it->source);
-
-          and_exprt expr_5{enabled, read.s_it->guard};
-          equal_exprt constraint{exec, expr_5};
-          simplify(constraint, ns);
-          log.warning() << format(constraint) << messaget::eom;
-          equation.constraint(constraint, "cs constraint", read.s_it->source);
         }
       }
     }
   }
   for(auto blocking_event : blocking_events)
   {
-    for(size_t round = 1; round <= rounds; ++round)
+    if(!(std::find(
+           past_labels.begin(), past_labels.end(), blocking_event.label) !=
+         past_labels.end()))
     {
-      unsigned label_int = blocking_event.label;
-      exprt label{from_integer({label_int}, unsignedbv_typet{n_bit})};
-
-      symbol_exprt exec = create_exec_symbol(blocking_event.label, round);
-
-      symbol_exprt enabled = create_enabled_symbol(blocking_event.label, round);
-
-      symbol_exprt cs_curr =
-        create_cs_symbol(blocking_event.s_it->source.thread_nr, round);
-
-      symbol_exprt cs_prev =
-        create_cs_symbol(blocking_event.s_it->source.thread_nr, round - 1);
-
-      std::string active_name =
-        "active_thread_T" +
-        std::to_string(blocking_event.s_it->source.thread_nr);
-      std::optional<symbol_exprt> active_thread =
-        previous_shared(active_name, blocking_event.label, round);
-      exprt active_thread_value = true_exprt{};
-      if(active_thread.has_value())
+      past_labels.emplace_back(blocking_event.label);
+      for(size_t round = 1; round <= rounds; ++round)
       {
-        active_thread_value = active_thread.value();
+        unsigned label_int = blocking_event.label;
+        exprt label{from_integer({label_int}, unsignedbv_typet{n_bit})};
+
+        symbol_exprt exec = create_exec_symbol(blocking_event.label, round);
+
+        symbol_exprt enabled =
+          create_enabled_symbol(blocking_event.label, round);
+
+        symbol_exprt cs_curr =
+          create_cs_symbol(blocking_event.s_it->source.thread_nr, round);
+
+        symbol_exprt cs_prev =
+          create_cs_symbol(blocking_event.s_it->source.thread_nr, round - 1);
+
+        std::string active_name =
+          "active_thread_T" +
+          std::to_string(blocking_event.s_it->source.thread_nr);
+        std::optional<symbol_exprt> active_thread =
+          previous_shared(active_name, blocking_event.label, round);
+        exprt active_thread_value = true_exprt{};
+        if(active_thread.has_value())
+        {
+          active_thread_value = active_thread.value();
+        }
+
+        greater_than_exprt expr_1{cs_curr, label};
+        exprt expr_2;
+        if(round == 1)
+          expr_2 = true_exprt{};
+        else
+        {
+          expr_2 = less_than_or_equal_exprt{cs_prev, label};
+        }
+        and_exprt expr_3{expr_1, expr_2};
+        equal_exprt enabled_expr{enabled, expr_3};
+        simplify(enabled_expr, ns);
+        log.warning() << format(enabled_expr) << messaget::eom;
+        equation.constraint(
+          enabled_expr, "cs constraint", blocking_event.s_it->source);
+
+        implies_exprt active_expr{enabled, active_thread_value};
+        simplify(active_expr, ns);
+        log.warning() << format(active_expr) << messaget::eom;
+        equation.constraint(
+          active_expr, "cs constraint", blocking_event.s_it->source);
+
+        and_exprt expr_5{enabled, blocking_event.s_it->guard};
+        equal_exprt constraint{exec, expr_5};
+        simplify(constraint, ns);
+        log.warning() << format(constraint) << messaget::eom;
+        equation.constraint(
+          constraint, "cs constraint", blocking_event.s_it->source);
       }
-
-      greater_than_exprt expr_1{cs_curr, label};
-      exprt expr_2;
-      if(round == 1)
-        expr_2 = true_exprt{};
-      else
-      {
-        expr_2 = less_than_or_equal_exprt{cs_prev, label};
-      }
-      and_exprt expr_3{expr_1, expr_2};
-      equal_exprt enabled_expr{enabled, expr_3};
-      simplify(enabled_expr, ns);
-      log.warning() << format(enabled_expr) << messaget::eom;
-      equation.constraint(
-        enabled_expr, "cs constraint", blocking_event.s_it->source);
-
-      implies_exprt active_expr{enabled, active_thread_value};
-      simplify(active_expr, ns);
-      log.warning() << format(active_expr) << messaget::eom;
-      equation.constraint(
-        active_expr, "cs constraint", blocking_event.s_it->source);
-
-      and_exprt expr_5{enabled, blocking_event.s_it->guard};
-      equal_exprt constraint{exec, expr_5};
-      simplify(constraint, ns);
-      log.warning() << format(constraint) << messaget::eom;
-      equation.constraint(
-        constraint, "cs constraint", blocking_event.s_it->source);
     }
   }
 }
@@ -751,8 +775,7 @@ void lazy_c_seqt::collect_reads_and_writes(
   log.warning() << "-------------------COLLECTING--------------------------"
                 << messaget::eom;
 
-  unsigned label = 1;
-
+  unsigned label = 0;
 
   for(symex_target_equationt::SSA_stepst::const_iterator s_it =
         ssa_steps.begin();
@@ -764,10 +787,12 @@ void lazy_c_seqt::collect_reads_and_writes(
 
     if(s_it->is_assert() || s_it->is_assume())
     {
+      if(source_to_label.count(s_it->source.pc->source_location().hash()) == 0)
+        label++;
       label_to_thread[label] = s_it->source.thread_nr;
+      source_to_label[s_it->source.pc->source_location().hash()] = label;
       shared_event shared_event{s_it, label};
-      n_bit = 0 ? 0 : 32 - __builtin_clz(label+1);
-      label++;
+      n_bit = 0 ? 0 : 32 - __builtin_clz(label + 1);
 
       log.warning() << "Thread: " << shared_event.s_it->source.thread_nr
                     << "\tBlocking statement: " << shared_event.label << "\t"
@@ -780,6 +805,7 @@ void lazy_c_seqt::collect_reads_and_writes(
     {
       label_to_thread[label] = s_it->source.thread_nr;
       label++;
+      label_to_thread[label] = s_it->source.thread_nr;
       atomic_sections.emplace_back(label, NULL);
     }
 
@@ -788,6 +814,7 @@ void lazy_c_seqt::collect_reads_and_writes(
       atomic_sections.back().second = label;
       label_to_thread[label] = s_it->source.thread_nr;
       label++;
+      label_to_thread[label] = s_it->source.thread_nr;
       for(auto atomic_write : atomic_writes)
       {
         this->writes[atomic_write.first].emplace_back(atomic_write.second);
@@ -799,10 +826,13 @@ void lazy_c_seqt::collect_reads_and_writes(
       // TODO: this may be too restrictive
       if(can_cast_expr<symbol_exprt>(s_it->ssa_lhs))
       {
+        if(
+          source_to_label.count(s_it->source.pc->source_location().hash()) == 0)
+          label++;
         label_to_thread[label] = s_it->source.thread_nr;
+        source_to_label[s_it->source.pc->source_location().hash()] = label;
         shared_event shared_event{s_it, label};
-        n_bit = 0 ? 0 : 32 - __builtin_clz(label+1);
-        label++;
+        n_bit = 0 ? 0 : 32 - __builtin_clz(label + 1);
 
         log.warning()
           << "Thread: " << shared_event.s_it->source.thread_nr
@@ -837,10 +867,13 @@ void lazy_c_seqt::collect_reads_and_writes(
       // TODO: this may be too restrictive
       if(can_cast_expr<symbol_exprt>(s_it->ssa_lhs))
       {
+        if(
+          source_to_label.count(s_it->source.pc->source_location().hash()) == 0)
+          label++;
         label_to_thread[label] = s_it->source.thread_nr;
+        source_to_label[s_it->source.pc->source_location().hash()] = label;
         shared_event shared_event{s_it, label};
-        n_bit = 0 ? 0 : 32 - __builtin_clz(label+1);
-        label++;
+        n_bit = 0 ? 0 : 32 - __builtin_clz(label + 1);
 
         log.warning()
           << "Thread: " << shared_event.s_it->source.thread_nr
