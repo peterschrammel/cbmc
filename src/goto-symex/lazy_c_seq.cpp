@@ -787,10 +787,10 @@ void lazy_c_seqt::collect_reads_and_writes(
 
     if(s_it->is_assert() || s_it->is_assume())
     {
-      if(source_to_label.count(s_it->source.pc->source_location().hash()) == 0)
+      if(source_to_label.count(s_it->source.pc->location_number) == 0)
         label++;
       label_to_thread[label] = s_it->source.thread_nr;
-      source_to_label[s_it->source.pc->source_location().hash()] = label;
+      source_to_label[s_it->source.pc->location_number] = label;
       shared_event shared_event{s_it, label};
       n_bit = 0 ? 0 : 32 - __builtin_clz(label + 1);
 
@@ -827,10 +827,10 @@ void lazy_c_seqt::collect_reads_and_writes(
       if(can_cast_expr<symbol_exprt>(s_it->ssa_lhs))
       {
         if(
-          source_to_label.count(s_it->source.pc->source_location().hash()) == 0)
+          source_to_label.count(s_it->source.pc->location_number) == 0)
           label++;
         label_to_thread[label] = s_it->source.thread_nr;
-        source_to_label[s_it->source.pc->source_location().hash()] = label;
+        source_to_label[s_it->source.pc->location_number] = label;
         shared_event shared_event{s_it, label};
         n_bit = 0 ? 0 : 32 - __builtin_clz(label + 1);
 
@@ -868,10 +868,10 @@ void lazy_c_seqt::collect_reads_and_writes(
       if(can_cast_expr<symbol_exprt>(s_it->ssa_lhs))
       {
         if(
-          source_to_label.count(s_it->source.pc->source_location().hash()) == 0)
+          source_to_label.count(s_it->source.pc->location_number) == 0)
           label++;
         label_to_thread[label] = s_it->source.thread_nr;
-        source_to_label[s_it->source.pc->source_location().hash()] = label;
+        source_to_label[s_it->source.pc->location_number] = label;
         shared_event shared_event{s_it, label};
         n_bit = 0 ? 0 : 32 - __builtin_clz(label + 1);
 
