@@ -777,6 +777,9 @@ void lazy_c_seqt::collect_reads_and_writes(
 
   unsigned label = 0;
 
+  symex_target_equationt::SSA_stepst::const_iterator prev_event =
+    ssa_steps.begin();
+
   for(symex_target_equationt::SSA_stepst::const_iterator s_it =
         ssa_steps.begin();
       s_it != ssa_steps.end();
@@ -787,10 +790,15 @@ void lazy_c_seqt::collect_reads_and_writes(
 
     if(s_it->is_assert() || s_it->is_assume())
     {
-      if(source_to_label.count(s_it->source.pc->location_number) == 0)
+      if(
+        prev_event == ssa_steps.begin() ||
+        prev_event->source.pc->location_number !=
+          s_it->source.pc->location_number ||
+        (prev_event->source.pc->location_number ==
+           s_it->source.pc->location_number &&
+         prev_event->guard != s_it->guard))
         label++;
       label_to_thread[label] = s_it->source.thread_nr;
-      source_to_label[s_it->source.pc->location_number] = label;
       shared_event shared_event{s_it, label};
       n_bit = 0 ? 0 : 32 - __builtin_clz(label + 1);
 
@@ -799,6 +807,7 @@ void lazy_c_seqt::collect_reads_and_writes(
                     << format(s_it->cond_expr) << messaget::eom;
 
       this->blocking_events.emplace_back(shared_event);
+      prev_event = s_it;
     }
 
     if(s_it->is_atomic_begin())
@@ -827,12 +836,17 @@ void lazy_c_seqt::collect_reads_and_writes(
       if(can_cast_expr<symbol_exprt>(s_it->ssa_lhs))
       {
         if(
-          source_to_label.count(s_it->source.pc->location_number) == 0)
+          prev_event == ssa_steps.begin() ||
+          prev_event->source.pc->location_number !=
+            s_it->source.pc->location_number ||
+          (prev_event->source.pc->location_number ==
+             s_it->source.pc->location_number &&
+           prev_event->guard != s_it->guard))
           label++;
         label_to_thread[label] = s_it->source.thread_nr;
-        source_to_label[s_it->source.pc->location_number] = label;
         shared_event shared_event{s_it, label};
         n_bit = 0 ? 0 : 32 - __builtin_clz(label + 1);
+        prev_event = s_it;
 
         log.warning()
           << "Thread: " << shared_event.s_it->source.thread_nr
@@ -868,12 +882,17 @@ void lazy_c_seqt::collect_reads_and_writes(
       if(can_cast_expr<symbol_exprt>(s_it->ssa_lhs))
       {
         if(
-          source_to_label.count(s_it->source.pc->location_number) == 0)
+          prev_event == ssa_steps.begin() ||
+          prev_event->source.pc->location_number !=
+            s_it->source.pc->location_number ||
+          (prev_event->source.pc->location_number ==
+             s_it->source.pc->location_number &&
+           prev_event->guard != s_it->guard))
           label++;
         label_to_thread[label] = s_it->source.thread_nr;
-        source_to_label[s_it->source.pc->location_number] = label;
         shared_event shared_event{s_it, label};
         n_bit = 0 ? 0 : 32 - __builtin_clz(label + 1);
+        prev_event = s_it;
 
         log.warning()
           << "Thread: " << shared_event.s_it->source.thread_nr
