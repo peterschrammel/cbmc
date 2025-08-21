@@ -188,7 +188,7 @@ void lazy_c_seqt::create_cs_constraint(
         }
       }
     }
-    unsigned max_num = max_read > max_write ? max_read + 1 : max_write + 1;
+    unsigned max_num = max_read > max_write ? max_read : max_write;
     unsigned min_num = min_read < min_write ? min_read : min_write;
 
     for(size_t round = 1; round <= rounds; ++round)
