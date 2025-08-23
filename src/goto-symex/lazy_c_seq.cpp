@@ -137,6 +137,11 @@ std::optional<symbol_exprt> lazy_c_seqt::previous_shared(
       previous = lazy_variable.symbol;
       continue;
     }
+    if(round == lazy_variable.round && label == lazy_variable.label)
+    {
+      previous = lazy_variable.symbol;
+      continue;
+    }
     return previous;
   }
   return previous;
