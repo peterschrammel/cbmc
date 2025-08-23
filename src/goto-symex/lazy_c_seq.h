@@ -75,7 +75,6 @@ private:
   std::vector<std::pair<std::size_t, std::size_t>> atomic_sections;
   std::unordered_map<irep_idt, shared_event> atomic_writes;
   std::unordered_map<std::size_t, std::size_t> label_to_thread;
-  std::unordered_map<std::size_t, std::size_t> source_to_label;
 
   unsigned n_bit;
 
