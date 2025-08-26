@@ -54,9 +54,7 @@ void lazy_c_seqt::create_write_constraints(
       continue;
     exprt previous = this->writes.at(global_variable).front().s_it->ssa_lhs;
     lazy_variable first_lazy_struct = lazy_variable{
-      0,
-      0,
-      this->writes.at(global_variable).front().s_it->ssa_lhs};
+      0, 0, 0, this->writes.at(global_variable).front().s_it->ssa_lhs};
     this->lazy_variables[global_variable].emplace_back(first_lazy_struct);
     this->writes.at(global_variable)
       .erase(this->writes.at(global_variable).begin());
@@ -66,7 +64,8 @@ void lazy_c_seqt::create_write_constraints(
       {
         const symbol_exprt lazy_variable_exprt = create_lazy_symbol(
           write.label, round, write.s_it->ssa_lhs, write.s_it->ssa_lhs.type());
-        lazy_variable lazy_struct = lazy_variable{round, write.label, lazy_variable_exprt};
+        lazy_variable lazy_struct =
+          lazy_variable{round, write.label, write.num, lazy_variable_exprt};
         this->lazy_variables[global_variable].emplace_back(lazy_struct);
 
         const symbol_exprt exec = create_exec_symbol(write.label, round);
@@ -103,7 +102,7 @@ void lazy_c_seqt::create_read_constraints(
         const symbol_exprt exec = create_exec_symbol(read.label, round);
 
         std::optional<symbol_exprt> previous =
-          previous_shared(global_variable, read.label, round);
+          previous_shared(global_variable, read.num, round);
         if(previous.has_value())
         {
           temp_constraint = if_exprt{exec, previous.value(), temp_constraint};
@@ -117,10 +116,8 @@ void lazy_c_seqt::create_read_constraints(
   }
 }
 
-std::optional<symbol_exprt> lazy_c_seqt::previous_shared(
-  irep_idt variable,
-  unsigned label,
-  std::size_t round)
+std::optional<symbol_exprt>
+lazy_c_seqt::previous_shared(irep_idt variable, unsigned num, std::size_t round)
 {
   if(lazy_variables.count(variable) == 0)
     return std::nullopt;
@@ -132,7 +129,7 @@ std::optional<symbol_exprt> lazy_c_seqt::previous_shared(
       previous = lazy_variable.symbol;
       continue;
     }
-    if(round == lazy_variable.round && label > lazy_variable.label)
+    if(round == lazy_variable.round && num > lazy_variable.num)
     {
       previous = lazy_variable.symbol;
       continue;
@@ -261,7 +258,7 @@ void lazy_c_seqt::create_cs_constraint(
             std::string active_name =
               "active_thread_T" + std::to_string(write.s_it->source.thread_nr);
             std::optional<symbol_exprt> active_thread =
-              previous_shared(active_name, write.label, round);
+              previous_shared(active_name, write.num, round);
             exprt active_thread_value = true_exprt{};
             if(active_thread.has_value())
             {
@@ -325,7 +322,7 @@ void lazy_c_seqt::create_cs_constraint(
             std::string active_name =
               "active_thread_T" + std::to_string(read.s_it->source.thread_nr);
             std::optional<symbol_exprt> active_thread =
-              previous_shared(active_name, read.label, round);
+              previous_shared(active_name, read.num, round);
             exprt active_thread_value = true_exprt{};
             if(active_thread.has_value())
             {
@@ -390,7 +387,7 @@ void lazy_c_seqt::create_cs_constraint(
           "active_thread_T" +
           std::to_string(blocking_event.s_it->source.thread_nr);
         std::optional<symbol_exprt> active_thread =
-          previous_shared(active_name, blocking_event.label, round);
+          previous_shared(active_name, blocking_event.num, round);
         exprt active_thread_value = true_exprt{};
         if(active_thread.has_value())
         {
@@ -776,6 +773,7 @@ void lazy_c_seqt::collect_reads_and_writes(
                 << messaget::eom;
 
   unsigned label = 0;
+  unsigned num = 0;
 
   symex_target_equationt::SSA_stepst::const_iterator prev_event =
     ssa_steps.begin();
@@ -798,12 +796,14 @@ void lazy_c_seqt::collect_reads_and_writes(
            s_it->source.pc->location_number &&
          prev_event->guard != s_it->guard))
         label++;
+      num++;
       label_to_thread[label] = s_it->source.thread_nr;
-      shared_event shared_event{s_it, label};
+      shared_event shared_event{s_it, label, num};
       n_bit = 0 ? 0 : 32 - __builtin_clz(label + 1);
 
       log.warning() << "Thread: " << shared_event.s_it->source.thread_nr
-                    << "\tBlocking statement: " << shared_event.label << "\t"
+                    << "\tBlocking statement L: " << shared_event.label << "\t"
+                    << "\tNum: " << shared_event.num << "\t"
                     << format(s_it->cond_expr) << messaget::eom;
 
       this->blocking_events.emplace_back(shared_event);
@@ -843,8 +843,9 @@ void lazy_c_seqt::collect_reads_and_writes(
              s_it->source.pc->location_number &&
            prev_event->guard != s_it->guard))
           label++;
+        num++;
         label_to_thread[label] = s_it->source.thread_nr;
-        shared_event shared_event{s_it, label};
+        shared_event shared_event{s_it, label, num};
         n_bit = 0 ? 0 : 32 - __builtin_clz(label + 1);
         prev_event = s_it;
 
@@ -852,7 +853,8 @@ void lazy_c_seqt::collect_reads_and_writes(
           << "Thread: " << shared_event.s_it->source.thread_nr
           << "\tWrite: " << shared_event.label << "   \t"
           << to_symbol_expr(shared_event.s_it->ssa_lhs).get_identifier()
-          << "\tL" << shared_event.label << messaget::eom;
+          << "\tL: " << shared_event.label << "\tNum: " << shared_event.num
+          << messaget::eom;
         if(s_it->atomic_section_id == 0)
         {
           this->writes[shared_event.s_it->ssa_lhs.get_l1_object_identifier()]
@@ -889,8 +891,9 @@ void lazy_c_seqt::collect_reads_and_writes(
              s_it->source.pc->location_number &&
            prev_event->guard != s_it->guard))
           label++;
+        num++;
         label_to_thread[label] = s_it->source.thread_nr;
-        shared_event shared_event{s_it, label};
+        shared_event shared_event{s_it, label, num};
         n_bit = 0 ? 0 : 32 - __builtin_clz(label + 1);
         prev_event = s_it;
 
@@ -898,7 +901,8 @@ void lazy_c_seqt::collect_reads_and_writes(
           << "Thread: " << shared_event.s_it->source.thread_nr
           << "\tRead: " << shared_event.label << "   \t"
           << to_symbol_expr(shared_event.s_it->ssa_lhs).get_identifier()
-          << "\tL" << shared_event.label << messaget::eom;
+          << "\tL: " << shared_event.label << "\tNum: " << shared_event.num
+          << messaget::eom;
 
         this->reads[shared_event.s_it->ssa_lhs.get_l1_object_identifier()].emplace_back(shared_event);
         this->global_variables.insert(shared_event.s_it->ssa_lhs.get_l1_object_identifier());

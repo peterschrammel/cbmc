@@ -23,11 +23,13 @@ private:
   {
     symex_target_equationt::SSA_stepst::const_iterator s_it;
     unsigned label;
+    unsigned num;
   };
   struct lazy_variable
   {
     std::size_t round;
     unsigned label;
+    unsigned num;
     symbol_exprt symbol;
   };
   struct active_thread
@@ -99,7 +101,7 @@ private:
     message_handlert &message_handler);
 
   std::optional<symbol_exprt>
-  previous_shared(irep_idt variable, unsigned label, std::size_t round);
+  previous_shared(irep_idt variable, unsigned num, std::size_t round);
 
   void create_cs_constraint(
     symex_target_equationt &equation,
