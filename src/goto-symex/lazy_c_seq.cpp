@@ -150,43 +150,23 @@ void lazy_c_seqt::create_cs_constraint(
   for(unsigned thread = 0; thread <= threads; ++thread)
   {
     exprt previous;
-    unsigned max_read = 0;
-    unsigned min_read = std::numeric_limits<int>::max();
-    unsigned max_write = 0;
-    unsigned min_write = std::numeric_limits<int>::max();
-    for(auto global_variable : global_variables)
+    unsigned max_num = 0;
+    unsigned min_num = std::numeric_limits<int>::max();
+
+    for(auto &event : shared_events)
     {
-      if(this->reads.count(global_variable) != 0)
+      if(event.s_it->source.thread_nr == thread && event.label > max_num)
       {
-        for(auto &read : this->reads.at(global_variable))
-        {
-          if(read.s_it->source.thread_nr == thread && read.label > max_read)
-          {
-            max_read = read.label;
-          }
-          if(read.s_it->source.thread_nr == thread && read.label < min_read)
-          {
-            min_read = read.label;
-          }
-        }
+        max_num = event.label;
       }
-      if(this->writes.count(global_variable) != 0)
+      if(event.s_it->source.thread_nr == thread && event.label < min_num)
       {
-        for(auto &write : this->writes.at(global_variable))
-        {
-          if(write.s_it->source.thread_nr == thread && write.label > max_write)
-          {
-            max_write = write.label;
-          }
-          if(write.s_it->source.thread_nr == thread && write.label < min_write)
-          {
-            min_write = write.label;
-          }
-        }
+        min_num = event.label;
       }
     }
-    unsigned max_num = max_read > max_write ? max_read : max_write;
-    unsigned min_num = min_read < min_write ? min_read : min_write;
+
+    log.warning() << "thread " << thread << ": from " << min_num << " to "
+                  << max_num << messaget::eom;
 
     for(size_t round = 1; round <= rounds; ++round)
     {
@@ -580,9 +560,9 @@ void lazy_c_seqt::handling_atomic_sections(
       symbol_exprt cs =
         create_cs_symbol(label_to_thread.at(atomic_section.first), round);
       constraint = or_exprt{
-        less_than_exprt{
+        less_than_or_equal_exprt{
           cs, from_integer(atomic_section.first, unsignedbv_typet{n_bit})},
-        greater_than_exprt{
+        greater_than_or_equal_exprt{
           cs, from_integer(atomic_section.second, unsignedbv_typet{n_bit})}};
 
       log.warning() << format(constraint) << messaget::eom;
@@ -807,6 +787,7 @@ void lazy_c_seqt::collect_reads_and_writes(
                     << format(s_it->cond_expr) << messaget::eom;
 
       this->blocking_events.emplace_back(shared_event);
+      shared_events.emplace_back(shared_event);
       prev_event = s_it;
     }
 
@@ -816,11 +797,14 @@ void lazy_c_seqt::collect_reads_and_writes(
       label++;
       label_to_thread[label] = s_it->source.thread_nr;
       atomic_sections.emplace_back(label, NULL);
+      log.warning() << "ATOMIC BEGIN: " << label << messaget::eom;
     }
 
     if(s_it->is_atomic_end())
     {
+      label++;
       atomic_sections.back().second = label;
+      log.warning() << "ATOMIC END: " << label << messaget::eom;
       label_to_thread[label] = s_it->source.thread_nr;
       label++;
       label_to_thread[label] = s_it->source.thread_nr;
@@ -855,6 +839,7 @@ void lazy_c_seqt::collect_reads_and_writes(
           << to_symbol_expr(shared_event.s_it->ssa_lhs).get_identifier()
           << "\tL: " << shared_event.label << "\tNum: " << shared_event.num
           << messaget::eom;
+        shared_events.emplace_back(shared_event);
         if(s_it->atomic_section_id == 0)
         {
           this->writes[shared_event.s_it->ssa_lhs.get_l1_object_identifier()]
@@ -903,6 +888,8 @@ void lazy_c_seqt::collect_reads_and_writes(
           << to_symbol_expr(shared_event.s_it->ssa_lhs).get_identifier()
           << "\tL: " << shared_event.label << "\tNum: " << shared_event.num
           << messaget::eom;
+
+        shared_events.emplace_back(shared_event);
 
         this->reads[shared_event.s_it->ssa_lhs.get_l1_object_identifier()].emplace_back(shared_event);
         this->global_variables.insert(shared_event.s_it->ssa_lhs.get_l1_object_identifier());
