@@ -1,3 +1,4 @@
+// clang-format off
 //
 // Created by paolo on 8/30/25.
 //
@@ -1332,5 +1333,5 @@ __NTH (pthread_equal (pthread_t __thread1, pthread_t __thread2))
 
 __END_DECLS
 
-
 #endif //CBMC_PTHREAD_H
+// clang-format off

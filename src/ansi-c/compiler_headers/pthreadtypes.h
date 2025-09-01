@@ -1,9 +1,10 @@
+// clang-format off
 //
 // Created by paolo on 8/30/25.
 //
 
-#ifndef CBMC_PTHREADTYPES_LIB_H
-#define CBMC_PTHREADTYPES_LIB_H
+#ifndef CBMC_PTHREADTYPES_H
+#define CBMC_PTHREADTYPES_H
 
 /* For internal mutex and condition variable definitions.  */
 #include <bits/thread-shared-types.h>
@@ -50,6 +51,8 @@ typedef union pthread_attr_t pthread_attr_t;
 #endif
 
 
+typedef signed char pthread_mutex_t;
+
 /*typedef union
 {
   struct __pthread_mutex_s __data;
@@ -57,7 +60,6 @@ typedef union pthread_attr_t pthread_attr_t;
   long int __align;
 } pthread_mutex_t;*/
 
-typedef signed char pthread_mutex_t;
 
 typedef union
 {
@@ -106,4 +108,5 @@ typedef union
 #endif
 
 
-#endif //CBMC_PTHREADTYPES_LIB_H
+#endif //CBMC_PTHREADTYPES_H
+// clang-format on

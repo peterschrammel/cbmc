@@ -60,6 +60,8 @@ endif()
 
 ################################################################################
 
+make_inc(compiler_headers/pthreadtypes)
+make_inc(compiler_headers/pthread)
 make_inc(compiler_headers/arm_builtin_headers)
 make_inc(compiler_headers/clang_builtin_headers)
 make_inc(compiler_headers/cw_builtin_headers)
@@ -87,6 +89,8 @@ make_inc(compiler_headers/windows_builtin_headers)
 make_inc(cprover_builtin_headers)
 
 set(extra_dependencies
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/pthreadtypes.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/pthread.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/arm_builtin_headers.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/clang_builtin_headers.inc
     ${CMAKE_CURRENT_BINARY_DIR}/compiler_headers/cw_builtin_headers.inc
