@@ -4,6 +4,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+add_compile_definitions(CBMC_SRC_DIR="${CMAKE_SOURCE_DIR}")
+
 # Compile with /usr/bin/clang on MacOS
 # See https://github.com/diffblue/cbmc/issues/4956
 #

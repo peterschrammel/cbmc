@@ -380,6 +380,9 @@ bool c_preprocess_codewarrior(
   for(const auto &define : config.ansi_c.defines)
     command.push_back(" -D" + define);
 
+  #ifdef CBMC_SRC_DIR
+  config.ansi_c.include_paths.push_back(std::string(CBMC_SRC_DIR) + "/src/ansi-c/compiler_headers");
+  #endif
   for(const auto &include_path : config.ansi_c.include_paths)
     command.push_back(" -I" + include_path);
 
@@ -595,6 +598,9 @@ bool c_preprocess_gcc_clang(
   for(const auto &define : config.ansi_c.defines)
     argv.push_back("-D" + define);
 
+  #ifdef CBMC_SRC_DIR
+  config.ansi_c.include_paths.push_back(std::string(CBMC_SRC_DIR) + "/src/ansi-c/compiler_headers");
+  #endif
   for(const auto &include_path : config.ansi_c.include_paths)
     argv.push_back("-I" + include_path);
 
@@ -687,6 +693,9 @@ bool c_preprocess_arm(
   for(const auto &define : config.ansi_c.defines)
     argv.push_back("-D" + define);
 
+  #ifdef CBMC_SRC_DIR
+  config.ansi_c.include_paths.push_back(std::string(CBMC_SRC_DIR) + "/src/ansi-c/compiler_headers");
+  #endif
   for(const auto &include_path : config.ansi_c.include_paths)
     argv.push_back("-I" + include_path);
 
