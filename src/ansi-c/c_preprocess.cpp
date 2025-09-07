@@ -381,7 +381,7 @@ bool c_preprocess_codewarrior(
     command.push_back(" -D" + define);
 
   #ifdef CBMC_SRC_DIR
-  config.ansi_c.include_paths.push_back(std::string(CBMC_SRC_DIR) + "/src/ansi-c/compiler_headers");
+  config.ansi_c.include_paths.push_back(std::string(CBMC_SRC_DIR) + "/src/ansi-c/compiler_headers/pthread");
   #endif
   for(const auto &include_path : config.ansi_c.include_paths)
     command.push_back(" -I" + include_path);
@@ -599,7 +599,7 @@ bool c_preprocess_gcc_clang(
     argv.push_back("-D" + define);
 
   #ifdef CBMC_SRC_DIR
-  config.ansi_c.include_paths.push_back(std::string(CBMC_SRC_DIR) + "/src/ansi-c/compiler_headers");
+  config.ansi_c.include_paths.push_back(std::string(CBMC_SRC_DIR) + "/src/ansi-c/compiler_headers/pthread");
   #endif
   for(const auto &include_path : config.ansi_c.include_paths)
     argv.push_back("-I" + include_path);
@@ -694,7 +694,7 @@ bool c_preprocess_arm(
     argv.push_back("-D" + define);
 
   #ifdef CBMC_SRC_DIR
-  config.ansi_c.include_paths.push_back(std::string(CBMC_SRC_DIR) + "/src/ansi-c/compiler_headers");
+  config.ansi_c.include_paths.push_back(std::string(CBMC_SRC_DIR) + "/src/ansi-c/compiler_headers/pthread");
   #endif
   for(const auto &include_path : config.ansi_c.include_paths)
     argv.push_back("-I" + include_path);
