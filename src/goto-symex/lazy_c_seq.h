@@ -23,11 +23,13 @@ private:
   {
     symex_target_equationt::SSA_stepst::const_iterator s_it;
     unsigned label;
+    unsigned thread;
   };
   struct lazy_variable
   {
     std::size_t round;
     unsigned label;
+    unsigned thread;
     symbol_exprt symbol;
   };
   struct active_thread
@@ -39,12 +41,14 @@ private:
   struct exec
   {
     unsigned label;
+    unsigned thread;
     std::size_t round;
     symbol_exprt symbol;
   };
   struct enabled
   {
     unsigned label;
+    unsigned thread;
     std::size_t round;
     symbol_exprt symbol;
   };
@@ -73,11 +77,10 @@ private:
   std::vector<enabled> enabled_vector;
   std::vector<cs> cs_vector;
   std::vector<reach> reach_vector;
-  std::vector<std::pair<std::size_t, std::size_t>> atomic_sections;
+  std::vector<std::pair<unsigned, std::pair<std::size_t, std::size_t>>>
+    atomic_sections; // < thread < start_label, end_label > >
   std::unordered_map<irep_idt, shared_event> atomic_writes;
-  std::unordered_map<std::size_t, std::size_t> label_to_thread;
-
-  unsigned n_bit;
+  std::unordered_map<unsigned, unsigned> n_bit;
 
   void handling_active_threads(
     symex_target_equationt &equation,
@@ -99,8 +102,11 @@ private:
     symex_target_equationt &equation,
     message_handlert &message_handler);
 
-  std::optional<symbol_exprt>
-  previous_shared(irep_idt variable, unsigned label, std::size_t round);
+  std::optional<symbol_exprt> previous_shared(
+    irep_idt variable,
+    unsigned label,
+    unsigned thread,
+    std::size_t round);
 
   void create_cs_constraint(
     symex_target_equationt &equation,
@@ -114,12 +120,18 @@ private:
     symex_target_equationt &equation,
     message_handlert &message_handler);
 
+  symbol_exprt create_lazy_symbol(
+    unsigned label,
+    unsigned thread,
+    std::size_t round,
+    ssa_exprt lhs,
+    typet type);
+
   symbol_exprt
-  create_lazy_symbol(unsigned label, std::size_t round, ssa_exprt lhs, typet type);
+  create_exec_symbol(unsigned label, unsigned thread, std::size_t round);
 
-  symbol_exprt create_exec_symbol(unsigned label, std::size_t round);
-
-  symbol_exprt create_enabled_symbol(unsigned label, std::size_t round);
+  symbol_exprt
+  create_enabled_symbol(unsigned label, unsigned thread, std::size_t round);
 
   symbol_exprt create_cs_symbol(std::size_t thread, std::size_t round);
 
