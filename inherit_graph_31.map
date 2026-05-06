@@ -1,6 +1,9 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classai__storage__baset.html" title="This is the basic interface for storing domains." alt="" coords="5,35,139,61"/>
-<area shape="rect" id="node2" href="$classtrace__map__storaget.html" title=" " alt="" coords="187,35,339,61"/>
-<area shape="rect" id="node3" href="$classhistory__sensitive__storaget.html" title=" " alt="" coords="387,5,581,32"/>
-<area shape="rect" id="node4" href="$classlocation__sensitive__storaget.html" title="The most conventional storage; one domain per location." alt="" coords="414,57,554,98"/>
+<area shape="rect" id="Node000000" href="$classai__history__factory__baset.html" title="As more detailed histories can get complex (for example, nested loops or deep, mutually recursive cal..." alt="" coords="5,85,144,125"/>
+<area shape="rect" id="Node000001" href="$classai__history__factory__default__constructort.html" title="An easy factory implementation for histories that don&#39;t need parameters." alt="" coords="192,5,352,60"/>
+<area shape="poly" id="edge100_Node000000_Node000001" title=" " alt="" coords="142,77,196,58,198,63,144,82"/>
+<area shape="rect" id="Node000002" href="$classcall__stack__history__factoryt.html" title=" " alt="" coords="203,85,341,125"/>
+<area shape="poly" id="edge101_Node000000_Node000002" title=" " alt="" coords="158,102,202,102,202,107,158,107"/>
+<area shape="rect" id="Node000003" href="$classlocal__control__flow__history__factoryt.html" title=" " alt="" coords="203,149,341,189"/>
+<area shape="poly" id="edge102_Node000000_Node000003" title=" " alt="" coords="151,126,211,146,209,151,149,131"/>
 </map>

@@ -1,44 +1,75 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/fresh_symbol.h" name="/home/runner/work/cbmc/cbmc/src/util/fresh_symbol.h">
-<area shape="rect" id="node1" title="Fresh auxiliary symbol creation." alt="" coords="4561,5,4775,47"/>
-<area shape="rect" id="node2" href="$allocate__objects_8cpp.html" title=" " alt="" coords="5,102,189,158"/>
-<area shape="rect" id="node3" href="$c__nondet__symbol__factory_8cpp.html" title="C Nondet Symbol Factory." alt="" coords="214,102,405,158"/>
-<area shape="rect" id="node4" href="$c__typecheck__type_8cpp.html" title="C++ Language Type Checking." alt="" coords="429,102,641,158"/>
-<area shape="rect" id="node5" href="$builtin__functions_8cpp.html" title="Program Transformation." alt="" coords="664,102,901,158"/>
-<area shape="rect" id="node6" href="$goto__clean__expr_8cpp.html" title="Program Transformation." alt="" coords="925,95,1109,165"/>
-<area shape="rect" id="node7" href="$goto__convert_8cpp.html" title="Program Transformation." alt="" coords="1134,102,1349,158"/>
-<area shape="rect" id="node8" href="$goto__convert__side__effect_8cpp.html" title="Program Transformation." alt="" coords="1373,95,1560,165"/>
-<area shape="rect" id="node9" href="$memory__snapshot__harness__generator_8cpp.html" title=" " alt="" coords="1584,95,1789,165"/>
-<area shape="rect" id="node10" href="$recursive__initialization_8cpp.html" title=" " alt="" coords="1814,102,2015,158"/>
-<area shape="rect" id="node11" href="$contracts_8cpp.html" title="Verify and use annotated loop and function contracts." alt="" coords="2039,102,2233,158"/>
-<area shape="rect" id="node12" href="$dfcc_8cpp.html" title=" " alt="" coords="2257,95,2455,165"/>
-<area shape="rect" id="node13" href="$dfcc__cfg__info_8cpp.html" title=" " alt="" coords="2479,95,2676,165"/>
-<area shape="rect" id="node14" href="$dfcc__contract__clauses__codegen_8cpp.html" title=" " alt="" coords="2700,95,2959,165"/>
-<area shape="rect" id="node15" href="$dfcc__contract__functions_8cpp.html" title=" " alt="" coords="2983,95,3190,165"/>
-<area shape="rect" id="node16" href="$dfcc__contract__handler_8cpp.html" title=" " alt="" coords="3215,95,3412,165"/>
-<area shape="rect" id="node17" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="3436,95,3633,165"/>
-<area shape="rect" id="node18" href="$dfcc__instrument__loop_8cpp.html" title=" " alt="" coords="3657,95,3855,165"/>
-<area shape="rect" id="node19" href="$dfcc__swap__and__wrap_8cpp.html" title=" " alt="" coords="3879,95,4076,165"/>
-<area shape="rect" id="node20" href="$dfcc__utils_8cpp.html" title=" " alt="" coords="4100,95,4297,165"/>
-<area shape="rect" id="node21" href="$instrument__spec__assigns_8cpp.html" title="Specify write set in code contracts." alt="" coords="4322,95,4521,165"/>
-<area shape="rect" id="node22" href="$memory__predicates_8cpp.html" title="Predicates to specify memory footprint in function contracts." alt="" coords="4545,102,4791,158"/>
-<area shape="rect" id="node23" href="$utils_8cpp.html" title=" " alt="" coords="4815,102,5009,158"/>
-<area shape="rect" id="node24" href="$generate__function__bodies_8cpp.html" title=" " alt="" coords="5033,102,5255,158"/>
-<area shape="rect" id="node25" href="$nondet__volatile_8cpp.html" title="Volatile Variables." alt="" coords="5279,102,5473,158"/>
-<area shape="rect" id="node26" href="$shared__buffers_8cpp.html" title=" " alt="" coords="5497,102,5690,158"/>
-<area shape="rect" id="node27" href="$weak__memory_8cpp.html" title="Weak Memory Instrumentation for Threaded Goto Programs." alt="" coords="5714,102,5907,158"/>
-<area shape="rect" id="node28" href="$mm__io_8cpp.html" title="Perform Memory&#45;mapped I/O instrumentation." alt="" coords="5932,102,6116,158"/>
-<area shape="rect" id="node29" href="$remove__function__pointers_8cpp.html" title="Program Transformation." alt="" coords="6141,102,6363,158"/>
-<area shape="rect" id="node30" href="$remove__virtual__functions_8cpp.html" title="Remove Virtual Function (Method) Calls." alt="" coords="6388,102,6607,158"/>
-<area shape="rect" id="node31" href="$string__abstraction_8cpp.html" title="String Abstraction." alt="" coords="6631,102,6815,158"/>
-<area shape="rect" id="node32" href="$auto__objects_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="6839,102,7038,158"/>
-<area shape="rect" id="node33" href="$goto__symex_8cpp.html" title="Symbolic Execution." alt="" coords="7062,102,7261,158"/>
-<area shape="rect" id="node34" href="$shadow__memory_8cpp.html" title="Symex Shadow Memory Instrumentation." alt="" coords="7285,102,7505,158"/>
-<area shape="rect" id="node35" href="$symex__builtin__functions_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="7529,102,7743,158"/>
-<area shape="rect" id="node36" href="$symex__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="7767,102,7982,158"/>
-<area shape="rect" id="node37" href="$symex__function__call_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="8006,102,8221,158"/>
-<area shape="rect" id="node38" href="$value__set__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="8245,102,8446,158"/>
-<area shape="rect" id="node39" href="$fresh__symbol_8cpp.html" title="Fresh auxiliary symbol creation." alt="" coords="8470,109,8698,151"/>
-<area shape="rect" id="node40" href="$create__array__with__type__intrinsic_8cpp.html" title="Implementation of CProver.createArrayWithType intrinsic." alt="" coords="8722,102,8987,158"/>
-<area shape="rect" id="node41" href="$java__object__factory_8cpp.html" title=" " alt="" coords="9012,102,9231,158"/>
-<area shape="rect" id="node42" href="$java__utils_8cpp.html" title=" " alt="" coords="9255,102,9473,158"/>
+<area shape="rect" id="Node000001" title="Fresh auxiliary symbol creation." alt="" coords="4095,5,4309,45"/>
+<area shape="rect" id="Node000002" href="$create__array__with__type__intrinsic_8cpp.html" title="Implementation of CProver.createArrayWithType intrinsic." alt="" coords="5,101,271,155"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="4082,30,3282,35,2095,47,952,66,532,80,383,88,284,96,240,103,239,98,283,91,382,82,531,75,952,61,2095,41,3282,30,4081,25"/>
+<area shape="rect" id="Node000003" href="$java__object__factory_8cpp.html" title=" " alt="" coords="295,101,514,155"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="4081,30,3325,34,2215,44,1651,53,1149,64,757,78,619,87,526,96,489,103,488,98,526,91,618,81,757,73,1149,59,1651,48,2215,39,3325,28,4081,24"/>
+<area shape="rect" id="Node000004" href="$java__utils_8cpp.html" title=" " alt="" coords="538,101,757,155"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="4081,30,3370,35,2336,46,1347,66,983,79,855,87,769,96,732,103,731,98,768,91,854,82,983,74,1346,60,2336,41,3370,29,4081,25"/>
+<area shape="rect" id="Node000005" href="$allocate__objects_8cpp.html" title=" " alt="" coords="781,101,965,155"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="4082,30,3409,34,2440,44,1951,53,1516,64,1177,78,1057,87,977,96,945,103,944,98,976,91,1056,81,1176,73,1515,59,1951,48,2440,39,3409,28,4082,24"/>
+<area shape="rect" id="Node000006" href="$c__nondet__symbol__factory_8cpp.html" title="C Nondet Symbol Factory." alt="" coords="989,101,1180,155"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="4082,30,3449,35,2547,46,1691,66,1377,80,1266,87,1192,96,1159,103,1158,98,1191,91,1265,82,1377,74,1690,61,2547,41,3449,30,4081,25"/>
+<area shape="rect" id="Node000007" href="$c__typecheck__type_8cpp.html" title="C++ Language Type Checking." alt="" coords="1204,101,1416,155"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="4082,30,3494,37,2667,50,1884,70,1597,82,1428,96,1393,103,1392,98,1427,91,1597,77,1883,64,2666,45,3494,32,4082,25"/>
+<area shape="rect" id="Node000008" href="$builtin__functions_8cpp.html" title="Program Transformation." alt="" coords="1439,101,1677,155"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="4081,29,3590,30,2898,38,2538,46,2200,58,1909,74,1689,96,1650,103,1649,98,1688,91,1908,69,2200,52,2538,41,2898,32,3590,25,4081,24"/>
+<area shape="rect" id="Node000009" href="$goto__clean__expr_8cpp.html" title="Program Transformation." alt="" coords="1701,93,1885,163"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="4082,31,3584,38,2904,52,2267,71,2034,83,1897,96,1885,98,1884,93,1896,91,2034,78,2267,66,2904,46,3584,33,4082,25"/>
+<area shape="rect" id="Node000010" href="$goto__convert_8cpp.html" title="Program Transformation." alt="" coords="1909,101,2124,155"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="4081,29,3669,32,3108,41,2818,50,2547,61,2313,77,2137,96,2101,103,2100,98,2136,91,2313,71,2546,56,2817,44,3107,36,3669,27,4081,24"/>
+<area shape="rect" id="Node000011" href="$goto__convert__side__effect_8cpp.html" title="Program Transformation." alt="" coords="2149,93,2335,163"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="4081,29,3707,32,3207,41,2949,50,2710,61,2504,77,2348,96,2336,98,2335,93,2347,91,2503,71,2709,56,2949,44,3206,36,3707,27,4081,24"/>
+<area shape="rect" id="Node000012" href="$memory__snapshot__harness__generator_8cpp.html" title=" " alt="" coords="2359,93,2565,163"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="4082,31,3750,36,3316,47,2888,66,2711,80,2577,96,2565,98,2564,93,2576,91,2711,74,2888,61,3316,42,3750,30,4081,25"/>
+<area shape="rect" id="Node000013" href="$recursive__initialization_8cpp.html" title=" " alt="" coords="2589,101,2791,155"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="4082,31,3792,38,3424,50,3064,69,2915,81,2802,96,2770,103,2768,98,2802,91,2915,76,3064,64,3423,45,3792,33,4081,26"/>
+<area shape="rect" id="Node000014" href="$contracts_8cpp.html" title="Verify and use annotated loop and function contracts." alt="" coords="2815,101,3008,155"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="4082,32,3530,54,3235,72,3114,83,3021,96,2989,103,2988,98,3020,91,3113,78,3235,67,3529,48,4081,27"/>
+<area shape="rect" id="Node000015" href="$dfcc__cfg__info_8cpp.html" title=" " alt="" coords="3033,93,3230,163"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="4082,29,3916,33,3705,43,3474,63,3357,77,3242,96,3231,98,3229,93,3242,91,3356,72,3473,57,3705,37,3915,27,4082,24"/>
+<area shape="rect" id="Node000016" href="$dfcc__contract__clauses__codegen_8cpp.html" title=" " alt="" coords="3254,93,3513,163"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="4082,36,3825,57,3675,74,3525,96,3513,98,3513,93,3524,91,3674,69,3824,52,4081,31"/>
+<area shape="rect" id="Node000017" href="$dfcc__instrument_8cpp.html" title=" " alt="" coords="3537,93,3734,163"/>
+<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="4082,42,3922,64,3747,96,3735,99,3733,94,3745,91,3921,58,4082,37"/>
+<area shape="rect" id="Node000018" href="$dfcc__utils_8cpp.html" title=" " alt="" coords="3758,93,3955,163"/>
+<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="4123,52,3968,96,3956,99,3955,94,3967,91,4121,46"/>
+<area shape="rect" id="Node000019" href="$instrument__spec__assigns_8cpp.html" title="Specify write set in code contracts." alt="" coords="3980,93,4179,163"/>
+<area shape="poly" id="edge18_Node000001_Node000019" title=" " alt="" coords="4170,56,4122,95,4119,91,4167,52"/>
+<area shape="rect" id="Node000020" href="$memory__predicates_8cpp.html" title="Predicates to specify memory footprint in function contracts." alt="" coords="4203,101,4449,155"/>
+<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="4238,52,4295,98,4292,102,4234,56"/>
+<area shape="rect" id="Node000021" href="$utils_8cpp.html" title=" " alt="" coords="4473,101,4667,155"/>
+<area shape="poly" id="edge20_Node000001_Node000021" title=" " alt="" coords="4293,46,4463,91,4488,98,4486,103,4461,96,4291,51"/>
+<area shape="rect" id="Node000022" href="$generate__function__bodies_8cpp.html" title=" " alt="" coords="4691,101,4913,155"/>
+<area shape="poly" id="edge21_Node000001_Node000022" title=" " alt="" coords="4323,37,4492,59,4680,91,4712,98,4711,103,4679,96,4492,64,4322,42"/>
+<area shape="rect" id="Node000023" href="$nondet__volatile_8cpp.html" title="Volatile Variables." alt="" coords="4937,101,5131,155"/>
+<area shape="poly" id="edge22_Node000001_Node000023" title=" " alt="" coords="4323,28,4448,34,4599,46,4763,64,4925,91,4956,98,4954,103,4924,96,4762,70,4599,51,4448,40,4322,33"/>
+<area shape="rect" id="Node000024" href="$shared__buffers_8cpp.html" title=" " alt="" coords="5155,101,5348,155"/>
+<area shape="poly" id="edge23_Node000001_Node000024" title=" " alt="" coords="4323,24,4486,27,4692,37,4918,57,5032,72,5144,91,5175,98,5174,103,5143,96,5031,78,4917,63,4691,43,4486,33,4323,29"/>
+<area shape="rect" id="Node000025" href="$weak__memory_8cpp.html" title="Weak Memory Instrumentation for Threaded Goto Programs." alt="" coords="5372,101,5565,155"/>
+<area shape="poly" id="edge24_Node000001_Node000025" title=" " alt="" coords="4323,27,4864,48,5152,67,5270,78,5361,91,5393,98,5391,103,5360,96,5270,83,5151,72,4863,54,4322,33"/>
+<area shape="rect" id="Node000026" href="$mm__io_8cpp.html" title="Perform Memory&#45;mapped I/O instrumentation." alt="" coords="5590,101,5774,155"/>
+<area shape="poly" id="edge25_Node000001_Node000026" title=" " alt="" coords="4322,26,4607,32,4969,44,5322,63,5467,76,5578,91,5609,98,5608,103,5578,96,5467,81,5321,68,4969,49,4607,37,4322,31"/>
+<area shape="rect" id="Node000027" href="$remove__function__pointers_8cpp.html" title="Program Transformation." alt="" coords="5799,101,6021,155"/>
+<area shape="poly" id="edge26_Node000001_Node000027" title=" " alt="" coords="4322,26,4646,32,5068,44,5483,63,5656,76,5786,91,5823,98,5822,103,5786,96,5655,81,5483,68,5068,49,4646,37,4322,31"/>
+<area shape="rect" id="Node000028" href="$remove__virtual__functions_8cpp.html" title="Remove Virtual Function (Method) Calls." alt="" coords="6046,101,6265,155"/>
+<area shape="poly" id="edge27_Node000001_Node000028" title=" " alt="" coords="4323,25,4693,29,5187,40,5677,59,5880,73,6034,91,6071,98,6070,103,6034,96,5880,79,5676,65,5186,45,4692,34,4323,30"/>
+<area shape="rect" id="Node000029" href="$string__abstraction_8cpp.html" title="String Abstraction." alt="" coords="6289,101,6473,155"/>
+<area shape="poly" id="edge28_Node000001_Node000029" title=" " alt="" coords="4323,23,4737,24,5301,32,5593,40,5865,52,6100,69,6277,91,6309,98,6307,103,6276,96,6099,74,5865,58,5593,46,5301,37,4737,30,4323,29"/>
+<area shape="rect" id="Node000030" href="$auto__objects_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="6497,101,6696,155"/>
+<area shape="poly" id="edge29_Node000001_Node000030" title=" " alt="" coords="4322,23,4773,24,5398,31,5723,39,6026,51,6288,68,6485,91,6519,98,6518,103,6484,96,6287,74,6026,57,5723,45,5398,36,4773,29,4322,29"/>
+<area shape="rect" id="Node000031" href="$goto__symex_8cpp.html" title="Symbolic Execution." alt="" coords="6720,101,6919,155"/>
+<area shape="poly" id="edge30_Node000001_Node000031" title=" " alt="" coords="4322,25,4859,32,5602,46,6302,65,6558,77,6709,91,6743,98,6741,103,6708,96,6557,82,6302,70,5602,51,4859,38,4322,31"/>
+<area shape="rect" id="Node000032" href="$shadow__memory_8cpp.html" title="Symex Shadow Memory Instrumentation." alt="" coords="6943,101,7163,155"/>
+<area shape="poly" id="edge31_Node000001_Node000032" title=" " alt="" coords="4322,25,4902,32,5715,46,6484,65,6765,77,6932,91,6968,98,6967,103,6931,96,6765,82,6483,70,5715,51,4902,38,4322,31"/>
+<area shape="rect" id="Node000033" href="$symex__builtin__functions_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="7187,101,7401,155"/>
+<area shape="poly" id="edge32_Node000001_Node000033" title=" " alt="" coords="4322,25,4948,31,5837,43,6683,63,6992,76,7176,91,7212,98,7211,103,7175,96,6992,81,6683,68,5837,49,4948,36,4322,30"/>
+<area shape="rect" id="Node000034" href="$symex__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="7425,101,7640,155"/>
+<area shape="poly" id="edge33_Node000001_Node000034" title=" " alt="" coords="4322,25,4993,30,5957,42,6877,61,7215,75,7414,91,7451,98,7450,103,7414,96,7215,80,6877,67,5957,47,4992,35,4322,30"/>
+<area shape="rect" id="Node000035" href="$symex__function__call_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="7664,101,7879,155"/>
+<area shape="poly" id="edge34_Node000001_Node000035" title=" " alt="" coords="4322,25,5037,29,6076,40,6603,49,7072,60,7437,74,7567,82,7653,91,7689,98,7688,103,7652,96,7566,87,7437,79,7071,65,6603,54,6076,45,5037,34,4322,30"/>
+<area shape="rect" id="Node000036" href="$value__set__dereference_8cpp.html" title="Symbolic Execution of ANSI&#45;C." alt="" coords="7903,101,8104,155"/>
+<area shape="poly" id="edge35_Node000001_Node000036" title=" " alt="" coords="4323,24,5081,27,6196,37,6762,46,7266,57,7660,72,7799,81,7892,91,7926,98,7925,103,7891,96,7798,86,7659,77,7266,62,6762,51,6196,42,5081,33,4323,30"/>
+<area shape="rect" id="Node000037" href="$fresh__symbol_8cpp.html" title="Fresh auxiliary symbol creation." alt="" coords="8128,108,8356,148"/>
+<area shape="poly" id="edge36_Node000001_Node000037" title=" " alt="" coords="4323,24,5123,28,6308,38,6911,47,7449,58,7869,73,8018,81,8117,91,8184,105,8183,111,8116,96,8018,86,7869,78,7449,63,6911,52,6308,43,5123,33,4323,30"/>
 </map>

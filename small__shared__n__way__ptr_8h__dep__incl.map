@@ -1,62 +1,172 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/small_shared_n_way_ptr.h" name="/home/runner/work/cbmc/cbmc/src/util/small_shared_n_way_ptr.h">
-<area shape="rect" id="node1" title=" " alt="" coords="5684,5,5884,61"/>
-<area shape="rect" id="node2" href="$sharing__node_8h.html" title="Sharing node." alt="" coords="5692,109,5876,165"/>
-<area shape="rect" id="node3" href="$sharing__map_8h.html" title="Sharing map." alt="" coords="5679,213,5888,255"/>
-<area shape="rect" id="node4" href="$abstract__object_8h.html" title="abstract_objectt is the top of the inheritance heirarchy of objects used to represent individual vari..." alt="" coords="3252,303,3462,359"/>
-<area shape="rect" id="node9" href="$full__struct__abstract__object_8h.html" title="An abstraction of a structure that stores one abstract object per field." alt="" coords="769,644,993,715"/>
-<area shape="rect" id="node48" href="$goto__state_8h.html" title="goto_statet class definition" alt="" coords="6256,414,6455,470"/>
-<area shape="rect" id="node54" href="$renaming__level_8h.html" title="Renaming levels." alt="" coords="5668,303,5900,359"/>
-<area shape="rect" id="node57" href="$value__set_8h.html" title="Value Set." alt="" coords="6259,303,6452,359"/>
-<area shape="rect" id="node5" href="$abstract__aggregate__object_8h.html" title="Common behaviour for abstract objects modelling aggregate values &#45; arrays, structs,..." alt="" coords="2482,525,2707,596"/>
-<area shape="rect" id="node14" href="$abstract__environment_8h.html" title="An abstract version of a program environment." alt="" coords="3098,414,3352,470"/>
-<area shape="rect" id="node16" href="$abstract__object_8cpp.html" title=" " alt="" coords="65,533,292,589"/>
-<area shape="rect" id="node32" href="$abstract__pointer__object_8h.html" title="The base of all pointer abstractions." alt="" coords="3854,407,4060,477"/>
-<area shape="rect" id="node36" href="$abstract__value__object_8h.html" title="Common behaviour for abstract objects modelling values &#45; constants, intervals, etc." alt="" coords="4486,407,4689,477"/>
-<area shape="rect" id="node42" href="$context__abstract__object_8h.html" title="General implementation of a an abstract_objectt which can track side information in the form of a &#39;co..." alt="" coords="5136,644,5344,715"/>
-<area shape="rect" id="node45" href="$location__update__visitor_8h.html" title=" " alt="" coords="82,644,285,715"/>
-<area shape="rect" id="node46" href="$variable__sensitivity__object__factory_8h.html" title="Tracks the user&#45;supplied configuration for VSD and build the correct type of abstract object when nee..." alt="" coords="1017,644,1244,715"/>
-<area shape="rect" id="node47" href="$write__stack__entry_8h.html" title="Represents an entry in the write_stackt." alt="" coords="3376,414,3602,470"/>
-<area shape="rect" id="node6" href="$full__array__abstract__object_8h.html" title="An abstraction of an array value." alt="" coords="2012,644,2233,715"/>
-<area shape="rect" id="node11" href="$two__value__array__abstract__object_8h.html" title="The base type of all abstract array representations." alt="" coords="2258,644,2464,715"/>
-<area shape="rect" id="node12" href="$two__value__struct__abstract__object_8h.html" title="The base of all structure abstractions." alt="" coords="2489,644,2700,715"/>
-<area shape="rect" id="node13" href="$two__value__union__abstract__object_8h.html" title="The base of all union abstractions." alt="" coords="2724,644,2934,715"/>
-<area shape="rect" id="node7" href="$full__array__abstract__object_8cpp.html" title=" " alt="" coords="320,763,541,833"/>
-<area shape="rect" id="node8" href="$variable__sensitivity__object__factory_8cpp.html" title=" " alt="" coords="2801,763,3028,833"/>
-<area shape="rect" id="node10" href="$full__struct__abstract__object_8cpp.html" title=" " alt="" coords="72,763,296,833"/>
-<area shape="rect" id="node15" href="$abstract__environment_8cpp.html" title=" " alt="" coords="3358,770,3628,826"/>
-<area shape="rect" id="node17" href="$abstract__pointer__object_8cpp.html" title=" " alt="" coords="3854,525,4060,596"/>
-<area shape="rect" id="node18" href="$abstract__value__object_8cpp.html" title=" " alt="" coords="4857,763,5060,833"/>
-<area shape="rect" id="node19" href="$constant__pointer__abstract__object_8cpp.html" title=" " alt="" coords="3404,644,3612,715"/>
-<area shape="rect" id="node20" href="$interval__abstract__value_8cpp.html" title=" " alt="" coords="3100,763,3310,833"/>
-<area shape="rect" id="node21" href="$two__value__pointer__abstract__object_8cpp.html" title=" " alt="" coords="3009,644,3228,715"/>
-<area shape="rect" id="node22" href="$value__set__abstract__object_8cpp.html" title="Value Set Abstract Object." alt="" coords="4594,763,4816,833"/>
-<area shape="rect" id="node23" href="$value__set__pointer__abstract__object_8cpp.html" title="Value Set of Pointer Abstract Object." alt="" coords="3664,763,3879,833"/>
-<area shape="rect" id="node24" href="$variable__sensitivity__domain_8h.html" title="There are different ways of handling arrays, structures, unions and pointers." alt="" coords="1385,525,1612,596"/>
-<area shape="rect" id="node30" href="$write__stack_8cpp.html" title="Represents a stack of write operations to an addressable memory location." alt="" coords="3628,533,3830,589"/>
-<area shape="rect" id="node31" href="$write__stack__entry_8cpp.html" title="Represents an entry in the write_stackt." alt="" coords="3364,533,3604,589"/>
-<area shape="rect" id="node25" href="$three__way__merge__abstract__interpreter_8cpp.html" title="An abstract interpreter, based on the default recursive&#45;interprocedural that uses variable sensitivit..." alt="" coords="1268,644,1484,715"/>
-<area shape="rect" id="node26" href="$variable__sensitivity__dependence__graph_8h.html" title="A forked and modified version of analyses/dependence_graph." alt="" coords="518,644,745,715"/>
-<area shape="rect" id="node27" href="$build__analyzer_8cpp.html" title=" " alt="" coords="565,770,749,826"/>
-<area shape="rect" id="node28" href="$variable__sensitivity__domain_8cpp.html" title=" " alt="" coords="1508,644,1734,715"/>
-<area shape="rect" id="node29" href="$goto__analyzer__parse__options_8h.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="1759,651,1987,707"/>
-<area shape="rect" id="node33" href="$constant__pointer__abstract__object_8h.html" title="An abstraction of a pointer that tracks a single pointer." alt="" coords="4084,525,4292,596"/>
-<area shape="rect" id="node34" href="$two__value__pointer__abstract__object_8h.html" title=" " alt="" coords="2969,525,3188,596"/>
-<area shape="rect" id="node35" href="$value__set__pointer__abstract__object_8h.html" title="Value Set of Pointer Abstract Object." alt="" coords="3738,644,3952,715"/>
-<area shape="rect" id="node37" href="$abstract__object__set_8h.html" title="an unordered set of value objects" alt="" coords="4468,533,4707,589"/>
-<area shape="rect" id="node39" href="$value__set__abstract__object_8h.html" title="Value Set Abstract Object." alt="" coords="4594,644,4816,715"/>
-<area shape="rect" id="node40" href="$constant__abstract__value_8h.html" title="An abstraction of a single value that just stores a constant." alt="" coords="4840,651,5111,707"/>
-<area shape="rect" id="node41" href="$interval__abstract__value_8h.html" title="An interval to represent a set of possible values." alt="" coords="3977,651,4241,707"/>
-<area shape="rect" id="node38" href="$abstract__object__set_8cpp.html" title=" " alt="" coords="4316,651,4569,707"/>
-<area shape="rect" id="node43" href="$context__abstract__object_8cpp.html" title=" " alt="" coords="5084,763,5292,833"/>
-<area shape="rect" id="node44" href="$write__location__context_8h.html" title="Maintain a context in the variable sensitvity domain that records write locations for a given abstrac..." alt="" coords="5316,763,5518,833"/>
-<area shape="rect" id="node49" href="$frame_8h.html" title="Class for stack frames." alt="" coords="6097,540,6318,581"/>
-<area shape="rect" id="node51" href="$goto__symex__state_8h.html" title="Symbolic Execution." alt="" coords="5960,770,6159,826"/>
-<area shape="rect" id="node52" href="$goto__state_8cpp.html" title=" " alt="" coords="6108,881,6307,937"/>
-<area shape="rect" id="node50" href="$call__stack_8h.html" title=" " alt="" coords="6104,651,6298,707"/>
-<area shape="rect" id="node53" href="$renaming__level_8cpp.html" title="Renaming levels." alt="" coords="5720,881,5952,937"/>
-<area shape="rect" id="node55" href="$postcondition_8cpp.html" title="Symbolic Execution." alt="" coords="5948,421,6233,463"/>
-<area shape="rect" id="node56" href="$precondition_8cpp.html" title="Symbolic Execution." alt="" coords="5644,421,5923,463"/>
-<area shape="rect" id="node58" href="$value__set_8cpp.html" title="Value Set." alt="" coords="6696,414,6890,470"/>
-<area shape="rect" id="node59" href="$value__set__domain_8h.html" title="Value Set." alt="" coords="6479,414,6672,470"/>
-<area shape="rect" id="node60" href="$value__set__analysis_8h.html" title="Value Set Propagation." alt="" coords="6479,533,6672,589"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5537,5,5737,60"/>
+<area shape="rect" id="Node000002" href="$sharing__node_8h.html" title="Sharing node." alt="" coords="5545,108,5729,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="5640,74,5640,108,5635,108,5635,74"/>
+<area shape="rect" id="Node000003" href="$sharing__map_8h.html" title="Sharing map." alt="" coords="5533,211,5742,251"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="5640,176,5640,211,5635,211,5635,176"/>
+<area shape="rect" id="Node000004" href="$abstract__object_8h.html" title="abstract_objectt is the top of the inheritance heirarchy of objects used to represent individual vari..." alt="" coords="3551,299,3761,353"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="5519,240,3762,322,3761,317,5519,235"/>
+<area shape="rect" id="Node000009" href="$full__struct__abstract__object_8h.html" title="An abstraction of a structure that stores one abstract object per field." alt="" coords="283,636,507,705"/>
+<area shape="poly" id="edge89_Node000003_Node000009" title=" " alt="" coords="5519,236,4912,246,3936,273,3361,294,2757,323,2144,359,1543,404,1387,412,1253,410,1023,401,914,406,802,423,742,439,679,460,611,487,539,521,501,545,468,576,418,638,414,634,464,572,498,541,536,516,609,482,677,455,740,434,801,418,914,400,1023,396,1253,405,1387,406,1543,399,2144,354,2757,318,3361,289,3936,267,4912,241,5519,231"/>
+<area shape="rect" id="Node000059" href="$goto__state_8h.html" title="goto_statet class definition" alt="" coords="5691,409,5890,463"/>
+<area shape="poly" id="edge90_Node000003_Node000059" title=" " alt="" coords="5713,254,5742,272,5767,297,5782,324,5791,354,5795,408,5790,409,5785,355,5777,326,5763,300,5739,277,5710,259"/>
+<area shape="rect" id="Node000129" href="$renaming__level_8h.html" title="Renaming levels." alt="" coords="5521,299,5753,353"/>
+<area shape="poly" id="edge98_Node000003_Node000129" title=" " alt="" coords="5640,264,5640,299,5635,299,5635,264"/>
+<area shape="rect" id="Node000132" href="$value__set_8h.html" title="Value Set." alt="" coords="6098,299,6291,353"/>
+<area shape="poly" id="edge104_Node000003_Node000132" title=" " alt="" coords="5756,249,6098,306,6097,311,5755,254"/>
+<area shape="rect" id="Node000005" href="$abstract__aggregate__object_8h.html" title="Common behaviour for abstract objects modelling aggregate values &#45; arrays, structs,..." alt="" coords="1102,519,1327,588"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="3537,332,3183,341,2713,356,2248,377,2055,390,1908,404,1750,429,1592,460,1328,524,1327,519,1591,455,1749,424,1908,399,2055,384,2248,371,2713,350,3183,336,3537,327"/>
+<area shape="rect" id="Node000014" href="$abstract__environment_8h.html" title="An abstract version of a program environment." alt="" coords="3286,409,3541,463"/>
+<area shape="poly" id="edge17_Node000004_Node000014" title=" " alt="" coords="3585,361,3474,411,3471,406,3583,357"/>
+<area shape="rect" id="Node000016" href="$abstract__object_8cpp.html" title=" " alt="" coords="4080,526,4307,581"/>
+<area shape="poly" id="edge39_Node000004_Node000016" title=" " alt="" coords="3732,356,4132,523,4130,528,3730,361"/>
+<area shape="rect" id="Node000037" href="$abstract__pointer__object_8h.html" title="The base of all pointer abstractions." alt="" coords="2711,401,2916,471"/>
+<area shape="poly" id="edge40_Node000004_Node000037" title=" " alt="" coords="3537,345,2917,424,2916,419,3537,340"/>
+<area shape="rect" id="Node000041" href="$abstract__value__object_8h.html" title="Common behaviour for abstract objects modelling values &#45; constants, intervals, etc." alt="" coords="1920,401,2123,471"/>
+<area shape="poly" id="edge52_Node000004_Node000041" title=" " alt="" coords="3537,338,2123,431,2123,425,3537,332"/>
+<area shape="rect" id="Node000048" href="$context__abstract__object_8h.html" title="General implementation of a an abstract_objectt which can track side information in the form of a &#39;co..." alt="" coords="4823,636,5031,705"/>
+<area shape="poly" id="edge72_Node000004_Node000048" title=" " alt="" coords="3775,324,3995,327,4261,337,4392,347,4513,360,4616,377,4693,399,4733,419,4770,446,4803,477,4833,510,4881,578,4913,634,4908,637,4876,581,4829,514,4799,480,4767,450,4730,424,4691,404,4615,382,4512,365,4392,352,4260,342,3995,332,3775,329"/>
+<area shape="rect" id="Node000056" href="$location__update__visitor_8h.html" title=" " alt="" coords="5,636,208,705"/>
+<area shape="poly" id="edge79_Node000004_Node000056" title=" " alt="" coords="3537,333,2841,352,2353,368,1833,389,1324,415,872,446,682,463,522,481,400,500,320,521,268,545,220,576,143,638,139,634,217,571,266,541,318,516,399,495,522,476,681,457,872,440,1324,410,1833,384,2353,363,2841,346,3537,327"/>
+<area shape="rect" id="Node000057" href="$variable__sensitivity__object__factory_8h.html" title="Tracks the user&#45;supplied configuration for VSD and build the correct type of abstract object when nee..." alt="" coords="4572,636,4799,705"/>
+<area shape="poly" id="edge82_Node000004_Node000057" title=" " alt="" coords="3775,329,3970,337,4200,351,4418,372,4507,384,4575,399,4651,416,4712,432,4739,444,4764,461,4788,485,4812,517,4821,536,4824,553,4820,570,4812,589,4790,617,4763,638,4760,634,4787,613,4807,587,4815,569,4818,553,4816,538,4807,520,4784,488,4761,465,4736,449,4710,437,4649,422,4574,404,4506,389,4417,377,4200,357,3969,343,3775,334"/>
+<area shape="rect" id="Node000058" href="$write__stack__entry_8h.html" title="Represents an entry in the write_stackt." alt="" coords="4338,409,4563,463"/>
+<area shape="poly" id="edge86_Node000004_Node000058" title=" " alt="" coords="3775,341,4338,417,4337,422,3775,346"/>
+<area shape="rect" id="Node000006" href="$full__array__abstract__object_8h.html" title="An abstraction of an array value." alt="" coords="632,636,853,705"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="1089,585,866,639,854,642,853,636,865,633,1088,580"/>
+<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="1089,574,620,639,507,655,507,650,620,633,1088,569"/>
+<area shape="rect" id="Node000011" href="$two__value__array__abstract__object_8h.html" title="The base type of all abstract array representations." alt="" coords="1111,636,1318,705"/>
+<area shape="poly" id="edge11_Node000005_Node000011" title=" " alt="" coords="1217,602,1217,636,1212,636,1212,602"/>
+<area shape="rect" id="Node000012" href="$two__value__struct__abstract__object_8h.html" title="The base of all structure abstractions." alt="" coords="1343,636,1553,705"/>
+<area shape="poly" id="edge13_Node000005_Node000012" title=" " alt="" coords="1296,592,1381,633,1379,638,1294,596"/>
+<area shape="rect" id="Node000013" href="$two__value__union__abstract__object_8h.html" title="The base of all union abstractions." alt="" coords="878,636,1087,705"/>
+<area shape="poly" id="edge15_Node000005_Node000013" title=" " alt="" coords="1136,596,1052,638,1049,633,1134,592"/>
+<area shape="rect" id="Node000007" href="$full__array__abstract__object_8cpp.html" title=" " alt="" coords="459,753,680,823"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="682,715,622,755,619,751,679,711"/>
+<area shape="rect" id="Node000008" href="$variable__sensitivity__object__factory_8cpp.html" title=" " alt="" coords="1503,753,1729,823"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="867,703,1044,731,1218,752,1503,777,1502,783,1217,758,1043,736,866,708"/>
+<area shape="poly" id="edge10_Node000009_Node000008" title=" " alt="" coords="520,689,620,703,867,728,1112,749,1503,777,1502,782,1111,755,866,733,620,708,520,695"/>
+<area shape="rect" id="Node000010" href="$full__struct__abstract__object_8cpp.html" title=" " alt="" coords="133,753,357,823"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="342,716,291,755,288,751,339,712"/>
+<area shape="poly" id="edge12_Node000011_Node000008" title=" " alt="" coords="1332,703,1503,752,1502,757,1330,708"/>
+<area shape="poly" id="edge14_Node000012_Node000008" title=" " alt="" coords="1510,711,1568,751,1565,755,1507,715"/>
+<area shape="poly" id="edge16_Node000013_Node000008" title=" " alt="" coords="1101,703,1318,743,1503,770,1502,776,1317,749,1100,708"/>
+<area shape="poly" id="edge18_Node000014_Node000005" title=" " alt="" coords="3272,450,2928,473,2005,521,1328,550,1327,545,2004,515,2928,468,3272,445"/>
+<area shape="poly" id="edge24_Node000014_Node000007" title=" " alt="" coords="3272,451,2928,473,2748,479,2525,481,2007,484,1741,487,1490,493,1268,504,1090,521,1015,529,948,531,834,536,782,545,731,563,678,592,622,638,601,664,587,694,579,725,574,753,569,752,574,724,582,692,597,661,618,634,675,588,729,558,781,540,834,531,948,526,1014,523,1089,516,1268,499,1490,488,1741,482,2007,479,2525,476,2748,473,2928,468,3272,446"/>
+<area shape="poly" id="edge25_Node000014_Node000010" title=" " alt="" coords="3272,451,2928,473,2708,479,2436,480,1802,478,1477,479,1170,485,898,499,781,509,680,521,614,529,555,532,453,538,407,547,363,564,318,594,273,638,256,664,247,694,244,725,244,753,239,753,239,725,242,693,251,662,269,634,315,590,360,560,405,542,452,532,555,526,614,523,680,516,781,503,898,493,1169,480,1477,474,1802,472,2436,474,2708,473,2928,468,3272,446"/>
+<area shape="rect" id="Node000015" href="$abstract__environment_8cpp.html" title=" " alt="" coords="4529,761,4799,815"/>
+<area shape="poly" id="edge19_Node000014_Node000015" title=" " alt="" coords="3555,441,3681,451,3814,466,3933,487,3980,501,4016,516,4035,534,4043,553,4052,571,4069,586,4095,593,4135,599,4250,603,4563,599,4727,597,4873,600,4984,611,5021,621,5044,634,5057,652,5061,670,5056,689,5045,707,5019,732,4994,747,4968,753,4940,754,4881,751,4848,751,4811,756,4778,763,4777,758,4810,751,4847,746,4881,745,4940,749,4967,748,4992,742,5016,728,5041,704,5051,687,5055,670,5052,654,5041,638,5019,626,4983,616,4872,605,4727,602,4563,604,4250,608,4134,604,4093,599,4067,590,4048,574,4039,555,4030,537,4013,521,3978,506,3932,492,3813,471,3680,456,3554,447"/>
+<area shape="poly" id="edge20_Node000014_Node000016" title=" " alt="" coords="3554,447,3792,474,3928,493,4062,516,4097,523,4095,529,4061,521,3927,499,3792,480,3554,453"/>
+<area shape="rect" id="Node000017" href="$abstract__pointer__object_8cpp.html" title=" " alt="" coords="2941,519,3147,588"/>
+<area shape="poly" id="edge21_Node000014_Node000017" title=" " alt="" coords="3317,470,3148,523,3146,518,3316,465"/>
+<area shape="rect" id="Node000018" href="$abstract__value__object_8cpp.html" title=" " alt="" coords="2316,753,2519,823"/>
+<area shape="poly" id="edge22_Node000014_Node000018" title=" " alt="" coords="3367,473,3302,521,3257,560,3237,576,3208,590,3146,608,3092,614,3042,611,2994,605,2948,600,2900,601,2850,612,2793,638,2777,654,2769,671,2760,690,2743,707,2689,737,2631,758,2573,773,2519,782,2518,777,2572,767,2630,753,2687,732,2740,703,2756,687,2764,669,2772,650,2791,634,2848,607,2900,596,2948,595,2995,600,3042,606,3092,609,3145,603,3206,586,3234,571,3254,556,3298,517,3364,469"/>
+<area shape="rect" id="Node000019" href="$constant__pointer__abstract__object_8cpp.html" title=" " alt="" coords="3143,636,3351,705"/>
+<area shape="poly" id="edge23_Node000014_Node000019" title=" " alt="" coords="3389,476,3273,637,3269,634,3384,473"/>
+<area shape="rect" id="Node000020" href="$interval__abstract__value_8cpp.html" title=" " alt="" coords="3202,753,3411,823"/>
+<area shape="poly" id="edge26_Node000014_Node000020" title=" " alt="" coords="3425,476,3432,525,3434,584,3428,646,3421,677,3409,707,3390,733,3366,755,3363,751,3386,730,3404,704,3416,676,3423,645,3429,583,3426,525,3419,477"/>
+<area shape="rect" id="Node000021" href="$two__value__pointer__abstract__object_8cpp.html" title=" " alt="" coords="2511,636,2729,705"/>
+<area shape="poly" id="edge27_Node000014_Node000021" title=" " alt="" coords="3313,471,3264,493,3218,521,3201,538,3191,556,3180,574,3160,590,3103,616,3052,630,3006,635,2960,635,2866,629,2811,630,2748,639,2730,642,2729,637,2748,633,2811,625,2866,624,2961,630,3005,630,3051,625,3101,611,3157,586,3176,571,3186,554,3196,535,3214,517,3261,488,3311,466"/>
+<area shape="rect" id="Node000022" href="$value__set__abstract__object_8cpp.html" title="Value Set Abstract Object." alt="" coords="2825,753,3047,823"/>
+<area shape="poly" id="edge28_Node000014_Node000022" title=" " alt="" coords="3421,477,3423,529,3418,591,3411,622,3400,653,3385,682,3364,707,3349,716,3322,725,3242,743,3048,775,3047,769,3241,738,3320,720,3347,711,3361,703,3380,679,3395,651,3406,621,3413,590,3418,528,3416,477"/>
+<area shape="rect" id="Node000023" href="$value__set__pointer__abstract__object_8cpp.html" title="Value Set of Pointer Abstract Object." alt="" coords="3758,753,3973,823"/>
+<area shape="poly" id="edge29_Node000014_Node000023" title=" " alt="" coords="3555,444,3669,454,3788,470,3894,490,3936,502,3968,516,3988,533,3998,551,4008,569,4025,586,4051,598,4076,603,4123,601,4146,601,4168,604,4190,614,4210,634,4220,651,4225,667,4225,681,4220,695,4198,718,4164,737,4121,752,4072,764,3973,780,3972,775,4071,759,4119,747,4162,732,4195,714,4215,692,4220,680,4220,667,4216,653,4206,638,4187,619,4167,609,4146,606,4123,607,4075,608,4049,603,4023,590,4004,572,3993,554,3984,536,3965,521,3934,507,3892,495,3787,475,3668,460,3554,449"/>
+<area shape="rect" id="Node000024" href="$variable__sensitivity__domain_8h.html" title="There are different ways of handling arrays, structures, unions and pointers." alt="" coords="3728,519,3955,588"/>
+<area shape="poly" id="edge30_Node000014_Node000024" title=" " alt="" coords="3524,464,3729,519,3727,524,3523,469"/>
+<area shape="rect" id="Node000035" href="$write__stack_8cpp.html" title="Represents a stack of write operations to an addressable memory location." alt="" coords="4595,526,4797,581"/>
+<area shape="poly" id="edge37_Node000014_Node000035" title=" " alt="" coords="3554,435,3757,439,4014,451,4299,476,4443,494,4583,516,4616,523,4615,529,4582,521,4442,499,4298,481,4014,457,3757,444,3554,440"/>
+<area shape="rect" id="Node000036" href="$write__stack__entry_8cpp.html" title="Represents an entry in the write_stackt." alt="" coords="4331,526,4571,581"/>
+<area shape="poly" id="edge38_Node000014_Node000036" title=" " alt="" coords="3555,440,3712,450,3903,464,4112,486,4319,516,4356,523,4355,529,4318,521,4111,492,3903,470,3712,455,3554,446"/>
+<area shape="rect" id="Node000025" href="$three__way__merge__abstract__interpreter_8cpp.html" title="An abstract interpreter, based on the default recursive&#45;interprocedural that uses variable sensitivit..." alt="" coords="3980,636,4196,705"/>
+<area shape="poly" id="edge31_Node000024_Node000025" title=" " alt="" coords="3927,591,4017,633,4015,638,3925,596"/>
+<area shape="rect" id="Node000026" href="$variable__sensitivity__dependence__graph_8h.html" title="A forked and modified version of analyses/dependence_graph." alt="" coords="4271,636,4497,705"/>
+<area shape="poly" id="edge32_Node000024_Node000026" title=" " alt="" coords="3969,579,4271,643,4270,648,3968,584"/>
+<area shape="rect" id="Node000028" href="$build__analyzer_8cpp.html" title=" " alt="" coords="4321,761,4505,815"/>
+<area shape="poly" id="edge35_Node000024_Node000028" title=" " alt="" coords="3969,577,4024,585,4273,597,4426,610,4481,620,4500,627,4511,634,4522,652,4525,669,4520,687,4512,707,4489,738,4461,763,4457,759,4485,735,4507,704,4515,685,4519,669,4517,653,4507,638,4497,631,4480,625,4425,615,4273,602,4024,591,3968,582"/>
+<area shape="rect" id="Node000030" href="$variable__sensitivity__domain_8cpp.html" title=" " alt="" coords="3476,636,3703,705"/>
+<area shape="poly" id="edge34_Node000024_Node000030" title=" " alt="" coords="3757,596,3664,638,3662,633,3754,591"/>
+<area shape="rect" id="Node000031" href="$goto__analyzer__parse__options_8h.html" title="Goto&#45;Analyser Command Line Option Processing." alt="" coords="3727,643,3955,698"/>
+<area shape="poly" id="edge36_Node000024_Node000031" title=" " alt="" coords="3844,602,3844,643,3839,643,3839,602"/>
+<area shape="poly" id="edge33_Node000026_Node000028" title=" " alt="" coords="4399,718,4409,760,4404,761,4393,720"/>
+<area shape="poly" id="edge41_Node000037_Node000017" title=" " alt="" coords="2894,475,2978,516,2975,521,2892,479"/>
+<area shape="rect" id="Node000038" href="$constant__pointer__abstract__object_8h.html" title="An abstraction of a pointer that tracks a single pointer." alt="" coords="2709,519,2917,588"/>
+<area shape="poly" id="edge42_Node000037_Node000038" title=" " alt="" coords="2816,485,2816,518,2811,518,2811,485"/>
+<area shape="rect" id="Node000039" href="$two__value__pointer__abstract__object_8h.html" title=" " alt="" coords="2416,519,2635,588"/>
+<area shape="poly" id="edge46_Node000037_Node000039" title=" " alt="" coords="2718,478,2610,521,2609,516,2716,473"/>
+<area shape="rect" id="Node000040" href="$value__set__pointer__abstract__object_8h.html" title="Value Set of Pointer Abstract Object." alt="" coords="2271,636,2486,705"/>
+<area shape="poly" id="edge49_Node000037_Node000040" title=" " alt="" coords="2697,449,2612,459,2526,473,2453,494,2425,506,2406,521,2389,546,2380,577,2376,608,2377,636,2372,636,2371,607,2374,575,2384,544,2402,517,2422,502,2451,489,2525,468,2611,453,2697,443"/>
+<area shape="poly" id="edge45_Node000038_Node000008" title=" " alt="" coords="2696,583,2647,591,2471,596,2177,600,2024,604,1886,611,1779,622,1742,630,1719,638,1688,662,1664,692,1644,724,1631,754,1626,752,1640,722,1659,689,1685,658,1716,634,1741,625,1778,617,1886,606,2024,599,2177,595,2471,591,2646,585,2696,578"/>
+<area shape="poly" id="edge43_Node000038_Node000019" title=" " alt="" coords="2932,586,3125,633,3143,638,3142,643,3123,639,2930,591"/>
+<area shape="poly" id="edge44_Node000038_Node000023" title=" " alt="" coords="2931,586,3081,634,3099,652,3107,671,3115,688,3132,703,3166,714,3225,725,3393,746,3758,777,3758,782,3392,752,3224,731,3164,719,3129,708,3111,691,3102,673,3094,655,3079,638,2930,591"/>
+<area shape="poly" id="edge48_Node000039_Node000008" title=" " alt="" coords="2403,578,2310,591,2178,594,1958,597,1844,602,1742,609,1665,621,1639,629,1625,638,1609,663,1603,693,1604,724,1609,752,1603,753,1599,725,1598,693,1604,661,1621,634,1637,624,1664,616,1741,604,1843,596,1957,592,2177,589,2309,585,2402,573"/>
+<area shape="poly" id="edge47_Node000039_Node000021" title=" " alt="" coords="2564,597,2594,634,2590,637,2560,601"/>
+<area shape="poly" id="edge51_Node000040_Node000008" title=" " alt="" coords="2258,708,2112,734,1969,754,1730,780,1729,775,1968,749,2111,728,2257,703"/>
+<area shape="poly" id="edge50_Node000040_Node000023" title=" " alt="" coords="2500,703,2640,722,2759,734,2864,740,2962,741,3164,741,3283,744,3423,751,3758,775,3757,781,3423,756,3283,749,3164,747,2962,747,2864,745,2758,739,2639,728,2499,708"/>
+<area shape="poly" id="edge64_Node000041_Node000007" title=" " alt="" coords="1906,442,1564,451,1133,467,929,477,756,490,633,505,596,513,578,521,559,546,548,575,541,606,540,638,547,701,560,753,555,754,542,702,535,638,536,605,542,573,555,543,574,517,594,507,632,499,756,485,929,472,1133,461,1563,446,1906,437"/>
+<area shape="poly" id="edge59_Node000041_Node000018" title=" " alt="" coords="1919,478,1827,522,1784,549,1746,577,1717,608,1701,639,1699,655,1701,671,1707,687,1719,703,1748,718,1802,732,1962,754,2150,770,2316,780,2315,785,2150,775,1962,759,1801,737,1746,723,1716,707,1703,690,1696,672,1693,655,1696,638,1713,605,1742,573,1781,544,1825,518,1917,474"/>
+<area shape="rect" id="Node000042" href="$abstract__object__set_8h.html" title="an unordered set of value objects" alt="" coords="2059,526,2298,581"/>
+<area shape="poly" id="edge53_Node000041_Node000042" title=" " alt="" coords="2080,477,2145,524,2141,528,2077,481"/>
+<area shape="rect" id="Node000044" href="$value__set__abstract__object_8h.html" title="Value Set Abstract Object." alt="" coords="2025,636,2247,705"/>
+<area shape="poly" id="edge71_Node000041_Node000044" title=" " alt="" coords="2024,484,2031,536,2038,562,2049,587,2067,612,2089,634,2086,638,2063,615,2044,589,2033,564,2026,537,2019,485"/>
+<area shape="rect" id="Node000045" href="$constant__abstract__value_8h.html" title="An abstraction of a single value that just stores a constant." alt="" coords="1730,643,2001,698"/>
+<area shape="poly" id="edge60_Node000041_Node000045" title=" " alt="" coords="1993,484,1885,645,1881,642,1989,481"/>
+<area shape="rect" id="Node000047" href="$interval__abstract__value_8h.html" title="An interval to represent a set of possible values." alt="" coords="2804,643,3068,698"/>
+<area shape="poly" id="edge65_Node000041_Node000047" title=" " alt="" coords="2137,439,2271,447,2419,462,2554,484,2608,499,2648,516,2666,533,2675,551,2683,569,2699,586,2755,618,2815,641,2813,646,2752,623,2696,590,2679,572,2670,553,2662,536,2645,521,2606,504,2553,489,2419,467,2270,452,2136,444"/>
+<area shape="poly" id="edge58_Node000042_Node000040" title=" " alt="" coords="2237,585,2321,633,2319,638,2234,590"/>
+<area shape="poly" id="edge54_Node000042_Node000044" title=" " alt="" coords="2167,594,2151,637,2146,635,2162,592"/>
+<area shape="poly" id="edge57_Node000044_Node000008" title=" " alt="" coords="2012,708,1730,768,1729,763,2011,703"/>
+<area shape="poly" id="edge55_Node000044_Node000018" title=" " alt="" coords="2232,708,2336,751,2334,756,2230,713"/>
+<area shape="poly" id="edge56_Node000044_Node000022" title=" " alt="" coords="2261,703,2417,729,2570,750,2825,776,2824,781,2570,755,2417,735,2261,708"/>
+<area shape="poly" id="edge63_Node000045_Node000008" title=" " alt="" coords="1797,706,1690,756,1688,751,1795,701"/>
+<area shape="poly" id="edge61_Node000045_Node000018" title=" " alt="" coords="1992,698,2013,703,2317,764,2315,770,2011,708,1991,704"/>
+<area shape="poly" id="edge62_Node000045_Node000022" title=" " alt="" coords="1986,698,2012,703,2344,733,2825,775,2824,780,2344,739,2012,708,1985,703"/>
+<area shape="poly" id="edge70_Node000047_Node000008" title=" " alt="" coords="2791,701,2742,708,2456,738,2174,760,1730,785,1729,779,2173,755,2456,732,2741,703,2790,696"/>
+<area shape="poly" id="edge66_Node000047_Node000015" title=" " alt="" coords="3082,696,3131,703,3341,720,3520,726,3678,725,3825,720,3972,717,4129,719,4308,728,4518,751,4561,758,4560,763,4517,756,4307,734,4129,724,3972,723,3825,726,3678,730,3520,731,3341,725,3130,708,3081,702"/>
+<area shape="poly" id="edge67_Node000047_Node000018" title=" " alt="" coords="2806,704,2786,708,2519,767,2518,762,2785,703,2805,698"/>
+<area shape="poly" id="edge68_Node000047_Node000020" title=" " alt="" coords="3034,699,3202,752,3201,757,3032,705"/>
+<area shape="poly" id="edge69_Node000047_Node000022" title=" " alt="" coords="2939,711,2939,753,2933,753,2933,711"/>
+<area shape="poly" id="edge73_Node000048_Node000015" title=" " alt="" coords="4839,713,4725,763,4723,758,4836,708"/>
+<area shape="poly" id="edge74_Node000048_Node000018" title=" " alt="" coords="4809,708,4610,728,4365,740,4091,746,3803,748,3245,748,3005,750,2812,756,2519,779,2519,774,2812,751,3005,744,3245,742,3803,743,4091,741,4365,735,4609,723,4809,703"/>
+<area shape="poly" id="edge76_Node000048_Node000022" title=" " alt="" coords="4809,708,4646,725,4447,735,3991,742,3539,744,3345,748,3190,756,3048,772,3047,767,3189,751,3345,743,3539,739,3991,736,4447,729,4646,719,4809,703"/>
+<area shape="poly" id="edge77_Node000048_Node000023" title=" " alt="" coords="4809,708,4658,725,4429,745,3973,781,3973,776,4428,740,4658,719,4809,703"/>
+<area shape="rect" id="Node000049" href="$context__abstract__object_8cpp.html" title=" " alt="" coords="4823,753,5031,823"/>
+<area shape="poly" id="edge75_Node000048_Node000049" title=" " alt="" coords="4929,719,4929,753,4924,753,4924,719"/>
+<area shape="rect" id="Node000050" href="$write__location__context_8h.html" title="Maintain a context in the variable sensitvity domain that records write locations for a given abstrac..." alt="" coords="5055,753,5257,823"/>
+<area shape="poly" id="edge78_Node000048_Node000050" title=" " alt="" coords="5007,709,5090,751,5088,756,5005,714"/>
+<area shape="poly" id="edge80_Node000056_Node000007" title=" " alt="" coords="222,698,459,757,458,762,221,703"/>
+<area shape="poly" id="edge81_Node000056_Node000010" title=" " alt="" coords="159,712,206,751,203,755,156,716"/>
+<area shape="poly" id="edge84_Node000057_Node000008" title=" " alt="" coords="4559,701,4510,708,4295,724,4028,735,3408,745,2787,748,2304,756,1730,783,1730,778,2304,751,2787,743,3408,739,4028,729,4295,719,4509,703,4558,696"/>
+<area shape="poly" id="edge83_Node000057_Node000015" title=" " alt="" coords="4679,719,4672,761,4666,760,4674,718"/>
+<area shape="poly" id="edge85_Node000057_Node000028" title=" " alt="" coords="4595,713,4476,763,4474,758,4592,708"/>
+<area shape="poly" id="edge87_Node000058_Node000035" title=" " alt="" coords="4520,467,4641,523,4639,528,4517,471"/>
+<area shape="poly" id="edge88_Node000058_Node000036" title=" " alt="" coords="4453,477,4453,526,4448,526,4448,477"/>
+<area shape="rect" id="Node000060" href="$frame_8h.html" title="Class for stack frames." alt="" coords="5683,533,5904,573"/>
+<area shape="poly" id="edge91_Node000059_Node000060" title=" " alt="" coords="5794,477,5796,533,5790,533,5789,477"/>
+<area shape="rect" id="Node000063" href="$goto__symex__state_8h.html" title="Symbolic Execution." alt="" coords="5694,761,5893,815"/>
+<area shape="poly" id="edge97_Node000059_Node000063" title=" " alt="" coords="5869,469,5897,490,5918,517,5923,534,5924,559,5920,620,5905,706,5879,739,5847,763,5843,758,5875,735,5900,704,5915,619,5919,559,5918,535,5914,520,5893,494,5866,473"/>
+<area shape="rect" id="Node000066" href="$goto__state_8cpp.html" title=" " alt="" coords="5793,871,5991,925"/>
+<area shape="poly" id="edge96_Node000059_Node000066" title=" " alt="" coords="5885,467,5916,489,5940,517,5959,564,5968,613,5968,664,5961,714,5950,762,5936,806,5908,872,5903,870,5931,804,5945,761,5956,713,5963,664,5963,614,5954,565,5935,520,5912,493,5882,472"/>
+<area shape="rect" id="Node000061" href="$call__stack_8h.html" title=" " alt="" coords="5697,643,5890,698"/>
+<area shape="poly" id="edge92_Node000060_Node000061" title=" " alt="" coords="5796,587,5796,643,5791,643,5791,587"/>
+<area shape="poly" id="edge93_Node000061_Node000063" title=" " alt="" coords="5796,712,5796,760,5791,760,5791,712"/>
+<area shape="poly" id="edge94_Node000063_Node000066" title=" " alt="" coords="5829,824,5870,869,5866,872,5825,828"/>
+<area shape="rect" id="Node000105" href="$renaming__level_8cpp.html" title="Renaming levels." alt="" coords="5411,871,5643,925"/>
+<area shape="poly" id="edge95_Node000063_Node000105" title=" " alt="" coords="5717,823,5592,873,5590,868,5715,818"/>
+<area shape="poly" id="edge99_Node000129_Node000059" title=" " alt="" coords="5687,359,5755,406,5751,410,5684,363"/>
+<area shape="poly" id="edge100_Node000129_Node000063" title=" " alt="" coords="5635,367,5632,435,5636,522,5642,569,5652,616,5667,661,5688,704,5713,734,5744,758,5741,762,5709,738,5683,707,5662,663,5647,617,5636,570,5630,522,5627,435,5630,367"/>
+<area shape="poly" id="edge103_Node000129_Node000105" title=" " alt="" coords="5508,346,5397,369,5352,385,5323,403,5300,437,5293,470,5297,552,5297,672,5302,706,5314,737,5333,766,5357,792,5413,836,5468,868,5466,873,5410,841,5353,796,5329,769,5310,740,5297,707,5292,672,5292,552,5288,469,5295,435,5319,399,5350,380,5395,364,5507,341"/>
+<area shape="rect" id="Node000130" href="$postcondition_8cpp.html" title="Symbolic Execution." alt="" coords="5913,416,6199,456"/>
+<area shape="poly" id="edge101_Node000129_Node000130" title=" " alt="" coords="5753,354,5983,413,5982,418,5752,359"/>
+<area shape="rect" id="Node000131" href="$precondition_8cpp.html" title="Symbolic Execution." alt="" coords="5333,416,5611,456"/>
+<area shape="poly" id="edge102_Node000129_Node000131" title=" " alt="" coords="5587,363,5503,418,5500,414,5584,359"/>
+<area shape="poly" id="edge105_Node000132_Node000059" title=" " alt="" coords="6086,356,5902,404,5876,411,5875,406,5901,399,6084,351"/>
+<area shape="poly" id="edge106_Node000132_Node000130" title=" " alt="" coords="6151,364,6082,418,6079,414,6148,360"/>
+<area shape="rect" id="Node000133" href="$simplify__expr__with__value__set_8cpp.html" title=" " alt="" coords="6222,409,6445,463"/>
+<area shape="poly" id="edge107_Node000132_Node000133" title=" " alt="" coords="6241,360,6301,406,6298,410,6238,364"/>
+<area shape="rect" id="Node000134" href="$value__set_8cpp.html" title="Value Set." alt="" coords="6469,409,6662,463"/>
+<area shape="poly" id="edge108_Node000132_Node000134" title=" " alt="" coords="6304,355,6458,399,6482,406,6481,411,6457,404,6302,360"/>
+<area shape="rect" id="Node000135" href="$value__set__domain_8h.html" title="Value Set." alt="" coords="6686,409,6879,463"/>
+<area shape="poly" id="edge109_Node000132_Node000135" title=" " alt="" coords="6305,337,6480,362,6675,399,6703,406,6702,411,6674,404,6479,367,6305,342"/>
+<area shape="rect" id="Node000136" href="$value__set__analysis_8h.html" title="Value Set Propagation." alt="" coords="6686,526,6879,581"/>
+<area shape="poly" id="edge110_Node000135_Node000136" title=" " alt="" coords="6785,477,6785,526,6780,526,6780,477"/>
 </map>
