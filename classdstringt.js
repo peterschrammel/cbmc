@@ -2,9 +2,10 @@ var classdstringt =
 [
     [ "dstringt", "classdstringt.html#ade5eba4db4f60766407d39130c9c0761", null ],
     [ "dstringt", "classdstringt.html#a29d34783feedb870959dd1ac186e993c", null ],
+    [ "dstringt", "classdstringt.html#a420ee93c6d3b3954b9c015c577310214", null ],
     [ "dstringt", "classdstringt.html#a155fb760c5a86ddd1b5b7d4cb04ea3ad", null ],
     [ "dstringt", "classdstringt.html#a31ffaecf24c072a93a34cc8353ef2aaa", null ],
-    [ "dstringt", "classdstringt.html#acf8b011a617d53aba96333db5268a429", null ],
+    [ "dstringt", "classdstringt.html#ac1cb2d5fa96cc42deb5b660451849632", null ],
     [ "dstringt", "classdstringt.html#a13f169da20bb269d452ba6b0dde36122", null ],
     [ "as_string", "classdstringt.html#a0d80c41eee7a9f628478a4d16bc2537f", null ],
     [ "begin", "classdstringt.html#ac92debcc1095ccd678de56f58455d0fe", null ],
@@ -24,7 +25,7 @@ var classdstringt =
     [ "operator<<", "classdstringt.html#a8e822a7f7b275f640cfca3609cfb286d", null ],
     [ "operator<=", "classdstringt.html#a3aefeb7d8fd1e029747288f232774c43", null ],
     [ "operator=", "classdstringt.html#a3a603a657a4eefb29350b9244aea9560", null ],
-    [ "operator=", "classdstringt.html#af7105f6a35e48f41b0725064a0ff9b80", null ],
+    [ "operator=", "classdstringt.html#a625cedd5b740809d8e630e04b0cc7352", null ],
     [ "operator==", "classdstringt.html#a61e74c0009f341ded94be1d109c5c96c", null ],
     [ "operator==", "classdstringt.html#a9faebe195be15ecf1a7cc46194904ab8", null ],
     [ "operator==", "classdstringt.html#addfb1593895f316bb79c425f764a5af0", null ],
@@ -33,7 +34,7 @@ var classdstringt =
     [ "operator[]", "classdstringt.html#ad351c090775c994bcff2dd9e6beae487", null ],
     [ "size", "classdstringt.html#aa1ffdeb71a3035dc8cd289066bc634bc", null ],
     [ "starts_with", "classdstringt.html#a1d8ed5d7f9cb92e42fdfa6ef7cdac022", null ],
-    [ "starts_with", "classdstringt.html#a27628fcb2a03f87ff068d9fe4f20b67b", null ],
+    [ "starts_with", "classdstringt.html#a26c91bf6df99e182eda07ce627c84cd0", null ],
     [ "swap", "classdstringt.html#a1969094925dd74c39194226419055dfd", null ],
     [ "no", "classdstringt.html#ae4fb067f04c5f3fa31dcebe08a649db8", null ]
 ];

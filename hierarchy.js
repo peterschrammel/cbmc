@@ -295,6 +295,7 @@ var hierarchy =
     [ "concurrency_instrumentationt", "classconcurrency__instrumentationt.html", null ],
     [ "goto_check_ct::conditiont", "structgoto__check__ct_1_1conditiont.html", null ],
     [ "cone_of_influencet", "classcone__of__influencet.html", null ],
+    [ "config_restoret", "structconfig__restoret.html", null ],
     [ "bv_refinementt::configt", "structbv__refinementt_1_1configt.html", [
       [ "bv_refinementt::infot", "structbv__refinementt_1_1infot.html", [
         [ "string_refinementt::infot", "structstring__refinementt_1_1infot.html", null ]
@@ -1175,6 +1176,7 @@ var hierarchy =
     [ "namespace_baset", "classnamespace__baset.html", [
       [ "namespacet", "classnamespacet.html", [
         [ "c_typecheck_baset", "classc__typecheck__baset.html", null ],
+        [ "empty_namespacet", "classempty__namespacet.html", null ],
         [ "multi_namespacet", "classmulti__namespacet.html", null ]
       ] ]
     ] ],
@@ -1620,7 +1622,6 @@ var hierarchy =
               [ "bitor_exprt", "classbitor__exprt.html", null ],
               [ "bitxnor_exprt", "classbitxnor__exprt.html", null ],
               [ "bitxor_exprt", "classbitxor__exprt.html", null ],
-              [ "case_exprt", "classcase__exprt.html", null ],
               [ "concatenation_exprt", "classconcatenation__exprt.html", null ],
               [ "cond_exprt", "classcond__exprt.html", null ],
               [ "mult_exprt", "classmult__exprt.html", null ],
@@ -1727,6 +1728,12 @@ var hierarchy =
                 [ "live_object_exprt", "classlive__object__exprt.html", null ],
                 [ "onehot0_exprt", "classonehot0__exprt.html", null ],
                 [ "onehot_exprt", "classonehot__exprt.html", null ],
+                [ "reduction_and_exprt", "classreduction__and__exprt.html", null ],
+                [ "reduction_nand_exprt", "classreduction__nand__exprt.html", null ],
+                [ "reduction_nor_exprt", "classreduction__nor__exprt.html", null ],
+                [ "reduction_or_exprt", "classreduction__or__exprt.html", null ],
+                [ "reduction_xnor_exprt", "classreduction__xnor__exprt.html", null ],
+                [ "reduction_xor_exprt", "classreduction__xor__exprt.html", null ],
                 [ "sign_exprt", "classsign__exprt.html", null ],
                 [ "unary_overflow_exprt", "classunary__overflow__exprt.html", [
                   [ "unary_minus_overflow_exprt", "classunary__minus__overflow__exprt.html", null ]
@@ -2062,8 +2069,7 @@ var hierarchy =
     [ "string_instrumentationt", "classstring__instrumentationt.html", null ],
     [ "string_dependenciest::string_nodet", "classstring__dependenciest_1_1string__nodet.html", null ],
     [ "string_not_contains_constraintt", "structstring__not__contains__constraintt.html", null ],
-    [ "string_ptr_hash", "classstring__ptr__hash.html", null ],
-    [ "string_ptrt", "structstring__ptrt.html", null ],
+    [ "string_view_hasht", "classstring__view__hasht.html", null ],
     [ "struct_aggregate_typet", "structstruct__aggregate__typet.html", null ],
     [ "struct_encodingt", "classstruct__encodingt.html", null ],
     [ "structured_data_entryt", "structstructured__data__entryt.html", null ],
@@ -2082,7 +2088,9 @@ var hierarchy =
     [ "symbol_table_baset", "classsymbol__table__baset.html", [
       [ "journalling_symbol_tablet", "classjournalling__symbol__tablet.html", null ],
       [ "symbol_table_buildert", "classsymbol__table__buildert.html", null ],
-      [ "symbol_tablet", "classsymbol__tablet.html", null ]
+      [ "symbol_tablet", "classsymbol__tablet.html", [
+        [ "empty_namespacet", "classempty__namespacet.html", null ]
+      ] ]
     ] ],
     [ "symbolt", "classsymbolt.html", [
       [ "auxiliary_symbolt", "classauxiliary__symbolt.html", null ],
@@ -2130,6 +2138,7 @@ var hierarchy =
     ] ],
     [ "tinfl_decompressor_tag", "structtinfl__decompressor__tag.html", null ],
     [ "to_be_merged_irep_hash", "structto__be__merged__irep__hash.html", null ],
+    [ "smt2_tokenizert::tokent", "classsmt2__tokenizert_1_1tokent.html", null ],
     [ "trace_automatont", "classtrace__automatont.html", null ],
     [ "trace_optionst", "structtrace__optionst.html", null ],
     [ "propertyt::trace_statet", "structpropertyt_1_1trace__statet.html", null ],
