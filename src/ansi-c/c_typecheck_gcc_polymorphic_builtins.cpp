@@ -627,6 +627,29 @@ static symbolt result_symbol(
   return symbol;
 }
 
+// __SZH_ADD_BEGIN__
+static symbolt memorder_symbol(
+  const irep_idt &identifier,
+  const typet &type,
+  const source_locationt &source_location,
+  symbol_tablet &symbol_table)
+{
+  symbolt symbol;
+  symbol.name = id2string(identifier) + "::1::memorder";
+  symbol.base_name = "memorder";
+  symbol.type = type;
+  symbol.mode = ID_C;
+  symbol.location = source_location;
+  symbol.is_file_local = true;
+  symbol.is_lvalue = true;
+  symbol.is_thread_local = true;
+
+  symbol_table.add(symbol);
+
+  return symbol;
+}
+// __SZH_ADD_END__
+
 static void instantiate_atomic_fetch_op(
   const irep_idt &identifier,
   const irep_idt &identifier_with_type,
@@ -652,6 +675,11 @@ static void instantiate_atomic_fetch_op(
     code_typet{{}, void_type()},
     source_location}});
 
+  const symbol_exprt memorder =
+    memorder_symbol(identifier_with_type, signed_int_type(), source_location, symbol_table)
+      .symbol_expr();
+  block.add(code_frontend_assignt{memorder, parameter_exprs[2]});
+
   // build *ptr
   const dereference_exprt deref_ptr{parameter_exprs[0]};
 
@@ -674,11 +702,11 @@ static void instantiate_atomic_fetch_op(
   binary_exprt op_expr{result, op_id, parameter_exprs[1], type};
   block.add(code_frontend_assignt{deref_ptr, std::move(op_expr)});
 
-  block.add(code_expressiont{side_effect_expr_function_callt{
-    symbol_exprt::typeless("__atomic_thread_fence"),
-    {parameter_exprs[2]},
-    typet{},
-    source_location}});
+  // block.add(code_expressiont{side_effect_expr_function_callt{
+  //   symbol_exprt::typeless("__atomic_thread_fence"),
+  //   {parameter_exprs[2]},
+  //   typet{},
+  //   source_location}});
 
   block.add(code_expressiont{side_effect_expr_function_callt{
     symbol_exprt::typeless(CPROVER_PREFIX "atomic_end"),
@@ -954,6 +982,7 @@ static void instantiate_atomic_load(
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
+  symbol_tablet &symbol_table,
   code_blockt &block)
 {
   // void __atomic_load (type *ptr, type *ret, int memorder)
@@ -966,14 +995,19 @@ static void instantiate_atomic_load(
     code_typet{{}, void_type()},
     source_location}});
 
+  const symbol_exprt memorder =
+    memorder_symbol(identifier_with_type, signed_int_type(), source_location, symbol_table)
+      .symbol_expr();
+  block.add(code_frontend_assignt{memorder, parameter_exprs[2]});
+
   block.add(code_frontend_assignt{dereference_exprt{parameter_exprs[1]},
                                   dereference_exprt{parameter_exprs[0]}});
 
-  block.add(code_expressiont{side_effect_expr_function_callt{
-    symbol_exprt::typeless("__atomic_thread_fence"),
-    {parameter_exprs[2]},
-    typet{},
-    source_location}});
+  // block.add(code_expressiont{side_effect_expr_function_callt{
+  //   symbol_exprt::typeless("__atomic_thread_fence"),
+  //   {parameter_exprs[2]},
+  //   typet{},
+  //   source_location}});
 
   block.add(code_expressiont{side_effect_expr_function_callt{
     symbol_exprt::typeless(CPROVER_PREFIX "atomic_end"),
@@ -1014,6 +1048,7 @@ static void instantiate_atomic_store(
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
+  symbol_tablet &symbol_table,
   code_blockt &block)
 {
   //  void __atomic_store (type *ptr, type *val, int memorder)
@@ -1026,14 +1061,19 @@ static void instantiate_atomic_store(
     code_typet{{}, void_type()},
     source_location}});
 
+  const symbol_exprt memorder =
+    memorder_symbol(identifier_with_type, signed_int_type(), source_location, symbol_table)
+      .symbol_expr();
+  block.add(code_frontend_assignt{memorder, parameter_exprs[2]});
+
   block.add(code_frontend_assignt{dereference_exprt{parameter_exprs[0]},
                                   dereference_exprt{parameter_exprs[1]}});
 
-  block.add(code_expressiont{side_effect_expr_function_callt{
-    symbol_exprt::typeless("__atomic_thread_fence"),
-    {parameter_exprs[2]},
-    typet{},
-    source_location}});
+  // block.add(code_expressiont{side_effect_expr_function_callt{
+  //   symbol_exprt::typeless("__atomic_thread_fence"),
+  //   {parameter_exprs[2]},
+  //   typet{},
+  //   source_location}});
 
   block.add(code_expressiont{side_effect_expr_function_callt{
     symbol_exprt::typeless(CPROVER_PREFIX "atomic_end"),
@@ -1067,6 +1107,7 @@ static void instantiate_atomic_exchange(
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
+  symbol_tablet &symbol_table,
   code_blockt &block)
 {
   // void __atomic_exchange (type *ptr, type *val, type *ret, int memorder)
@@ -1079,16 +1120,21 @@ static void instantiate_atomic_exchange(
     code_typet{{}, void_type()},
     source_location}});
 
+  const symbol_exprt memorder =
+    memorder_symbol(identifier_with_type, signed_int_type(), source_location, symbol_table)
+      .symbol_expr();
+  block.add(code_frontend_assignt{memorder, parameter_exprs[2]});
+
   block.add(code_frontend_assignt{dereference_exprt{parameter_exprs[2]},
                                   dereference_exprt{parameter_exprs[0]}});
   block.add(code_frontend_assignt{dereference_exprt{parameter_exprs[0]},
                                   dereference_exprt{parameter_exprs[1]}});
 
-  block.add(code_expressiont{side_effect_expr_function_callt{
-    symbol_exprt::typeless("__atomic_thread_fence"),
-    {parameter_exprs[3]},
-    typet{},
-    source_location}});
+  // block.add(code_expressiont{side_effect_expr_function_callt{
+  //   symbol_exprt::typeless("__atomic_thread_fence"),
+  //   {parameter_exprs[3]},
+  //   typet{},
+  //   source_location}});
 
   block.add(code_expressiont{side_effect_expr_function_callt{
     symbol_exprt::typeless(CPROVER_PREFIX "atomic_end"),
@@ -1169,30 +1215,45 @@ static void instantiate_atomic_compare_exchange(
       result.type())});
 
   // we never fail spuriously, and ignore parameter_exprs[3]
+
+  const symbol_exprt memorder =
+    memorder_symbol(identifier_with_type, signed_int_type(), source_location, symbol_table)
+      .symbol_expr();
+  code_frontend_assignt success_memorder{memorder, parameter_exprs[4]};
+
   code_frontend_assignt assign{deref_ptr,
                                dereference_exprt{parameter_exprs[2]}};
   assign.add_source_location() = source_location;
-  code_expressiont success_fence{side_effect_expr_function_callt{
-    symbol_exprt::typeless("__atomic_thread_fence"),
-    {parameter_exprs[4]},
-    typet{},
-    source_location}};
-  success_fence.add_source_location() = source_location;
+
+  // code_expressiont success_fence{side_effect_expr_function_callt{
+  //   symbol_exprt::typeless("__atomic_thread_fence"),
+  //   {parameter_exprs[4]},
+  //   typet{},
+  //   source_location}};
+  // success_fence.add_source_location() = source_location;
+
+  code_frontend_assignt failure_memorder{memorder, parameter_exprs[5]};
 
   code_frontend_assignt assign_not_equal{dereference_exprt{parameter_exprs[1]},
                                          deref_ptr};
   assign_not_equal.add_source_location() = source_location;
-  code_expressiont failure_fence{side_effect_expr_function_callt{
-    symbol_exprt::typeless("__atomic_thread_fence"),
-    {parameter_exprs[5]},
-    typet{},
-    source_location}};
-  failure_fence.add_source_location() = source_location;
+
+  // code_expressiont failure_fence{side_effect_expr_function_callt{
+  //   symbol_exprt::typeless("__atomic_thread_fence"),
+  //   {parameter_exprs[5]},
+  //   typet{},
+  //   source_location}};
+  // failure_fence.add_source_location() = source_location;
+
+  // block.add(code_ifthenelset{
+  //   result,
+  //   code_blockt{{std::move(assign), std::move(success_fence)}},
+  //   code_blockt{{std::move(assign_not_equal), std::move(failure_fence)}}});
 
   block.add(code_ifthenelset{
     result,
-    code_blockt{{std::move(assign), std::move(success_fence)}},
-    code_blockt{{std::move(assign_not_equal), std::move(failure_fence)}}});
+    code_blockt{{std::move(success_memorder), std::move(assign)}},
+    code_blockt{{std::move(failure_memorder), std::move(assign_not_equal)}}});
 
   block.add(code_expressiont{side_effect_expr_function_callt{
     symbol_exprt::typeless(CPROVER_PREFIX "atomic_end"),
@@ -1327,7 +1388,7 @@ code_blockt c_typecheck_baset::instantiate_gcc_polymorphic_builtin(
   else if(identifier == ID___atomic_load)
   {
     instantiate_atomic_load(
-      identifier_with_type, code_type, source_location, parameter_exprs, block);
+      identifier_with_type, code_type, source_location, parameter_exprs, symbol_table, block);
   }
   else if(identifier == ID___atomic_load_n)
   {
@@ -1342,7 +1403,7 @@ code_blockt c_typecheck_baset::instantiate_gcc_polymorphic_builtin(
   else if(identifier == ID___atomic_store)
   {
     instantiate_atomic_store(
-      identifier_with_type, code_type, source_location, parameter_exprs, block);
+      identifier_with_type, code_type, source_location, parameter_exprs, symbol_table, block);
   }
   else if(identifier == ID___atomic_store_n)
   {
@@ -1352,7 +1413,7 @@ code_blockt c_typecheck_baset::instantiate_gcc_polymorphic_builtin(
   else if(identifier == ID___atomic_exchange)
   {
     instantiate_atomic_exchange(
-      identifier_with_type, code_type, source_location, parameter_exprs, block);
+      identifier_with_type, code_type, source_location, parameter_exprs, symbol_table, block);
   }
   else if(identifier == ID___atomic_exchange_n)
   {

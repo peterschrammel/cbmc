@@ -4,6 +4,7 @@ SRC = graphml.cpp \
       xml_parse_tree.cpp \
       xml_parser.cpp \
       xml_y.tab.cpp \
+      sha256.cpp \
       # Empty last line
 INCLUDES= -I ..
 

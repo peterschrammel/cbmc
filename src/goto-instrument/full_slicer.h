@@ -26,11 +26,13 @@ void full_slicer(goto_modelt &);
 void property_slicer(
   goto_functionst &,
   const namespacet &,
-  const std::list<std::string> &properties);
+  const std::list<std::string> &properties,
+  const std::list<std::string> &subproperties);
 
 void property_slicer(
   goto_modelt &,
-  const std::list<std::string> &properties);
+  const std::list<std::string> &properties,
+  const std::list<std::string> &subproperties);
 
 class slicing_criteriont
 {

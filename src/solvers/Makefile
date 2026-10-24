@@ -17,7 +17,7 @@ endif
 ifneq ($(MINISAT2),)
   MINISAT2_SRC=sat/satcheck_minisat2.cpp
   MINISAT2_INCLUDE=-I $(MINISAT2)
-  MINISAT2_LIB=$(MINISAT2)/minisat/simp/SimpSolver$(OBJEXT) $(MINISAT2)/minisat/core/Solver$(OBJEXT) $(MINISAT2)/minisat/utils/Options$(OBJEXT)
+  MINISAT2_LIB=$(MINISAT2)/minisat/core/MemoryModelSolver$(OBJEXT) $(MINISAT2)/minisat/core/MemoryModelStaticAnalyzer$(OBJEXT) $(MINISAT2)/minisat/core/SegmentSolver$(OBJEXT) $(MINISAT2)/minisat/core/SegmentTypes$(OBJEXT) $(MINISAT2)/minisat/core/ClosureSolver$(OBJEXT) $(MINISAT2)/minisat/core/Closure$(OBJEXT) $(MINISAT2)/minisat/core/ClosureTypes$(OBJEXT) $(MINISAT2)/minisat/core/ICDSolver$(OBJEXT) $(MINISAT2)/minisat/core/ICD$(OBJEXT) $(MINISAT2)/minisat/core/ICDTypes$(OBJEXT) $(MINISAT2)/minisat/core/GraphTypes$(OBJEXT) $(MINISAT2)/minisat/simp/SimpSolver$(OBJEXT) $(MINISAT2)/minisat/core/Solver$(OBJEXT) $(MINISAT2)/minisat/utils/Options$(OBJEXT) ../cat/cat_module$(OBJEXT)
   CP_CXXFLAGS += -DHAVE_MINISAT2 -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
   CLEANFILES += $(MINISAT2_LIB) $(patsubst %$(OBJEXT), %$(DEPEXT), $(MINISAT2_LIB))
 endif
@@ -219,6 +219,33 @@ include ../common
 ifneq ($(MINISAT2),)
 ifeq ($(BUILD_ENV_),MSVC)
 sat/satcheck_minisat2$(OBJEXT): sat/satcheck_minisat2.cpp
+	$(CXX) $(CP_CXXFLAGS) /w /nologo /c /EHsc $< /Fo$@
+
+$(MINISAT2)/minisat/core/MemoryModelSolver$(OBJEXT): $(MINISAT2)/minisat/core/MemoryModelSolver.cc
+	$(CXX) $(CP_CXXFLAGS) /w /nologo /c /EHsc $< /Fo$@
+
+$(MINISAT2)/minisat/core/MemoryModelStaticAnalyzer$(OBJEXT): $(MINISAT2)/minisat/core/MemoryModelStaticAnalyzer.cc
+	$(CXX) $(CP_CXXFLAGS) /w /nologo /c /EHsc $< /Fo$@
+
+$(MINISAT2)/minisat/core/SegmentSolver$(OBJEXT): $(MINISAT2)/minisat/core/SegmentSolver.cc
+	$(CXX) $(CP_CXXFLAGS) /w /nologo /c /EHsc $< /Fo$@
+
+$(MINISAT2)/minisat/core/ClosureSolver$(OBJEXT): $(MINISAT2)/minisat/core/ClosureSolver.cc
+	$(CXX) $(CP_CXXFLAGS) /w /nologo /c /EHsc $< /Fo$@
+
+$(MINISAT2)/minisat/core/Closure$(OBJEXT): $(MINISAT2)/minisat/core/Closure.cc
+	$(CXX) $(CP_CXXFLAGS) /w /nologo /c /EHsc $< /Fo$@
+
+$(MINISAT2)/minisat/core/ClosureTypes$(OBJEXT): $(MINISAT2)/minisat/core/ClosureTypes.cc
+	$(CXX) $(CP_CXXFLAGS) /w /nologo /c /EHsc $< /Fo$@
+
+$(MINISAT2)/minisat/core/ICDSolver$(OBJEXT): $(MINISAT2)/minisat/core/ICDSolver.cc
+	$(CXX) $(CP_CXXFLAGS) /w /nologo /c /EHsc $< /Fo$@
+
+$(MINISAT2)/minisat/core/ICD$(OBJEXT): $(MINISAT2)/minisat/core/ICD.cc
+	$(CXX) $(CP_CXXFLAGS) /w /nologo /c /EHsc $< /Fo$@
+
+$(MINISAT2)/minisat/core/ICDTypes$(OBJEXT): $(MINISAT2)/minisat/core/ICDTypes.cc
 	$(CXX) $(CP_CXXFLAGS) /w /nologo /c /EHsc $< /Fo$@
 
 $(MINISAT2)/minisat/simp/SimpSolver$(OBJEXT): $(MINISAT2)/minisat/simp/SimpSolver.cc

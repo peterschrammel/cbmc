@@ -244,6 +244,7 @@ void symex_assignt::assign_typecast(
 {
   // these may come from dereferencing on the lhs
   exprt rhs_typecasted = typecast_exprt::conditional_cast(rhs, lhs.op().type());
+
   expr_skeletont new_skeleton =
     full_lhs.compose(expr_skeletont::remove_op0(lhs));
   assign_rec(lhs.op(), new_skeleton, rhs_typecasted, guard);

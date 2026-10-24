@@ -47,10 +47,13 @@ void goto_check_c(
   "(retain-trivial-checks)"                                                    \
   "(error-label):"                                                             \
   "(no-assertions)(no-assumptions)"                                            \
-  "(assert-to-assume)"
+  "(refined-pointer-analysis)"                                                 \
+  "(assert-to-assume)" \
+  "(alloc-check)"
 
 // clang-format off
 #define HELP_GOTO_CHECK \
+  " --alloc-check                check the number of allocated bytes\n" \
   " --bounds-check               enable array bounds checks\n" \
   " --pointer-check              enable pointer checks\n" /* NOLINT(whitespace/line_length) */ \
   " --memory-leak-check          enable memory leak checks\n" \
@@ -72,6 +75,7 @@ void goto_check_c(
   " --assert-to-assume           convert user assertions to assumptions\n" \
 
 #define PARSE_OPTIONS_GOTO_CHECK(cmdline, options) \
+  options.set_option("alloc-check", cmdline.isset("alloc-check")); \
   options.set_option("bounds-check", cmdline.isset("bounds-check")); \
   options.set_option("pointer-check", cmdline.isset("pointer-check")); \
   options.set_option("memory-leak-check", cmdline.isset("memory-leak-check")); \
@@ -90,10 +94,13 @@ void goto_check_c(
                      cmdline.isset("retain-trivial-checks")); \
   options.set_option("assertions", !cmdline.isset("no-assertions")); /* NOLINT(whitespace/line_length) */ \
   options.set_option("assumptions", !cmdline.isset("no-assumptions")); /* NOLINT(whitespace/line_length) */ \
+  options.set_option("refined-pointer-analysis", cmdline.isset("refined-pointer-analysis")); /* NOLINT(whitespace/line_length) */ \
   options.set_option("assert-to-assume", cmdline.isset("assert-to-assume")); /* NOLINT(whitespace/line_length) */ \
   options.set_option("retain-trivial", cmdline.isset("retain-trivial")); /* NOLINT(whitespace/line_length) */ \
   if(cmdline.isset("error-label")) \
     options.set_option("error-label", cmdline.get_values("error-label")); \
+  if(cmdline.isset("mm-flag")) \
+    options.set_option("assertions", false); \
   (void)0
 // clang-format on
 

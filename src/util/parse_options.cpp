@@ -152,6 +152,14 @@ int parse_options_baset::main()
 void parse_options_baset::log_version_and_architecture(
   const std::string &front_end)
 {
+  // __SZH_ADD_BEGIN__
+  log.status() << "Deagle" << " version " << "4.1.0" << " "
+               << sizeof(void *) * CHAR_BIT << "-bit "
+               << config.this_architecture() << " "
+               << config.this_operating_system() << messaget::eom;
+  log.status() << "which contains:\n";
+  // __SZH_ADD_END__
+
   log.status() << front_end << " version " << CBMC_VERSION << " "
                << sizeof(void *) * CHAR_BIT << "-bit "
                << config.this_architecture() << " "

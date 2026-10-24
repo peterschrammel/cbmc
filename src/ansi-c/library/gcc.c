@@ -135,6 +135,387 @@ __CPROVER_HIDE:;
   __atomic_thread_fence(memorder);
 }
 
+// __SZH_ADD_BEGIN__
+
+/* FUNCTION: __LKMM_LOAD */
+
+int __LKMM_LOAD(int* loc, int memorder)
+{
+__CPROVER_HIDE:;
+  return __CPROVER_LKMM_LOAD(loc, memorder);
+}
+
+/* FUNCTION: __LKMM_STORE */
+
+void __LKMM_STORE(int* loc, int val, int memorder)
+{
+__CPROVER_HIDE:;
+  __CPROVER_LKMM_STORE(loc, val, memorder);
+}
+
+/* FUNCTION: __LKMM_FENCE */
+
+void __LKMM_FENCE(int memorder)
+{
+__CPROVER_HIDE:;
+    __CPROVER_fence(
+      "WWfence",
+      "RRfence",
+      "RWfence",
+      "WRfence",
+      "WWcumul",
+      "RRcumul",
+      "RWcumul",
+      "WRcumul");
+}
+
+/* FUNCTION: __LKMM_XCHG */
+
+#ifndef __LKMM_RELAXED
+#define __LKMM_RELAXED 0
+#endif
+
+#ifndef __LKMM_ONCE
+#define __LKMM_ONCE 1
+#endif
+
+#ifndef __LKMM_ACQUIRE
+#define __LKMM_ACQUIRE 2
+#endif
+
+#ifndef __LKMM_RELEASE
+#define __LKMM_RELEASE 3
+#endif
+
+#ifndef __LKMM_MB
+#define __LKMM_MB 4
+#endif
+
+int __LKMM_XCHG(int* loc, int val, int memorder)
+{
+__CPROVER_HIDE:;
+  if(memorder == __LKMM_MB)
+    __LKMM_FENCE(__LKMM_MB);
+
+  __CPROVER_atomic_begin();
+  int xchg_tmp;
+  if(memorder == __LKMM_ACQUIRE)
+    xchg_tmp = __LKMM_LOAD(loc, __LKMM_ACQUIRE);
+  else
+    xchg_tmp = __LKMM_LOAD(loc, __LKMM_ONCE);
+
+  if(memorder == __LKMM_RELEASE)
+    __LKMM_STORE(loc, val, __LKMM_RELEASE);
+  else
+    __LKMM_STORE(loc, val, __LKMM_ONCE);
+  __CPROVER_atomic_end();
+
+  if(memorder == __LKMM_MB)
+    __LKMM_FENCE(__LKMM_MB);
+  
+  return xchg_tmp;
+}
+
+/* FUNCTION: __LKMM_CMPXCHG */
+
+#ifndef __LKMM_RELAXED
+#define __LKMM_RELAXED 0
+#endif
+
+#ifndef __LKMM_ONCE
+#define __LKMM_ONCE 1
+#endif
+
+#ifndef __LKMM_ACQUIRE
+#define __LKMM_ACQUIRE 2
+#endif
+
+#ifndef __LKMM_RELEASE
+#define __LKMM_RELEASE 3
+#endif
+
+#ifndef __LKMM_MB
+#define __LKMM_MB 4
+#endif
+
+int __LKMM_CMPXCHG(int* loc, int old, int new, int memorder1, int memorder2)
+{
+__CPROVER_HIDE:;
+  if(memorder1 == __LKMM_MB)
+    __LKMM_FENCE(__LKMM_MB);
+
+  __CPROVER_atomic_begin();
+  int xchg_tmp;
+  if(memorder1 == __LKMM_ACQUIRE)
+    xchg_tmp = __LKMM_LOAD(loc, __LKMM_ACQUIRE);
+  else
+    xchg_tmp = __LKMM_LOAD(loc, __LKMM_ONCE);
+
+  if(xchg_tmp == old)
+  {
+    if(memorder2 == __LKMM_RELEASE)
+      __LKMM_STORE(loc, new, __LKMM_RELEASE);
+    else
+      __LKMM_STORE(loc, new, __LKMM_ONCE);
+  }
+  __CPROVER_atomic_end();
+
+  if(memorder1 == __LKMM_MB)
+    __LKMM_FENCE(__LKMM_MB);
+  
+  return xchg_tmp;
+}
+
+/* FUNCTION: __LKMM_ATOMIC_OP */
+
+#ifndef __LKMM_ADD
+#define __LKMM_ADD 0
+#endif
+
+#ifndef __LKMM_SUB
+#define __LKMM_SUB 1
+#endif
+
+#ifndef __LKMM_AND
+#define __LKMM_AND 2
+#endif
+
+#ifndef __LKMM_OR
+#define __LKMM_OR 3
+#endif
+
+#ifndef __LKMM_ONCE
+#define __LKMM_ONCE 1
+#endif
+
+void __LKMM_ATOMIC_OP(int* loc, int val, int op)
+{
+__CPROVER_HIDE:;
+  __CPROVER_atomic_begin();
+  if(op == __LKMM_ADD)
+  {
+    int fetch_tmp = __LKMM_LOAD(loc, __LKMM_ONCE);
+    __LKMM_STORE(loc, fetch_tmp + val, __LKMM_ONCE);
+  }
+  if(op == __LKMM_SUB)
+  {
+    int fetch_tmp = __LKMM_LOAD(loc, __LKMM_ONCE);
+    __LKMM_STORE(loc, fetch_tmp - val, __LKMM_ONCE);
+  }
+  if(op == __LKMM_AND)
+  {
+    int fetch_tmp = __LKMM_LOAD(loc, __LKMM_ONCE);
+    __LKMM_STORE(loc, fetch_tmp & val, __LKMM_ONCE);
+  }
+  if(op == __LKMM_OR)
+  {
+    int fetch_tmp = __LKMM_LOAD(loc, __LKMM_ONCE);
+    __LKMM_STORE(loc, fetch_tmp | val, __LKMM_ONCE);
+  }
+  __CPROVER_atomic_end();
+}
+
+/* FUNCTION: __LKMM_ATOMIC_FETCH_OP */
+
+#ifndef __LKMM_ADD
+#define __LKMM_ADD 0
+#endif
+
+#ifndef __LKMM_SUB
+#define __LKMM_SUB 1
+#endif
+
+#ifndef __LKMM_AND
+#define __LKMM_AND 2
+#endif
+
+#ifndef __LKMM_OR
+#define __LKMM_OR 3
+#endif
+
+#ifndef __LKMM_ONCE
+#define __LKMM_ONCE 1
+#endif
+
+#ifndef __LKMM_ACQUIRE
+#define __LKMM_ACQUIRE 2
+#endif
+
+#ifndef __LKMM_RELEASE
+#define __LKMM_RELEASE 3
+#endif
+
+#ifndef __LKMM_MB
+#define __LKMM_MB 4
+#endif
+
+int __LKMM_ATOMIC_FETCH_OP(int* loc, int val, int memorder, int op)
+{
+__CPROVER_HIDE:;
+  if(memorder == __LKMM_MB)
+    __LKMM_FENCE(__LKMM_MB);
+
+  __CPROVER_atomic_begin();
+  int fetch_tmp;
+  if(memorder == __LKMM_ACQUIRE)
+    fetch_tmp = __LKMM_LOAD(loc, __LKMM_ACQUIRE);
+  else
+    fetch_tmp = __LKMM_LOAD(loc, __LKMM_ONCE);
+
+  if(op == __LKMM_ADD)
+  {
+    if(memorder == __LKMM_RELEASE)
+      __LKMM_STORE(loc, fetch_tmp + val, __LKMM_RELEASE);
+    else
+      __LKMM_STORE(loc, fetch_tmp + val, __LKMM_ONCE);
+  }
+  if(op == __LKMM_SUB)
+  {
+    if(memorder == __LKMM_RELEASE)
+      __LKMM_STORE(loc, fetch_tmp - val, __LKMM_RELEASE);
+    else
+      __LKMM_STORE(loc, fetch_tmp - val, __LKMM_ONCE);
+  }
+  if(op == __LKMM_AND)
+  {
+    if(memorder == __LKMM_RELEASE)
+      __LKMM_STORE(loc, fetch_tmp & val, __LKMM_RELEASE);
+    else
+      __LKMM_STORE(loc, fetch_tmp & val, __LKMM_ONCE);
+  }
+  if(op == __LKMM_OR)
+  {
+    if(memorder == __LKMM_RELEASE)
+      __LKMM_STORE(loc, fetch_tmp | val, __LKMM_RELEASE);
+    else
+      __LKMM_STORE(loc, fetch_tmp | val, __LKMM_ONCE);
+  }
+  __CPROVER_atomic_end();
+
+  if(memorder == __LKMM_MB)
+    __LKMM_FENCE(__LKMM_MB);
+
+  return fetch_tmp;
+}
+
+/* FUNCTION: __LKMM_ATOMIC_OP_RETURN */
+
+#ifndef __LKMM_ADD
+#define __LKMM_ADD 0
+#endif
+
+#ifndef __LKMM_SUB
+#define __LKMM_SUB 1
+#endif
+
+#ifndef __LKMM_AND
+#define __LKMM_AND 2
+#endif
+
+#ifndef __LKMM_OR
+#define __LKMM_OR 3
+#endif
+
+#ifndef __LKMM_ONCE
+#define __LKMM_ONCE 1
+#endif
+
+#ifndef __LKMM_ACQUIRE
+#define __LKMM_ACQUIRE 2
+#endif
+
+#ifndef __LKMM_RELEASE
+#define __LKMM_RELEASE 3
+#endif
+
+#ifndef __LKMM_MB
+#define __LKMM_MB 4
+#endif
+
+int __LKMM_ATOMIC_OP_RETURN(int* loc, int val, int memorder, int op)
+{
+__CPROVER_HIDE:;
+  if(memorder == __LKMM_MB)
+    __LKMM_FENCE(__LKMM_MB);
+
+  __CPROVER_atomic_begin();
+  int fetch_tmp;
+  if(memorder == __LKMM_ACQUIRE)
+    fetch_tmp = __LKMM_LOAD(loc, __LKMM_ACQUIRE);
+  else
+    fetch_tmp = __LKMM_LOAD(loc, __LKMM_ONCE);
+
+  if(op == __LKMM_ADD)
+    fetch_tmp += val;
+  if(op == __LKMM_SUB)
+    fetch_tmp -= val;
+  if(op == __LKMM_AND)
+    fetch_tmp &= val;
+  if(op == __LKMM_OR)
+    fetch_tmp |= val;
+
+  if(memorder == __LKMM_RELEASE)
+    __LKMM_STORE(loc, fetch_tmp, __LKMM_RELEASE);
+  else
+    __LKMM_STORE(loc, fetch_tmp, __LKMM_ONCE);
+  __CPROVER_atomic_end();
+
+  if(memorder == __LKMM_MB)
+    __LKMM_FENCE(__LKMM_MB);
+
+  return fetch_tmp;
+}
+
+/* FUNCTION: __LKMM_SPIN_LOCK */
+
+#ifndef __LKMM_ONCE
+#define __LKMM_ONCE 1
+#endif
+
+#ifndef __LKMM_ACQUIRE
+#define __LKMM_ACQUIRE 2
+#endif
+
+#ifndef __LKMM_STRUCT_SPINLOCK
+#define __LKMM_STRUCT_SPINLOCK
+typedef struct spinlock {
+    int unused;
+} spinlock_t;
+#endif
+
+int __LKMM_SPIN_LOCK(spinlock_t *lock)
+{
+  __CPROVER_HIDE:;
+  __CPROVER_atomic_begin();
+  int lock_status = __LKMM_LOAD((unsigned *)lock, __LKMM_ACQUIRE);
+  __CPROVER_assume(!lock_status);
+  __LKMM_STORE((unsigned *)lock, 1, __LKMM_ONCE);
+  __CPROVER_atomic_end();
+  return 0;
+}
+
+/* FUNCTION: __LKMM_SPIN_UNLOCK */
+
+#ifndef __LKMM_STRUCT_SPINLOCK
+#define __LKMM_STRUCT_SPINLOCK
+typedef struct spinlock {
+    int unused;
+} spinlock_t;
+#endif
+
+#ifndef __LKMM_RELEASE
+#define __LKMM_RELEASE 3
+#endif
+
+int __LKMM_SPIN_UNLOCK(spinlock_t *lock)
+{
+  __CPROVER_HIDE:;
+  __LKMM_STORE((unsigned *)lock, 0, __LKMM_RELEASE);
+  return 0;
+}
+
+// __SZH_ADD_END__
+
 /* FUNCTION: __atomic_always_lock_free */
 
 _Bool __atomic_always_lock_free(__CPROVER_size_t size, void *ptr)

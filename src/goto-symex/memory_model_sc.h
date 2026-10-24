@@ -30,9 +30,6 @@ protected:
     partial_order_concurrencyt::event_it e1,
     partial_order_concurrencyt::event_it e2) const;
 
-  void build_per_thread_map(
-    const symex_target_equationt &equation,
-    per_thread_mapt &dest) const;
   void thread_spawn(
     symex_target_equationt &equation,
     const per_thread_mapt &per_thread_map);

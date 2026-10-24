@@ -52,7 +52,22 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
     hidden ? symex_targett::assignment_typet::HIDDEN
            : symex_targett::assignment_typet::STATE);
 
-  if(path_storage.dirty(ssa.get_object_name()) && state.atomic_section_id == 0)
+  // __SZH_ADD_BEGIN__
+  bool is_dirty = path_storage.dirty(ssa.get_object_name());
+  std::string obj_name = ssa.get_object_name().c_str();
+  if(obj_name.find("__atomic_load") != std::string::npos)
+    is_dirty = false;
+  if(obj_name.find("__atomic_store") != std::string::npos)
+    is_dirty = false;
+  if(obj_name.find("__atomic_fetch") != std::string::npos)
+    is_dirty = false;
+  if(obj_name.find("__atomic_compare_exchange") != std::string::npos)
+    is_dirty = false;
+  if(obj_name.find("__atomic_exchange") != std::string::npos)
+    is_dirty = false;
+  // __SZH_ADD_END__
+
+  if(is_dirty && state.atomic_section_id == 0)
     target.shared_write(
       state.guard.as_expr(),
       ssa,

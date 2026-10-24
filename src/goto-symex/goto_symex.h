@@ -67,6 +67,21 @@ public:
       _remaining_vccs(std::numeric_limits<unsigned>::max()),
       complexity_module(mh, options)
   {
+    // __SZH_ADD_BEGIN__
+    enable_datarace = options.get_bool_option("datarace");
+    if(enable_datarace)
+    {
+      if(options.get_bool_option("goblint"))
+        datarace_filter = "goblint";
+      else if(options.get_bool_option("locksmith"))
+        datarace_filter = "locksmith";
+    }
+    enable_reach = options.get_bool_option("assertions");
+    enable_overflow = options.get_bool_option("signed-overflow-check") || options.get_bool_option("unsigned-overflow-check");
+    enable_alloc = options.get_bool_option("alloc-check");
+    // __SZH_ADD_END__
+
+    enable_deadlock = options.get_bool_option("deadlock");
   }
 
   /// A virtual destructor allowing derived classes to be cleaned up correctly
@@ -154,6 +169,31 @@ public:
   /// If this flag is set to true then assertions will be temporarily ignored
   /// by the symbolic executions.
   bool ignore_assertions = false;
+
+  // __SZH_ADD_BEGIN__
+  bool enable_datarace = false;
+  std::string datarace_filter = "";
+  bool enable_reach = false;
+  bool enable_overflow = false;
+  bool enable_alloc = false;
+
+  void symex_datarace(std::string filename);
+
+  void symex_alloc_check();
+
+  void remove_dummy_accesses();
+
+  bool try_finding_value_set = false;
+  value_sett overall_value_set;
+  std::set<symbol_exprt> dynamic_objects;
+  // __SZH_ADD_END__
+
+  // __WP_ADD_BEGIN__ for deadlock
+  bool enable_deadlock = false;
+  // void backtracing_for_deadlock(std::vector<symex_target_equationt::event_it>& locks_tuples,
+  //  std::map<unsigned, std::vector<symex_target_equationt::event_it>>::iterator it1, int& deadlock_assert_id);
+  void symex_deadlock();
+  // __WP_ADD_END__
 
   /// \brief Defines condition for interrupting symbolic execution for a
   ///   specific loop
@@ -247,9 +287,11 @@ protected:
   /// the scope of this manager.
   guard_managert &guard_manager;
 
+public:
   /// The equation that this execution is building up
   symex_target_equationt &target;
 
+protected:
   /// A monotonically increasing index for each encountered ATOMIC_BEGIN
   /// instruction
   unsigned atomic_section_counter;
@@ -381,6 +423,14 @@ protected:
     const exprt &,
     const std::string &msg,
     statet &);
+
+  // __SZH_ADD_BEGIN__
+  virtual void stateless_vcc(
+    const exprt &,
+    const std::string &msg,
+    const std::string &assert_id,
+    const symex_targett::sourcet &source);
+  // __SZH_ADD_END__
 
   /// Symbolically execute an ASSUME instruction or simulate such an execution
   /// for a synthetic assumption
@@ -777,17 +827,19 @@ protected:
   virtual void symex_output(statet &state, const codet &code);
 
   /// A monotonically increasing index for each created dynamic object
+public:
   static unsigned dynamic_counter;
+private:
 
   void rewrite_quantifiers(exprt &, statet &);
 
+public:
   /// \brief Symbolic execution paths to be resumed later
   /// \remarks
   /// Partially-executed symbolic execution \ref path_storaget::patht "paths"
   /// whose execution can be resumed later
   path_storaget &path_storage;
 
-public:
   /// \brief Number of VCCs generated during the run of this goto_symext object
   ///
   /// This member is always initialized to `0` upon construction of this object.

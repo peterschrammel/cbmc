@@ -104,6 +104,12 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
 
     exprt::operandst new_operands = expr.operands();
 
+// __SZH_ADD_BEGIN__
+// for (a || true || ...) or (a && false && ...), we want to retain a, 
+// because when this expr appears as an if-condition, a is still executed before shortcutting
+    bool erase_after = false;
+// __SZH_ADD_END__
+
     for(exprt::operandst::const_iterator it = new_operands.begin();
         it != new_operands.end();)
     {
@@ -113,18 +119,21 @@ simplify_exprt::resultt<> simplify_exprt::simplify_boolean(const exprt &expr)
       bool is_true=it->is_true();
       bool is_false=it->is_false();
 
+      bool erase=
+        (expr.id()==ID_and ? is_true : is_false) ||
+        !expr_set.insert(*it).second ||
+        erase_after;
+
       if(expr.id()==ID_and && is_false)
       {
-        return false_exprt();
+        // return false_exprt();
+        erase_after = true;
       }
       else if(expr.id()==ID_or && is_true)
       {
-        return true_exprt();
+        // return true_exprt();
+        erase_after = true;
       }
-
-      bool erase=
-        (expr.id()==ID_and ? is_true : is_false) ||
-        !expr_set.insert(*it).second;
 
       if(erase)
       {

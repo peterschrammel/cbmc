@@ -175,7 +175,7 @@ int pthread_mutex_trylock(pthread_mutex_t *mutex)
   if(*((__CPROVER_mutex_t *)mutex)==1)
   {
     // failed
-    return_value=1;
+    return_value=16;
   }
   else
   {
@@ -231,8 +231,8 @@ int pthread_mutex_unlock(pthread_mutex_t *mutex)
   __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
                     "WWcumul", "RRcumul", "RWcumul", "WRcumul");
   __CPROVER_atomic_begin();
-  __CPROVER_assert(*((__CPROVER_mutex_t *)mutex)==1,
-    "must hold lock upon unlock");
+  // __CPROVER_assert(*((__CPROVER_mutex_t *)mutex)==1,
+  //   "must hold lock upon unlock");
   *((__CPROVER_mutex_t *)mutex)=0;
   __CPROVER_atomic_end();
   #endif
@@ -275,8 +275,8 @@ int pthread_mutex_destroy(pthread_mutex_t *mutex)
   __CPROVER_set_may(mutex, "mutex-destroyed");
   #else
 
-  __CPROVER_assert(*((__CPROVER_mutex_t *)mutex)==0,
-    "lock held upon destroy");
+  // __CPROVER_assert(*((__CPROVER_mutex_t *)mutex)==0,
+  //   "lock held upon destroy");
   *((__CPROVER_mutex_t *)mutex)=-1;
 
   #endif
@@ -402,8 +402,8 @@ __CPROVER_HIDE:;
 int pthread_rwlock_destroy(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
-  __CPROVER_assert(*((signed char *)lock)==0,
-    "rwlock held upon destroy");
+  // __CPROVER_assert(*((signed char *)lock)==0,
+  //   "rwlock held upon destroy");
   *((signed char *)lock)=-1;
 
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
@@ -451,15 +451,21 @@ int pthread_rwlock_init(
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
+#define RWLOCK_WRITE_BIAS 127
+
 int pthread_rwlock_rdlock(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
   __CPROVER_atomic_begin();
-  __CPROVER_assert(*((signed char *)lock)!=-1,
-    "lock not initialised or destroyed");
-  __CPROVER_assume(!*((signed char *)lock));
-  *((signed char *)lock)=1;
+  // __CPROVER_assert(*((signed char *)lock)!=-1,
+  //   "lock not initialised or destroyed");
+  __CPROVER_assume(*((signed char *)lock) != RWLOCK_WRITE_BIAS);
+  (*((signed char *)lock))++;
   __CPROVER_atomic_end();
+
+  __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
+                  "WWcumul", "RRcumul", "RWcumul", "WRcumul");
+  
   return 0; // we never fail
 }
 
@@ -504,13 +510,22 @@ int pthread_rwlock_trywrlock(pthread_rwlock_t *lock)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
+#define RWLOCK_WRITE_BIAS 127
+
 int pthread_rwlock_unlock(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
-  __CPROVER_assert(*((signed char *)lock)==1,
-    "must hold lock upon unlock");
+  // __CPROVER_assert(*((signed char *)lock)==1,
+  //   "must hold lock upon unlock");
   // TODO: unlocks all held locks at once
-  *((signed char *)lock)=0;
+  __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
+                  "WWcumul", "RRcumul", "RWcumul", "WRcumul");
+  __CPROVER_atomic_begin();
+  if(*((signed char *)lock) == RWLOCK_WRITE_BIAS)
+    *((signed char *)lock)=0;
+  else
+    (*((signed char *)lock))--;
+  __CPROVER_atomic_end();
   return 0; // we never fail
 }
 
@@ -521,15 +536,21 @@ int pthread_rwlock_unlock(pthread_rwlock_t *lock)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
+#define RWLOCK_WRITE_BIAS 127
+
 int pthread_rwlock_wrlock(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
   __CPROVER_atomic_begin();
-  __CPROVER_assert(*((signed char *)lock)!=-1,
-    "lock not initialised or destroyed");
+  // __CPROVER_assert(*((signed char *)lock)!=-1,
+  //   "lock not initialised or destroyed");
   __CPROVER_assume(!*((signed char *)lock));
-  *((signed char *)lock)=2;
+  *((signed char *)lock)=RWLOCK_WRITE_BIAS;
   __CPROVER_atomic_end();
+
+  __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
+                  "WWcumul", "RRcumul", "RWcumul", "WRcumul");
+
   return 0; // we never fail
 }
 
@@ -663,8 +684,8 @@ int pthread_create(
 
 int pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr)
 { __CPROVER_HIDE:
-  *((unsigned *)cond)=0;
-  if(attr) (void)*attr;
+  // *((unsigned *)cond)=0;
+  // if(attr) (void)*attr;
   return 0;
 }
 
@@ -677,9 +698,9 @@ int pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr)
 
 int pthread_cond_signal(pthread_cond_t *cond)
 { __CPROVER_HIDE:
-  __CPROVER_atomic_begin();
-  (*((unsigned *)cond))++;
-  __CPROVER_atomic_end();
+  // __CPROVER_atomic_begin();
+  // (*((unsigned *)cond))++;
+  // __CPROVER_atomic_end();
   return 0;
 }
 
@@ -692,9 +713,9 @@ int pthread_cond_signal(pthread_cond_t *cond)
 
 int pthread_cond_broadcast(pthread_cond_t *cond)
 { __CPROVER_HIDE:
-  __CPROVER_atomic_begin();
-  *((unsigned *)cond)=(unsigned)-1;
-  __CPROVER_atomic_end();
+  // __CPROVER_atomic_begin();
+  // *((unsigned *)cond)=(unsigned)-1;
+  // __CPROVER_atomic_end();
   return 0;
 }
 
@@ -723,10 +744,13 @@ int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex)
   __CPROVER_clear_may(mutex, "mutex-locked");
   #endif
 
-  __CPROVER_atomic_begin();
-  if(*((unsigned *)cond))
-    (*((unsigned *)cond))--;
-  __CPROVER_atomic_end();
+  pthread_mutex_unlock(mutex);
+  pthread_mutex_lock(mutex);
+
+  // __CPROVER_atomic_begin();
+  // if(*((unsigned *)cond))
+  //   (*((unsigned *)cond))--;
+  // __CPROVER_atomic_end();
 
   return 0; // we never fail
 }

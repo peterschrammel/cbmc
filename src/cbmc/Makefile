@@ -44,6 +44,10 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
       ../solvers/solvers$(LIBEXT) \
       ../util/util$(LIBEXT) \
+      ../cat/cat_parsing_driver$(OBJEXT) \
+      ../cat/cat_module$(OBJEXT) \
+      ../cat/cat_lexer.yy$(OBJEXT) \
+      ../cat/cat_parser.tab$(OBJEXT) \
 
 INCLUDES= -I ..
 
@@ -52,9 +56,9 @@ LIBS =
 include ../config.inc
 include ../common
 
-CLEANFILES = cbmc$(EXEEXT)
+CLEANFILES = deagle_exe$(EXEEXT)
 
-all: cbmc$(EXEEXT)
+all: deagle_exe$(EXEEXT)
 
 ifneq ($(wildcard ../bv_refinement/Makefile),)
   OBJ += ../bv_refinement/bv_refinement$(LIBEXT)
@@ -68,10 +72,10 @@ endif
 
 ###############################################################################
 
-cbmc$(EXEEXT): $(OBJ)
+deagle_exe$(EXEEXT): $(OBJ)
 	$(LINKBIN)
 
 .PHONY: cbmc-mac-signed
 
-cbmc-mac-signed: cbmc$(EXEEXT)
-	strip cbmc$(EXEEXT) ; codesign -v -s $(OSX_IDENTITY) cbmc$(EXEEXT)
+cbmc-mac-signed: deagle_exe$(EXEEXT)
+	strip deagle_exe$(EXEEXT) ; codesign -v -s $(OSX_IDENTITY) deagle_exe$(EXEEXT)

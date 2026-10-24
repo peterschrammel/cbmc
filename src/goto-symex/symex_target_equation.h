@@ -21,11 +21,53 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <util/narrow.h>
 
+#include <cat/cat_module.h>
+
 #include "ssa_step.h"
 #include "symex_target.h"
+// #include "partial_order_concurrency.h"
 
 class decision_proceduret;
 class namespacet;
+
+// __SZH_ADD_BEGIN__
+struct oc_edget
+{
+    std::string e1_str;
+    std::string e2_str;
+    std::string kind;
+    exprt expr;
+
+    oc_edget(std::string _e1_str, std::string _e2_str, std::string _kind, exprt _expr):
+            e1_str(_e1_str), e2_str(_e2_str), kind(_kind), expr(_expr) {}
+
+    bool operator<(const oc_edget& right) const
+    {
+        if(e1_str != right.e1_str)
+            return e1_str < right.e1_str;
+        if(e2_str != right.e2_str)
+            return e2_str < right.e2_str;
+        return kind < right.kind;
+    }
+};
+
+struct oc_labelt
+{
+    std::string e_str;
+    std::string label;
+    exprt expr;
+
+    oc_labelt(std::string _e_str, std::string _label, exprt _expr):
+            e_str(_e_str), label(_label), expr(_expr){}
+
+    bool operator<(const oc_labelt& right) const
+    {
+        if(e_str != right.e_str)
+            return e_str < right.e_str;
+        return label < right.label;
+    }
+};
+// __SZH_ADD_END__
 
 /// Inheriting the interface of symex_targett this class represents the SSA
 /// form of the input program as a list of \ref SSA_stept. It further extends
@@ -281,6 +323,20 @@ public:
       step.validate(ns, vm);
   }
 
+  // __SZH_ADD_BEGIN__
+  typedef SSA_stepst::const_iterator event_it;
+  std::set<event_it> oc_guard_map;
+  std::vector<oc_edget> oc_edges;
+  std::vector<oc_labelt> oc_labels;
+
+  std::map<std::string, int> oc_result_order;
+
+  std::set<std::string> preserved_accesses;
+
+  std::vector<std::pair<event_it, event_it>> numbered_dataraces;
+  std::map<event_it, exprt> read_dirties;
+  // __SZH_ADD_END__
+
 protected:
   messaget log;
 
@@ -293,6 +349,75 @@ protected:
 
   // for unique function call argument identifiers
   std::size_t argument_count = 0;
+
+  // __SZH_ADD_BEGIN__ for datarace information
+public:
+  bool enable_datarace = false;
+  std::set<std::string> datarace_lines;
+  void build_available_cond_map(std::map<std::string, exprt>& available_cond_map, const namespacet& ns);
+  int get_byte_length(const exprt& expr);
+  void build_byte_update_map(std::map<std::string, std::pair<exprt, exprt>>& byte_update_map, const namespacet& ns);
+  void build_with_map(std::map<std::string, exprt>& with_map, const namespacet& ns);
+  void build_array_update_set(std::set<std::pair<std::string, std::string>>& apo_set);
+  void build_same_pointer_set(std::set<std::pair<std::string, std::string>>& apo_set);
+  void apply_same_line_atomic_set(const namespacet& ns, std::vector<symex_target_equationt::event_it>& same_line_events, std::set<std::pair<std::string, std::string>>& apo_set);
+  void build_same_line_atomic_set(const namespacet& ns, std::set<std::pair<std::string, std::string>>& apo_set);
+  void build_datarace(const namespacet& ns, bool filter);
+  bool choose_datarace();
+
+  std::set<std::string> atomic_dynamic_objects;
+  void dynamic_object_atomicity(const namespacet& ns);
+  bool symbol_is_atomic(const namespacet& ns, irep_idt symbol_name);
+
+  void remove_dummy_accesses();
+
+  struct race_identifier_t
+  {
+    std::string var_name;
+    std::string first_linenumber;
+    std::string second_linenumber;
+    bool first_is_write;
+    bool second_is_write;
+
+    race_identifier_t(std::string v, std::string fl, std::string sl, bool fw, bool sw) :
+        var_name(v), first_linenumber(fl), second_linenumber(sl), first_is_write(fw), second_is_write(sw)
+        {}
+
+    bool operator<(const race_identifier_t& right) const
+    {
+        if(var_name != right.var_name)
+            return var_name < right.var_name;
+        if(first_linenumber != right.first_linenumber)
+            return first_linenumber < right.first_linenumber;
+        if(second_linenumber != right.second_linenumber)
+            return second_linenumber < right.second_linenumber;
+        if(first_is_write != right.first_is_write)
+            return first_is_write < right.first_is_write;
+        return second_is_write < right.second_is_write;
+    }
+  };
+  
+  std::map<race_identifier_t, std::vector<std::pair<event_it, event_it>>> linenumbers_to_races; //all filtered races
+  std::map<race_identifier_t, std::vector<std::pair<event_it, event_it>>>::iterator next_races;
+
+  std::vector<std::pair<event_it, event_it>> datarace_pairs; //chosen races in this solving procedure
+  // __SZH_ADD_END__
+
+  // __WP_ADD_BEGIN__ for deadlock information
+  std::map<unsigned, std::vector<event_it>> per_thread_lock_writes;
+  std::map<unsigned, std::vector<event_it>> per_thread_lock_begins;
+  std::vector<event_it> program_returns;
+  std::vector<event_it> loop_asserts_in_critical;
+  void build_deadlock();
+  // __SZH_ADD_END__
+
+  // __SZH_ADD_BEGIN__
+  bool use_cat = false;
+  cat_modulet cat;
+  bool use_deagle_closure = false;
+  bool use_deagle_icd = false;
+  bool use_deagle_segment = false;
+  // __SZH_ADD_END__
 };
 
 inline bool operator<(

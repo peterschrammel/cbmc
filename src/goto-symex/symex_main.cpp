@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_symex.h"
 
 #include <memory>
+#include <chrono>
 
 #include <pointer-analysis/value_set_dereference.h>
 
@@ -33,7 +34,7 @@ symex_configt::symex_configt(const optionst &options)
   : max_depth(options.get_unsigned_int_option("depth")),
     doing_path_exploration(options.is_set("paths")),
     allow_pointer_unsoundness(
-      options.get_bool_option("allow-pointer-unsoundness")),
+     options.get_bool_option("allow-pointer-unsoundness")),
     constant_propagation(options.get_bool_option("propagation")),
     self_loops_to_assumptions(
       options.get_bool_option("self-loops-to-assumptions")),
@@ -197,6 +198,14 @@ void goto_symext::vcc(
   target.assertion(state.guard.as_expr(), guarded_condition, msg, state.source);
 }
 
+// __SZH_ADD_BEGIN__ : because datarace VCCs have no states
+void goto_symext::stateless_vcc(const exprt &condition, const std::string &msg, const std::string &assert_id, const symex_targett::sourcet &source)
+{
+  target.assertion(true_exprt(), condition, msg, source);
+  target.SSA_steps.back().custom_assert_id = assert_id;
+}
+// __SZH_ADD_END__
+
 void goto_symext::symex_assume(statet &state, const exprt &cond)
 {
   exprt simplified_cond = clean_expr(cond, state, false);
@@ -326,6 +335,10 @@ void goto_symext::symex_with_state(
   const get_goto_functiont &get_goto_function,
   symbol_tablet &new_symbol_table)
 {
+  // __SZH_ADD_BEGIN__
+  state.symbol_table = new_symbol_table;
+  // __SZH_ADD_END__
+
   // resets the namespace to only wrap a single symbol table, and does so upon
   // destruction of an object of this type; instantiating the type is thus all
   // that's needed to achieve a reset upon exiting this method
@@ -593,6 +606,11 @@ void goto_symext::symex_step(
   const get_goto_functiont &get_goto_function,
   statet &state)
 {
+  // __SZH_ADD_BEGIN__
+  if(try_finding_value_set)
+    overall_value_set.make_union(state.value_set);
+  // __SZH_ADD_END__
+
   // Print debug statements if they've been enabled.
   print_symex_step(state);
   execute_next_instruction(get_goto_function, state);
@@ -880,3 +898,582 @@ void goto_symext::try_filter_value_sets(
       *entry_index, erase_from_jump_not_taken_value_set);
   }
 }
+
+// __SZH_ADD_BEGIN__
+#include <iostream>
+#include <fstream>
+
+#include <regex>
+#include <unistd.h>
+
+std::string process_filename(std::string filename)
+{
+  std::string processed;
+
+  for(char c : filename)
+  {
+    if(c == '.')
+      processed += "\\.";
+    else
+      processed += c;
+  }
+  return processed;
+}
+
+std::string basename_filename(std::string filename)
+{
+  return filename.substr(filename.rfind('/') + 1);
+}
+
+int read_goblint_result(std::set<std::string>& linenumbers, std::ifstream& in, std::string filename)
+{
+  int goblint_race_num = 0;
+
+  std::string line;
+  std::vector<std::string> lines;
+
+  while(std::getline(in, line))
+  {
+      if(!line.empty())
+          lines.push_back(line);
+  }
+
+  bool datarace = false;
+
+  int write_num = 0;
+  int read_num = 0;
+
+  std::regex pattern ("\\(" + process_filename(filename) + ":(\\d+):(\\d+)" + "\\)");
+
+  for(auto line : lines)
+  {
+      if(line.find("[Warning]") != std::string::npos) //header
+      {
+          datarace = (line.find("[Warning]") != std::string::npos);
+
+          goblint_race_num += read_num * write_num + write_num * (write_num - 1) / 2;
+          write_num = 0;
+          read_num = 0;
+      }
+      else if(datarace)
+      {
+          std::smatch match_result;
+          if(std::regex_search(line, match_result, pattern))
+              linenumbers.insert(match_result[1].str());
+
+          if(line.find("write with") != std::string::npos)
+              write_num++;
+          if(line.find("read with") != std::string::npos)
+              read_num++;
+      }
+  }
+
+  goblint_race_num += read_num * write_num + write_num * (write_num - 1) / 2;
+
+  return goblint_race_num;
+}
+
+void widen_datarace_lines(std::set<std::string>& lines)
+{
+  auto original_lines = lines;
+  for(auto line : original_lines)
+  {
+    int line_int = std::stoi(line);
+    lines.insert(std::to_string(line_int + 1));
+  }
+}
+
+void invoke_goblint(std::string filename, symex_target_equationt& equation)
+{
+  char buffer[256];
+  auto getcwd_result = getcwd(buffer, 256);
+  std::cout << "getcwd: " << getcwd_result << "\n";
+  std::string goblint_command = buffer;
+  std::string output = "goblint/goblint_output";
+  goblint_command += "/goblint/goblint ";
+  goblint_command += filename;
+  goblint_command += " | tee ";
+  goblint_command += output;
+
+
+  const auto goblint_start = std::chrono::steady_clock::now();
+
+  int res = system(goblint_command.c_str());
+  std::cout << goblint_command << ": " << res << "\n";
+
+  const auto goblint_stop = std::chrono::steady_clock::now();
+  std::chrono::duration<double> goblint_runtime = std::chrono::duration<double>(goblint_stop - goblint_start);
+  std::cout << "Runtime goblint filter: " << goblint_runtime.count() << "s\n";
+
+  std::ifstream in(output.c_str());
+
+  read_goblint_result(equation.datarace_lines, in, filename);
+  widen_datarace_lines(equation.datarace_lines);
+}
+
+void read_locksmith_result(std::set<std::string>& linenumbers, std::ifstream& in, std::string filename)
+{
+  std::string line;
+  std::vector<std::string> lines;
+
+  while(std::getline(in, line))
+  {
+      if(!line.empty())
+          lines.push_back(line);
+  }
+
+  std::string processed_filename = process_filename(basename_filename(filename));
+  std::regex pattern1 ("Warning: Possible data race:.*" + processed_filename + ":(\\d+) is not protected!");
+  std::regex pattern2 ("dereference of .*" + processed_filename + ":(\\d+) at " + processed_filename + ":(\\d+)");
+
+  for(auto line : lines)
+  {
+    std::cout << line << "\n";
+    std::smatch match_result1;
+    if(std::regex_search(line, match_result1, pattern1))
+        linenumbers.insert(match_result1[1].str());
+    std::smatch match_result2;
+    if(std::regex_search(line, match_result2, pattern2))
+        linenumbers.insert(match_result2[2].str());
+  }
+}
+
+void invoke_locksmith(std::string filename, symex_target_equationt& equation)
+{
+  char buffer[256];
+  auto getcwd_result = getcwd(buffer, 256);
+  std::cout << "getcwd: " << getcwd_result << "\n";
+  std::string locksmith_command = buffer;
+  std::string output = "locksmith/locksmith_output";
+  locksmith_command += "/locksmith/locksmith ";
+  locksmith_command += filename;
+  locksmith_command += " > ";
+  locksmith_command += output;
+  locksmith_command += " 2>&1";
+
+  const auto locksmith_start = std::chrono::steady_clock::now();
+
+  int res = system(locksmith_command.c_str());
+  std::cout << locksmith_command << ": " << res << "\n";
+
+  const auto locksmith_stop = std::chrono::steady_clock::now();
+  std::chrono::duration<double> locksmith_runtime = std::chrono::duration<double>(locksmith_stop - locksmith_start);
+  std::cout << "Runtime locksmith filter: " << locksmith_runtime.count() << "s\n";
+
+  std::ifstream in(output.c_str());
+
+  read_locksmith_result(equation.datarace_lines, in, filename);
+  widen_datarace_lines(equation.datarace_lines);
+}
+
+inline bool has_prefix(std::string str)
+{
+  return str.find("[[") != str.npos || str.find("..") != str.npos;
+}
+
+#include <util/arith_tools.h>
+
+void goto_symext::symex_datarace(std::string filename)
+{
+  target.enable_datarace = true;
+
+  if(datarace_filter == "goblint")
+  {
+    std::cout << "Handling datarace with goblint\n";
+    invoke_goblint(filename, target);
+    target.build_datarace(ns, true);
+  }
+  else if(datarace_filter == "locksmith")
+  {
+    std::cout << "Handling datarace with locksmith\n";
+    invoke_locksmith(filename, target);
+    target.build_datarace(ns, true);
+  }
+  else
+  {
+    std::cout << "Handling datarace with no aid\n";
+    target.build_datarace(ns, false);
+  }
+  
+  // There are two methods to represent arrays:
+  // Method1: arr#1
+  // Method2: arr#1[[0]], arr#1[[1]], ...
+  // In the first method, array operation is represented like arr#2 = with(arr#1, i, new_value)
+  // Here only the ith element of arr#1 and arr#2 are accessed
+  // In the second method, arr#1 = {arr#1[[[0]], arr#1[[1]], ...} and each element is respectively assigned
+  // However, accesses to some elements might be dummy
+  // (such as arr#2[[0]] = arr#1[[0]], which means the 0th element just keeps the same)
+
+  // used for Method1
+  std::map<std::string, std::pair<exprt, exprt>> byte_update_map;
+  target.build_byte_update_map(byte_update_map, ns);
+  std::map<std::string, exprt> with_map;
+  target.build_with_map(with_map, ns);
+
+  // used for Method2
+  std::map<std::string, exprt> available_cond_map;
+  target.build_available_cond_map(available_cond_map, ns);
+
+  int race_assert_id = 0;
+  for(auto& races_it : target.linenumbers_to_races)
+  {
+    auto& races = races_it.second;
+    auto& race_identifier = races_it.first;
+    const symex_targett::sourcet* race_source = NULL;
+
+    exprt::operandst same_races;
+
+    std::cout << "Races between line " << race_identifier.first_linenumber << " - line " << race_identifier.second_linenumber << ":\n";
+
+    for(auto& race : races)
+    {
+      int race_id_int = target.numbered_dataraces.size();
+      std::string race_id_str = "race" + std::to_string(race_id_int);
+      irep_idt race_id(race_id_str);
+      symbol_exprt race_var(race_id, bool_typet());
+
+      exprt::operandst conds;
+      if(race.first->guard != true_exprt())
+        conds.push_back(race.first->guard);
+      if(race.second->guard != true_exprt())
+        conds.push_back(race.second->guard);
+
+      std::string first_str = race.first->ssa_lhs.get_identifier().c_str();
+      std::string second_str = race.second->ssa_lhs.get_identifier().c_str();
+
+      // Method 1
+      if(byte_update_map.find(first_str) != byte_update_map.end() || byte_update_map.find(second_str) != byte_update_map.end())
+      {
+        exprt first_index_from = from_integer(0, signedbv_typet(32));
+        exprt first_index_to = from_integer(target.get_byte_length(race.first->ssa_lhs), signedbv_typet(32));
+        if(byte_update_map.find(first_str) != byte_update_map.end())
+        {
+          first_index_from = byte_update_map[first_str].first;
+          first_index_to = byte_update_map[first_str].second;
+        }
+        exprt second_index_from = from_integer(0, signedbv_typet(32));
+        exprt second_index_to = from_integer(target.get_byte_length(race.second->ssa_lhs), signedbv_typet(32));
+        if(byte_update_map.find(second_str) != byte_update_map.end())
+        {
+          second_index_from = byte_update_map[second_str].first;
+          second_index_to = byte_update_map[second_str].second;
+        }
+
+        and_exprt overlap(greater_than_exprt(first_index_to, second_index_from), greater_than_exprt(second_index_to, first_index_from));
+        simplify(overlap, ns);
+
+        conds.push_back(overlap);
+      }
+      else if(with_map.find(first_str) != with_map.end() && with_map.find(second_str) != with_map.end())
+      {
+        auto& first_index = with_map[first_str];
+        auto& second_index = with_map[second_str];
+
+        equal_exprt equality(first_index, second_index);
+        simplify(equality, ns);
+
+        conds.push_back(equality);
+      }
+      else // Method 2
+      {
+        auto first_cond_it = available_cond_map.find(first_str);
+        if(first_cond_it != available_cond_map.end())
+          conds.push_back(first_cond_it->second);
+        else
+        {
+          std::cout << "\t" << first_str << " " << second_str << "(hidden, because first is dummy)\n";
+          continue;
+        }
+        auto second_cond_it = available_cond_map.find(second_str);
+        if(second_cond_it != available_cond_map.end())
+          conds.push_back(second_cond_it->second);
+        else
+        {
+          std::cout << "\t" << first_str << " " << second_str << "(hidden, because second is dummy)\n";
+          continue;
+        }
+      }
+
+      // implies_exprt no_datarace(conjunction(conds), not_exprt(race_var));
+      // same_races.push_back(no_datarace);
+      same_races.push_back(not_exprt(race_var));
+
+      auto cond = conjunction(conds);
+      simplify(cond, ns);
+      if(!cond.is_true())
+        target.constraint(implies_exprt(race_var, conjunction(conds)), "", race.first->source);
+
+      target.numbered_dataraces.push_back(race);
+      race_source = &(race.first->source);
+
+      std::cout << "\t" << first_str << " " << second_str << " with condition " << format(cond) << "\n";
+    }
+
+    if(same_races.empty())
+      continue;
+
+    auto all_race_triplets = conjunction(same_races);
+
+    std::string msg = "No data races on variable " + race_identifier.var_name;
+    msg += " between line " + race_identifier.first_linenumber;
+    msg += " and line " + race_identifier.second_linenumber;
+
+    std::string assert_id = "nodatarace.assertion." + std::to_string(race_assert_id);
+    race_assert_id++;
+
+    stateless_vcc(all_race_triplets, msg, assert_id, *race_source);
+  }
+
+}
+
+void goto_symext::symex_alloc_check()
+{
+  int alloc_assert_id = 0;
+
+  for(symex_target_equationt::event_it e_it=target.SSA_steps.begin(); e_it!=target.SSA_steps.end(); e_it++)
+  {
+    if(e_it->is_assignment())
+    {
+      auto lhs = e_it->ssa_lhs;
+      std::string lhs_name = lhs.get_identifier().c_str();
+      if(lhs_name.find("malloc::malloc_size") == std::string::npos)
+        continue;
+      
+      auto rhs = e_it->ssa_rhs;
+      if(rhs.id() != ID_mult)
+        continue;
+      
+      auto& mult_op0 = to_mult_expr(rhs).op0();
+      auto& mult_op1 = to_mult_expr(rhs).op1();
+
+      greater_than_or_equal_exprt geq_than_op0(lhs, mult_op0);
+      greater_than_or_equal_exprt geq_than_op1(lhs, mult_op1);
+      or_exprt assertion(geq_than_op0, geq_than_op1);
+      std::string msg = lhs_name + " does not overflow";
+      std::string assert_id = "alloc.assertion." + std::to_string(alloc_assert_id);
+      alloc_assert_id++;
+
+      stateless_vcc(implies_exprt(e_it->guard, assertion), msg, assert_id, e_it->source);
+    }
+  }
+
+  for(symex_target_equationt::event_it e_it=target.SSA_steps.begin(); e_it!=target.SSA_steps.end(); e_it++)
+  {
+    if(e_it->is_assignment())
+    {
+      auto lhs = e_it->ssa_lhs;
+      std::string lhs_name = lhs.get_identifier().c_str();
+
+      if(lhs_name.find("array_size") == std::string::npos)
+        continue;
+      std::cout << "find assignment to array size:\n";
+      e_it->output(std::cout);
+      auto rhs = e_it->ssa_rhs;
+      if(rhs.id() != ID_typecast)
+        continue;
+      auto& typecast_original = to_typecast_expr(rhs).operands()[0];
+      //constant_exprt million("10000000000000000000", typecast_original.type());
+      constant_exprt million("100000", typecast_original.type());
+      less_than_exprt assertion(typecast_original, million);
+      std::string msg = lhs_name + " does not exceed";
+      std::string assert_id = "alloc.assertion." + std::to_string(alloc_assert_id);
+      alloc_assert_id++;
+
+      stateless_vcc(implies_exprt(e_it->guard, assertion), msg, assert_id, e_it->source);
+    }
+  }
+}
+
+void goto_symext::remove_dummy_accesses()
+{
+  target.remove_dummy_accesses();
+}
+// __SZH_ADD_END__
+
+
+// __WP_ADD_BEGIN__
+// void goto_symext::backtracing_for_deadlock(std::vector<symex_target_equationt::event_it>& locks_tuples,
+//  std::map<unsigned, std::vector<symex_target_equationt::event_it>>::iterator it1, int& deadlock_assert_id) {
+//   if(locks_tuples.size() >= 2) {
+//     std::string msg = "No deadlock on ";
+//     std::string assert_id = "nodeadlock.assertion." + std::to_string(deadlock_assert_id);
+//     deadlock_assert_id++;
+
+//     exprt::operandst lock_guard_tuples;
+//     for(auto& lock : locks_tuples) {
+
+//       // lock_guard_tuples.push_back(lock->guard);
+
+//       if (lock->guard.id() == ID_and) {
+//         // std::cout << "AND_______lock->guard: " << lock->guard.pretty() << "\n";
+//         // std::cout << "AND_______lock->guard.operands().back(): " << lock->guard.operands().back().pretty() << "\n";
+//         lock_guard_tuples.push_back(lock->guard.operands().back());
+//       }
+//       else {
+//         // std::cout << "NotAND____lock->guard: " << lock->guard.pretty() << "\n";
+//         lock_guard_tuples.push_back(lock->guard);
+//       }
+      
+//       msg += "variable ";
+//       msg += id2string(lock->ssa_lhs.get_identifier());
+//       msg += " in line ";
+//       msg += lock->source.pc->source_location().get_line().c_str();
+//       msg += ",";
+//     }
+//     msg.pop_back();
+//     msg += ".";
+
+//     stateless_vcc(disjunction(lock_guard_tuples), msg, assert_id, (*locks_tuples.begin())->source);
+//   }
+
+//   if(it1 == target.per_thread_locks.end())
+//     return;
+  
+//   // std::cout << "thread_id: " << it1->first << "\n";
+
+//   it1++;
+//   if (it1 != target.per_thread_locks.end())
+//     backtracing_for_deadlock(locks_tuples, it1, deadlock_assert_id);
+//   it1--;
+
+//   for(auto it2 = it1->second.begin(); it2 != it1->second.end(); it2++) {
+//     locks_tuples.push_back(*it2);
+//     it1++;
+//     backtracing_for_deadlock(locks_tuples, it1, deadlock_assert_id);
+//     it1--;
+//     locks_tuples.pop_back();
+//   }
+// }
+
+
+void goto_symext::symex_deadlock()
+{
+  std::cout << "Handling deadlock!\n";
+
+  target.build_deadlock();
+  // std::cout << "target.build_deadlock() over!\n";
+  // std::cout << "per_thread_locks:\n";
+
+  // int function_return_assert_id = 0;
+  // for(auto& event_return : target.function_returns) {
+  //   std::string msg = "No return-problem on function ";
+  //   msg += id2string(event_return->source.function_id);
+
+  //   std::string assert_id = "no-return-problem.assertion." + std::to_string(function_return_assert_id);
+  //   deadlock_assert_id++;
+
+  //   stateless_vcc(event_return->guard, msg, assert_id, event_return->source);
+  // }
+  exprt::operandst integrity_constraint;
+
+  for(auto& event_return : target.program_returns) {
+    integrity_constraint.push_back(boolean_negate(event_return->guard));
+  }
+
+  for(auto& event_assert : target.loop_asserts_in_critical) {
+    integrity_constraint.push_back(event_assert->cond_expr);
+    // std::cout << "event_assert->cond_expr.pretty(): " << event_assert->cond_expr.pretty() << "\n";
+  }
+
+  // std::cout << "integrity_constraint generate over!\n";
+
+  int deadlock_assert_id = 0;
+
+  for(auto& p : target.per_thread_lock_writes) {
+    // std::cout << "p.first:" << p.first << ":\n";
+    // std::cout << "p.second.size():" << p.second.size() << ":\n";
+    // std::cout << "target.per_thread_lock_begins[p.first].size():" << target.per_thread_lock_begins[p.first].size() << ":\n";
+
+    // bool is_single_lock_begin = true;
+    //   for(int i = 1; i < target.per_thread_lock_begins[p.first].size(); i++) {
+    //     if (target.per_thread_lock_begins[p.first][i] != target.per_thread_lock_begins[p.first][0])
+    //       is_single_lock_begin = false;
+    //   }
+    //   if (is_single_lock_begin)
+    //     continue;
+
+    for(unsigned i = 0; i < p.second.size(); i++) {
+
+      // std::cout << "p.second[" << i << "] starts!\n";
+
+      auto& lock_write = p.second[i];
+      // symex_target_equationt::event_it lock_begin;
+      // std::cout << "lock_write->guard: " << lock_write->guard.pretty() << "\n";
+      // if (i < target.per_thread_lock_begins[p.first].size()) {
+      //   lock_begin = target.per_thread_lock_begins[p.first][i];
+
+      //   // std::cout << "lock_begin->guard: " << lock_begin->guard.pretty() << "\n";
+
+      //   if (lock_write->guard == lock_begin->guard)
+      //     continue;
+      // }
+      
+      auto& lock_begin = target.per_thread_lock_begins[p.first][i];
+
+      if (lock_write->guard == lock_begin->guard)
+        continue;
+      // std::cout << "\nvar_name:" << lock_write->ssa_lhs.get_identifier()
+      // << "\nline:" << lock_write->source.pc->source_location().get_line().c_str()
+      // << "\nvar_guard:" << lock_write->guard.pretty() << "\n------\n";
+
+      exprt::operandst deadlock_error;
+
+      if (lock_write->guard.id() == ID_and) {
+        // std::cout << "AND_______lock_write->guard: " << lock_write->guard.pretty() << "\n";
+        // std::cout << "AND_______lock_write->guard.operands().back(): " << lock_write->guard.operands().back().pretty() << "\n";
+
+        deadlock_error.push_back(boolean_negate(lock_write->guard.operands().back()));
+
+        // if(lock_write->ssa_lhs.type().pretty().find("#typedef: pthread_mutex_t") != std::string::npos)
+        // int pos = lock_write->ssa_lhs.type().pretty().find("#typedef: pthread_mutex_t");
+        // std::cout << "lock_write->ssa_lhs.type():" << lock_write->ssa_lhs.type().pretty().at(pos) << "\n";
+
+        auto lock_guard = lock_write->guard;
+        lock_guard.operands().pop_back();
+
+        // std::cout << "AND_______lock_guard: " << lock_guard.pretty() << "\n";
+
+        deadlock_error.push_back(lock_guard);
+
+        std::string msg = "No deadlock on variable ";
+        msg += id2string(lock_write->ssa_lhs.get_identifier());
+
+        std::string assert_id = "nodeadlock.assertion." + std::to_string(deadlock_assert_id);
+        deadlock_assert_id++;
+
+        stateless_vcc(boolean_negate(make_and(conjunction(deadlock_error), conjunction(integrity_constraint))), msg, assert_id, lock_write->source);
+      }
+      else {
+        // std::cout << "The lock_write's guard is NotAND, then the lock's guard is True!!!\n";
+
+        deadlock_error.push_back(boolean_negate(lock_write->guard));
+
+        // std::cout << "The deadlock_error is done!\n";
+
+        std::string msg = "No deadlock on variable ";
+        msg += id2string(lock_write->ssa_lhs.get_identifier());
+
+        std::string assert_id = "nodeadlock.assertion." + std::to_string(deadlock_assert_id);
+        deadlock_assert_id++;
+
+        // std::cout << "The preparation of vcc is over!\n";
+
+        stateless_vcc(boolean_negate(make_and(conjunction(deadlock_error), conjunction(integrity_constraint))), msg, assert_id, lock_write->source);
+
+        // std::cout << "The vcc is done!\n";
+      }
+
+      // std::cout << "p.second[" << i << "] is done!\n";
+    }
+
+  }
+
+  // std::cout << "The symex_deadlock is done!\n";
+  
+  // int deadlock_assert_id = 0;
+  // std::vector<symex_target_equationt::event_it> locks_tuples;
+  // std::map<unsigned, std::vector<symex_target_equationt::event_it>>::iterator it1 = target.per_thread_locks.begin();
+  // backtracing_for_deadlock(locks_tuples, it1, deadlock_assert_id);
+}
+
+// __WP_ADD_END__

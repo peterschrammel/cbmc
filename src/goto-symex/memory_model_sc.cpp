@@ -12,6 +12,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 #include "memory_model_sc.h"
 
 #include <util/std_expr.h>
+#include <iostream>
 
 void memory_model_sct::
 operator()(symex_target_equationt &equation, message_handlert &message_handler)
@@ -22,10 +23,21 @@ operator()(symex_target_equationt &equation, message_handlert &message_handler)
   build_event_lists(equation, message_handler);
   build_clock_type();
 
+  if(enable_datarace)
+    data_race(equation);
+
   read_from(equation);
+
   write_serialization_external(equation);
+  
   program_order(equation);
-  from_read(equation);
+
+  if(!use_deagle)
+    from_read(equation);
+
+  // std::cout << "see the equation!\n";
+  // equation.output(std::cout);
+  // std::cout << "finish seeing!\n";
 }
 
 exprt memory_model_sct::before(event_it e1, event_it e2)
@@ -42,27 +54,6 @@ bool memory_model_sct::program_order_is_relaxed(
   PRECONDITION(e2->is_shared_read() || e2->is_shared_write());
 
   return false;
-}
-
-void memory_model_sct::build_per_thread_map(
-  const symex_target_equationt &equation,
-  per_thread_mapt &dest) const
-{
-  // this orders the events within a thread
-
-  for(eventst::const_iterator
-      e_it=equation.SSA_steps.begin();
-      e_it!=equation.SSA_steps.end();
-      e_it++)
-  {
-    // concurrency-related?
-    if(!e_it->is_shared_read() &&
-       !e_it->is_shared_write() &&
-       !e_it->is_spawn() &&
-       !e_it->is_memory_barrier()) continue;
-
-    dest[e_it->source.thread_nr].push_back(e_it);
-  }
 }
 
 void memory_model_sct::thread_spawn(
@@ -93,11 +84,12 @@ void memory_model_sct::thread_spawn(
           n_it++)
       {
         if(!(*n_it)->is_memory_barrier())
-          add_constraint(
-            equation,
-            before(e_it, *n_it),
-            "thread-spawn",
-            e_it->source);
+        {
+          if(use_deagle)
+            add_oc_edge(equation, e_it, *n_it, is_apo(e_it, *n_it) ? "apo" : "po", true_exprt());
+          else
+            add_constraint(equation, before(e_it, *n_it), "thread-spawn", e_it->source);
+        }
       }
     }
   }
@@ -156,6 +148,14 @@ void memory_model_sct::program_order(
 
   thread_spawn(equation, per_thread_map);
 
+  if(use_deagle)
+    build_guard_map_write(equation);
+
+  std::set<std::pair<std::string, std::string>> apo_set;
+  equation.build_array_update_set(apo_set);
+  equation.build_same_pointer_set(apo_set);
+  equation.build_same_line_atomic_set(ns, apo_set);
+
   // iterate over threads
 
   for(per_thread_mapt::const_iterator
@@ -184,11 +184,10 @@ void memory_model_sct::program_order(
         continue;
       }
 
-      add_constraint(
-        equation,
-        before(previous, *e_it),
-        "po",
-        (*e_it)->source);
+      if(use_deagle)
+        add_oc_edge(equation, previous, *e_it, is_apo(apo_set, previous, *e_it) ? "apo" : "po", true_exprt());
+      else
+        add_constraint(equation, before(previous, *e_it), "po", (*e_it)->source);
 
       previous=*e_it;
     }
@@ -198,53 +197,119 @@ void memory_model_sct::program_order(
 void memory_model_sct::write_serialization_external(
   symex_target_equationt &equation)
 {
-  for(address_mapt::const_iterator
-      a_it=address_map.begin();
-      a_it!=address_map.end();
-      a_it++)
+  for(auto a_it=address_map.begin(); a_it!=address_map.end(); a_it++)
   {
     const a_rect &a_rec=a_it->second;
 
     // This is quadratic in the number of writes
     // per address. Perhaps some better encoding
     // based on 'places'?
-    for(event_listt::const_iterator
-        w_it1=a_rec.writes.begin();
-        w_it1!=a_rec.writes.end();
-        ++w_it1)
+    for(auto w_it1=a_rec.writes.begin(); w_it1!=a_rec.writes.end(); ++w_it1)
     {
-      event_listt::const_iterator next=w_it1;
+      auto next=w_it1;
       ++next;
 
-      for(event_listt::const_iterator w_it2=next;
-          w_it2!=a_rec.writes.end();
-          ++w_it2)
+      for(auto w_it2=next; w_it2!=a_rec.writes.end(); ++w_it2)
       {
-        // external?
-        if((*w_it1)->source.thread_nr==
-           (*w_it2)->source.thread_nr)
-          continue;
-
         // ws is a total order, no two elements have the same rank
         // s -> w_evt1 before w_evt2; !s -> w_evt2 before w_evt1
 
-        symbol_exprt s=nondet_bool_symbol("ws-ext");
+        bool can12 = !(assume_local_consistency && po(*w_it2, *w_it1));
+        bool can21 = !(assume_local_consistency && po(*w_it1, *w_it2));
+        if((*w_it1)->is_init())
+          can21 = false;
+        if((*w_it2)->is_init())
+          can12 = false;
 
-        // write-to-write edge
-        add_constraint(
-          equation,
-          implies_exprt(s, before(*w_it1, *w_it2)),
-          "ws-ext",
-          (*w_it1)->source);
+        if(can12 && can21)
+        {
+          symbol_exprt s12=nondet_bool_symbol("ws");
+          symbol_exprt s21=nondet_bool_symbol("ws");
 
-        add_constraint(
-          equation,
-          implies_exprt(not_exprt(s), before(*w_it2, *w_it1)),
-          "ws-ext",
-          (*w_it1)->source);
+          add_constraint(equation, equal_exprt(or_exprt(s12, s21), and_exprt((*w_it1)->guard, (*w_it2)->guard)), "ws-some", (*w_it1)->source);
+          // add_constraint(equation, not_exprt(and_exprt(s12, s21)), "ws-only-one", (*w_it1)->source);
+          if(use_deagle)
+          {
+            add_oc_edge(equation, *w_it1, *w_it2, "ws", s12);
+            add_oc_edge(equation, *w_it2, *w_it1, "ws", s21);
+          }
+          else
+          {
+            add_constraint(equation, implies_exprt(s12, before(*w_it1, *w_it2)), "ws", (*w_it1)->source);
+            add_constraint(equation, implies_exprt(s21, before(*w_it2, *w_it1)), "ws", (*w_it1)->source);
+          }
+        }
+        else if(can12)
+        {
+          symbol_exprt s12=nondet_bool_symbol("ws");
+          add_constraint(equation, equal_exprt(s12, and_exprt((*w_it1)->guard, (*w_it2)->guard)), "ws-some", (*w_it1)->source);
+          if(use_deagle)
+            add_oc_edge(equation, *w_it1, *w_it2, "ws", s12);
+          else
+            add_constraint(equation, implies_exprt(s12, before(*w_it1, *w_it2)), "ws", (*w_it1)->source);
+        }
+        else if(can21)
+        {
+          symbol_exprt s21=nondet_bool_symbol("ws");
+          add_constraint(equation, equal_exprt(s21, and_exprt((*w_it2)->guard, (*w_it1)->guard)), "ws-some", (*w_it1)->source);
+          if(use_deagle)
+            add_oc_edge(equation, *w_it2, *w_it1, "ws", s21);
+          else
+            add_constraint(equation, implies_exprt(s21, before(*w_it2, *w_it1)), "ws", (*w_it1)->source);
+        }
+        else
+          std::cout << "WARNING: either " << id(*w_it1) << " or " << id(*w_it2) << " cannot coherence before each other.\n";
       }
     }
   }
+
+  // for(address_mapt::const_iterator
+  //     a_it=address_map.begin();
+  //     a_it!=address_map.end();
+  //     a_it++)
+  // {
+  //   const a_rect &a_rec=a_it->second;
+
+  //   // This is quadratic in the number of writes
+  //   // per address. Perhaps some better encoding
+  //   // based on 'places'?
+  //   for(event_listt::const_iterator
+  //       w_it1=a_rec.writes.begin();
+  //       w_it1!=a_rec.writes.end();
+  //       ++w_it1)
+  //   {
+  //     event_listt::const_iterator next=w_it1;
+  //     ++next;
+
+  //     for(event_listt::const_iterator w_it2=next;
+  //         w_it2!=a_rec.writes.end();
+  //         ++w_it2)
+  //     {
+  //       // external?
+  //       if((*w_it1)->source.thread_nr==
+  //          (*w_it2)->source.thread_nr)
+  //         continue;
+
+  //       // ws is a total order, no two elements have the same rank
+  //       // s -> w_evt1 before w_evt2; !s -> w_evt2 before w_evt1
+
+  //       symbol_exprt s=nondet_bool_symbol("ws-ext");
+
+  //       // write-to-write edge
+  //       add_constraint(
+  //         equation,
+  //         implies_exprt(s, before(*w_it1, *w_it2)),
+  //         "ws-ext",
+  //         (*w_it1)->source);
+
+  //       add_constraint(
+  //         equation,
+  //         implies_exprt(not_exprt(s), before(*w_it2, *w_it1)),
+  //         "ws-ext",
+  //         (*w_it1)->source);
+  //     }
+  //   }
+  // }
 }
 
 void memory_model_sct::from_read(symex_target_equationt &equation)

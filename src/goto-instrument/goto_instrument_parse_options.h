@@ -83,7 +83,7 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_REMOVE_CONST_FUNCTION_POINTERS \
   "(print-internal-representation)" \
   "(remove-function-pointers)" \
-  "(show-claims)(property):" \
+  "(show-claims)(property):(subproperty):" \
   "(show-symbol-table)(show-points-to)(show-rw-set)" \
   OPT_TIMESTAMP \
   "(show-natural-loops)(show-lexical-loops)(accelerate)(havoc-loops)" \

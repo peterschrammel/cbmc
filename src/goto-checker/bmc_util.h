@@ -180,6 +180,10 @@ void run_property_decider(
   "(slice-formula)" \
   "(unwinding-assertions)" \
   "(no-unwinding-assertions)" \
+  "(mm-strict-guard)" \
+  "(mm-cutting)" \
+  "(mm-flag)" \
+  "(unwind-suggest)" \
   "(no-self-loops-to-assumptions)" \
   "(partial-loops)" \
   "(paths):" \
@@ -195,6 +199,7 @@ void run_property_decider(
   "(unwind-max):" \
   "(ignore-properties-before-unwind-min)" \
   "(symex-cache-dereferences)" \
+  "(allow-pointer-unsoundness)" \
   OPT_UNWINDSET \
 
 #define HELP_BMC \

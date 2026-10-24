@@ -596,10 +596,22 @@ void value_sett::get_value_set_rec(
 
       if(op.is_zero())
       {
-        insert(
-          dest,
-          exprt(ID_null_object, to_type_with_subtype(expr_type).subtype()),
-          mp_integer{0});
+        // __SZH_ADD_BEGIN__ : typecast to void*
+        if(expr_type.id() == ID_empty)
+        {
+          insert(
+            dest,
+            exprt(ID_null_object, expr_type),
+            mp_integer{0});
+        }
+        else
+        {
+          insert(
+            dest,
+            exprt(ID_null_object, to_type_with_subtype(expr_type).subtype()),
+            mp_integer{0});
+        }
+        // __SZH_ADD_END__
       }
       else
       {

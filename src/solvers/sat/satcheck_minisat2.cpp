@@ -21,6 +21,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <minisat/core/Solver.h>
 #include <minisat/simp/SimpSolver.h>
+#include "../minisat-2.2.1/minisat/core/ClosureSolver.h"
+#include "../minisat-2.2.1/minisat/core/SegmentSolver.h"
+#include "../minisat-2.2.1/minisat/core/MemoryModelSolver.h"
 
 #ifndef HAVE_MINISAT2
 #error "Expected HAVE_MINISAT2"
@@ -108,6 +111,28 @@ const std::string satcheck_minisat_simplifiert::solver_text()
 {
   return "MiniSAT 2.2.1 with simplifier";
 }
+
+// __SZH_ADD_BEGIN__
+const std::string deagle_closure_solvert::solver_text()
+{
+  return "Deagle's Closure Solver";
+}
+
+const std::string deagle_icd_solvert::solver_text()
+{
+  return "Deagle's ICD Solver";
+}
+
+const std::string deagle_segment_solvert::solver_text()
+{
+  return "Deagle's Segment Solver";
+}
+
+const std::string memory_model_solvert::solver_text()
+{
+  return "Deagle's Memory Model Solver";
+}
+// __SZH_ADD_END__
 
 template<typename T>
 void satcheck_minisat2_baset<T>::add_variables()
@@ -348,6 +373,10 @@ void satcheck_minisat2_baset<T>::set_assumptions(const bvt &bv)
 
 template class satcheck_minisat2_baset<Minisat::Solver>;
 template class satcheck_minisat2_baset<Minisat::SimpSolver>;
+template class satcheck_minisat2_baset<Minisat::ClosureSolver>;
+template class satcheck_minisat2_baset<Minisat::ICDSolver>;
+template class satcheck_minisat2_baset<Minisat::SegmentSolver>;
+template class satcheck_minisat2_baset<Minisat::MemoryModelSolver>;
 
 void satcheck_minisat_simplifiert::set_frozen(literalt a)
 {
@@ -372,4 +401,24 @@ bool satcheck_minisat_simplifiert::is_eliminated(literalt a) const
   PRECONDITION(!a.is_constant());
 
   return solver->isEliminated(a.var_no());
+}
+
+void deagle_closure_solvert::save_raw_graph(oc_edge_tablet& _oc_edge_table, oc_guard_mapt& _oc_guard_map, oc_location_mapt& _oc_location_map, std::map<std::string, int>& _oc_result_order)
+{
+  solver->save_raw_graph(_oc_edge_table, _oc_guard_map, _oc_location_map, _oc_result_order);
+}
+
+void deagle_icd_solvert::save_raw_graph(oc_edge_tablet& _oc_edge_table, std::map<std::string, int>& _oc_result_order)
+{
+  solver->save_raw_graph(_oc_edge_table, _oc_result_order);
+}
+
+void deagle_segment_solvert::save_raw_graph(oc_edge_tablet& _oc_edge_table, oc_guard_mapt& _oc_guard_map, oc_location_mapt& _oc_location_map, std::map<std::string, int>& _oc_result_order)
+{
+  solver->save_raw_graph(_oc_edge_table, _oc_guard_map, _oc_location_map, _oc_result_order);
+}
+
+void memory_model_solvert::save_raw_graph(oc_edge_tablet& _oc_edge_table, oc_label_tablet& _oc_label_table, cat_modulet& _cat_module)
+{
+  solver->save_raw_graph(_oc_edge_table, _oc_label_table, _cat_module);
 }

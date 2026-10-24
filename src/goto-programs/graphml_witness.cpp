@@ -288,15 +288,15 @@ static bool contains_symbol_prefix(const exprt &expr, const std::string &prefix)
 void graphml_witnesst::operator()(const goto_tracet &goto_trace)
 {
   unsigned int max_thread_idx = 0;
-  bool trace_has_violation = false;
+  //bool trace_has_violation = false;
   for(goto_tracet::stepst::const_iterator it = goto_trace.steps.begin();
       it != goto_trace.steps.end();
       ++it)
   {
     if(it->thread_nr > max_thread_idx)
       max_thread_idx = it->thread_nr;
-    if(it->is_assert() && !it->cond_value)
-      trace_has_violation = true;
+    // if(it->is_assert() && !it->cond_value)
+    //   trace_has_violation = true;
   }
 
   graphml.key_values["sourcecodelang"]="C";
@@ -306,41 +306,41 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
   graphml[sink].is_violation=false;
   graphml[sink].has_invariant=false;
 
-  if(max_thread_idx > 0 && trace_has_violation)
-  {
-    std::vector<graphmlt::node_indext> nodes;
+  // if(max_thread_idx > 0 && trace_has_violation)
+  // {
+  //   std::vector<graphmlt::node_indext> nodes;
 
-    for(unsigned int i = 0; i <= max_thread_idx + 1; ++i)
-    {
-      nodes.push_back(graphml.add_node());
-      graphml[nodes.back()].node_name = "N" + std::to_string(i);
-      graphml[nodes.back()].is_violation = i == max_thread_idx + 1;
-      graphml[nodes.back()].has_invariant = false;
-    }
+  //   for(unsigned int i = 0; i <= max_thread_idx + 1; ++i)
+  //   {
+  //     nodes.push_back(graphml.add_node());
+  //     graphml[nodes.back()].node_name = "N" + std::to_string(i);
+  //     graphml[nodes.back()].is_violation = i == max_thread_idx + 1;
+  //     graphml[nodes.back()].has_invariant = false;
+  //   }
 
-    for(auto it = nodes.cbegin(); std::next(it) != nodes.cend(); ++it)
-    {
-      xmlt edge("edge");
-      edge.set_attribute("source", graphml[*it].node_name);
-      edge.set_attribute("target", graphml[*std::next(it)].node_name);
-      const auto thread_id = std::distance(nodes.cbegin(), it);
-      xmlt &data = edge.new_element("data");
-      data.set_attribute("key", "createThread");
-      data.data = std::to_string(thread_id);
-      if(thread_id == 0)
-      {
-        xmlt &data = edge.new_element("data");
-        data.set_attribute("key", "enterFunction");
-        data.data = "main";
-      }
-      graphml[*std::next(it)].in[*it].xml_node = edge;
-      graphml[*it].out[*std::next(it)].xml_node = edge;
-    }
+  //   for(auto it = nodes.cbegin(); std::next(it) != nodes.cend(); ++it)
+  //   {
+  //     xmlt edge("edge");
+  //     edge.set_attribute("source", graphml[*it].node_name);
+  //     edge.set_attribute("target", graphml[*std::next(it)].node_name);
+  //     const auto thread_id = std::distance(nodes.cbegin(), it);
+  //     xmlt &data = edge.new_element("data");
+  //     data.set_attribute("key", "createThread");
+  //     data.data = std::to_string(thread_id);
+  //     // if(thread_id == 0)
+  //     // {
+  //     //   xmlt &data = edge.new_element("data");
+  //     //   data.set_attribute("key", "enterFunction");
+  //     //   data.data = "main";
+  //     // }
+  //     graphml[*std::next(it)].in[*it].xml_node = edge;
+  //     graphml[*it].out[*std::next(it)].xml_node = edge;
+  //   }
 
-    // we do not provide any further details as CPAchecker does not seem to
-    // handle more detailed concurrency witnesses
-    return;
-  }
+  //   // we do not provide any further details as CPAchecker does not seem to
+  //   // handle more detailed concurrency witnesses
+  //   return;
+  // }
 
   // step numbers start at 1
   std::vector<std::size_t> step_to_node(goto_trace.steps.size()+1, 0);
@@ -470,28 +470,27 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
                to_multi_ary_expr(it->full_lhs_value).op0().get(ID_value)),
              "INVALID-")))
         {
-          xmlt &val = edge.new_element("data");
-          val.set_attribute("key", "assumption");
-
+          // __SZH_EDIT_BEGIN__ witnesslint does not know function name, do not generate them
           code_assignt assign{it->full_lhs, it->full_lhs_value};
-          val.data = convert_assign_rec(lhs_id, assign);
+          std::string assign_data = convert_assign_rec(lhs_id, assign);
 
-          xmlt &val_s = edge.new_element("data");
-          val_s.set_attribute("key", "assumption.scope");
-          irep_idt function_id = it->function_id;
-          const symbolt *symbol_ptr = nullptr;
-          if(!ns.lookup(lhs_id, symbol_ptr) && symbol_ptr->is_parameter)
-          {
-            function_id = lhs_id.substr(0, lhs_id.find("::"));
-          }
-          val_s.data = id2string(function_id);
+          // xmlt &val_s = edge.new_element("data");
+          // val_s.set_attribute("key", "assumption.scope");
+          // irep_idt function_id = it->function_id;
+          // const symbolt *symbol_ptr = nullptr;
+          // if(!ns.lookup(lhs_id, symbol_ptr) && symbol_ptr->is_parameter)
+          // {
+          //   function_id = lhs_id.substr(0, lhs_id.find("::"));
+          // }
+          // val_s.data = id2string(function_id);
 
-          if(has_prefix(val.data, "\\result ="))
+          if(!has_prefix(assign_data, "\\result ="))
           {
-            xmlt &val_f = edge.new_element("data");
-            val_f.set_attribute("key", "assumption.resultfunction");
-            val_f.data = id2string(it->function_id);
+            xmlt &val = edge.new_element("data");
+            val.set_attribute("key", "assumption");
+            val.data = assign_data;
           }
+          // __SZH_EDIT_END__
         }
       }
       else if(it->type == goto_trace_stept::typet::GOTO && it->pc->is_goto())

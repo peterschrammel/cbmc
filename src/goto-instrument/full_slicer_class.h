@@ -139,8 +139,9 @@ class properties_criteriont:public slicing_criteriont
 {
 public:
   explicit properties_criteriont(
-    const std::list<std::string> &properties):
-    property_ids(properties)
+    const std::list<std::string> &properties,
+    const std::list<std::string> &subproperties):
+    property_ids(properties), subproperty_ids(subproperties)
   {
   }
 
@@ -153,18 +154,32 @@ public:
     const std::string &p_id =
       id2string(target->source_location().get_property_id());
 
+    if(!property_ids.empty())
+    {
     for(std::list<std::string>::const_iterator
         it=property_ids.begin();
         it!=property_ids.end();
         ++it)
       if(p_id==*it)
         return true;
+    }
+
+    if(!subproperty_ids.empty())
+    {
+    for(std::list<std::string>::const_iterator
+        it=subproperty_ids.begin();
+        it!=subproperty_ids.end();
+        ++it)
+      if(p_id.find(*it)!=std::string::npos)
+        return true;
+    }
 
     return false;
   }
 
 protected:
   const std::list<std::string> &property_ids;
+  const std::list<std::string> &subproperty_ids;
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_FULL_SLICER_CLASS_H

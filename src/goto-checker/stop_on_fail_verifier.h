@@ -39,6 +39,8 @@ public:
     return determine_result(properties);
   }
 
+  #include "goto-checker/report_util.h"
+
   void report() override
   {
     switch(determine_result(properties))
@@ -53,6 +55,10 @@ public:
     {
       message_building_error_trace(log);
       goto_tracet goto_trace = incremental_goto_checker.build_shortest_trace();
+      
+      auto sorted_properties = get_sorted_properties(get_properties());
+      output_properties_plain(sorted_properties, log);
+
       output_error_trace(
         goto_trace,
         incremental_goto_checker.get_namespace(),

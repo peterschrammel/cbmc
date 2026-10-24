@@ -62,4 +62,15 @@ void output_overall_result(
   resultt result,
   ui_message_handlert &ui_message_handler);
 
+// __SZH_ADD_BEGIN__ : to use them elsewhere
+#include "util/message.h"
+
+std::vector<propertiest::const_iterator>
+get_sorted_properties(const propertiest &properties);
+
+void output_properties_plain(
+  const std::vector<propertiest::const_iterator> &sorted_properties,
+  messaget &log);
+// __SZH_ADD_END__
+
 #endif // CPROVER_GOTO_CHECKER_REPORT_UTIL_H

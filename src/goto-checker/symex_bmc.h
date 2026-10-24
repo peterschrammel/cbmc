@@ -18,6 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symex_coverage.h"
 
+#include "util/std_code.h"
+
 class unwindsett;
 
 class symex_bmct : public goto_symext
@@ -84,6 +86,35 @@ public:
 
   unwindsett &unwindset;
 
+  // __SZH_ADD_BEGIN__: SV-COMP unwinding strategy
+  std::vector<code_assumet> assumes;
+  std::vector<code_expressiont> expressions;
+  std::vector<code_fort> fors;
+  std::vector<code_whilet> whiles;
+  std::vector<code_assignt> assigns;
+  // __WP_ADD_BEGIN__
+  std::vector<code_declt> decls;
+  // __WP_ADD_END__
+  std::vector<code_function_callt> function_calls;
+  std::vector<code_ifthenelset> ifthenelses;
+  void get_interesting_codes();
+
+  std::map<std::string, int> assume_upperbounds;
+  std::map<symbol_exprt, int> const_values;
+  void update_assume_upperbound(std::string& id, int value);
+  void get_assume_upperbounds();
+  void get_const_values();
+
+  std::map<source_locationt, int> single_unwind_limit;
+  int for_unwind_limit_single(code_fort& code);
+  // __WP_ADD_BEGIN__
+  int while_unwind_limit_single(code_whilet& code);
+  void unwind_suggest();
+  void show_unwind_suggest(const goto_functionst &goto_functions);
+  // __WP_ADD_END__
+
+  void svcomp_unsupported_library();
+  // __SZH_ADD_END__
 protected:
   /// Callbacks that may provide an unwind/do-not-unwind decision for a loop
   std::vector<loop_unwind_handlert> loop_unwind_handlers;

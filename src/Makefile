@@ -26,6 +26,7 @@ DIRS = analyses \
        symtab2gb \
        util \
        xmllang \
+       cat \
        # Empty last line
 
 all: cbmc.dir \
@@ -71,7 +72,7 @@ languages: util.dir langapi.dir \
            cpp.dir ansi-c.dir xmllang.dir assembler.dir \
            jsil.dir json.dir json-symtab-language.dir statement-list.dir
 
-solvers.dir: util.dir
+solvers.dir: util.dir cat.dir
 
 goto-harness.dir: util.dir goto-programs.dir langapi.dir linking.dir \
                   json.dir json-symtab-language.dir \
@@ -84,7 +85,7 @@ goto-checker.dir: solvers.dir goto-symex.dir goto-programs.dir
 
 cbmc.dir: languages solvers.dir goto-symex.dir analyses.dir \
           pointer-analysis.dir goto-programs.dir linking.dir \
-          goto-instrument.dir goto-checker.dir
+          goto-instrument.dir goto-checker.dir cat.dir
 
 cprover.dir: ansi-c.dir langapi.dir solvers.dir goto-programs.dir \
              linking.dir analyses.dir
@@ -103,6 +104,8 @@ memory-analyzer.dir: util.dir goto-programs.dir langapi.dir linking.dir \
 
 symtab2gb.dir: util.dir goto-programs.dir langapi.dir linking.dir \
                json.dir json-symtab-language.dir ansi-c.dir
+
+goto-symex.dir: cat.dir
 
 # building for a particular directory
 

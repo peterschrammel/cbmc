@@ -263,14 +263,28 @@ void build_goto_trace(
         // these are just used to get the time stamp -- the clock type is
         // computed to be of the minimal necessary size, but we don't need to
         // know it to get the value so just use typeless
-        exprt clock_value = decision_procedure.get(
-          symbol_exprt::typeless(partial_order_concurrencyt::rw_clock_id(it)));
 
-        const auto cv = numeric_cast<mp_integer>(clock_value);
-        if(cv.has_value())
-          current_time = *cv;
+        // __SZH_ADD_BEGIN__
+        if(!target.oc_edges.empty()) // use deagle
+        {
+          std::string name = id2string(it->ssa_lhs.get_identifier());
+          if(target.oc_result_order.find(name) != target.oc_result_order.end())
+            current_time = target.oc_result_order.at(name);
+          else
+            current_time = 0;
+        }
+        // __SZH_ADD_END__
         else
-          current_time = 0;
+        {
+          exprt clock_value = decision_procedure.get(
+            symbol_exprt::typeless(partial_order_concurrencyt::rw_clock_id(it)));
+
+          const auto cv = numeric_cast<mp_integer>(clock_value);
+          if(cv.has_value())
+            current_time = *cv;
+          else
+            current_time = 0;
+        }
       }
       else if(it->is_atomic_end() && current_time<0)
         current_time*=-1;

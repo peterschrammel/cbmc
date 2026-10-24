@@ -20,25 +20,55 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void set_properties(
   goto_programt &goto_program,
-  std::unordered_set<irep_idt> &property_set)
+  std::unordered_set<irep_idt> &property_set,
+  const std::list<std::string> &properties,
+  const std::list<std::string> &subproperties)
 {
-  for(goto_programt::instructionst::iterator
-      it=goto_program.instructions.begin();
-      it!=goto_program.instructions.end();
-      it++)
+  if(!properties.empty())
   {
-    if(!it->is_assert())
-      continue;
+    for(goto_programt::instructionst::iterator
+        it=goto_program.instructions.begin();
+        it!=goto_program.instructions.end();
+        it++)
+    {
+      if(!it->is_assert())
+        continue;
 
-    irep_idt property_id = it->source_location().get_property_id();
+      irep_idt property_id = it->source_location().get_property_id();
 
-    std::unordered_set<irep_idt>::iterator c_it =
-      property_set.find(property_id);
+      std::unordered_set<irep_idt>::iterator c_it =
+        property_set.find(property_id);
 
-    if(c_it==property_set.end())
-      it->turn_into_skip();
-    else
-      property_set.erase(c_it);
+      if(c_it==property_set.end())
+        it->turn_into_skip();
+      else
+        property_set.erase(c_it);
+    }
+  }
+
+  if(!subproperties.empty())
+  {
+    for(goto_programt::instructionst::iterator
+        it=goto_program.instructions.begin();
+        it!=goto_program.instructions.end();
+        it++)
+    {
+      if(!it->is_assert())
+        continue;
+
+      irep_idt property_id = it->source_location().get_property_id();
+      std::string property_str = property_id.c_str();
+
+      bool substr_match = false;
+      for(auto& substr : subproperties)
+        if(property_str.find(substr) != std::string::npos)
+        {
+          substr_match = true;
+          break;
+        }
+      if(!substr_match)
+        it->turn_into_skip();
+    }
   }
 }
 
@@ -105,21 +135,23 @@ void label_properties(irep_idt function_identifier, goto_programt &goto_program)
 
 void set_properties(
   goto_modelt &goto_model,
-  const std::list<std::string> &properties)
+  const std::list<std::string> &properties,
+  const std::list<std::string> &subproperties)
 {
-  set_properties(goto_model.goto_functions, properties);
+  set_properties(goto_model.goto_functions, properties, subproperties);
 }
 
 void set_properties(
   goto_functionst &goto_functions,
-  const std::list<std::string> &properties)
+  const std::list<std::string> &properties,
+  const std::list<std::string> &subproperties)
 {
   std::unordered_set<irep_idt> property_set;
 
   property_set.insert(properties.begin(), properties.end());
 
   for(auto &gf_entry : goto_functions.function_map)
-    set_properties(gf_entry.second.body, property_set);
+    set_properties(gf_entry.second.body, property_set, properties, subproperties);
 
   if(!property_set.empty())
     throw invalid_command_line_argument_exceptiont(

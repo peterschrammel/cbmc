@@ -23,6 +23,7 @@ void reachability_slicer(goto_modelt &, message_handlert &);
 void reachability_slicer(
   goto_modelt &,
   const std::list<std::string> &properties,
+  const std::list<std::string> &subproperties,
   message_handlert &);
 
 void function_path_reachability_slicer(
@@ -38,6 +39,7 @@ void reachability_slicer(
 void reachability_slicer(
   goto_modelt &,
   const std::list<std::string> &properties,
+  const std::list<std::string> &subproperties,
   const bool include_forward_reachability,
   message_handlert &);
 

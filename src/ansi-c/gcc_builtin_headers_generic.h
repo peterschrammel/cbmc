@@ -33,6 +33,20 @@ void __atomic_signal_fence(int);
 _Bool __atomic_always_lock_free(__CPROVER_size_t, void *);
 _Bool __atomic_is_lock_free(__CPROVER_size_t, void *);
 
+// __SZH_ADD_BEGIN__
+int __LKMM_LOAD(int *, int);
+void __LKMM_STORE(int*, int, int);
+void __LKMM_FENCE(int);
+int __LKMM_XCHG(int*, int, int);
+int __LKMM_CMPXCHG(int*, int, int, int, int);
+void __LKMM_ATOMIC_OP(int*, int, int);
+int __LKMM_ATOMIC_FETCH_OP(int*, int, int, int);
+int __LKMM_ATOMIC_OP_RETURN(int*, int, int, int);
+
+int __LKMM_SPIN_LOCK(spinlock_t*);
+int __LKMM_SPIN_UNLOCK(spinlock_t*);
+// __SZH_ADD_END__
+
 // other
 int __builtin_choose_expr(_Bool, ...);
 int __builtin_classify_type();

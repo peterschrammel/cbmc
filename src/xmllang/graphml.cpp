@@ -17,6 +17,9 @@ Author: Michael Tautschnig, mt@eecs.qmul.ac.uk
 // collide with std::stack included by graph.h
 #include "xml_parser.h"
 
+#include <fstream>
+#include "sha256.h"
+
 typedef std::map<std::string, graphmlt::node_indext> name_mapt;
 
 static graphmlt::node_indext add_node(
@@ -202,7 +205,7 @@ bool read_graphml(
   return build_graph(xml, dest, entry);
 }
 
-bool write_graphml(const graphmlt &src, std::ostream &os)
+bool write_graphml(const graphmlt &src, std::ostream &os, std::string filename, const optionst& options)
 {
   xmlt graphml("graphml");
   graphml.set_attribute(
@@ -229,24 +232,24 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
       key.new_element("default").data="<command-line>";
   }
 
-  // <key attr.name="invariant" attr.type="string" for="node" id="invariant"/>
-  {
-    xmlt &key=graphml.new_element("key");
-    key.set_attribute("attr.name", "invariant");
-    key.set_attribute("attr.type", "string");
-    key.set_attribute("for", "node");
-    key.set_attribute("id", "invariant");
-  }
+  // // <key attr.name="invariant" attr.type="string" for="node" id="invariant"/>
+  // {
+  //   xmlt &key=graphml.new_element("key");
+  //   key.set_attribute("attr.name", "invariant");
+  //   key.set_attribute("attr.type", "string");
+  //   key.set_attribute("for", "node");
+  //   key.set_attribute("id", "invariant");
+  // }
 
-  // <key attr.name="invariant.scope" attr.type="string" for="node"
-  //     id="invariant.scope"/>
-  {
-    xmlt &key=graphml.new_element("key");
-    key.set_attribute("attr.name", "invariant.scope");
-    key.set_attribute("attr.type", "string");
-    key.set_attribute("for", "node");
-    key.set_attribute("id", "invariant.scope");
-  }
+  // // <key attr.name="invariant.scope" attr.type="string" for="node"
+  // //     id="invariant.scope"/>
+  // {
+  //   xmlt &key=graphml.new_element("key");
+  //   key.set_attribute("attr.name", "invariant.scope");
+  //   key.set_attribute("attr.type", "string");
+  //   key.set_attribute("for", "node");
+  //   key.set_attribute("id", "invariant.scope");
+  // }
 
   // <key attr.name="isViolationNode" attr.type="boolean" for="node"
   //      id="violation">
@@ -438,43 +441,43 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
 
   // <key attr.name="assumption.resultfunction" attr.type="string" for="edge"
   //      id="assumption.resultfunction"/>
-  {
-    xmlt &key=graphml.new_element("key");
-    key.set_attribute("attr.name", "assumption.resultfunction");
-    key.set_attribute("attr.type", "string");
-    key.set_attribute("for", "edge");
-    key.set_attribute("id", "assumption.resultfunction");
-  }
+  // {
+  //   xmlt &key=graphml.new_element("key");
+  //   key.set_attribute("attr.name", "assumption.resultfunction");
+  //   key.set_attribute("attr.type", "string");
+  //   key.set_attribute("for", "edge");
+  //   key.set_attribute("id", "assumption.resultfunction");
+  // }
 
   // <key attr.name="assumption.scope" attr.type="string" for="edge"
   //      id="assumption.scope"/>
-  {
-    xmlt &key=graphml.new_element("key");
-    key.set_attribute("attr.name", "assumption.scope");
-    key.set_attribute("attr.type", "string");
-    key.set_attribute("for", "edge");
-    key.set_attribute("id", "assumption.scope");
-  }
+  // {
+  //   xmlt &key=graphml.new_element("key");
+  //   key.set_attribute("attr.name", "assumption.scope");
+  //   key.set_attribute("attr.type", "string");
+  //   key.set_attribute("for", "edge");
+  //   key.set_attribute("id", "assumption.scope");
+  // }
 
   // <key attr.name="enterFunction" attr.type="string" for="edge"
   //      id="enterFunction"/>
-  {
-    xmlt &key=graphml.new_element("key");
-    key.set_attribute("attr.name", "enterFunction");
-    key.set_attribute("attr.type", "string");
-    key.set_attribute("for", "edge");
-    key.set_attribute("id", "enterFunction");
-  }
+  // {
+  //   xmlt &key=graphml.new_element("key");
+  //   key.set_attribute("attr.name", "enterFunction");
+  //   key.set_attribute("attr.type", "string");
+  //   key.set_attribute("for", "edge");
+  //   key.set_attribute("id", "enterFunction");
+  // }
 
   // <key attr.name="returnFromFunction" attr.type="string" for="edge"
   //      id="returnFrom"/>
-  {
-    xmlt &key=graphml.new_element("key");
-    key.set_attribute("attr.name", "returnFromFunction");
-    key.set_attribute("attr.type", "string");
-    key.set_attribute("for", "edge");
-    key.set_attribute("id", "returnFrom");
-  }
+  // {
+  //   xmlt &key=graphml.new_element("key");
+  //   key.set_attribute("attr.name", "returnFromFunction");
+  //   key.set_attribute("attr.type", "string");
+  //   key.set_attribute("for", "edge");
+  //   key.set_attribute("id", "returnFrom");
+  // }
 
   // <key attr.name="witness-type" attr.type="string" for="graph"
   //      id="witness-type"/>
@@ -488,6 +491,94 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
 
   xmlt &graph=graphml.new_element("graph");
   graph.set_attribute("edgedefault", "directed");
+
+  // __SZH_ADD_BEGIN__
+
+  // <data key="witness-type">violation_witness</data>
+  {
+    xmlt &data=graph.new_element("data");
+    data.set_attribute("key", "witness-type");
+    data.data="violation_witness";
+  }
+
+  // <data key="sourcecodelang">C</data>
+  // {
+  //   xmlt &data=graph.new_element("data");
+  //   data.set_attribute("key", "sourcecodelang");
+  //   data.data="C";
+  // }
+
+  // <data key="producer">Deagle 4.1.0</data>
+  {
+    xmlt &data=graph.new_element("data");
+    data.set_attribute("key", "producer");
+    data.data="Deagle 4.1.0";
+  }
+
+  // <data key="specification">CHECK( init(main()), LTL(G ! call(__VERIFIER_error())) )</data>
+  {
+    xmlt &data=graph.new_element("data");
+    data.set_attribute("key", "specification");
+
+    bool enable_unreach_call = !options.get_bool_option("no-assertions");
+    bool enable_datarace = options.get_bool_option("datarace");
+    bool enable_overflow = options.get_bool_option("signed-overflow-check") || options.get_bool_option("signed-overflow-check");
+    bool enable_memsafety = options.get_bool_option("pointer-check") || options.get_bool_option("alloc-check") || options.get_bool_option("memory-leak-check");
+
+    if(enable_unreach_call)
+      data.data="CHECK( init(main()), LTL(G ! call(reach_error())) )";
+    else if(enable_datarace)
+      data.data="CHECK( init(main()), LTL(G ! data-race) )";
+    else if(enable_overflow)
+      data.data="CHECK( init(main()), LTL(G ! overflow) )";
+    else if(enable_memsafety)
+    {
+      data.data="CHECK( init(main()), LTL(G valid-free) )\n";
+      data.data+="CHECK( init(main()), LTL(G valid-deref) )\n";
+      data.data+="CHECK( init(main()), LTL(G valid-memtrack) )\n";
+    }
+  }
+
+  // <data key="programfile">../../sv-benchmarks/c/bitvector/s3_clnt_3_true-unreach-call.BV.c.cil.c</data>
+  {
+    xmlt &data=graph.new_element("data");
+    data.set_attribute("key", "programfile");
+    data.data=filename;
+  }
+
+  // <data key="programhash">c53759a150934ef20fe7ff264c4326cfaaab3702</data>
+  {
+    xmlt &data=graph.new_element("data");
+    data.set_attribute("key", "programhash");
+
+    std::ifstream file(filename);
+    std::string file_content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+    ly::Sha256 sha256;
+
+    data.data=sha256.getHexMessageDigest(file_content);
+  }
+
+  // <data key="architecture">32bit</data>
+  {
+    xmlt &data=graph.new_element("data");
+    data.set_attribute("key", "architecture");
+    data.data="32bit";
+  }
+
+  // <data key="creationtime">2016-12-24T13:15:32+02:00</data>
+  {
+      time_t now = time(0) + 8 * 3600;
+      tm* gm = gmtime(&now);
+      char time_data[100];
+      strftime(time_data, 100, "%Y-%m-%dT%H:%M:%S+08:00", gm);
+      std::string data_str = time_data;
+
+      xmlt &data=graph.new_element("data");
+      data.set_attribute("key", "creationtime");
+      data.data=data_str;
+  }
+  // __SZH_ADD_END__
 
   for(const auto &kv : src.key_values)
   {
@@ -527,16 +618,16 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
       entry.data="true";
     }
 
-    if(n.has_invariant)
-    {
-      xmlt &val=node.new_element("data");
-      val.set_attribute("key", "invariant");
-      val.data=n.invariant;
+    // if(n.has_invariant)
+    // {
+    //   xmlt &val=node.new_element("data");
+    //   val.set_attribute("key", "invariant");
+    //   val.data=n.invariant;
 
-      xmlt &val_s=node.new_element("data");
-      val_s.set_attribute("key", "invariant.scope");
-      val_s.data=n.invariant_scope;
-    }
+    //   xmlt &val_s=node.new_element("data");
+    //   val_s.set_attribute("key", "invariant.scope");
+    //   val_s.data=n.invariant_scope;
+    // }
 
     for(graphmlt::edgest::const_iterator
         e_it=n.out.begin();

@@ -16,6 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "invariant.h"
 #include "std_expr.h"
 
+#include <cstdint>
+#include <limits>
+
 mp_integer ieee_float_spect::bias() const
 {
   return power(2, e-1)-1;

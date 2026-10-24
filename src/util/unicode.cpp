@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "unicode.h"
 
 #include <codecvt>
+#include <cstdint>
 #include <iomanip>
 #include <locale>
 #include <sstream>

@@ -17,6 +17,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include <goto-symex/show_vcc.h>
 
 #include <chrono>
+#include <iostream>
 
 #include "bmc_util.h"
 
@@ -76,8 +77,49 @@ void multi_path_symex_only_checkert::generate_equation()
 {
   const auto symex_start = std::chrono::steady_clock::now();
 
+  // __WP_ADD_BEGIN__
+  if(options.get_bool_option("unwind-suggest"))
+  {
+    symex.unwind_suggest();
+    symex.show_unwind_suggest(goto_model.get_goto_functions());
+    std::exit(0);
+  }
+  // __WP_ADD_END__
+
+  // __SZH_ADD_BEGIN__
+  // if the program has threads, we need to symex twice
+  symex.try_finding_value_set = true;
   symex.symex_from_entry_point_of(
     goto_symext::get_goto_function(goto_model), symex_symbol_table);
+
+  std::cout << "Unwinding successfully\n";
+
+  if(options.get_bool_option("refined-pointer-analysis") && symex.target.has_threads())
+  {
+    symex.path_storage.clear();
+    symex.target.clear();
+    symex.try_finding_value_set = false;
+    symex.dynamic_counter = 0;
+
+    symex.symex_from_entry_point_of(
+      goto_symext::get_goto_function(goto_model), symex_symbol_table);
+  }
+  // __SZH_ADD_END__
+
+  symex.remove_dummy_accesses();
+
+  equation.dynamic_object_atomicity(ns);
+
+  if(symex.enable_datarace)
+    symex.symex_datarace(options.get_option("filename"));
+
+  // __WP_ADD_BEGIN__
+  if(symex.enable_deadlock)
+    symex.symex_deadlock();
+  // __WP_ADD_END__
+
+  if(symex.enable_alloc)
+    symex.symex_alloc_check();
 
   const auto symex_stop = std::chrono::steady_clock::now();
   std::chrono::duration<double> symex_runtime =

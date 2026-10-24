@@ -546,8 +546,8 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
     return CPROVER_EXIT_SUCCESS;
   }
 
-  if(cmdline.isset("property"))
-    ::set_properties(goto_model, cmdline.get_values("property"));
+  if(cmdline.isset("property") || cmdline.isset("subproperty"))
+    ::set_properties(goto_model, cmdline.get_values("property"), cmdline.get_values("subproperty"));
 
   if(options.get_bool_option("general-analysis"))
   {

@@ -138,6 +138,23 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
+  // __SZH_ADD_BEGIN__
+  if(cmdline.isset("unwind-suggest"))
+    options.set_option("unwind-suggest", true);
+  
+  if(cmdline.isset("mm-strict-guard"))
+    options.set_option("mm-strict-guard", true);
+  
+  if(cmdline.isset("mm-flag"))
+    options.set_option("mm-flag", true);
+
+  if(cmdline.isset("mm-cutting"))
+    options.set_option("mm-cutting", true);
+
+  if(cmdline.isset("allow-pointer-unsoundness") || cmdline.isset("refined-pointer-analysis"))
+    options.set_option("allow-pointer-unsoundness", true);
+  // __SZH_ADD_END__
+
   if(cmdline.isset("max-field-sensitivity-array-size"))
   {
     options.set_option(
@@ -190,7 +207,14 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     parse_cover_options(cmdline, options);
 
   if(cmdline.isset("mm"))
+  {
     options.set_option("mm", cmdline.get_value("mm"));
+// __SZH_ADD_BEGIN__
+    auto mm = cmdline.get_value("mm");
+    if(mm != "sc" && mm != "tso" && mm != "pso")
+      options.set_option("cat", true);
+// __SZH_ADD_END__
+  }
 
   if(cmdline.isset("symex-complexity-limit"))
     options.set_option(
@@ -203,6 +227,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("property"))
     options.set_option("property", cmdline.get_values("property"));
+
+  if(cmdline.isset("subproperty"))
+    options.set_option("subproperty", cmdline.get_values("subproperty"));
 
   if(cmdline.isset("drop-unused-functions"))
     options.set_option("drop-unused-functions", true);
@@ -377,7 +404,7 @@ int cbmc_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
-    std::cout << CBMC_VERSION << '\n';
+    std::cout << "4.1.0" << '\n';
     return CPROVER_EXIT_SUCCESS;
   }
 
@@ -650,11 +677,11 @@ int cbmc_parse_optionst::doit()
 
 bool cbmc_parse_optionst::set_properties()
 {
-  if(cmdline.isset("claim")) // will go away
-    ::set_properties(goto_model, cmdline.get_values("claim"));
+  if(cmdline.isset("claim") || cmdline.isset("subproperty")) // will go away
+    ::set_properties(goto_model, cmdline.get_values("claim"), cmdline.get_values("subproperty"));
 
-  if(cmdline.isset("property")) // use this one
-    ::set_properties(goto_model, cmdline.get_values("property"));
+  if(cmdline.isset("property") || cmdline.isset("subproperty")) // use this one
+    ::set_properties(goto_model, cmdline.get_values("property"), cmdline.get_values("subproperty"));
 
   return false;
 }
@@ -811,11 +838,12 @@ bool cbmc_parse_optionst::process_goto_program(
   {
     log.status() << "Performing a forwards-backwards reachability slice"
                  << messaget::eom;
-    if(options.is_set("property"))
+    if(options.is_set("property") || options.is_set("subproperty"))
     {
       reachability_slicer(
         goto_model,
         options.get_list_option("property"),
+        options.get_list_option("subproperty"),
         true,
         log.get_message_handler());
     }
@@ -826,11 +854,12 @@ bool cbmc_parse_optionst::process_goto_program(
   if(options.get_bool_option("reachability-slice"))
   {
     log.status() << "Performing a reachability slice" << messaget::eom;
-    if(options.is_set("property"))
+    if(options.is_set("property") || options.is_set("subproperty"))
     {
       reachability_slicer(
         goto_model,
         options.get_list_option("property"),
+        options.get_list_option("subproperty"),
         log.get_message_handler());
     }
     else
@@ -841,8 +870,8 @@ bool cbmc_parse_optionst::process_goto_program(
   if(options.get_bool_option("full-slice"))
   {
     log.status() << "Performing a full slice" << messaget::eom;
-    if(options.is_set("property"))
-      property_slicer(goto_model, options.get_list_option("property"));
+    if(options.is_set("property") && options.is_set("subproperty"))
+      property_slicer(goto_model, options.get_list_option("property"), options.get_list_option("subproperty"));
     else
       full_slicer(goto_model);
   }
@@ -857,6 +886,17 @@ bool cbmc_parse_optionst::process_goto_program(
 void cbmc_parse_optionst::help()
 {
   // clang-format off
+
+  // __SZH_ADD_BEGIN__
+  std::cout << "\n" << banner_string("Deagle", "4.1.0") << '\n'
+            << align_center_with_border("Zhihang Sun, Pei Wang, Hongyu Fan, and Fei HE") << '\n'
+            << align_center_with_border("School of Software, Tsinghua University") << '\n'
+            << align_center_with_border("hefei@tsinghua.edu.cn") << '\n';
+  
+  std::cout << "which contains:\n";
+
+  // __SZH_ADD_END__
+
   std::cout << '\n' << banner_string("CBMC", CBMC_VERSION) << '\n'
             << align_center_with_border("Copyright (C) 2001-2018") << '\n'
             << align_center_with_border("Daniel Kroening, Edmund Clarke") << '\n' // NOLINT(*)

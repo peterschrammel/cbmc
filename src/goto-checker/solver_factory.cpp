@@ -209,10 +209,34 @@ make_satcheck_prop(message_handlert &message_handler, const optionst &options)
   return satcheck;
 }
 
+#include "solvers/sat/satcheck_minisat2.h"
+
 std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
 {
   auto solver = util_make_unique<solvert>();
-  if(
+  // __SZH_ADD_BEGIN__
+  if(options.get_bool_option("cat"))
+  {
+    solver->set_prop(make_satcheck_prop<memory_model_solvert>(message_handler, options));
+    std::cout << "Use Deagle's memory model solver\n";
+  }
+  else if(options.get_bool_option("deagle-closure"))
+  {
+    solver->set_prop(make_satcheck_prop<deagle_closure_solvert>(message_handler, options));
+    std::cout << "Use Deagle's closure solver\n";
+  }
+  else if(options.get_bool_option("deagle-icd"))
+  {
+    solver->set_prop(make_satcheck_prop<deagle_icd_solvert>(message_handler, options));
+    std::cout << "Use Deagle's ICD solver\n";
+  }
+  else if(options.get_bool_option("deagle-segment"))
+  {
+    solver->set_prop(make_satcheck_prop<deagle_segment_solvert>(message_handler, options));
+    std::cout << "Use Deagle's segment solver\n";
+  }
+  // __SZH_ADD_END__
+  else if(
     options.get_bool_option("beautify") ||
     !options.get_bool_option("sat-preprocessor")) // no simplifier
   {
@@ -564,6 +588,33 @@ static void parse_smt2_options(const cmdlinet &cmdline, optionst &options)
       options.set_option("z3", true);
     }
   }
+
+  // __SZH_ADD_BEGIN__ : default
+  if(cmdline.isset("deagle-closure") || (!cmdline.isset("deagle-segment") && !cmdline.isset("deagle-icd") && !solver_set))
+    options.set_option("deagle-closure", true);
+
+  if(cmdline.isset("deagle-icd"))
+    options.set_option("deagle-icd", true);
+
+  if(cmdline.isset("deagle-segment"))
+    options.set_option("deagle-segment", true);
+
+  if(cmdline.isset("datarace"))
+    options.set_option("datarace", true);
+
+  if(cmdline.isset("no-assertions"))
+    options.set_option("no-assertions", true);
+  
+  if(cmdline.isset("deadlock"))
+    options.set_option("deadlock", true);
+  
+  options.set_option("filename", cmdline.args[0]);
+
+  if(cmdline.isset("goblint"))
+    options.set_option("goblint", true);
+  else if(cmdline.isset("locksmith"))
+    options.set_option("locksmith", true);
+  // __SZH_ADD_END__
 }
 
 void parse_solver_options(const cmdlinet &cmdline, optionst &options)

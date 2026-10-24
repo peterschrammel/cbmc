@@ -43,6 +43,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_tokenizer.h"
 
+#include <cstdint>
+
 // Mark different kinds of error conditions
 
 // Unexpected types and other combinations not implemented and not
@@ -4690,6 +4692,8 @@ void smt2_convt::unflatten(
   }
 }
 
+#include "../../util/find_symbols.h"
+
 void smt2_convt::set_to(const exprt &expr, bool value)
 {
   PRECONDITION(expr.type().id() == ID_bool);
@@ -4729,6 +4733,15 @@ void smt2_convt::set_to(const exprt &expr, bool value)
 
     if(equal_expr.lhs().id()==ID_symbol)
     {
+      // __SZH_ADD_BEGIN__
+      symbol_exprt left_symbol = to_symbol_expr(equal_expr.lhs());
+      exprt right_expr = equal_expr.rhs();
+      std::set<symbol_exprt> right_symbols;
+      ::find_symbols(right_expr, right_symbols);
+      if(right_symbols.find(left_symbol) != right_symbols.end())
+        return;
+      // __SZH_ADD_END__
+
       const irep_idt &identifier=
         to_symbol_expr(equal_expr.lhs()).get_identifier();
 

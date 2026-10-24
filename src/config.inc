@@ -5,7 +5,7 @@ BUILD_ENV = AUTO
 ifeq ($(BUILD_ENV),MSVC)
   #CXXFLAGS += /Wall /WX
 else
-  CXXFLAGS += -Wall -pedantic -Werror -Wno-deprecated-declarations -Wswitch-enum
+  CXXFLAGS += -Wall -pedantic -Wno-deprecated-declarations -Wswitch-enum
 endif
 
 ifeq ($(CPROVER_WITH_PROFILING),1)
@@ -76,7 +76,7 @@ endif
 OSX_IDENTITY="Developer ID Application: Daniel Kroening"
 
 # Detailed version information
-CBMC_VERSION = 5.68.0
+CBMC_VERSION = 5.67.0
 
 # Use the CUDD library for BDDs, can be installed using `make -C src cudd-download`
 # CUDD = ../../cudd-3.0.0

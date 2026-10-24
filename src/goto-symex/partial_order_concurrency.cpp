@@ -87,11 +87,14 @@ void partial_order_concurrencyt::build_event_lists(
   {
     if(e_it->is_shared_read() ||
        e_it->is_shared_write() ||
+// __SZH_ADD_BEGIN__
+       e_it->is_memory_barrier() ||
+// __SZH_ADD_END__
        e_it->is_spawn())
     {
       unsigned thread_nr=e_it->source.thread_nr;
 
-      if(!e_it->is_spawn())
+      if(!e_it->is_spawn() && !e_it->is_memory_barrier())
       {
         a_rect &a_rec=address_map[address(e_it)];
 

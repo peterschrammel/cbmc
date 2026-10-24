@@ -247,6 +247,7 @@ void goto_symext::symex_function_call_post_clean(
   {
     if(symex_config.unwinding_assertions)
       vcc(false_exprt(), "recursion unwinding assertion", state);
+
     if(!symex_config.partial_loops)
     {
       // Rule out this path:

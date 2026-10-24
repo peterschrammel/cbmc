@@ -65,6 +65,11 @@ public:
     std::unordered_set<irep_idt> &updated_properties,
     decision_proceduret::resultt dec_result,
     bool set_pass = true) const;
+
+    // __SZH_ADD_BEGIN__ : for ease of Deagle solver
+    solver_factoryt::solvert* get_solver() { return solver.get(); }
+    // __SZH_ADD_END__
+
 protected:
   const optionst &options;
   ui_message_handlert &ui_message_handler;

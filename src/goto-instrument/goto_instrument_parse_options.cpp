@@ -1642,10 +1642,10 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     // reachability_slicer requires that the model has unique location numbers:
     goto_model.goto_functions.update();
 
-    if(cmdline.isset("property"))
+    if(cmdline.isset("property") || cmdline.isset("subproperty"))
     {
       reachability_slicer(
-        goto_model, cmdline.get_values("property"), ui_message_handler);
+        goto_model, cmdline.get_values("property"), cmdline.get_values("subproperty"), ui_message_handler);
     }
     else
       reachability_slicer(goto_model, ui_message_handler);
@@ -1670,8 +1670,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     do_remove_returns();
 
     log.status() << "Performing a full slice" << messaget::eom;
-    if(cmdline.isset("property"))
-      property_slicer(goto_model, cmdline.get_values("property"));
+    if(cmdline.isset("property") || cmdline.isset("subproperty"))
+      property_slicer(goto_model, cmdline.get_values("property"), cmdline.get_values("subproperty"));
     else
     {
       // full_slicer requires that the model has unique location numbers:
@@ -1732,10 +1732,10 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     goto_model.goto_functions.update();
 
     log.status() << "Performing a reachability slice" << messaget::eom;
-    if(cmdline.isset("property"))
+    if(cmdline.isset("property") || cmdline.isset("subproperty"))
     {
       reachability_slicer(
-        goto_model, cmdline.get_values("property"), ui_message_handler);
+        goto_model, cmdline.get_values("property"), cmdline.get_values("subproperty"), ui_message_handler);
     }
     else
       reachability_slicer(goto_model, ui_message_handler);

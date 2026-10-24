@@ -33,6 +33,7 @@ class optionst;
 
 // clang-format off
 #define CBMC_OPTIONS \
+  "(deagle-closure)(deagle-icd)(deagle-segment)(datarace)(goblint)(locksmith)(deadlock)" \
   OPT_BMC \
   "(preprocess)(slice-by-trace):" \
   OPT_FUNCTIONS \
@@ -55,7 +56,7 @@ class optionst;
   "(show-symbol-table)(show-parse-tree)" \
   "(drop-unused-functions)" \
   "(havoc-undefined-functions)" \
-  "(property):(stop-on-fail)(trace)" \
+  "(property):(subproperty):(stop-on-fail)(trace)" \
   "(verbosity):(no-library)" \
   "(nondet-static)" \
   "(version)" \

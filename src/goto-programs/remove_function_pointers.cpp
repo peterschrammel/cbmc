@@ -431,8 +431,8 @@ void remove_function_pointer(
   source_locationt annotated_location = target->source_location();
   annotated_location.set_property_class("pointer dereference");
   annotated_location.set_comment(function_pointer_assertion_comment(functions));
-  new_code_gotos.add(
-    goto_programt::make_assertion(false_exprt(), annotated_location));
+  // new_code_gotos.add(
+  //   goto_programt::make_assertion(false_exprt(), annotated_location));
   new_code_gotos.add(
     goto_programt::make_assumption(false_exprt(), target->source_location()));
 

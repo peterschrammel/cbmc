@@ -147,13 +147,19 @@ static void output_single_property_plain(
   messaget &log,
   irep_idt current_file = irep_idt())
 {
-  const auto &l = property_info.pc->source_location();
   log.result() << messaget::faint << '[' << property_id << "] "
                << messaget::reset;
+  // __SZH_ADD_BEGIN__ : no data race properties don't need them
+  std::string property_id_str = property_id.c_str();
+  if(property_id_str.find("nodatarace") == std::string::npos && property_id_str.find("alloc") == std::string::npos)
+  {
+  const auto &l = property_info.pc->source_location();
   if(l.get_file() != current_file)
     log.result() << "file " << l.get_file() << ' ';
   if(!l.get_line().empty())
     log.result() << "line " << l.get_line() << ' ';
+  }
+  // __SZH_ADD_END__
   log.result() << property_info.description << ": ";
   switch(property_info.status)
   {
@@ -193,17 +199,17 @@ using propertyt = std::pair<irep_idt, property_infot>;
 static bool
 is_property_less_than(const propertyt &property1, const propertyt &property2)
 {
-  const auto &p1 = property1.second.pc->source_location();
-  const auto &p2 = property2.second.pc->source_location();
-  if(p1.get_file() != p2.get_file())
-    return id2string(p1.get_file()) < id2string(p2.get_file());
-  if(p1.get_function() != p2.get_function())
-    return id2string(p1.get_function()) < id2string(p2.get_function());
-  else if(
-    !p1.get_line().empty() && !p2.get_line().empty() &&
-    p1.get_line() != p2.get_line())
-    return std::stoul(id2string(p1.get_line())) <
-           std::stoul(id2string(p2.get_line()));
+  // const auto &p1 = property1.second.pc->source_location();
+  // const auto &p2 = property2.second.pc->source_location();
+  // if(p1.get_file() != p2.get_file())
+  //   return id2string(p1.get_file()) < id2string(p2.get_file());
+  // if(p1.get_function() != p2.get_function())
+  //   return id2string(p1.get_function()) < id2string(p2.get_function());
+  // else if(
+  //   !p1.get_line().empty() && !p2.get_line().empty() &&
+  //   p1.get_line() != p2.get_line())
+  //   return std::stoul(id2string(p1.get_line())) <
+  //          std::stoul(id2string(p2.get_line()));
 
   const auto split_property_id =
     [](const irep_idt &property_id) -> std::pair<std::string, std::size_t> {
@@ -242,7 +248,7 @@ is_property_less_than(const propertyt &property1, const propertyt &property2)
     return left_id_number < right_id_number;
 }
 
-static std::vector<propertiest::const_iterator>
+std::vector<propertiest::const_iterator>
 get_sorted_properties(const propertiest &properties)
 {
   std::vector<propertiest::const_iterator> sorted_properties;
@@ -258,7 +264,7 @@ get_sorted_properties(const propertiest &properties)
   return sorted_properties;
 }
 
-static void output_properties_plain(
+void output_properties_plain(
   const std::vector<propertiest::const_iterator> &sorted_properties,
   messaget &log)
 {
@@ -271,22 +277,28 @@ static void output_properties_plain(
   irep_idt current_file;
   for(const auto &p : sorted_properties)
   {
-    const auto &l = p->second.pc->source_location();
-    if(l.get_function() != previous_function)
+    std::string property_id_str = p->first.c_str();
+    // __SZH_ADD_BEGIN__ : no data race properties do not need them
+    if(property_id_str.find("nodatarace") == std::string::npos && property_id_str.find("alloc") == std::string::npos)
     {
-      if(!previous_function.empty())
-        log.result() << '\n';
-      previous_function = l.get_function();
-      if(!previous_function.empty())
+      const auto &l = p->second.pc->source_location();
+      if(l.get_function() != previous_function)
       {
-        current_file = l.get_file();
-        if(!current_file.empty())
-          log.result() << current_file << ' ';
-        if(!l.get_function().empty())
-          log.result() << "function " << l.get_function();
-        log.result() << messaget::eom;
+        if(!previous_function.empty())
+          log.result() << '\n';
+        previous_function = l.get_function();
+        if(!previous_function.empty())
+        {
+          current_file = l.get_file();
+          if(!current_file.empty())
+            log.result() << current_file << ' ';
+          if(!l.get_function().empty())
+            log.result() << "function " << l.get_function();
+          log.result() << messaget::eom;
+        }
       }
     }
+    // __SZH_ADD_END__
     output_single_property_plain(p->first, p->second, log, current_file);
   }
 }

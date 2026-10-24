@@ -22,11 +22,13 @@ class goto_programt;
 
 void set_properties(
   goto_functionst &goto_functions,
-  const std::list<std::string> &properties);
+  const std::list<std::string> &properties,
+  const std::list<std::string> &subproperties);
 
 void set_properties(
   goto_modelt &goto_model,
-  const std::list<std::string> &properties);
+  const std::list<std::string> &properties,
+  const std::list<std::string> &subproperties);
 
 void label_properties(goto_functionst &);
 void label_properties(irep_idt function_identifier, goto_programt &);

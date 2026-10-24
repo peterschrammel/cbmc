@@ -664,6 +664,11 @@ protected:
     const symbol_exprt &function,
     const exprt::operandst &arguments,
     goto_programt &dest);
+  void do_sscanf(
+    const exprt &lhs,
+    const symbol_exprt &function,
+    const exprt::operandst &arguments,
+    goto_programt &dest);
   void do_input(
     const exprt &rhs,
     const exprt::operandst &arguments,
@@ -688,6 +693,25 @@ protected:
     const exprt::operandst &arguments,
     goto_programt &dest,
     const irep_idt &mode);
+// __SZH_ADD_BEGIN__
+  void do_atomic_store(
+    const symbol_exprt &function,
+    const exprt::operandst &arguments,
+    goto_programt &dest);
+  void do_atomic_load(
+    const symbol_exprt &function,
+    const exprt::operandst &arguments,
+    goto_programt &dest);
+  void do_lkmm_load(
+    const exprt &lhs,
+    const symbol_exprt &function,
+    const exprt::operandst &arguments,
+    goto_programt &dest);
+  void do_lkmm_store(
+    const symbol_exprt &function,
+    const exprt::operandst &arguments,
+    goto_programt &dest);
+// __SZH_ADD_END__
 
   exprt get_array_argument(const exprt &src);
 };

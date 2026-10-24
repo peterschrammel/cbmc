@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/rational_tools.h>
 #include <util/simplify_expr.h>
 #include <util/symbol_table.h>
+#include <iostream>
 
 #include <langapi/language_util.h>
 
@@ -213,10 +214,10 @@ void goto_convertt::do_scanf(
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
-  const irep_idt &f_id = function.get_identifier();
+  // const irep_idt &f_id = function.get_identifier();
 
-  if(f_id==CPROVER_PREFIX "scanf")
-  {
+  // if(f_id==CPROVER_PREFIX "scanf")
+  // {
     if(arguments.empty())
     {
       error().source_location=function.find_source_location();
@@ -305,9 +306,112 @@ void goto_convertt::do_scanf(
 
       copy(function_call, FUNCTION_CALL, dest);
     }
+  // }
+  // else
+  //   UNREACHABLE;
+}
+
+void goto_convertt::do_sscanf(
+  const exprt &lhs,
+  const symbol_exprt &function,
+  const exprt::operandst &arguments,
+  goto_programt &dest)
+{
+  std::cout << "doing sscanf! arguments include:\n";
+  for(auto& op : arguments)
+    std::cout << op.pretty() << "\n";
+
+  if(arguments.empty())
+  {
+    error().source_location=function.find_source_location();
+    error() << "scanf takes at least one argument" << eom;
+    throw 0;
+  }
+
+  irep_idt format_string;
+
+  if(!get_string_constant(arguments[1], format_string))
+  {
+    // use our model
+    format_token_listt token_list=
+      parse_format_string(id2string(format_string));
+
+    std::size_t argument_number=2;
+
+    for(const auto &t : token_list)
+    {
+      const auto type = get_type(t);
+
+      if(type.has_value())
+      {
+        if(argument_number<arguments.size())
+        {
+          const typecast_exprt ptr(
+            arguments[argument_number], pointer_type(*type));
+          argument_number++;
+
+          if(type->id() == ID_array)
+          {
+            #if 0
+            // A string. We first need a nondeterministic size.
+            exprt size=side_effect_expr_nondett(size_type());
+            to_array_type(*type).size()=size;
+
+            const symbolt &tmp_symbol=
+              new_tmp_symbol(
+                *type, "scanf_string", dest, function.source_location());
+
+            const address_of_exprt rhs(
+              index_exprt(
+                tmp_symbol.symbol_expr(),
+                from_integer(0, c_index_type())));
+
+            // now use array copy
+            codet array_copy_statement;
+            array_copy_statement.set_statement(ID_array_copy);
+            array_copy_statement.operands().resize(2);
+            array_copy_statement.op0()=ptr;
+\              array_copy_statement.op1()=rhs;
+            array_copy_statement.add_source_location()=
+              function.source_location();
+
+            copy(array_copy_statement, OTHER, dest);
+            #else
+            const index_exprt new_lhs(
+              dereference_exprt{ptr}, from_integer(0, c_index_type()));
+            const side_effect_expr_nondett rhs(
+              to_array_type(*type).element_type(),
+              function.source_location());
+            code_assignt assign(new_lhs, rhs);
+            assign.add_source_location()=function.source_location();
+            copy(assign, ASSIGN, dest);
+            #endif
+          }
+          else
+          {
+            // make it nondet for now
+            const dereference_exprt new_lhs{ptr};
+            const side_effect_expr_nondett rhs(
+              *type, function.source_location());
+            code_assignt assign(new_lhs, rhs);
+            assign.add_source_location()=function.source_location();
+            copy(assign, ASSIGN, dest);
+          }
+        }
+      }
+    }
   }
   else
-    UNREACHABLE;
+  {
+    // we'll just do nothing
+    code_function_callt function_call(lhs, function, arguments);
+    function_call.add_source_location()=function.source_location();
+
+    copy(function_call, FUNCTION_CALL, dest);
+  }
+  // }
+  // else
+  //   UNREACHABLE;
 }
 
 void goto_convertt::do_input(
@@ -721,6 +825,51 @@ void goto_convertt::do_havoc_slice(
   dest.add(goto_programt::make_other(array_replace, source_location));
 }
 
+// __SZH_ADD_BEGIN__
+void goto_convertt::do_atomic_store(
+  const symbol_exprt &function,
+  const exprt::operandst &arguments,
+  goto_programt &dest)
+{
+  dereference_exprt lhs{arguments[0]};
+  dereference_exprt rhs{arguments[1]};
+  dest.add(goto_programt::make_assignment(lhs, rhs, function.source_location()));
+
+  greater_than_or_equal_exprt assumption(arguments[2], from_integer(0, signedbv_typet(32)));
+  dest.add(goto_programt::make_assumption(assumption, function.source_location()));
+}
+
+void goto_convertt::do_atomic_load(
+  const symbol_exprt &function,
+  const exprt::operandst &arguments,
+  goto_programt &dest)
+{
+  dereference_exprt lhs{arguments[1]};
+  dereference_exprt rhs{arguments[0]};
+  dest.add(goto_programt::make_assignment(lhs, rhs, function.source_location()));
+}
+
+void goto_convertt::do_lkmm_load(
+  const exprt &lhs,
+  const symbol_exprt &function,
+  const exprt::operandst &arguments,
+  goto_programt &dest)
+{
+  dereference_exprt rhs{arguments[0]};
+  dest.add(goto_programt::make_assignment(lhs, rhs, function.source_location()));
+}
+
+void goto_convertt::do_lkmm_store(const symbol_exprt &function,
+  const exprt::operandst &arguments,
+  goto_programt &dest)
+{
+  dereference_exprt lhs{arguments[0]};
+  exprt rhs = arguments[1];
+  dest.add(goto_programt::make_assignment(lhs, rhs, function.source_location()));
+}
+
+// __SZH_ADD_END__
+
 /// add function calls to function queue for later processing
 void goto_convertt::do_function_call_symbol(
   const exprt &lhs,
@@ -929,10 +1078,18 @@ void goto_convertt::do_function_call_symbol(
   {
     do_printf(lhs, function, arguments, dest);
   }
-  else if(identifier==CPROVER_PREFIX "scanf")
+  // __SZH_MODIFY_BEGIN__ : or silly CBMC does not identify scanf
+  else if(identifier==CPROVER_PREFIX "scanf" || identifier==CPROVER_PREFIX "__isoc99_scanf" || identifier=="scanf" || identifier=="__isoc99_scanf")
+  // _SZH_MODIFY_END__
   {
     do_scanf(lhs, function, arguments, dest);
   }
+  // __SZH_ADD_BEGIN__
+  else if(identifier==CPROVER_PREFIX "sscanf" || identifier==CPROVER_PREFIX "__isoc99_sscanf" || identifier=="sscanf" || identifier=="__isoc99_sscanf")
+  {
+    do_sscanf(lhs, function, arguments, dest);
+  }
+  // __SZH_ADD_END__
   else if(identifier==CPROVER_PREFIX "input" ||
           identifier=="__CPROVER::input")
   {
@@ -1427,8 +1584,46 @@ void goto_convertt::do_function_call_symbol(
       std::move(dead_object_sym), std::move(rhs), source_location};
     targets.destructor_stack.add(assign);
   }
+  // __SZH_ADD_BEGIN__ : C11 and LKMM builtin functions
+  else if(identifier == CPROVER_PREFIX "atomic_store")
+  {
+    do_atomic_store(function, arguments, dest);
+  }
+  else if(identifier == CPROVER_PREFIX "atomic_store_n")
+  {
+    do_atomic_store(function, arguments, dest);
+  }
+  else if(identifier == CPROVER_PREFIX "atomic_load")
+  {
+    do_atomic_load(function, arguments, dest);
+  }
+  else if(identifier == CPROVER_PREFIX "atomic_load_n")
+  {
+    do_atomic_load(function, arguments, dest);
+  }
+  else if(identifier == CPROVER_PREFIX "LKMM_LOAD")
+  {
+    do_lkmm_load(lhs, function, arguments, dest);
+  }
+  else if(identifier == CPROVER_PREFIX "LKMM_STORE")
+  {
+    do_lkmm_store(function, arguments, dest);
+  }
+  // __SZH_ADD_END__
   else
   {
+    // __SZH_ADD_BEGIN__
+    if(identifier == "pthread_key_create")
+    {
+      auto dtor = simplify_expr(arguments[1], ns);
+      if(dtor.id() != ID_constant)
+      {
+        std::cout << "Destroyer functions are yet unsupported in pthread_key_create\n";
+        std::exit(0);
+      }
+    }
+    // __SZH_ADD_END__
+
     do_function_call_symbol(*symbol);
 
     // insert function call

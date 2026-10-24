@@ -190,7 +190,13 @@ irep_idt SSA_stept::get_property_id() const
 
   irep_idt property_id;
 
-  if(source.pc->is_assert())
+  // __SZH_ADD_BEGIN__
+  if(is_custom_assert())
+  {
+    property_id = custom_assert_id;
+  }
+  // __SZH_ADD_END__
+  else if(source.pc->is_assert())
   {
     property_id = source.pc->source_location().get_property_id();
   }

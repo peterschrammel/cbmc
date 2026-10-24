@@ -418,11 +418,12 @@ void reachability_slicer(
 void reachability_slicer(
   goto_modelt &goto_model,
   const std::list<std::string> &properties,
+  const std::list<std::string> &subproperties,
   const bool include_forward_reachability,
   message_handlert &message_handler)
 {
   reachability_slicert s;
-  properties_criteriont p(properties);
+  properties_criteriont p(properties, subproperties);
   s(goto_model.goto_functions,
     p,
     include_forward_reachability,
@@ -476,7 +477,8 @@ void reachability_slicer(
 void reachability_slicer(
   goto_modelt &goto_model,
   const std::list<std::string> &properties,
+  const std::list<std::string> &subproperties,
   message_handlert &message_handler)
 {
-  reachability_slicer(goto_model, properties, false, message_handler);
+  reachability_slicer(goto_model, properties, subproperties, false, message_handler);
 }

@@ -1927,19 +1927,21 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
   const auto val_size = pointer_offset_bits(value.type(), ns);
   const auto root_size = pointer_offset_bits(root.type(), ns);
 
+// __SZH_REMOVE_BEGIN__
   // byte update of full object is byte_extract(new value)
-  if(
-    offset.is_zero() && val_size.has_value() && *val_size > 0 &&
-    root_size.has_value() && *root_size > 0 && *val_size >= *root_size)
-  {
-    byte_extract_exprt be(
-      expr.id()==ID_byte_update_little_endian ?
-        ID_byte_extract_little_endian :
-        ID_byte_extract_big_endian,
-      value, offset, expr.type());
+  // if(
+  //   offset.is_zero() && val_size.has_value() && *val_size > 0 &&
+  //   root_size.has_value() && *root_size > 0 && *val_size >= *root_size)
+  // {
+  //   byte_extract_exprt be(
+  //     expr.id()==ID_byte_update_little_endian ?
+  //       ID_byte_extract_little_endian :
+  //       ID_byte_extract_big_endian,
+  //     value, offset, expr.type());
 
-    return changed(simplify_byte_extract(be));
-  }
+  //   return changed(simplify_byte_extract(be));
+  // }
+// __SZH_REMOVE_END__
 
   // update bits in a constant
   const auto offset_int = numeric_cast<mp_integer>(offset);

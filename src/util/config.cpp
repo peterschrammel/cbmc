@@ -1052,6 +1052,10 @@ bool configt::set(const cmdlinet &cmdline)
 
   // the following allows overriding the defaults
 
+  // __SZH_ADD_BEGIN__: default --32
+  ansi_c.set_32();
+  // __SZH_ADD_END__
+
   if(cmdline.isset("16"))
     ansi_c.set_16();
 
