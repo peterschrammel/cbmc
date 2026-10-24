@@ -1,0 +1,196 @@
+%skeleton "lalr1.cc" // -*- C++ -*-
+%require "3.2"
+
+// %define api.token.raw
+%define api.token.constructor
+%define api.token.prefix {TOK_}
+%define api.value.type variant
+%define parse.assert
+%define parse.trace
+%locations
+
+%code requires {
+  #include <string>
+  #include <memory>
+  #include "cat_type.h"
+  class cat_parsing_drivert;
+  extern char *current_line;
+  extern void reset_current_line();
+}
+
+%param { cat_parsing_drivert& drv }
+
+%code {
+ /*
+  * KATER -- Automating Weak Memory Model Metatheory
+  *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation; either version 3 of the License, or
+  * (at your option) any later version.
+  *
+  * This program is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, you can access it online at
+  * http://www.gnu.org/licenses/gpl-3.0.html.
+  */
+
+  #include "cat_parsing_driver.h"
+  #include "cat_type.h"
+  #include <iostream>
+  #include <memory>
+  #include <unordered_map>
+  #include <vector>
+}
+
+
+%token
+  FREE "free"
+  ACYCLIC   "acyclic"
+  IRREFLEXIVE   "irreflexive"
+  DECLARE   "declare"
+  DECLARE_LOC "declare-loc"
+  EMPTY	    "empty"
+  NOT_EMPTY	    "~empty"
+  FLAG      "flag" 
+  ERROR	    "error"
+  ID_REL    "id"
+  AS        "as"   
+  INCLUDE   "include"
+  LET	    "let"
+  REC       "rec"
+  SAVE      "save"
+  TOTAL     "total"
+  VIEW      "view"
+  WARNING   "warning"
+  EQ		"="
+  DCOLON    "::"
+  COMMA     ","
+  ZERO      "0"
+  MONE      "-1"
+  SEMI      ";"
+  AND       "&"
+  ALT       "|"
+  BSLASH    "\\"
+  PLUS      "+"
+  PROD      "*"
+  QMARK     "?"
+  LPAREN    "("
+  RPAREN    ")"
+  LBRACK    "["
+  RBRACK    "]"
+  SUPER     "^"
+  FENCEREL  "fencerel"
+;
+
+%token YYEOF 0
+
+%token <std::string> ID;
+%token <std::string> QPATH;
+%nterm <std::string> qualified_ID;
+%nterm <cat_relationt> rel;
+/* %nterm <std::string> reduce_opt; */
+
+%precedence "="
+%left  "|"
+%left  "\\" "&"
+%left  ";"
+%precedence "+" "*" "?" "^"
+%precedence "fencerel"
+/* 
+%printer { yyo << *($$); } <std::unique_ptr<cat_relationt>>;
+%printer { yyo << *($$); } <std::unique_ptr<cat_axiomt>>;
+%printer { yyo << $$; } <*>; */
+
+%start main
+%%
+
+main:	  %empty		{ }
+	| main decl		{ }
+        ;
+
+decl:     "include" QPATH                  { }
+  | QPATH {}
+	| "let" ID "=" rel                 { drv.rename_relation(std::move($4), $2, false); }
+	| "let" "rec" ID "=" rel                 { drv.rename_relation(std::move($5), $3, true); }
+  | "let" ID "=" "0"                 { drv.make_dummy_relation(std::move($2)); }
+	| constraint
+	;
+
+qualified_ID: ID        { $$ = $1; }
+	| ID "::" ID    { $$ = $1 + "::" + $3; }
+	;
+
+constraint:	"empty" rel		{ drv.addConstraint(rel_axiomt::EMPTY, std::move($2)); }
+	| "acyclic" rel		{ drv.addConstraint(rel_axiomt::ACYCLIC, std::move($2)); }
+	| "irreflexive" rel	{ drv.addConstraint(rel_axiomt::IRREFLEXIVE, std::move($2)); }
+  | "empty" rel	"as" ID	{ drv.addConstraint(rel_axiomt::EMPTY, std::move($2)); }
+	| "acyclic" rel	"as" ID	{ drv.addConstraint(rel_axiomt::ACYCLIC, std::move($2)); }
+	| "irreflexive" rel "as" ID	{ drv.addConstraint(rel_axiomt::IRREFLEXIVE, std::move($2)); }
+  | "flag" "~empty" rel	{ drv.addConstraint(rel_axiomt::NOT_EMPTY, std::move($3)); }
+  | "flag" "~empty" rel "as" ID	{ drv.addConstraint(rel_axiomt::NOT_EMPTY, std::move($3)); }
+	;
+
+rel:	"id"			    { $$ = drv.make_base("id"); }
+	| qualified_ID		{ $$ = cat_relationt($1, rel_opt::TERMINAL, std::vector<std::string>{}); }
+	| "(" rel ")"		  { $$ = std::move($2); }
+	| "[" rel "]"		  { $$ = drv.make_relation(rel_opt::BRACKET, std::vector<std::string>{$2.name}); }
+	| "[" "]"		      { $$ = drv.make_base("id"); }
+	| rel "|" rel		  { $$ = drv.make_relation(rel_opt::ALT, std::vector<std::string>{$1.name, $3.name}); }
+	| rel ";" rel		  { $$ = drv.make_relation(rel_opt::SEQ, std::vector<std::string>{$1.name, $3.name}); }
+	| rel "&" rel		  { $$ = drv.make_relation(rel_opt::AND, std::vector<std::string>{$1.name, $3.name}); }
+	| rel "\\" rel	  { $$ = drv.make_relation(rel_opt::SUB, std::vector<std::string>{$1.name, $3.name}); }
+	| rel "*" rel		  { $$ = drv.make_relation(rel_opt::PROD, std::vector<std::string>{$1.name, $3.name}); }
+	| rel "+"		      { $$ = drv.make_relation(rel_opt::PLUS, std::vector<std::string>{$1.name}); }
+  | rel "*"         { $$ = drv.make_star($1.name); }
+	| rel "?"		      { $$ = drv.make_qmark($1.name); }
+	| rel "^" "-1" 		{ $$ = drv.make_relation(rel_opt::FLIP, std::vector<std::string>{$1.name}); }
+  | "fencerel" rel  { $$ = drv.make_fencerel($2.name); }
+	;
+
+%%
+
+void yy::parser::error(const location_type &l, const std::string &m)
+{
+	std::cerr << "\n" << l << ": " << m << "\n";
+}
+
+/* void yy::parser::report_syntax_error(const yy::parser::context &ctx) const
+{
+	std::cerr << ctx.location() << ": error";
+
+	{
+		enum { TOKENMAX = 5 };
+		symbol_kind_type expected[TOKENMAX];
+
+		auto n = ctx.expected_tokens(expected, TOKENMAX);
+		for (auto i = 0; i < n; i++)
+			std::cerr << (i == 0 ? ": expected \'" : "\' or \'") << symbol_name(expected[i]);
+		if (n > 0)
+			std::cerr << "\'";
+	}
+
+	{
+		auto lookahead = ctx.token();
+		if (lookahead != symbol_kind::S_YYEMPTY)
+			std::cerr << " before \'" << symbol_name (lookahead) << "\'";
+	}
+
+	std::cerr << '\n';
+
+	{
+		auto &loc = ctx.location();
+		std::cerr << current_line;
+		for (auto i = 0; i < loc.begin.column-1; i++)
+			std::cerr << " ";
+		std::cerr << "^";
+		for (auto i = loc.begin.column+1; i < loc.end.column; i++)
+			std::cerr << "~";
+		std::cerr << "\n";
+		reset_current_line();
+	}
+} */
