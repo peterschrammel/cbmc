@@ -194,6 +194,22 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
         set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -pg")
     endif()
+
+    option(enable_static "Build statically linked binaries")
+    if(enable_static)
+        set(CMAKE_EXE_LINKER_FLAGS
+            "${CMAKE_EXE_LINKER_FLAGS} -static")
+        # CMake unconditionally re-appends its cached (non-static) implicit
+        # link library probe to every link command. On some toolchains that
+        # probe includes gcc_s_asneeded/gcc_s, which only exist as shared
+        # objects, breaking -static links. libgcc/libgcc_eh (already
+        # present in the same list) provide the same functionality when
+        # statically linked, so it is safe to drop these entries.
+        foreach(lang C CXX)
+            list(REMOVE_ITEM CMAKE_${lang}_IMPLICIT_LINK_LIBRARIES
+                gcc_s_asneeded gcc_s)
+        endforeach()
+    endif()
 endif()
 
 function(cprover_default_properties)
