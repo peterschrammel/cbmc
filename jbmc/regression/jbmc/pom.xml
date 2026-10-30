@@ -420,6 +420,7 @@
         <module>virtual_filter_value_sets</module>
         <module>virtual_function_unwinding</module>
         <module>virtual_temp_var_for_this_argument</module>
+        <module>yaml_witness1</module>
     </modules>
 
 </project>

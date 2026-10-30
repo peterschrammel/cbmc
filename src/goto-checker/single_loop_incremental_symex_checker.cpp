@@ -246,4 +246,5 @@ void single_loop_incremental_symex_checkert::output_error_witness(
   const goto_tracet &error_trace)
 {
   output_graphml(error_trace, ns, options);
+  output_yaml_witness(error_trace, ns, options);
 }

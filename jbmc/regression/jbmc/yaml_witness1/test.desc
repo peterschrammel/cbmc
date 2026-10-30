@@ -1,0 +1,31 @@
+CORE
+Main
+-cp target/classes --yaml-witness - --yaml-witness-input-file src/main/java
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^- entry_type: "violation_sequence"$
+^    format_version: "2.4"$
+^      name: "JBMC"$
+^      - "src/main/java/Main.java"$
+^      - "src/main/java/org/sosy_lab/sv_benchmarks/Verifier.java"$
+^        "src/main/java/Main.java": "[0-9a-f]{64}"$
+^      specification: "CHECK\( init\(Main.main\(\)\), LTL\(G assert\) \)"$
+^      language: "Java"$
+^          value: "\\\\result == -3L"$
+^          format: "ext_java_expression"$
+^          file_name: "src/main/java/Main.java"$
+^          line: 9$
+^          column: 33$
+^          line: 10$
+^          column: 35$
+^          column: 57$
+^        type: "target"$
+^          line: 12$
+--
+^warning: ignoring
+data_model
+--
+Checks the violation witness in YAML format for Java: the results of calls to
+org.sosy_lab.sv_benchmarks.Verifier.nondet* are given as function_return
+waypoints at the call site, and the target is the assertion.

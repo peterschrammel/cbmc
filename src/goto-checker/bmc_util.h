@@ -13,6 +13,7 @@ Author: Daniel Kroening, Peter Schrammel
 #define CPROVER_GOTO_CHECKER_BMC_UTIL_H
 
 #include <goto-programs/unwindset.h>
+#include <goto-programs/yaml_witness.h>
 
 #include <goto-symex/build_goto_trace.h>
 
@@ -63,6 +64,11 @@ void output_error_trace(
 void output_graphml(const goto_tracet &, const namespacet &, const optionst &);
 void output_graphml(
   const symex_target_equationt &,
+  const namespacet &,
+  const optionst &);
+
+void output_yaml_witness(
+  const goto_tracet &,
   const namespacet &,
   const optionst &);
 
@@ -180,7 +186,7 @@ void run_property_decider(
   "(depth):"                                                                   \
   "(max-field-sensitivity-array-size):"                                        \
   "(no-array-field-sensitivity)"                                               \
-  "(graphml-witness):"                                                         \
+  "(graphml-witness):" OPT_YAML_WITNESS                                        \
   "(symex-complexity-limit):"                                                  \
   "(symex-complexity-failed-child-loops-limit):"                               \
   "(incremental-loop):"                                                        \
@@ -231,7 +237,7 @@ void run_property_decider(
   "how many child branches ({uN}) in an iteration are allowed to fail due to " \
   "complexity violations before the loop gets blacklisted\n"                   \
   " {y--graphml-witness} {ufilename} \t write the witness in GraphML format "  \
-  "to {ufilename}\n"                                                           \
+  "to {ufilename}\n" HELP_YAML_WITNESS                                         \
   " {y--symex-cache-dereferences} \t enable caching of repeated "              \
   "dereferences\n"
 

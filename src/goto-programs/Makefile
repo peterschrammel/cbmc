@@ -64,6 +64,7 @@ SRC = adjust_float_expressions.cpp \
       write_goto_binary.cpp \
       xml_expr.cpp \
       xml_goto_trace.cpp \
+      yaml_witness.cpp \
       # Empty last line
 
 INCLUDES= -I ..

@@ -181,6 +181,7 @@ void single_path_symex_checkert::output_error_witness(
   const goto_tracet &goto_trace)
 {
   output_graphml(goto_trace, ns, options);
+  output_yaml_witness(goto_trace, ns, options);
 }
 
 void single_path_symex_checkert::output_proof()

@@ -201,6 +201,7 @@ SRC += analyses/ai/ai.cpp \
        util/range.cpp \
        util/replace_symbol.cpp \
        util/run.cpp \
+       util/sha256.cpp \
        util/sharing_map.cpp \
        util/sharing_node.cpp \
        util/simplify_expr.cpp \

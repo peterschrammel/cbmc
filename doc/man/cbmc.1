@@ -457,6 +457,18 @@ gets blacklisted
 \fB\-\-graphml\-witness\fR filename
 write the witness in GraphML format to filename
 .TP
+\fB\-\-yaml\-witness\fR filename
+write a violation witness in the SV\-COMP YAML format to filename
+(\fB\-\fR for stdout)
+.TP
+\fB\-\-yaml\-witness\-input\-file\fR \fIfile\fR
+source file or directory that witness locations refer to; can be given
+multiple times (default: the source files given on the command line)
+.TP
+\fB\-\-yaml\-witness\-specification\fR \fIspec\fR
+specification to state in the witness (default: derived from the violated
+property)
+.TP
 \fB\-\-symex\-cache\-dereferences\fR
 enable caching of repeated dereferences
 .SS "Backend options:"

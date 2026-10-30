@@ -456,6 +456,8 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("trace", true);
   }
 
+  parse_yaml_witness_options(cmdline, options);
+
   if(cmdline.isset("symex-coverage-report"))
   {
     options.set_option(
