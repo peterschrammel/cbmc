@@ -75,7 +75,6 @@ SRC = \
       replace_expr.cpp \
       replace_symbol.cpp \
       run.cpp \
-      sha256.cpp \
       signal_catcher.cpp \
       simplify_expr.cpp \
       simplify_expr_array.cpp \

@@ -129,11 +129,11 @@ void output_yaml_witness(
   const namespacet &ns,
   const optionst &options)
 {
-  const std::string filename = options.get_option("yaml-witness");
+  const std::string filename = options.get_option("witness");
   if(filename.empty())
     return;
 
-  yaml_violation_witnesst yaml_witness(ns, options);
+  yaml_violation_witnesst yaml_witness(ns);
   yaml_witness(goto_trace);
 
   if(filename == "-")

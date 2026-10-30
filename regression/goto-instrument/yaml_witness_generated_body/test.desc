@@ -1,0 +1,16 @@
+CORE
+main.c
+--generate-function-body reach_error --generate-function-body-options assert-false _ --witness -
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^          value: "\\\\result == 42"$
+^          line: 6$
+^        type: "target"$
+^          line: 8$
+--
+^warning: ignoring
+--
+The assertion of a generated function body is located at the function's
+declaration, which is not a statement; the target of the violation witness is
+the call of that function instead.

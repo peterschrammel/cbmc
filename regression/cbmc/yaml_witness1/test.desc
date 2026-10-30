@@ -1,6 +1,6 @@
 CORE
 main.c
---yaml-witness -
+--witness -
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
@@ -9,26 +9,26 @@ main.c
 ^    uuid: "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"$
 ^    creation_time: "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z"$
 ^      name: "CBMC"$
-^      - "main.c"$
-^        "main.c": "[0-9a-f]{64}"$
-^      specification: "CHECK\( init\(main\(\)\), LTL\(G ! call\(reach_error\(\)\)\) \)"$
+^    task:$
+^      data_model: "(ILP32|LP64)"$
 ^      language: "C"$
 ^        type: "function_return"$
 ^          value: "\\\\result == 42"$
 ^          value: "\\\\result == 1"$
 ^          value: "\\\\result == 2"$
 ^          format: "acsl_expression"$
-^          line: 11$
-^          column: 45$
-^          line: 12$
-^          column: 33$
-^          column: 62$
+^          file_name: "main.c"$
+^          line: 6$
+^          line: 7$
 ^        type: "target"$
-^          line: 14$
-^          column: 5$
+^          line: 8$
+^          function: "main"$
 --
 ^warning: ignoring
+column:
+specification:
+input_file
 --
-Checks the violation witness in YAML format: the nondet values are given as
-function_return waypoints, also distinguishing multiple calls on one line, and
-the target is the call to reach_error.
+Checks the violation witness in witness format 2.x: the nondet values are given
+as function_return waypoints and the target is the violated assertion. Columns
+and the metadata of the verification task are left to the caller.

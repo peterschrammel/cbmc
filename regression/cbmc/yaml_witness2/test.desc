@@ -1,17 +1,15 @@
 CORE
 main.c
---pointer-check --yaml-witness -
+--pointer-check --witness -
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-^      specification: "CHECK\( init\(main\(\)\), LTL\(G valid-deref\) \)"$
 ^          value: "\\\\result == -?[0-9]+"$
 ^          line: 8$
-^          column: 28$
 ^        type: "target"$
 ^          line: 10$
 --
 ^warning: ignoring
 --
-Checks the specification and the target of a memory-safety violation in the
-violation witness in YAML format.
+Checks the target of a memory-safety violation in the violation witness in
+witness format 2.x.
