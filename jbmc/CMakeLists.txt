@@ -18,7 +18,7 @@ cprover_default_properties(
 # java models library
 find_program(MAVEN_PROGRAM mvn REQUIRED)
 
-file(GLOB_RECURSE java_models_sources "lib/java-models-library/src/*.java")
+file(GLOB_RECURSE java_models_sources "lib/java-models-library/*/src/*.java")
 
 add_custom_command(OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/lib/java-models-library/target/core-models.jar"
     COMMAND ${MAVEN_PROGRAM} --quiet -Dmaven.test.skip=true package
