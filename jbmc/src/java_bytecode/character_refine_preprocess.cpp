@@ -142,23 +142,32 @@ codet character_refine_preprocesst::convert_digit_char(
   const std::size_t nb_args=function_call.arguments().size();
   PRECONDITION(nb_args==1 || nb_args==2);
   const exprt &arg=function_call.arguments()[0];
-  // If there is no radix argument we set it to 36 which is the maximum possible
-  const exprt &radix=
-    nb_args>1?function_call.arguments()[1]:from_integer(36, arg.type());
   const exprt &result=function_call.lhs();
   const typet &type=result.type();
+  // If there is no radix argument we set it to 36 which is the maximum possible
+  const exprt &radix=
+    nb_args>1?function_call.arguments()[1]:from_integer(36, type);
 
   // TODO: If the radix is not in the range MIN_RADIX <= radix <= MAX_RADIX or
   // if the value of ch is not a valid digit in the specified radix,
   // -1 is returned.
 
+  // All arithmetic below (and the "invalid" sentinel) is carried out in the
+  // result type (int), matching Java's own promotion of char to int for
+  // arithmetic. Computing it in arg's own (char, unsigned) type instead -
+  // as a previous version of this code did - made the -1 sentinel come out
+  // as 65535, and compared values of mismatched width/signedness against
+  // radix (which is always int), both of which could produce wrong results
+  // for inputs that are valid digits.
+  typecast_exprt arg_as_int(arg, type);
+
   // Case 1: The method isDigit is true of the character and the Unicode
   // decimal digit value of the character (or its single-character
   // decomposition) is less than the specified radix.
-  exprt invalid=from_integer(-1, arg.type());
-  exprt c0=from_integer('0', arg.type());
+  exprt invalid=from_integer(-1, type);
+  exprt c0=from_integer('0', type);
   exprt latin_digit=in_interval_expr(arg, '0', '9');
-  minus_exprt value1(arg, c0);
+  minus_exprt value1(arg_as_int, c0);
   // TODO: this is only valid for latin digits
   if_exprt case1(
     binary_relation_exprt(value1, ID_lt, radix), value1, invalid);
@@ -166,18 +175,18 @@ codet character_refine_preprocesst::convert_digit_char(
   // Case 2: The character is one of the uppercase Latin letters 'A'
   // through 'Z' and its code is less than radix + 'A' - 10,
   // then ch - 'A' + 10 is returned.
-  exprt cA=from_integer('A', arg.type());
-  exprt i10=from_integer(10, arg.type());
+  exprt cA=from_integer('A', type);
+  exprt i10=from_integer(10, type);
   exprt upper_case=in_interval_expr(arg, 'A', 'Z');
-  plus_exprt value2(minus_exprt(arg, cA), i10);
+  plus_exprt value2(minus_exprt(arg_as_int, cA), i10);
   if_exprt case2(
     binary_relation_exprt(value2, ID_lt, radix), value2, invalid);
 
   // The character is one of the lowercase Latin letters 'a' through 'z' and
   // its code is less than radix + 'a' - 10, then ch - 'a' + 10 is returned.
-  exprt ca=from_integer('a', arg.type());
+  exprt ca=from_integer('a', type);
   exprt lower_case=in_interval_expr(arg, 'a', 'z');
-  plus_exprt value3(minus_exprt(arg, ca), i10);
+  plus_exprt value3(minus_exprt(arg_as_int, ca), i10);
   if_exprt case3(
     binary_relation_exprt(value3, ID_lt, radix), value3, invalid);
 
@@ -185,17 +194,17 @@ codet character_refine_preprocesst::convert_digit_char(
   // The character is one of the fullwidth uppercase Latin letters A ('\uFF21')
   // through Z ('\uFF3A') and its code is less than radix + '\uFF21' - 10.
   // In this case, ch - '\uFF21' + 10 is returned.
-  exprt uFF21=from_integer(0xFF21, arg.type());
+  exprt uFF21=from_integer(0xFF21, type);
   exprt fullwidth_upper_case=in_interval_expr(arg, 0xFF21, 0xFF3A);
-  plus_exprt value4(minus_exprt(arg, uFF21), i10);
+  plus_exprt value4(minus_exprt(arg_as_int, uFF21), i10);
   if_exprt case4(
     binary_relation_exprt(value4, ID_lt, radix), value4, invalid);
 
   // The character is one of the fullwidth lowercase Latin letters a ('\uFF41')
   // through z ('\uFF5A') and its code is less than radix + '\uFF41' - 10.
   // In this case, ch - '\uFF41' + 10 is returned.
-  exprt uFF41=from_integer(0xFF41, arg.type());
-  plus_exprt value5(minus_exprt(arg, uFF41), i10);
+  exprt uFF41=from_integer(0xFF41, type);
+  plus_exprt value5(minus_exprt(arg_as_int, uFF41), i10);
   if_exprt case5(
     binary_relation_exprt(value5, ID_lt, radix), value5, invalid);
 
@@ -204,9 +213,8 @@ codet character_refine_preprocesst::convert_digit_char(
     latin_digit,
     case1,
     if_exprt(upper_case, case2, if_exprt(lower_case, case3, fullwidth_cases)));
-  typecast_exprt tc_expr(expr, type);
 
-  return code_assignt(result, tc_expr);
+  return code_assignt(result, expr);
 }
 
 /// Converts function call to an assignment of an expression corresponding to
