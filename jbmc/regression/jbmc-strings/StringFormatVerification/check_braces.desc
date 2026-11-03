@@ -1,6 +1,6 @@
 FUTURE
 test
---max-nondet-string-length 20 --function test.check_braces --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --java-cp-include-files '([^/]*|org/cprover/.*|java/lang/.*|java/util/(Abstract(Collection|List|Map|Set)|Collections|Locale)(\$.*)?)\.class'
+--max-nondet-string-length 20 --function test.check_braces --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --java-cp-include-files '([^/]*|org/cprover/.*|java/lang/.*|java/util/(Abstract(Collection|List|Map|Set)|Collections)(\$.*)?)\.class'
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

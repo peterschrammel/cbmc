@@ -1,6 +1,6 @@
 CORE
 ComplexClass
---function ComplexClass.loopBlacklist --symex-complexity-limit 1 --symex-complexity-failed-child-loops-limit 1 --verbosity 9 --unwind 9 -cp `../../../../scripts/format_classpath.sh target/classes ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --java-cp-include-files '([^/]*|org/cprover/.*|java/lang/.*|java/util/(Abstract(Collection|List|Map|Set)|Collections|Enumeration|List|Collection|Iterator|ListIterator|Properties|Hashtable|Dictionary|Map)(\$.*)?)\.class'
+--function ComplexClass.loopBlacklist --symex-complexity-limit 1 --symex-complexity-failed-child-loops-limit 1 --verbosity 9 --unwind 9 -cp `../../../../scripts/format_classpath.sh target/classes ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --java-cp-include-files '([^/]*|org/cprover/.*|java/lang/.*|java/util/(Abstract(Collection|List|Map|Set)|Collections|ArrayList|LinkedList|RandomAccess|Deque|Queue|Enumeration|List|Collection|Iterator|ListIterator|Properties|Hashtable|Dictionary|Map)(\$.*)?)\.class'
 ^(\[symex-complexity\] Trying to enter blacklisted loop|\[symex-complexity\] Loop operations considered too complex)
 ^EXIT=10$
 ^SIGNAL=0$
