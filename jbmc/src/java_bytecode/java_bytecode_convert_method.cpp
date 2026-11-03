@@ -586,6 +586,10 @@ void java_bytecode_convert_methodt::convert(
   method_symbol.location=m.source_location;
   method_symbol.location.set_function(method_identifier);
 
+  // `method_type` was copied from the symbol, which may already carry the
+  // list if the method was converted before; rebuild it so that converting a
+  // method more than once yields the same type each time.
+  method_type.remove(ID_exceptions_thrown_list);
   for(const auto &exception_name : m.throws_exception_table)
     method_type.add_throws_exception(exception_name);
 
