@@ -1,6 +1,6 @@
 CORE
 Main
---function Main.test1 -cp `../../../../scripts/format_classpath.sh target/classes ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
+--function Main.test1 -cp `../../../../scripts/format_classpath.sh target/classes ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --java-cp-include-files '([^/]*|org/cprover/.*|java/lang/.*)\.class'
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

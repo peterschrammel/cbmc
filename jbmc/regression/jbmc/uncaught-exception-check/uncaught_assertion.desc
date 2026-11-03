@@ -1,6 +1,6 @@
 CORE
 Uncaught.foo
---throw-runtime-exceptions --throw-assertion-error --trace --uncaught-exception-check-only-for java.lang.AssertionError --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
+--throw-runtime-exceptions --throw-assertion-error --trace --uncaught-exception-check-only-for java.lang.AssertionError --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --java-cp-include-files '([^/]*|org/cprover/.*|java/lang/.*)\.class'
 dynamic_object.*java::java.lang.AssertionError
 ^Violated property:$
 ^  no uncaught exception$

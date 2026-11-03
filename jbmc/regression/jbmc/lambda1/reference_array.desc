@@ -1,6 +1,6 @@
 CORE
 Nondet
---function Nondet.testReferenceArray -cp `../../../../scripts/format_classpath.sh target/classes ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
+--function Nondet.testReferenceArray -cp `../../../../scripts/format_classpath.sh target/classes ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --java-cp-include-files '([^/]*|org/cprover/.*|java/lang/.*)\.class'
 line 14 assertion.*FAILURE$
 ^EXIT=10$
 ^SIGNAL=0$

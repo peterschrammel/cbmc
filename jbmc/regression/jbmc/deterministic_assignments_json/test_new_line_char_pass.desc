@@ -1,6 +1,6 @@
 CORE
 StaticValues
---unwind 1 -cp `../../../../scripts/format_classpath.sh target/classes ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --static-values clinit-state.json --function StaticValues.testNewLineCharPass
+--unwind 1 -cp `../../../../scripts/format_classpath.sh target/classes ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --static-values clinit-state.json --function StaticValues.testNewLineCharPass --java-cp-include-files '([^/]*|org/cprover/.*|java/lang/.*|java/util/(Abstract(Collection|List|Map|Set)|Collections|ArrayList|List|Collection|Iterator|ListIterator|RandomAccess|Date|HashMap|Map|Set)(\$.*)?|java/io/.*|(sun|jdk/internal)/.*)\.class'
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
