@@ -1,6 +1,6 @@
 CORE
 A
---function 'A.me6:()V' --java-threading --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --java-cp-include-files '([^/]*|org/cprover/.*|java/lang/.*|(sun|jdk/internal)/.*)\.class'
+--function 'A.me6:()V' --java-threading --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --java-cp-include-files '([^/]*|org/cprover/.*|java/lang/(Object|Thread|ThreadGroup|Runnable|String|Class|Throwable|Exception|RuntimeException|Error|Integer|Number|Comparable|CharSequence|Iterable|AutoCloseable|Cloneable|StackTraceElement|InterruptedException|IllegalThreadStateException|IllegalArgumentException|NullPointerException|SecurityException|ClassCastException|Void|Boolean|Long|StringBuilder|AbstractStringBuilder|Appendable|Enum|Record|ThreadLocal|InheritableThreadLocal|ClassLoader|System|Math)(\$.*)?|java/security/(AccessController|AccessControlContext|PrivilegedAction|PrivilegedExceptionAction|ProtectionDomain)|jdk/internal/reflect/Reflection|jdk/internal/misc/VM)\.class'
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL
