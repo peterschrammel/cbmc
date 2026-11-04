@@ -520,8 +520,12 @@ void goto_symext::merge_goto(
   goto_statet &&goto_state,
   statet &state)
 {
-  // check atomic section
-  if(state.atomic_section_id != goto_state.atomic_section_id)
+  // check atomic section; states that are not reachable (e.g., because of
+  // a recursion or loop bound being reached inside an atomic section) do not
+  // contribute to the merged state, so they are not required to agree
+  if(
+    state.reachable && goto_state.reachable &&
+    state.atomic_section_id != goto_state.atomic_section_id)
     throw incorrect_goto_program_exceptiont(
       "atomic sections differ across branches",
       state.source.pc->source_location());

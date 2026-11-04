@@ -273,6 +273,12 @@ bool ci_lazy_methodst::handle_virtual_methods_with_no_callees(
     const java_method_typet &java_method_type =
       to_java_method_type(virtual_function.type());
 
+    // The method type has no `this` parameter if the class declaring the
+    // method could not be loaded (e.g., because it is excluded by
+    // --java-cp-include-files); there is nothing to resolve for such a call.
+    if(java_method_type.get_this() == nullptr)
+      continue;
+
     // Add the call class to instantiated_classes and assert that it
     // didn't already exist. It can't be instantiated already, otherwise it
     // would give a concrete definition of the called method, and
