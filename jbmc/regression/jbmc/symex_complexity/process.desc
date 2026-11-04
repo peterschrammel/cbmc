@@ -1,6 +1,6 @@
 CORE
 ComplexClass
---function ComplexClass.process --symex-complexity-limit 2 --verbosity 9 --unwind 10 -cp `../../../../scripts/format_classpath.sh target/classes ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --java-cp-include-files '([^/]*|org/cprover/.*|java/lang/.*|java/util/(Abstract(Collection|List|Map|Set)|Collections|ArrayList|LinkedList|RandomAccess|Deque|Queue|Enumeration|List|Collection|Iterator|ListIterator|Properties|Hashtable|Dictionary|Map)(\$.*)?)\.class'
+--function ComplexClass.process --symex-complexity-limit 2 --verbosity 9 --unwind 10 -cp `../../../../scripts/format_classpath.sh target/classes ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --java-cp-include-files '([^/]*|org/cprover/.*|java/lang/(Object|String|(Abstract)?String(Buffer|Builder)|Throwable|Exception|RuntimeException|IllegalArgumentException|Iterable|Comparable|CharSequence|Appendable|Cloneable)|java/util/(Abstract(Map|Set|Collection)|Properties|Hashtable|Dictionary|Enumeration|Iterator|Collection|Set|Map)(\$.*)?|java/util/Collections(\$(Synchronized(Set|Collection)|Empty(Iterator|Enumeration)))?)\.class'
 ^\[symex-complexity\] Branch considered too complex|\[symex-complexity\] Trying to enter blacklisted loop|\[symex-complexity\] Loop operations considered too complex$
 ^EXIT=10$
 ^SIGNAL=0$
