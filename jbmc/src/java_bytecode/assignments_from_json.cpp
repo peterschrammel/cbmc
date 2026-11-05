@@ -538,7 +538,8 @@ static code_with_references_listt assign_struct_components_from_json(
     const irep_idt &component_name = component.get_name();
     if(
       component_name == JAVA_CLASS_IDENTIFIER_FIELD_NAME ||
-      component_name == "cproverMonitorCount")
+      component_name == "cproverMonitorCount" ||
+      component_name == "cproverMonitorOwner")
     {
       continue;
     }

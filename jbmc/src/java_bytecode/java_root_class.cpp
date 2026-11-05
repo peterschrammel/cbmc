@@ -62,4 +62,14 @@ void java_root_class_init(
     const typet &count_type = root_type.components()[count_nb].type();
     jlo.operands()[count_nb] = from_integer(0, count_type);
   }
+
+  // The same holds for the 'cproverMonitorOwner' component, which records
+  // the thread holding the monitor while 'cproverMonitorCount' is not 0.
+  if(root_type.has_component("cproverMonitorOwner"))
+  {
+    const std::size_t owner_nb =
+      root_type.component_number("cproverMonitorOwner");
+    const typet &owner_type = root_type.components()[owner_nb].type();
+    jlo.operands()[owner_nb] = from_integer(0, owner_type);
+  }
 }

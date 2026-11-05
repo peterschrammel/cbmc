@@ -855,9 +855,10 @@ void java_object_factoryt::gen_nondet_struct_init(
     {
       continue;
     }
-    else if(name == "cproverMonitorCount")
+    else if(name == "cproverMonitorCount" || name == "cproverMonitorOwner")
     {
-      // Zero-initialize 'cproverMonitorCount' field as it is not meant to be
+      // Zero-initialize 'cproverMonitorCount' (and 'cproverMonitorOwner')
+      // field as it is not meant to be
       // nondet. This field is only present when the java core models are
       // included in the class-path. It is used to implement a critical section,
       // which is necessary to support concurrency.
