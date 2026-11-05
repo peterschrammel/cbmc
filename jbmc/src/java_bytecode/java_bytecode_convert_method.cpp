@@ -2243,12 +2243,34 @@ void java_bytecode_convert_methodt::convert_invoke(
   const bool is_virtual(
     statement == "invokevirtual" || statement == "invokeinterface");
 
-  const irep_idt &invoked_method_id = class_method_descriptor.get_identifier();
+  irep_idt invoked_method_id = class_method_descriptor.get_identifier();
   INVARIANT(
     !invoked_method_id.empty(),
     "invoke statement arg0 must have an identifier");
 
   auto method_symbol = symbol_table.symbols.find(invoked_method_id);
+
+  // A statically bound call (invokespecial of a super-method, invokestatic)
+  // names the class in which the lookup starts, but the method may be declared
+  // in one of its super-classes, e.g., `super.getMessage()` in a subclass of
+  // RuntimeException refers to RuntimeException.getMessage, which is
+  // Throwable.getMessage. Bind the call to that declaration. Otherwise, an
+  // opaque method would be created for the named class below, which then also
+  // hides the inherited method from the calls that are bound dynamically.
+  if(
+    method_symbol == symbol_table.symbols.end() && !is_virtual &&
+    !is_constructor(invoked_method_id))
+  {
+    const auto inherited_method = get_inherited_method_implementation(
+      class_method_descriptor.mangled_method_name(),
+      class_method_descriptor.class_id(),
+      symbol_table);
+    if(inherited_method.has_value())
+    {
+      invoked_method_id = inherited_method->get_full_component_identifier();
+      method_symbol = symbol_table.symbols.find(invoked_method_id);
+    }
+  }
 
   // Use the most precise type available: the actual symbol has generic info,
   // whereas the type given by the invoke instruction doesn't and is therefore
