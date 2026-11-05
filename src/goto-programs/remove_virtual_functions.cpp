@@ -538,11 +538,26 @@ void get_virtual_calleest::get_child_functions_rec(
     {
       function.symbol_expr=last_method_defn;
     }
-    if(!function.symbol_expr.has_value())
+    // A definition inherited from the parent is only a fall back if it is
+    // abstract (which is what the root of an interface call is, if the
+    // interface does not provide a default): a class may inherit a concrete
+    // implementation from a super-class that is not a sub-type of the class of
+    // the call, e.g., AbstractSet inherits toArray from AbstractCollection for
+    // calls of Set.toArray.
+    const bool inherited_definition_is_abstract =
+      !method.is_not_nil() && function.symbol_expr.has_value() &&
+      symbol_table.has_symbol(function.symbol_expr->identifier()) &&
+      symbol_table.lookup_ref(function.symbol_expr->identifier())
+        .type.get_bool(ID_C_abstract);
+    if(!function.symbol_expr.has_value() || inherited_definition_is_abstract)
     {
       const auto resolved_call = get_inherited_method_implementation(
         component_name, child, symbol_table);
-      if(resolved_call)
+      if(
+        resolved_call &&
+        !(inherited_definition_is_abstract &&
+          symbol_table.lookup_ref(resolved_call->get_full_component_identifier())
+            .type.get_bool(ID_C_abstract)))
       {
         function.class_id = resolved_call->get_class_identifier();
         const symbolt &called_symbol = symbol_table.lookup_ref(
