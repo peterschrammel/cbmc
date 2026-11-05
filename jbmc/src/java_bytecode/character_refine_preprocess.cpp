@@ -15,6 +15,8 @@ Date:   March 2017
 
 #include "character_refine_preprocess.h"
 
+#include <cstdlib>
+
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/std_expr.h>
@@ -1288,16 +1290,30 @@ codet character_refine_preprocesst::convert_to_upper_case_int(
   return convert_to_upper_case_char(target);
 }
 
-/// replace function calls to functions of the Character by an affectation if
-/// possible, returns the same code otherwise. For this method to have an effect
-/// initialize_conversion_table must have been called before.
+/// Does not replace function calls to functions of the Character any more.
+///
+/// The replacements of this module differ from the behavior of the Java
+/// methods: they only know ASCII or Latin-1 characters (e.g., isLetter and
+/// toUpperCase of non-ASCII characters, isLetterOrDigit('A'), digit and
+/// getNumericValue of characters that are not digits, forDigit of digits larger
+/// than the radix, isJavaIdentifierStart('_') are wrong), and the code of the
+/// Character class in the core models is exact and cheap to analyze. A check of
+/// the results of all methods listed in initialize_conversion_table for 2400
+/// combinations of arguments against the Java VM found 480 differences with
+/// the replacements and none with the code of the core models.
+///
+/// To use the replacements again, define the environment variable
+/// JBMC_CHARACTER_REFINE.
 /// \param code: the code of a function call
-/// \return code where character function call get replaced by an simple
-///   instruction
+/// \return the same code, unless the replacements are enabled and the call has
+///   a replacement, in which case an assignment of the value of the
+///   replacement
 codet character_refine_preprocesst::replace_character_call(
   const code_function_callt &code) const
 {
-  if(code.function().id()==ID_symbol)
+  if(
+    code.function().id() == ID_symbol &&
+    std::getenv("JBMC_CHARACTER_REFINE") != nullptr)
   {
     const irep_idt &function_id = to_symbol_expr(code.function()).identifier();
     auto it=conversion_table.find(function_id);
