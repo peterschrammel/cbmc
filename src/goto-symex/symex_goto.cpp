@@ -527,7 +527,11 @@ void goto_symext::merge_goto(
     state.reachable && goto_state.reachable &&
     state.atomic_section_id != goto_state.atomic_section_id)
     throw incorrect_goto_program_exceptiont(
-      "atomic sections differ across branches",
+      "atomic sections differ across branches in function " +
+        id2string(state.source.function_id) + " at location " +
+        std::to_string(state.source.pc->location_number) + " (atomic section " +
+        std::to_string(state.atomic_section_id) + " vs " +
+        std::to_string(goto_state.atomic_section_id) + ")",
       state.source.pc->source_location());
 
   // Merge guards. Don't write this to `state` yet because we might move
