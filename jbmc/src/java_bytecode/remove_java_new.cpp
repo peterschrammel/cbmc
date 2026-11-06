@@ -26,6 +26,8 @@ Author: Peter Schrammel
 #include "java_types.h"
 #include "java_utils.h"
 
+#include <optional>
+
 class remove_java_newt
 {
 public:
@@ -186,15 +188,38 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
     underlying_type_and_dimension.second >= 1 &&
     can_cast_type<java_reference_typet>(underlying_type_and_dimension.first);
 
+  // An array of primitive arrays, e.g. byte[][], is a reference array of which
+  // the elements are the primitive arrays: its dimension is that of the
+  // primitive array type minus one, and its element type is the innermost
+  // (primitive) array.
+  std::size_t reference_array_dimension = underlying_type_and_dimension.second;
+  std::optional<struct_tag_typet> reference_array_element_type;
   if(target_type_is_reference_array)
+  {
+    reference_array_element_type = to_struct_tag_type(
+      to_pointer_type(underlying_type_and_dimension.first).base_type());
+  }
+  else if(underlying_type_and_dimension.second >= 2)
+  {
+    --reference_array_dimension;
+    struct_tag_typet innermost = object_type;
+    for(std::size_t level = 1; level < reference_array_dimension; ++level)
+    {
+      innermost = to_struct_tag_type(
+        to_pointer_type(java_array_element_type(innermost)).base_type());
+    }
+    reference_array_element_type = to_struct_tag_type(
+      to_pointer_type(java_array_element_type(innermost)).base_type());
+  }
+
+  if(reference_array_element_type)
   {
     exprt object_array_dimension = get_array_dimension_field(lhs);
     dest.insert_before(
       next,
       goto_programt::make_assignment(code_assignt(
         object_array_dimension,
-        from_integer(
-          underlying_type_and_dimension.second, object_array_dimension.type()),
+        from_integer(reference_array_dimension, object_array_dimension.type()),
         location)));
 
     exprt object_array_element_type = get_array_element_type_field(lhs);
@@ -203,10 +228,7 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
       goto_programt::make_assignment(code_assignt(
         object_array_element_type,
         constant_exprt(
-          to_struct_tag_type(
-            to_pointer_type(underlying_type_and_dimension.first).base_type())
-            .get_identifier(),
-          string_typet()),
+          reference_array_element_type->get_identifier(), string_typet()),
         location)));
   }
 
