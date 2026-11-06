@@ -3198,8 +3198,25 @@ std::optional<exprt> java_bytecode_convert_methodt::convert_invoke_dynamic(
 
   if(!symbol_table.has_symbol(synthetic_class_name))
   {
-    // We failed to parse the invokedynamic handle as a Java 8+ lambda;
-    // give up and return null.
+    // We failed to parse the invokedynamic handle as a Java 8+ lambda (or the
+    // functional interface is not loaded); the call site is not modelled: it
+    // fails with a property of class "not-modelled" and ends the execution,
+    // the result is null.
+    source_locationt not_modelled_location = location;
+    not_modelled_location.set_function(method_id);
+
+    code_assertt not_modelled_assert{false_exprt{}};
+    not_modelled_assert.add_source_location() = not_modelled_location;
+    not_modelled_assert.add_source_location().set_comment(
+      "not modelled: invokedynamic in " + id2string(method_id));
+    not_modelled_assert.add_source_location().set_property_class(
+      "not-modelled");
+
+    code_assumet not_modelled_assume{false_exprt{}};
+    not_modelled_assume.add_source_location() = not_modelled_location;
+
+    result_code = code_blockt({not_modelled_assert, not_modelled_assume});
+
     const auto value = zero_initializer(return_type, location, ns);
     if(!value.has_value())
     {
