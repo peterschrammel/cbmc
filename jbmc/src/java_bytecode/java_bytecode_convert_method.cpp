@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
+#include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
 #include <util/floatbv_expr.h>
@@ -2232,6 +2233,45 @@ static void adjust_invoke_argument_types(
   }
 }
 
+/// The calls of the methods that convert between floating-point numbers and
+/// their bit representation, which are replaced by a bit cast, as the core
+/// models cannot express them in Java.
+static std::optional<codet>
+replace_float_bits_call(const code_function_callt &call)
+{
+  static const std::unordered_set<irep_idt> bit_cast_methods{
+    "java::java.lang.Float.floatToRawIntBits:(F)I",
+    "java::java.lang.Float.intBitsToFloat:(I)F",
+    "java::java.lang.Double.doubleToRawLongBits:(D)J",
+    "java::java.lang.Double.longBitsToDouble:(J)D"};
+
+  if(call.function().id() != ID_symbol)
+    return {};
+  if(
+    bit_cast_methods.count(to_symbol_expr(call.function()).get_identifier()) ==
+      0 ||
+    call.arguments().size() != 1)
+  {
+    return {};
+  }
+
+  // the result is not used
+  if(call.lhs().is_nil())
+    return code_skipt();
+
+  // the bits of the argument (in little endian order, starting at byte 0) are
+  // the result
+  code_assignt assignment{
+    call.lhs(),
+    byte_extract_exprt{ID_byte_extract_little_endian,
+                       call.arguments()[0],
+                       from_integer(0, java_int_type()),
+                       8,
+                       call.lhs().type()}};
+  assignment.add_source_location() = call.source_location();
+  return std::move(assignment);
+}
+
 void java_bytecode_convert_methodt::convert_invoke(
   source_locationt location,
   const irep_idt &statement,
@@ -2406,6 +2446,8 @@ void java_bytecode_convert_methodt::convert_invoke(
   // Replacing call if it is a function of the Character library,
   // returning the same call otherwise
   c = string_preprocess.replace_character_call(call);
+  if(const auto bit_cast = replace_float_bits_call(call))
+    c = *bit_cast;
 
   if(!use_this)
   {
