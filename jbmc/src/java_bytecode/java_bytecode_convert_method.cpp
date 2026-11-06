@@ -2288,6 +2288,31 @@ void java_bytecode_convert_methodt::convert_invoke(
     !invoked_method_id.empty(),
     "invoke statement arg0 must have an identifier");
 
+  // A call of CProver.notModelled marks a limitation of the core models: the
+  // result of the verification cannot be trusted if the call is reached. It
+  // behaves like a failing assertion that is not an assertion of the program
+  // (its property class is "not-modelled", so that it is not confused with a
+  // violation of the program), and the execution ends there, as an assume(false)
+  // does, so that no violation of the program is reported on a path with it.
+  if(invoked_method_id == "java::org.cprover.CProver.notModelled:()V")
+  {
+    source_locationt not_modelled_location = location;
+    not_modelled_location.set_function(method_id);
+
+    code_assertt not_modelled_assert{false_exprt{}};
+    not_modelled_assert.add_source_location() = not_modelled_location;
+    not_modelled_assert.add_source_location().set_comment(
+      "not modelled: " + id2string(method_id));
+    not_modelled_assert.add_source_location().set_property_class(
+      "not-modelled");
+
+    code_assumet not_modelled_assume{false_exprt{}};
+    not_modelled_assume.add_source_location() = not_modelled_location;
+
+    c = code_blockt({not_modelled_assert, not_modelled_assume});
+    return;
+  }
+
   auto method_symbol = symbol_table.symbols.find(invoked_method_id);
 
   // A statically bound call (invokespecial of a super-method, invokestatic)
