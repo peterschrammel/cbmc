@@ -11,7 +11,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "jbmc_parse_options.h"
 
+#include <algorithm>
+
 #include <util/config.h>
+#include <java_bytecode/java_utils.h>
+#include <util/std_code.h>
+#include <util/prefix.h>
 #include <util/exit_codes.h>
 #include <util/help_formatter.h>
 #include <util/invariant.h>
@@ -476,6 +481,9 @@ int jbmc_parse_optionst::doit()
   stub_objects_are_not_null =
     options.get_bool_option("java-assume-inputs-non-null");
 
+  if(cmdline.isset("java-not-modelled-stubs"))
+    not_modelled_stubs = std::regex(cmdline.get_value("java-not-modelled-stubs"));
+
   std::unique_ptr<abstract_goto_modelt> goto_model_ptr;
   int get_goto_program_ret = get_goto_program(goto_model_ptr, options);
   if(get_goto_program_ret != -1)
@@ -924,6 +932,31 @@ bool jbmc_parse_optionst::can_generate_function_body(const irep_idt &name)
   return name != goto_functionst::entry_point() && name != initialize_id;
 }
 
+bool jbmc_parse_optionst::is_not_modelled_stub(
+  const irep_idt &function_name,
+  const symbol_table_baset &symbol_table) const
+{
+  if(!not_modelled_stubs)
+    return false;
+
+  const auto class_id = declaring_class(symbol_table.lookup_ref(function_name));
+  if(!class_id)
+    return false;
+
+  // the class file, as for --java-cp-include-files: java::a.b.C -> a/b/C.class
+  std::string class_file = id2string(*class_id);
+  if(has_prefix(class_file, "java::"))
+    class_file = class_file.substr(6);
+  std::replace(class_file.begin(), class_file.end(), '.', '/');
+  class_file += ".class";
+
+  // the CProver API consists of intrinsics
+  if(has_prefix(class_file, "org/cprover/"))
+    return false;
+
+  return std::regex_match(class_file, *not_modelled_stubs);
+}
+
 bool jbmc_parse_optionst::generate_function_body(
   const irep_idt &function_name,
   symbol_table_baset &symbol_table,
@@ -949,6 +982,32 @@ bool jbmc_parse_optionst::generate_function_body(
       stub_objects_are_not_null,
       object_factory_params,
       ui_message_handler);
+
+    // The methods of the classes that are not modelled fail, with a property
+    // that is not an assertion of the program, instead of returning an
+    // arbitrary value, and the execution ends.
+    if(is_not_modelled_stub(function_name, symbol_table))
+    {
+      symbolt &stub = symbol_table.get_writeable_ref(function_name);
+      source_locationt location = stub.location;
+      // a nil location would be replaced when the properties are labelled
+      if(location.is_nil())
+        location = source_locationt{};
+      location.set_function(function_name);
+
+      code_assertt not_modelled_assert{false_exprt{}};
+      not_modelled_assert.add_source_location() = location;
+      not_modelled_assert.add_source_location().set_comment(
+        "not modelled: " + id2string(function_name));
+      not_modelled_assert.add_source_location().set_property_class(
+        "not-modelled");
+
+      code_assumet not_modelled_assume{false_exprt{}};
+      not_modelled_assume.add_source_location() = location;
+
+      stub.value = code_blockt(
+        {not_modelled_assert, not_modelled_assume, to_code(stub.value)});
+    }
 
     goto_convert_functionst converter(symbol_table, ui_message_handler);
     converter.convert_function(function_name, function);

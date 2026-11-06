@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JBMC_JBMC_PARSE_OPTIONS_H
 #define CPROVER_JBMC_JBMC_PARSE_OPTIONS_H
 
+#include <optional>
+#include <regex>
 #include <util/parse_options.h>
 #include <util/timestamper.h>
 #include <util/ui_message.h>
@@ -113,6 +115,12 @@ public:
 
   bool can_generate_function_body(const irep_idt &name);
 
+  /// Whether the function is a method without code of a class that is not
+  /// modelled, see not_modelled_stubs.
+  bool is_not_modelled_stub(
+    const irep_idt &function_name,
+    const symbol_table_baset &symbol_table) const;
+
   bool generate_function_body(
     const irep_idt &function_name,
     symbol_table_baset &symbol_table,
@@ -122,6 +130,10 @@ public:
 protected:
   java_object_factory_parameterst object_factory_params;
   bool stub_objects_are_not_null;
+
+  /// Class files (as in --java-cp-include-files) whose methods without code are
+  /// not modelled, see --java-not-modelled-stubs.
+  std::optional<std::regex> not_modelled_stubs;
 
   std::unique_ptr<class_hierarchyt> class_hierarchy;
 

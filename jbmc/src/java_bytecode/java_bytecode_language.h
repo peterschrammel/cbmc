@@ -42,6 +42,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(max-nondet-tree-depth):" \
   "(java-max-vla-length):" \
   "(java-cp-include-files):" \
+  "(java-not-modelled-stubs):" \
   "(ignore-manifest-main-class)" \
   "(context-include):" \
   "(context-exclude):" \
@@ -85,6 +86,10 @@ Author: Daniel Kroening, kroening@kroening.com
   "limit the length of user-code-created arrays\n" \
   " {y--java-cp-include-files} {ur} \t " \
   "regexp or JSON list of files to load (with '@' prefix)\n" \
+  " {y--java-not-modelled-stubs} {ur} \t " \
+  "regexp of the class files whose methods that have no code are not modelled: " \
+  "a call is a failing property of its own kind instead of returning a " \
+  "nondeterministic value\n" \
   " {y--java-load-class} {uCLASS} \t also load code from class {uCLASS}\n" \
   " {y--java-no-load-class} {uCLASS} \t never load code from class " \
   "{uCLASS}\n" \
