@@ -697,6 +697,33 @@ void jbmc_parse_optionst::process_goto_function(
   bool using_symex_driven_loading =
     options.get_bool_option("symex-driven-lazy-loading");
 
+  // The static initializer of a class that is not modelled does not initialize
+  // its static fields: the execution fails like for the other methods of the
+  // class, with a property that is not an assertion of the program.
+  {
+    const symbolt &function_symbol =
+      symbol_table.lookup_ref(function.get_function_id());
+    if(
+      function_symbol.base_name == "clinit():V" &&
+      goto_function.body_available() &&
+      is_not_modelled_stub(function.get_function_id(), symbol_table))
+    {
+      source_locationt location;
+      location.set_function(function.get_function_id());
+      source_locationt assert_location = location;
+      assert_location.set_comment(
+        "not modelled: " + id2string(function.get_function_id()));
+      assert_location.set_property_class("not-modelled");
+
+      goto_programt not_modelled;
+      not_modelled.add(
+        goto_programt::make_assertion(false_exprt{}, assert_location));
+      not_modelled.add(goto_programt::make_assumption(false_exprt{}, location));
+      goto_function.body.destructive_insert(
+        goto_function.body.instructions.begin(), not_modelled);
+    }
+  }
+
   // Removal of RTTI inspection:
   remove_instanceof(
     function.get_function_id(),
