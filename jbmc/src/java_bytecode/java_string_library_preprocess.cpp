@@ -1786,9 +1786,8 @@ void java_string_library_preprocesst::initialize_conversion_table()
     ["java::java.lang.StringBuilder.appendCodePoint:(I)"
      "Ljava/lang/StringBuilder;"]=
       ID_cprover_string_concat_code_point_func;
-  cprover_equivalent_to_java_function
-    ["java::java.lang.StringBuilder.charAt:(I)C"]=
-      ID_cprover_string_char_at_func;
+  // StringBuilder.charAt is defined by the models: unlike the string
+  // function, it raises a StringIndexOutOfBoundsException.
   cprover_equivalent_to_java_function
     ["java::java.lang.StringBuilder.codePointAt:(I)I"]=
       ID_cprover_string_code_point_at_func;
