@@ -118,8 +118,14 @@ static std::string creation_time()
 ///   `org.sosy_lab.sv_benchmarks.Verifier` that return nondeterministic values
 static bool is_java_nondet_function(const irep_idt &function)
 {
+  // The factory of nondetObject calls the other nondet methods itself: the
+  // values of these calls are part of the witness.
   return has_prefix(
-    id2string(function), "java::org.sosy_lab.sv_benchmarks.Verifier.nondet");
+           id2string(function),
+           "java::org.sosy_lab.sv_benchmarks.Verifier.nondet") &&
+         !has_prefix(
+           id2string(function),
+           "java::org.sosy_lab.sv_benchmarks.Verifier.nondetObject");
 }
 
 yaml_violation_witnesst::yaml_violation_witnesst(const namespacet &ns)
