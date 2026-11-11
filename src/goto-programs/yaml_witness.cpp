@@ -12,12 +12,15 @@ Author: Peter Schrammel
 
 #include "yaml_witness.h"
 
+#include <util/arith_tools.h>
 #include <util/cmdline.h>
 #include <util/config.h>
+#include <util/bitvector_types.h>
 #include <util/ieee_float.h>
 #include <util/namespace.h>
 #include <util/options.h>
 #include <util/prefix.h>
+#include <util/pointer_expr.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
 #include <util/version.h>
@@ -30,6 +33,7 @@ Author: Peter Schrammel
 #include "goto_trace.h"
 
 #include <ctime>
+#include <algorithm>
 #include <iomanip>
 #include <ostream>
 #include <random>
@@ -164,12 +168,23 @@ static std::optional<std::string> value_to_string(
     return {};
 
   const irep_idt &type_id = value.type().id();
+  const bool java = get_mode_from_identifier(ns, function_id) != ID_C;
   if(type_id == ID_floatbv)
   {
     // print with enough digits to recover the exact value
     const ieee_float_valuet f(to_constant_expr(value));
-    if(f.is_NaN() || f.is_infinity() || (!f.is_float() && !f.is_double()))
+    if(!f.is_float() && !f.is_double())
       return {};
+    if(f.is_NaN() || f.is_infinity())
+    {
+      // only Java has names for them
+      if(!java)
+        return {};
+      const std::string type = f.is_float() ? "Float" : "Double";
+      if(f.is_NaN())
+        return type + ".NaN";
+      return type + (f.get_sign() ? ".NEGATIVE_INFINITY" : ".POSITIVE_INFINITY");
+    }
     std::ostringstream result;
     if(f.is_float())
       result << std::setprecision(9) << f.to_float();
@@ -187,10 +202,108 @@ static std::optional<std::string> value_to_string(
     return {};
   }
 
-  if(get_mode_from_identifier(ns, function_id) == ID_C)
+  if(!java)
     return expr2c(value, ns, expr2c_configurationt::clean_configuration);
-  else
-    return from_expr(ns, function_id, value);
+
+  // The values of the types byte and short are given as integers: a cast
+  // like (byte)0 is not understood by the validators of the witnesses.
+  const typet &type = value.type();
+  if(
+    type_id == ID_signedbv &&
+    (to_bitvector_type(type).get_width() == 8 ||
+     to_bitvector_type(type).get_width() == 16))
+  {
+    const auto integer = numeric_cast<mp_integer>(value);
+    if(integer.has_value())
+      return integer2string(*integer);
+  }
+
+  return from_expr(ns, function_id, value);
+}
+
+/// \return the name of the object, field or element given by \p expr, if it
+///   is made of symbols, members and elements at constant positions
+static std::string lvalue_key(const exprt &expr)
+{
+  if(expr.id() == ID_symbol)
+    return id2string(to_symbol_expr(expr).get_identifier());
+  if(expr.id() == ID_member)
+  {
+    const std::string base = lvalue_key(to_member_expr(expr).struct_op());
+    if(base.empty())
+      return "";
+    return base + "." + id2string(to_member_expr(expr).get_component_name());
+  }
+  if(expr.id() == ID_index)
+  {
+    const std::string base = lvalue_key(to_index_expr(expr).array());
+    const auto position = numeric_cast<mp_integer>(to_index_expr(expr).index());
+    if(base.empty() || !position.has_value())
+      return "";
+    return base + "[" + integer2string(*position) + "]";
+  }
+  return "";
+}
+
+/// \return the name of the object that \p expr points to or is a part of
+static std::string root_object(const exprt &expr)
+{
+  const exprt *current = &expr;
+  while(true)
+  {
+    if(current->id() == ID_symbol)
+      return id2string(to_symbol_expr(*current).get_identifier());
+    else if(current->id() == ID_address_of)
+      current = &to_address_of_expr(*current).object();
+    else if(current->id() == ID_member)
+      current = &to_member_expr(*current).struct_op();
+    else if(current->id() == ID_index)
+      current = &to_index_expr(*current).array();
+    else if(current->id() == ID_typecast)
+      current = &to_typecast_expr(*current).op();
+    else if(current->id() == ID_annotated_pointer_constant)
+      current = &current->operands().front();
+    else
+      return "";
+  }
+}
+
+/// \return \p chars as a Java string literal
+static std::string java_string_literal(const std::vector<unsigned> &chars)
+{
+  std::ostringstream result;
+  result << '"';
+  for(const unsigned c : chars)
+  {
+    switch(c)
+    {
+    case '"':
+      result << "\\\"";
+      break;
+    case '\\':
+      result << "\\\\";
+      break;
+    case '\n':
+      result << "\\n";
+      break;
+    case '\t':
+      result << "\\t";
+      break;
+    case '\r':
+      result << "\\r";
+      break;
+    default:
+      if(c >= 0x20 && c < 0x7f)
+        result << static_cast<char>(c);
+      else
+      {
+        result << "\\u" << std::hex << std::setw(4) << std::setfill('0') << c
+               << std::dec;
+      }
+    }
+  }
+  result << '"';
+  return result.str();
 }
 
 void yaml_violation_witnesst::add_function_return(
@@ -202,12 +315,22 @@ void yaml_violation_witnesst::add_function_return(
     return;
 
   const auto value_string = value_to_string(ns, function_id, value);
+
+  // An object, such as a string, is described when the trace is complete.
+  std::string object;
   if(!value_string.has_value())
-    return;
+  {
+    if(!is_java || value.type().id() != ID_pointer)
+      return;
+    object = root_object(value);
+    if(object.empty())
+      return;
+  }
 
   waypointt waypoint;
   waypoint.type = "function_return";
-  waypoint.constraint_value = "\\result == " + *value_string;
+  if(value_string.has_value())
+    waypoint.constraint_value = "\\result == " + *value_string;
   waypoint.constraint_format =
     is_java ? "ext_java_expression" : "acsl_expression";
   waypoint.file_name = id2string(call_location.get_file());
@@ -215,6 +338,60 @@ void yaml_violation_witnesst::add_function_return(
   if(!is_java)
     waypoint.function = id2string(call_location.get_function());
   waypoints.push_back(waypoint);
+  if(!object.empty())
+    pending_objects.emplace_back(waypoints.size() - 1, object);
+}
+
+void yaml_violation_witnesst::resolve_pending_objects()
+{
+  for(const auto &pending : pending_objects)
+  {
+    waypointt &waypoint = waypoints[pending.first];
+    const std::string &object = pending.second;
+
+    // the object is a string if it has a length and an array of characters
+    const auto length_it = assigned_values.find(object + ".length");
+    const auto data_it = assigned_values.find(object + ".data");
+    if(length_it == assigned_values.end() || data_it == assigned_values.end())
+    {
+      waypoint.type.clear();
+      continue;
+    }
+    const auto length = numeric_cast<mp_integer>(length_it->second);
+    const auto characters = assigned_values.find(root_object(data_it->second));
+    if(
+      !length.has_value() || characters == assigned_values.end() ||
+      characters->second.id() != ID_array ||
+      characters->second.operands().size() < *length)
+    {
+      waypoint.type.clear();
+      continue;
+    }
+
+    std::vector<unsigned> chars;
+    bool complete = true;
+    for(std::size_t i = 0; complete && i < *length; ++i)
+    {
+      const auto c = numeric_cast<mp_integer>(characters->second.operands()[i]);
+      complete = c.has_value();
+      if(complete)
+        chars.push_back(static_cast<unsigned>(c->to_ulong()));
+    }
+    if(!complete)
+    {
+      waypoint.type.clear();
+      continue;
+    }
+    waypoint.constraint_value = "\\result.equals(" + java_string_literal(chars) + ")";
+  }
+  pending_objects.clear();
+
+  waypoints.erase(
+    std::remove_if(
+      waypoints.begin(),
+      waypoints.end(),
+      [](const waypointt &waypoint) { return waypoint.type.empty(); }),
+    waypoints.end());
 }
 
 void yaml_violation_witnesst::add_target(
@@ -312,6 +489,13 @@ void yaml_violation_witnesst::operator()(const goto_tracet &goto_trace)
       break;
 
     case goto_trace_stept::typet::ASSIGNMENT:
+      if(is_java)
+      {
+        const std::string key = lvalue_key(step.full_lhs);
+        if(!key.empty())
+          assigned_values.insert_or_assign(key, step.full_lhs_value);
+      }
+
       if(step.thread_nr != 0)
         break;
 
@@ -362,6 +546,7 @@ void yaml_violation_witnesst::operator()(const goto_tracet &goto_trace)
       if(!step.cond_value)
       {
         add_target(step, call_stack, last_program_location);
+        resolve_pending_objects();
         return;
       }
       break;
@@ -384,6 +569,8 @@ void yaml_violation_witnesst::operator()(const goto_tracet &goto_trace)
       break;
     }
   }
+
+  resolve_pending_objects();
 }
 
 void yaml_violation_witnesst::output(std::ostream &out) const

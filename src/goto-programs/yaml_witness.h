@@ -13,10 +13,13 @@ Author: Peter Schrammel
 #ifndef CPROVER_GOTO_PROGRAMS_YAML_WITNESS_H
 #define CPROVER_GOTO_PROGRAMS_YAML_WITNESS_H
 
+#include <util/expr.h>
 #include <util/irep.h>
 
 #include <iosfwd>
+#include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 class cmdlinet;
@@ -68,6 +71,17 @@ protected:
   const namespacet &ns;
   bool is_java;
   std::vector<waypointt> waypoints;
+
+  /// The values assigned to the objects (Java only), by the name of the
+  /// object, field or element: the contents of the strings that are
+  /// returned by nondeterministic methods are found here
+  std::map<std::string, exprt> assigned_values;
+  /// The waypoints (given by their index) for the nondeterministic methods
+  /// that return an object, with the name of the object. The constraint is
+  /// the content of the string, if the object is one.
+  std::vector<std::pair<std::size_t, std::string>> pending_objects;
+
+  void resolve_pending_objects();
 
   bool is_program_location(const source_locationt &) const;
 
